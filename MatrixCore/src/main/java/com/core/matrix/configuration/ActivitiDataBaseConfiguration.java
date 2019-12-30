@@ -12,11 +12,16 @@ import java.util.HashMap;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.sql.DataSource;
+import org.activiti.engine.IdentityService;
+import org.activiti.engine.ProcessEngine;
+import org.activiti.engine.ProcessEngineConfiguration;
+import org.activiti.engine.impl.cfg.StandaloneProcessEngineConfiguration;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.EnvironmentAware;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Primary;
+import org.springframework.context.annotation.Scope;
 import org.springframework.core.env.Environment;
 import org.springframework.orm.jpa.JpaTransactionManager;
 import org.springframework.orm.jpa.LocalContainerEntityManagerFactoryBean;
@@ -29,13 +34,12 @@ import org.springframework.transaction.PlatformTransactionManager;
  */
 @Configuration
 public class ActivitiDataBaseConfiguration implements EnvironmentAware {
-    
-     @Autowired
+
+    @Autowired
     private ActivitiProperties activitiProperties;
 
     private Environment environment;
-    
-    
+
     @org.springframework.beans.factory.annotation.Value("${spring.profiles.active}")
     private String activeProfile;
 
@@ -51,7 +55,7 @@ public class ActivitiDataBaseConfiguration implements EnvironmentAware {
                 = new LocalContainerEntityManagerFactoryBean();
         em.setDataSource(dataSource());
         em.setPackagesToScan(
-                new String[]{"com.core.matrix.workflow.model","com.core.matrix.workflow.repository"});
+                new String[]{"com.core.matrix.workflow.model", "com.core.matrix.workflow.repository"});
 
         HibernateJpaVendorAdapter vendorAdapter = new HibernateJpaVendorAdapter();
         em.setJpaVendorAdapter(vendorAdapter);
@@ -84,8 +88,8 @@ public class ActivitiDataBaseConfiguration implements EnvironmentAware {
         hikariConfig.setConnectionTestQuery(activitiProperties.getDatasource().getSqlserver().getConnectionTestQuery());
 
         dataSource = new HikariDataSource(hikariConfig);
-        
-        Logger.getLogger(ActivitiDataBaseConfiguration.class.getName()).log(Level.INFO, "Profile -> " + activeProfile );
+
+        Logger.getLogger(ActivitiDataBaseConfiguration.class.getName()).log(Level.INFO, "Profile -> " + activeProfile);
 
         return dataSource;
     }
@@ -100,6 +104,27 @@ public class ActivitiDataBaseConfiguration implements EnvironmentAware {
                 entityManagerFactory().getObject());
         return transactionManager;
     }
-    
-    
+
+    @Bean
+    @Scope(value = "singleton")
+    public ProcessEngine processEngine() {
+
+        ProcessEngineConfiguration s = new StandaloneProcessEngineConfiguration()
+                .setCustomSessionFactories(null)
+                .setDatabaseSchemaUpdate(ProcessEngineConfiguration.DB_SCHEMA_UPDATE_FALSE)
+                // .setAsyncExecutorEnabled(true)
+                .setAsyncExecutorActivate(true)
+                .setDataSource(this.dataSource())
+                .setAsyncFailedJobWaitTime(2147483647)
+                .setDefaultFailedJobWaitTime(2147483647);
+
+        return s.buildProcessEngine();
+
+    }
+
+    @Bean
+    public IdentityService getId() {
+        return this.processEngine().getIdentityService();
+    }
+
 }

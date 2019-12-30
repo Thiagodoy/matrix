@@ -5,7 +5,7 @@
  */
 package com.core.matrix.utils;
 
-import com.core.matrix.workflow.model.User;
+import com.core.matrix.workflow.model.UserActiviti;
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.SignatureAlgorithm;

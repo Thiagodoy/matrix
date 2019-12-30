@@ -14,6 +14,7 @@ import javax.persistence.Id;
 import javax.persistence.OneToMany;
 import javax.persistence.Table;
 import lombok.Data;
+import org.activiti.engine.identity.User;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 
@@ -28,7 +29,7 @@ import org.springframework.security.core.userdetails.UserDetails;
 @Entity
 @Table(schema = "activiti", name = "act_id_user")
 @Data
-public class User implements UserDetails{
+public class UserActiviti implements UserDetails, User{
 
     @Id
     @Column(name = "ID_")
@@ -66,7 +67,7 @@ public class User implements UserDetails{
     @OneToMany(cascade = CascadeType.ALL, orphanRemoval = true, mappedBy = "userId", fetch = FetchType.EAGER)
     private List<UserInfo> info;   
 
-    public User() {
+    public UserActiviti() {
     }
 
     @Override
@@ -98,8 +99,11 @@ public class User implements UserDetails{
     @Override
     public boolean isEnabled() {
         return true;
-    }
+    } 
 
-  
+    @Override
+    public boolean isPictureSet() {
+        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+    }
 
 }

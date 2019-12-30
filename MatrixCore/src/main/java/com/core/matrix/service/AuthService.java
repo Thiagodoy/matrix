@@ -6,7 +6,7 @@
 package com.core.matrix.service;
 
 import com.core.matrix.request.AuthRequest;
-import com.core.matrix.workflow.model.User;
+import com.core.matrix.workflow.model.UserActiviti;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Service;
