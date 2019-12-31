@@ -74,7 +74,7 @@ public class UserActiviti implements UserDetails, User{
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
         //FIXME Corrigir 
-        return Arrays.asList(new Authority());
+        return Arrays.asList(new AbilityActiviti());
     }
 
     @Override
