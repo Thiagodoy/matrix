@@ -21,7 +21,7 @@ import lombok.NoArgsConstructor;
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
-public class Group {
+public class GroupActiviti {
 
     @Id
     @Column(name = "ID_")

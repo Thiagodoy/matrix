@@ -5,6 +5,7 @@ import java.util.Arrays;
 import java.util.Collection;
 
 import java.util.List;
+import java.util.Optional;
 import java.util.Set;
 import javax.persistence.CascadeType;
 import javax.persistence.Column;
@@ -62,10 +63,10 @@ public class UserActiviti implements UserDetails, User{
 //    private LocalDateTime createdAt;
 
     @OneToMany(cascade = CascadeType.ALL, orphanRemoval = true, mappedBy = "userId", fetch = FetchType.EAGER)
-    private Set<GroupMember> groups;
+    private Set<GroupMemberActiviti> groups;
 
     @OneToMany(cascade = CascadeType.ALL, orphanRemoval = true, mappedBy = "userId", fetch = FetchType.EAGER)
-    private List<UserInfo> info;   
+    private List<UserInfoActiviti> info;   
 
     public UserActiviti() {
     }
@@ -103,7 +104,7 @@ public class UserActiviti implements UserDetails, User{
 
     @Override
     public boolean isPictureSet() {
-        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+       return Optional.ofNullable(this.picture).isPresent();
     }
 
 }

@@ -22,8 +22,8 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 @Entity
 @Table(schema = "activiti", name = "act_id_membership")
-@IdClass(GroupMember.IdClass.class)
-public class GroupMember implements Serializable {
+@IdClass(GroupMemberActiviti.IdClass.class)
+public class GroupMemberActiviti implements Serializable {
     
     @Id
     @Column(name = "USER_ID_")

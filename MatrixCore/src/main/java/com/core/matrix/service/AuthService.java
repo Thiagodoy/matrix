@@ -5,14 +5,12 @@
  */
 package com.core.matrix.service;
 
-import com.core.matrix.request.AuthRequest;
-import com.core.matrix.workflow.model.UserActiviti;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Service;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
-import com.core.matrix.workflow.repository.UserRRepository;
+import com.core.matrix.workflow.repository.UserRepository;
 
 /**
  *
@@ -23,16 +21,10 @@ public class AuthService implements UserDetailsService {
     
     
     @Autowired(required = true)
-    private UserRRepository repository;
-    
-    
-    public void auth(AuthRequest request){
-        
-    }   
-   
+    private UserRepository repository;
 
     @Override
-    public UserDetails loadUserByUsername(String string) throws UsernameNotFoundException {        
+    public UserDetails loadUserByUsername(String string) throws UsernameNotFoundException { 
         return  this.repository.findById(string).orElseThrow(()-> new UsernameNotFoundException("User not found!") );
     }
 
