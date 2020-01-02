@@ -1,9 +1,12 @@
 package com.core.matrix.workflow.model;
 
 
+import java.util.List;
+import javax.persistence.CascadeType;
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.Id;
+import javax.persistence.OneToMany;
 import javax.persistence.Table;
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -21,7 +24,7 @@ import lombok.NoArgsConstructor;
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
-public class Group {
+public class GroupActiviti {
 
     @Id
     @Column(name = "ID_")
@@ -35,6 +38,9 @@ public class Group {
     
     @Column(name = "TYPE_")
     private String type;
+    
+    @OneToMany(mappedBy = "groupId", cascade = CascadeType.ALL)
+    private List<AbilityActiviti> abilitys;
     
    
             

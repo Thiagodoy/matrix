@@ -1,5 +1,6 @@
 package com.core.matrix.workflow.model;
 
+import java.util.Optional;
 import javax.annotation.PostConstruct;
 import javax.persistence.Column;
 import javax.persistence.Entity;
@@ -21,7 +22,7 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 @AllArgsConstructor
 @EqualsAndHashCode(of = {"userId", "key", "value"})
-public class UserInfo {
+public class UserInfoActiviti {
 
     @Id
     @Column(name = "ID_")
@@ -42,19 +43,20 @@ public class UserInfo {
     @Column(name = "VALUE_")
     private String value;
 
-    public UserInfo(String userId, String key, String value) {
+    public UserInfoActiviti(String userId, String key, String value) {
         this.rev = 1;
         this.type = "userinfo";
         this.key = key;
         this.value = value;
         this.userId = userId;
-        this.id = String.valueOf(hashCode());
-
     }
 
     @PostConstruct
     @PrePersist
-    public void setIdG() {
-        this.id = String.valueOf(hashCode());
+    public void generateId() {
+        
+        if(!Optional.ofNullable(this.id).isPresent()){
+            this.id = String.valueOf(hashCode());
+        }
     }
 }

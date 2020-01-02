@@ -123,8 +123,10 @@ public class ActivitiDataBaseConfiguration implements EnvironmentAware {
     }
 
     @Bean
-    public IdentityService getId() {
+    public IdentityService identityService() {
         return this.processEngine().getIdentityService();
     }
 
+    
+    
 }

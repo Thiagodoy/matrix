@@ -34,10 +34,10 @@ public class AuthResource {
 
     @Autowired
     private AuthenticationManager authenticationManager;
-    
+
     @Autowired
     private JwtTokenUtil jwtTokenUtil;
-    
+
     @Autowired
     private AuthService authService;
 
@@ -46,18 +46,15 @@ public class AuthResource {
 
         try {
             authenticate(request.getUsername(), request.getPassword());
-            
-             final UserDetails userDetails = authService
-                .loadUserByUsername(request.getUsername());
-        final String token = jwtTokenUtil.generateToken(userDetails);
-        return ResponseEntity.ok(new AuthResponse(token,userDetails));
-        
-            
+            final UserDetails userDetails = authService
+                    .loadUserByUsername(request.getUsername());
+            final String token = jwtTokenUtil.generateToken(userDetails);
+            return ResponseEntity.ok(new AuthResponse(token, userDetails));
+
         } catch (Exception ex) {
             Logger.getLogger(AuthResource.class.getName()).log(Level.SEVERE, null, ex);
             return ResponseEntity.status(HttpStatus.resolve(500)).body(ex.getMessage());
         }
-       
 
     }
 

@@ -5,6 +5,7 @@ import java.util.Arrays;
 import java.util.Collection;
 
 import java.util.List;
+import java.util.Optional;
 import java.util.Set;
 import javax.persistence.CascadeType;
 import javax.persistence.Column;
@@ -62,10 +63,10 @@ public class UserActiviti implements UserDetails, User{
 //    private LocalDateTime createdAt;
 
     @OneToMany(cascade = CascadeType.ALL, orphanRemoval = true, mappedBy = "userId", fetch = FetchType.EAGER)
-    private Set<GroupMember> groups;
+    private Set<GroupMemberActiviti> groups;
 
     @OneToMany(cascade = CascadeType.ALL, orphanRemoval = true, mappedBy = "userId", fetch = FetchType.EAGER)
-    private List<UserInfo> info;   
+    private List<UserInfoActiviti> info;   
 
     public UserActiviti() {
     }
@@ -73,7 +74,7 @@ public class UserActiviti implements UserDetails, User{
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
         //FIXME Corrigir 
-        return Arrays.asList(new Authority());
+        return Arrays.asList(new AbilityActiviti());
     }
 
     @Override
@@ -103,7 +104,11 @@ public class UserActiviti implements UserDetails, User{
 
     @Override
     public boolean isPictureSet() {
+<<<<<<< HEAD
         return false;
+=======
+       return Optional.ofNullable(this.picture).isPresent();
+>>>>>>> 28cff44f443282650dc72b7e4bbbc7c6bcda2e42
     }
 
 }

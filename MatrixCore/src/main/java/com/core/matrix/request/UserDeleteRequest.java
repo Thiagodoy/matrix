@@ -3,17 +3,18 @@
  * To change this template file, choose Tools | Templates
  * and open the template in the editor.
  */
-package com.core.matrix.configuration;
+package com.core.matrix.request;
 
-import org.springframework.context.annotation.Configuration;
+import lombok.Data;
 
 /**
  *
  * @author thiag
  */
-
-public class ActivitiCoreConfiguration {
-
-
-
+@Data
+public class UserDeleteRequest {
+ 
+    private String email;
+    
+    
 }
