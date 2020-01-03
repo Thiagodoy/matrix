@@ -57,7 +57,7 @@ public class UserResource {
             return ResponseEntity.ok().build();
 
         } catch (Exception e) {
-            Logger.getLogger(UserResource.class.getName()).log(Level.SEVERE, "[post]", e.getMessage());
+            Logger.getLogger(UserResource.class.getName()).log(Level.SEVERE, "[post]", e);
             return ResponseEntity.status(HttpStatus.resolve(500)).build();
         }
     }
