@@ -13,8 +13,12 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.sql.DataSource;
 import org.activiti.engine.IdentityService;
+import org.activiti.engine.ManagementService;
 import org.activiti.engine.ProcessEngine;
 import org.activiti.engine.ProcessEngineConfiguration;
+import org.activiti.engine.RepositoryService;
+import org.activiti.engine.RuntimeService;
+import org.activiti.engine.TaskService;
 import org.activiti.engine.impl.cfg.StandaloneProcessEngineConfiguration;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.EnvironmentAware;
@@ -33,7 +37,7 @@ import org.springframework.transaction.PlatformTransactionManager;
  * @author thiag
  */
 @Configuration
-public class ActivitiDataBaseConfiguration implements EnvironmentAware {
+public class ActivitiCoreConfiguration implements EnvironmentAware {
 
     @Autowired
     private ActivitiProperties activitiProperties;
@@ -89,7 +93,7 @@ public class ActivitiDataBaseConfiguration implements EnvironmentAware {
 
         dataSource = new HikariDataSource(hikariConfig);
 
-        Logger.getLogger(ActivitiDataBaseConfiguration.class.getName()).log(Level.INFO, "Profile -> " + activeProfile);
+        Logger.getLogger(ActivitiCoreConfiguration.class.getName()).log(Level.INFO, "Profile -> " + activeProfile);
 
         return dataSource;
     }
@@ -125,6 +129,26 @@ public class ActivitiDataBaseConfiguration implements EnvironmentAware {
     @Bean
     public IdentityService identityService() {
         return this.processEngine().getIdentityService();
+    }
+    
+    @Bean
+    public RuntimeService runtimeService() {
+        return this.processEngine().getRuntimeService();
+    }
+    
+    @Bean
+    public RepositoryService repositoryService() {
+        return this.processEngine().getRepositoryService();
+    }
+    
+    @Bean
+    public TaskService taskService() {
+        return this.processEngine().getTaskService();
+    }
+    
+    @Bean
+    public ManagementService managementService() {
+        return this.processEngine().getManagementService();
     }
 
     

@@ -5,6 +5,7 @@
  */
 package com.core.matrix.resource;
 
+import java.security.Principal;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
@@ -19,8 +20,16 @@ import org.springframework.web.bind.annotation.RestController;
 public class HelloResource {
     
     
+    
+    
+    
     @RequestMapping(method = RequestMethod.GET)
-    public ResponseEntity get(){
-        return ResponseEntity.ok("Hello");
+    public ResponseEntity get(Principal principal){
+        
+        return ResponseEntity.ok("Hello and user connected ->" + principal.getName() );
     }
+    
+    
+    
+    
 }
