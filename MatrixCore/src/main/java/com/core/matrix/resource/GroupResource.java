@@ -6,7 +6,7 @@
 package com.core.matrix.resource;
 
 import com.core.matrix.workflow.model.GroupActiviti;
-import com.core.matrix.workflow.service.GroupService;
+import com.core.matrix.workflow.service.GroupActivitiService;
 import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -28,7 +28,7 @@ import org.springframework.web.bind.annotation.RestController;
 public class GroupResource {
 
     @Autowired
-    private GroupService service;
+    private GroupActivitiService service;
 
     
     @RequestMapping(method = RequestMethod.GET)

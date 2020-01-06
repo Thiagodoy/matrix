@@ -8,13 +8,8 @@ import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 class MatrixApplicationTests {
 
 	@Test
-	void contextLoads() {
-            
+	void contextLoads() {            
             System.out.println("password-> " + new BCryptPasswordEncoder().encode("123456"));
-            
-            
-            
-            
-	}
+	} 
 
 }

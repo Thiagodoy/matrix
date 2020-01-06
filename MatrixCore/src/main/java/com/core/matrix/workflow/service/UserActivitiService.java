@@ -11,7 +11,6 @@ import com.core.matrix.workflow.model.UserActiviti;
 import com.core.matrix.workflow.repository.UserRepository;
 import com.core.matrix.workflow.specification.UserActivitiSpecification;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -25,7 +24,7 @@ import org.springframework.stereotype.Service;
  * @author thiag
  */
 @Service
-public class UserService {
+public class UserActivitiService {
     
     @Autowired
     private UserRepository repository;

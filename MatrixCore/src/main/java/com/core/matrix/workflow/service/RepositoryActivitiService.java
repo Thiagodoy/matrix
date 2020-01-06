@@ -6,6 +6,7 @@
 package com.core.matrix.workflow.service;
 
 import com.core.matrix.response.ProcessDefinitionResponse;
+import java.io.IOException;
 import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.List;
@@ -16,6 +17,7 @@ import org.activiti.engine.RuntimeService;
 import org.activiti.engine.impl.RepositoryServiceImpl;
 import org.activiti.engine.impl.persistence.entity.ProcessDefinitionEntity;
 import org.activiti.engine.repository.Deployment;
+import org.activiti.engine.repository.ProcessDefinition;
 import org.activiti.image.ProcessDiagramGenerator;
 import org.activiti.image.impl.DefaultProcessDiagramGenerator;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -38,8 +40,9 @@ public class RepositoryActivitiService {
         return this.repositoryService.createDeploymentQuery().deploymentId(deploymentId).singleResult();
     }
 
-    public void upload(String fileName, InputStream content) {
+    public void upload(String fileName, InputStream content) throws IOException {
         this.repositoryService.createDeployment().addInputStream(fileName, content).name(fileName).deploy();
+        content.close();
     }
 
     public void activateProcessDefinition(String processDefinitionId) {
@@ -55,7 +58,7 @@ public class RepositoryActivitiService {
     }
 
     public List<ProcessDefinitionResponse> listAll() {
-        return  this.repositoryService
+        return this.repositoryService
                 .createProcessDefinitionQuery()
                 .latestVersion()
                 .list()
@@ -67,15 +70,31 @@ public class RepositoryActivitiService {
 
     public InputStream generateProcessDiagram(String processDefinitionId, String processInstanceId) {
 
-        ProcessDiagramGenerator pdg = new DefaultProcessDiagramGenerator();
-        ProcessDefinitionEntity processDefinition = (ProcessDefinitionEntity) ((RepositoryServiceImpl) this.repositoryService).getDeployedProcessDefinition(processDefinitionId);
-        BpmnModel bpmnModel = this.repositoryService.getBpmnModel(processDefinitionId);
+        if (processDefinitionId != null && processInstanceId == null) {
 
-        if (processDefinition != null && processDefinition.isGraphicalNotationDefined() && processInstanceId != null) {
-            return pdg.generateDiagram(bpmnModel, "jpeg", this.runtimeService.getActiveActivityIds(processInstanceId));
+            ProcessDefinition processDefinition = this.repositoryService
+                    .createProcessDefinitionQuery()
+                    .processDefinitionId(processDefinitionId)
+                    .singleResult();
+            
+            String diagramResourceName = processDefinition.getDiagramResourceName();
+            
+            return this.repositoryService.getResourceAsStream(processDefinition.getDeploymentId(), diagramResourceName);
+
         } else {
-            return pdg.generateDiagram(bpmnModel, "jpeg", new ArrayList<String>() );
+
+            ProcessDiagramGenerator pdg = new DefaultProcessDiagramGenerator();
+            ProcessDefinitionEntity processDefinition = (ProcessDefinitionEntity) ((RepositoryServiceImpl) this.repositoryService).getDeployedProcessDefinition(processDefinitionId);
+            BpmnModel bpmnModel = this.repositoryService.getBpmnModel(processDefinitionId);
+
+            if (processDefinition != null && processDefinition.isGraphicalNotationDefined() && processInstanceId != null) {
+                return pdg.generateDiagram(bpmnModel, "jpeg", this.runtimeService.getActiveActivityIds(processInstanceId));
+            } else {
+                return null;
+            }
+
         }
+
     }
 
 }
