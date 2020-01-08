@@ -8,10 +8,14 @@ package com.core.matrix.workflow.service;
 import com.core.matrix.request.StartProcessRequest;
 import com.core.matrix.response.TaskResponse;
 import com.core.matrix.utils.Utils;
+import com.core.matrix.workflow.model.GroupMemberActiviti;
+import com.core.matrix.workflow.model.UserActiviti;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import java.util.stream.Collectors;
+import org.activiti.engine.ActivitiTaskAlreadyClaimedException;
 import org.activiti.engine.delegate.Expression;
 import org.activiti.engine.HistoryService;
 import org.activiti.engine.RepositoryService;
@@ -58,8 +62,11 @@ public class RuntimeActivitiService {
 
     @Autowired
     private RepositoryService repositoryService;
+    
+    @Autowired
+    private UserActivitiService userActivitiService;
 
-    public TaskResponse startProcess(StartProcessRequest request, String userId) {
+    public Optional<TaskResponse> startProcess(StartProcessRequest request, String userId) throws Exception {
 
         request.getVariables().put("created_by", userId);
         request.getVariables().put("created_at", Utils.dateTimeNowFormated());
@@ -68,7 +75,7 @@ public class RuntimeActivitiService {
 
         Task task = this.getNextUserTaskByProcessInstanceId(processInstance.getId(), userId, true);
 
-        return new TaskResponse(task, context);
+        return Optional.ofNullable(task).isPresent() ? Optional.of(new TaskResponse(task, context)) : Optional.empty();
 
     }
 
@@ -93,6 +100,45 @@ public class RuntimeActivitiService {
     public Map<String, Object> getVariables(String processInstanceId) {
         return runtimeService.getVariables(processInstanceId);
     }
+
+    public void assigneeTask(String taskId, String userId) {
+        
+        if (!Optional.ofNullable(userId).isPresent()) {
+            userId = null;
+        }
+
+        try {
+            taskService.claim(taskId, userId);
+        } catch (ActivitiTaskAlreadyClaimedException e) {
+            taskService.setAssignee(taskId, userId);
+        }
+
+    }
+
+    public List<TaskResponse> getGroupTasks(String userId) {
+
+        return taskService.createNativeTaskQuery().sql("SELECT \n"
+                + "    *\n"
+                + "FROM\n"
+                + "    ACT_RU_TASK t\n"
+                + "        INNER JOIN\n"
+                + "    ACT_RU_IDENTITYLINK i ON t.id_ = i.task_id_\n"
+                + "WHERE\n"
+                + "    assignee_ IS NULL\n"
+                + "        AND group_id_ IN (SELECT \n"
+                + "            a.GROUP_ID_\n"
+                + "        FROM\n"
+                + "            act_id_membership a\n"
+                + "                INNER JOIN\n"
+                + "            act_id_user b ON a.USER_ID_ = b.ID_ where  b.id_ = '" + userId + "')")
+                .list()
+                .stream()
+                .map((t) -> new TaskResponse(t, context))
+                .collect(Collectors.toList());
+
+    }
+    
+    
 
     public List<TaskResponse> getCandidateTasks(String user) {
         return taskService
@@ -132,8 +178,8 @@ public class RuntimeActivitiService {
 
     }
 
-    public TaskResponse completeTask(String userId, String processInstanceId, String taskId, Map<String, Object> vars) {
-        
+    public TaskResponse completeTask(String userId, String processInstanceId, String taskId, Map<String, Object> vars) throws Exception {
+
         Task currentTask = taskService.createTaskQuery().taskId(taskId).singleResult();
         boolean delegated = false;
         String owner = userId;
@@ -159,11 +205,39 @@ public class RuntimeActivitiService {
 
     }
 
-    public Task getNextUserTaskByProcessInstanceId(String processInstanceId, String userId, boolean assigneToUser) {
+    public Task getNextUserTaskByProcessInstanceId(String processInstanceId, String userId, boolean assigneToUser) throws Exception {
 
         List<Task> l = taskService.createTaskQuery().active().taskCandidateOrAssigned(userId).processInstanceId(processInstanceId).includeProcessVariables().includeTaskLocalVariables().list();
+        
+        
         if (l != null && !l.isEmpty()) {
             if (assigneToUser) {
+                taskService.claim(l.get(0).getId(), userId);
+            }
+
+            generateQuestionBar(l.get(0));
+            return l.get(0);
+        }
+        
+        
+        // Find by Group
+         GroupMemberActiviti group = userActivitiService
+                 .findById(userId)
+                 .getGroups()
+                 .stream()
+                 .findFirst()
+                 .orElseThrow(()-> new Exception("User not associate a group."));
+        
+        l = taskService.createTaskQuery().active().taskCandidateGroup(group.getGroupId())
+                .processInstanceId(processInstanceId)
+                .includeProcessVariables()
+                .includeTaskLocalVariables()
+                .list();
+        
+        
+        if (l != null && !l.isEmpty()) {
+            if (assigneToUser) {
+                l.get(0).setAssignee(userId);
                 taskService.claim(l.get(0).getId(), userId);
             }
 

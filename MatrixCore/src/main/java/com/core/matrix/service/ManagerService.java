@@ -27,8 +27,7 @@ public class ManagerService {
     
     
     @Autowired
-    private ManagerRepository repository;
-    
+    private ManagerRepository repository;   
     
     
     @Transactional
@@ -51,10 +50,11 @@ public class ManagerService {
             entity.setFancyName(request.getFancyName());
         }
         
-        if(Optional.ofNullable(request.getNickName()).isPresent() && !request.getFancyName().equals(entity.getFancyName())){
-            entity.setFancyName(request.getFancyName());
+        if(Optional.ofNullable(request.getNickName()).isPresent() && !request.getNickName().equals(entity.getNickName())){
+            entity.setNickName(request.getNickName());
         }
         
+        this.repository.save(entity);        
         
     }
     

@@ -12,6 +12,7 @@ import com.core.matrix.workflow.service.RuntimeActivitiService;
 import java.security.Principal;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -37,7 +38,7 @@ public class RunTimeResource {
     @RequestMapping(value = "/startProcess", method = RequestMethod.POST)
     public ResponseEntity startProcess(@RequestBody StartProcessRequest request, Principal principal) {
         try {
-            TaskResponse response = this.service.startProcess(request, principal.getName());
+            Optional<TaskResponse> response = this.service.startProcess(request, principal.getName());
             return ResponseEntity.ok(response);
         } catch (Exception e) {
             Logger.getLogger(RunTimeResource.class.getName()).log(Level.SEVERE, "[startProcess]", e);
@@ -56,6 +57,7 @@ public class RunTimeResource {
         }
     }
 
+    //TODO Create a pagination
     @RequestMapping(value = "/getCandidateTask", method = RequestMethod.GET)
     public ResponseEntity getCandidateTask(Principal principal) {
         try {
@@ -88,6 +90,24 @@ public class RunTimeResource {
             return ResponseEntity.status(HttpStatus.resolve(500)).body(e.getMessage());
         }
     }
+    
+    @RequestMapping(value = "/getGroupTasks", method = RequestMethod.GET)
+    public ResponseEntity getGroupTasks(Principal principal) {
+        try {
+            List<TaskResponse> response = this.service.getGroupTasks(principal.getName());
+            return ResponseEntity.ok(response);
+        } catch (Exception e) {
+            Logger.getLogger(RunTimeResource.class.getName()).log(Level.SEVERE, "[getGroupTasks]", e);
+            return ResponseEntity.status(HttpStatus.resolve(500)).body(e.getMessage());
+        }
+    }
+    
+    
+    
+    
+    
+    
+    
 
     @RequestMapping(value = "/variables", method = RequestMethod.GET)
     public ResponseEntity getVariables(@RequestParam(value = "type", required = true) String type,

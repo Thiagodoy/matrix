@@ -18,6 +18,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 /**
  *
@@ -29,15 +30,26 @@ public class UserActivitiService {
     @Autowired
     private UserRepository repository;
     
+    @Transactional
     public void save(UserActiviti user){        
         user.setPassword(Utils.encodePassword(user.getPassword()));        
         this.repository.save(user);
     }
     
+    @Transactional
     public void delete(UserDeleteRequest request){
         this.repository.deleteById(request.getEmail());
     }
     
+    
+    @Transactional(readOnly = true) 
+    public UserActiviti findById(String id) throws Exception{
+        return this.repository.
+                findById(id)
+                .orElseThrow(()-> new Exception("User not found."));
+    }
+    
+    @Transactional(readOnly = true)
     public Page<UserActiviti>  list(String firstName, String lastName, String email,  Pageable page){
          List<Specification<UserActiviti>> predicates = new ArrayList<>();
 
