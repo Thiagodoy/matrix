@@ -6,9 +6,8 @@
 package com.core.matrix.resource;
 
 import com.core.matrix.response.ProcessDefinitionResponse;
-import com.core.matrix.utils.Utils;
 import com.core.matrix.workflow.service.RepositoryActivitiService;
-import java.io.FileInputStream;
+
 import java.io.InputStream;
 import java.util.List;
 import java.util.logging.Level;
@@ -55,7 +54,7 @@ public class RepositoryResource {
             List<ProcessDefinitionResponse> response = this.repositoryActivitiService.listAll();
             return ResponseEntity.ok(response);
         } catch (Exception e) {
-            Logger.getLogger(RepositoryResource.class.getName()).log(Level.SEVERE, "[post]", e);
+            Logger.getLogger(RepositoryResource.class.getName()).log(Level.SEVERE, "[get]", e);
             return ResponseEntity.status(HttpStatus.resolve(500)).body(e.getMessage());
         }
     }
@@ -63,9 +62,7 @@ public class RepositoryResource {
     @RequestMapping(method = RequestMethod.POST)
     public ResponseEntity post(@RequestPart(value = "file") MultipartFile file) {
         try {
-
-            InputStream content = Utils.generateInpuStream(file);
-            this.repositoryActivitiService.upload(file.getOriginalFilename(), content);
+            this.repositoryActivitiService.upload(file.getOriginalFilename(), file.getInputStream());
             return ResponseEntity.ok().build();
         } catch (Exception e) {
             Logger.getLogger(RepositoryResource.class.getName()).log(Level.SEVERE, "[post]", e);
@@ -105,11 +102,12 @@ public class RepositoryResource {
             InputStream diagram = this.repositoryActivitiService.generateProcessDiagram(processDefinitionId, processDefinitionInstance);
             InputStreamResource inputStreamResource = new InputStreamResource(diagram);
             response.setContentLength((int)inputStreamResource.contentLength());
-            response.setHeader("Content-disposition", "attachment; filename= process.bpm");
+            response.setContentType("image/png");
+            response.setHeader("Content-disposition", "attachment; filename= diagram.png");
             return new ResponseEntity(inputStreamResource, HttpStatus.OK);
            
         } catch (Exception e) {
-            Logger.getLogger(RepositoryResource.class.getName()).log(Level.SEVERE, "[postSuspend]", e);
+            Logger.getLogger(RepositoryResource.class.getName()).log(Level.SEVERE, "[getDiagram]", e);
             return ResponseEntity.status(HttpStatus.resolve(500)).body(e.getMessage());
         }
     }

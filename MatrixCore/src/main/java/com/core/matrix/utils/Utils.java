@@ -11,6 +11,10 @@ import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.text.SimpleDateFormat;
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
+import java.util.Date;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Component;
 import org.springframework.web.multipart.MultipartFile;
@@ -23,13 +27,24 @@ import org.springframework.web.multipart.MultipartFile;
 public class Utils {
 
     private static BCryptPasswordEncoder bcpe;
-
+    private static SimpleDateFormat sdfHour;
+    
+    
     static {
         bcpe = new BCryptPasswordEncoder();
+        sdfHour = new SimpleDateFormat("yyyy-MM-dd HH:mm");
     }
 
     public static String encodePassword(String in) {
         return bcpe.encode(in);
+    }
+    
+    public synchronized static String dateTimeNowFormated(){
+        return LocalDateTime.now().format(DateTimeFormatter.ISO_DATE_TIME);
+    }
+    
+    public synchronized static String dateToString(Date date){
+        return sdfHour.format(date);
     }
     
     
@@ -39,6 +54,7 @@ public class Utils {
         FileOutputStream fos = new FileOutputStream(convFile);
         fos.write(file.getBytes());
         fos.close();       
+        convFile.deleteOnExit();
         
         return new FileInputStream(convFile);
         

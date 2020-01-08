@@ -17,7 +17,7 @@ import org.springframework.transaction.annotation.Transactional;
  * @author thiag
  */
 @Service
-public class GroupService {    
+public class GroupActivitiService {    
     
     @Autowired
     private GroupRepository repository;

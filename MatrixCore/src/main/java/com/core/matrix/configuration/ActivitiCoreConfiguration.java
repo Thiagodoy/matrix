@@ -12,6 +12,7 @@ import java.util.HashMap;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.sql.DataSource;
+import org.activiti.engine.HistoryService;
 import org.activiti.engine.IdentityService;
 import org.activiti.engine.ManagementService;
 import org.activiti.engine.ProcessEngine;
@@ -27,6 +28,7 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Primary;
 import org.springframework.context.annotation.Scope;
 import org.springframework.core.env.Environment;
+import org.springframework.data.jpa.repository.config.EnableJpaRepositories;
 import org.springframework.orm.jpa.JpaTransactionManager;
 import org.springframework.orm.jpa.LocalContainerEntityManagerFactoryBean;
 import org.springframework.orm.jpa.vendor.HibernateJpaVendorAdapter;
@@ -36,6 +38,11 @@ import org.springframework.transaction.PlatformTransactionManager;
  *
  * @author thiag
  */
+
+@EnableJpaRepositories(basePackages = {"com.core.matrix.workflow.repository"},
+         entityManagerFactoryRef = "entityManagerFactory", 
+        transactionManagerRef = "transactionManager") 
+
 @Configuration
 public class ActivitiCoreConfiguration implements EnvironmentAware {
 
@@ -64,8 +71,9 @@ public class ActivitiCoreConfiguration implements EnvironmentAware {
         HibernateJpaVendorAdapter vendorAdapter = new HibernateJpaVendorAdapter();
         em.setJpaVendorAdapter(vendorAdapter);
         HashMap<String, Object> properties = new HashMap<>();
-        properties.put("hibernate.hbm2ddl.auto", environment.getProperty("hibernate.hbm2ddl.auto"));
+        properties.put("hibernate.hbm2ddl.auto", "update");
         properties.put("hibernate.dialect", "org.hibernate.dialect.MySQL5InnoDBDialect");
+       // properties.put("hibernate.tool.hbm2ddl.SchemaUpdate", "true");
         em.setJpaPropertyMap(properties);
 
         return em;
@@ -115,7 +123,9 @@ public class ActivitiCoreConfiguration implements EnvironmentAware {
 
         ProcessEngineConfiguration s = new StandaloneProcessEngineConfiguration()
                 .setCustomSessionFactories(null)
-                .setDatabaseSchemaUpdate(ProcessEngineConfiguration.DB_SCHEMA_UPDATE_FALSE)
+                .setDatabaseSchemaUpdate(ProcessEngineConfiguration.DB_SCHEMA_UPDATE_TRUE)
+                
+                //.setPro
                 // .setAsyncExecutorEnabled(true)
                 .setAsyncExecutorActivate(true)
                 .setDataSource(this.dataSource())
@@ -150,7 +160,11 @@ public class ActivitiCoreConfiguration implements EnvironmentAware {
     public ManagementService managementService() {
         return this.processEngine().getManagementService();
     }
-
+    
+    @Bean
+    public HistoryService historyService(){
+        return this.processEngine().getHistoryService();
+    }
     
     
 }

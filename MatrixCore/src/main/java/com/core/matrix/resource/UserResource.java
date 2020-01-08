@@ -7,7 +7,7 @@ package com.core.matrix.resource;
 
 import com.core.matrix.request.UserDeleteRequest;
 import com.core.matrix.workflow.model.UserActiviti;
-import com.core.matrix.workflow.service.UserService;
+import com.core.matrix.workflow.service.UserActivitiService;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -30,7 +30,7 @@ import org.springframework.web.bind.annotation.RestController;
 public class UserResource {
 
     @Autowired
-    private UserService service;
+    private UserActivitiService service;
 
     @RequestMapping(method = RequestMethod.GET)
     public ResponseEntity get(@RequestParam(name = "firstName", required = false) String firstName,
