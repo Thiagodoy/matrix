@@ -5,6 +5,7 @@
  */
 package com.core.matrix.resource;
 
+import com.core.matrix.request.CompleteTaskRequest;
 import com.core.matrix.request.StartProcessRequest;
 import com.core.matrix.response.TaskResponse;
 import com.core.matrix.utils.Constants;
@@ -46,11 +47,31 @@ public class RunTimeResource {
         }
     }
 
-    @RequestMapping(value = "/getTask", method = RequestMethod.GET)
+    
+    @RequestMapping(value = "/getTask", method = RequestMethod.POST)
     public ResponseEntity getTask(@RequestParam(value = "taskId", required = true) String taskId) {
         try {
             TaskResponse response = this.service.getTask(taskId);
             return ResponseEntity.ok(response);
+        } catch (Exception e) {
+            Logger.getLogger(RunTimeResource.class.getName()).log(Level.SEVERE, "[getTask]", e);
+            return ResponseEntity.status(HttpStatus.resolve(500)).body(e.getMessage());
+        }
+    }
+    
+    
+    @RequestMapping(value = "/completeTask", method = RequestMethod.POST)
+    public ResponseEntity completeTask(@RequestBody CompleteTaskRequest request, Principal principal) {
+        try {
+            Optional<TaskResponse> response = this.service.completeTask(principal.getName(),request);
+            
+            if(response.isPresent()){
+                return ResponseEntity.ok(response.get());
+            }else{
+                return ResponseEntity.ok().build();
+            }
+            
+            
         } catch (Exception e) {
             Logger.getLogger(RunTimeResource.class.getName()).log(Level.SEVERE, "[getTask]", e);
             return ResponseEntity.status(HttpStatus.resolve(500)).body(e.getMessage());
@@ -101,6 +122,9 @@ public class RunTimeResource {
             return ResponseEntity.status(HttpStatus.resolve(500)).body(e.getMessage());
         }
     }
+    
+    
+    
     
     
     

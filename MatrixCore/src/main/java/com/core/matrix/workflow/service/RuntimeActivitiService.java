@@ -5,6 +5,7 @@
  */
 package com.core.matrix.workflow.service;
 
+import com.core.matrix.request.CompleteTaskRequest;
 import com.core.matrix.request.StartProcessRequest;
 import com.core.matrix.response.TaskResponse;
 import com.core.matrix.utils.Utils;
@@ -62,7 +63,7 @@ public class RuntimeActivitiService {
 
     @Autowired
     private RepositoryService repositoryService;
-    
+
     @Autowired
     private UserActivitiService userActivitiService;
 
@@ -76,6 +77,33 @@ public class RuntimeActivitiService {
         Task task = this.getNextUserTaskByProcessInstanceId(processInstance.getId(), userId, true);
 
         return Optional.ofNullable(task).isPresent() ? Optional.of(new TaskResponse(task, context)) : Optional.empty();
+
+    }
+
+    public Optional<TaskResponse> completeTask(String userId, CompleteTaskRequest request) throws Exception {
+
+        Task currentTask = taskService.createTaskQuery().taskId(request.getTaskId()).singleResult();
+        boolean delegated = false;
+        String owner = userId;
+        if (currentTask.getDelegationState() != null && currentTask.getDelegationState().equals(DelegationState.PENDING)) {
+            owner = currentTask.getOwner();
+            delegated = true;
+            taskService.resolveTask(request.getTaskId(), request.getVariables());
+            taskService.complete(request.getTaskId());
+        } else {
+            taskService.complete(request.getTaskId(), request.getVariables());
+        }
+        Task nextTask = getNextUserTaskByProcessInstanceId(request.getProcessInstanceId(), owner, true);
+
+        if (nextTask == null) {
+            //envia email para o proximo grupo
+            //sendEmailsForGroups(processInstanceId);
+        } else {
+            nextTask.setAssignee(owner);
+        }
+
+        //a proxima tarefa eh de quem delegou
+        return delegated && !userId.equals(owner) ? null : Optional.ofNullable(new TaskResponse(nextTask, context));
 
     }
 
@@ -102,7 +130,7 @@ public class RuntimeActivitiService {
     }
 
     public void assigneeTask(String taskId, String userId) {
-        
+
         if (!Optional.ofNullable(userId).isPresent()) {
             userId = null;
         }
@@ -137,8 +165,6 @@ public class RuntimeActivitiService {
                 .collect(Collectors.toList());
 
     }
-    
-    
 
     public List<TaskResponse> getCandidateTasks(String user) {
         return taskService
@@ -177,39 +203,12 @@ public class RuntimeActivitiService {
                 .collect(Collectors.toList());
 
     }
-
-    public TaskResponse completeTask(String userId, String processInstanceId, String taskId, Map<String, Object> vars) throws Exception {
-
-        Task currentTask = taskService.createTaskQuery().taskId(taskId).singleResult();
-        boolean delegated = false;
-        String owner = userId;
-        if (currentTask.getDelegationState() != null && currentTask.getDelegationState().equals(DelegationState.PENDING)) {
-            owner = currentTask.getOwner();
-            delegated = true;
-            taskService.resolveTask(taskId, vars);
-            taskService.complete(taskId);
-        } else {
-            taskService.complete(taskId, vars);
-        }
-        Task nextTask = getNextUserTaskByProcessInstanceId(processInstanceId, owner, true);
-
-        if (nextTask == null) {
-            //envia email para o proximo grupo
-            //sendEmailsForGroups(processInstanceId);
-        } else {
-            nextTask.setAssignee(owner);
-        }
-
-        //a proxima tarefa eh de quem delegou
-        return delegated && !userId.equals(owner) ? null : new TaskResponse(nextTask, context);
-
-    }
+  
 
     public Task getNextUserTaskByProcessInstanceId(String processInstanceId, String userId, boolean assigneToUser) throws Exception {
 
         List<Task> l = taskService.createTaskQuery().active().taskCandidateOrAssigned(userId).processInstanceId(processInstanceId).includeProcessVariables().includeTaskLocalVariables().list();
-        
-        
+
         if (l != null && !l.isEmpty()) {
             if (assigneToUser) {
                 taskService.claim(l.get(0).getId(), userId);
@@ -218,23 +217,21 @@ public class RuntimeActivitiService {
             generateQuestionBar(l.get(0));
             return l.get(0);
         }
-        
-        
+
         // Find by Group
-         GroupMemberActiviti group = userActivitiService
-                 .findById(userId)
-                 .getGroups()
-                 .stream()
-                 .findFirst()
-                 .orElseThrow(()-> new Exception("User not associate a group."));
-        
+        GroupMemberActiviti group = userActivitiService
+                .findById(userId)
+                .getGroups()
+                .stream()
+                .findFirst()
+                .orElseThrow(() -> new Exception("User not associate a group."));
+
         l = taskService.createTaskQuery().active().taskCandidateGroup(group.getGroupId())
                 .processInstanceId(processInstanceId)
                 .includeProcessVariables()
                 .includeTaskLocalVariables()
                 .list();
-        
-        
+
         if (l != null && !l.isEmpty()) {
             if (assigneToUser) {
                 l.get(0).setAssignee(userId);

@@ -12,4 +12,7 @@ class MatrixApplicationTests {
             System.out.println("password-> " + new BCryptPasswordEncoder().encode("123456"));
 	} 
 
+        
+        
+        
 }
