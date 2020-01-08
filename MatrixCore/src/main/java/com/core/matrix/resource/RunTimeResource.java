@@ -48,7 +48,7 @@ public class RunTimeResource {
     }
 
     
-    @RequestMapping(value = "/getTask", method = RequestMethod.POST)
+    @RequestMapping(value = "/getTask", method = RequestMethod.GET)
     public ResponseEntity getTask(@RequestParam(value = "taskId", required = true) String taskId) {
         try {
             TaskResponse response = this.service.getTask(taskId);
