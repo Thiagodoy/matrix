@@ -100,11 +100,16 @@ public class RepositoryResource {
         
         try {
             InputStream diagram = this.repositoryActivitiService.generateProcessDiagram(processDefinitionId, processDefinitionInstance);
-            InputStreamResource inputStreamResource = new InputStreamResource(diagram);
-            response.setContentLength((int)inputStreamResource.contentLength());
+            
+            
+            
+            org.apache.commons.io.IOUtils.copy(diagram, response.getOutputStream());
+            response.flushBuffer();            
+            
             response.setContentType("image/png");
             response.setHeader("Content-disposition", "attachment; filename= diagram.png");
-            return new ResponseEntity(inputStreamResource, HttpStatus.OK);
+            
+            return ResponseEntity.ok().build();
            
         } catch (Exception e) {
             Logger.getLogger(RepositoryResource.class.getName()).log(Level.SEVERE, "[getDiagram]", e);
