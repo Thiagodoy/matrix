@@ -84,19 +84,7 @@ public class RuntimeActivitiService {
 
         Task currentTask = taskService.createTaskQuery().taskId(request.getTaskId()).singleResult();
         boolean delegated = false;
-        String owner = userId;
-        
-        if(request.getVariables().containsKey("_controle")){
-            
-            ProcessInstance processInstance = runtimeService
-                    .createProcessInstanceQuery()
-                    .processInstanceId(request.getProcessInstanceId())
-                    .singleResult();            
-            
-            String exec = processInstance.getSuperExecutionId();
-            runtimeService.setVariable(exec, "_controle",request.getVariables().get("_controle"));
-        }
-        
+        String owner = userId;        
         
         if (currentTask.getDelegationState() != null && currentTask.getDelegationState().equals(DelegationState.PENDING)) {
             owner = currentTask.getOwner();
@@ -116,7 +104,7 @@ public class RuntimeActivitiService {
         }
 
         //a proxima tarefa eh de quem delegou
-        return delegated && !userId.equals(owner) ? null : Optional.ofNullable(new TaskResponse(nextTask, context));
+        return delegated && !userId.equals(owner) ? Optional.empty() : Optional.ofNullable(new TaskResponse(nextTask, context));
 
     }
 
