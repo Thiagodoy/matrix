@@ -5,10 +5,9 @@
  */
 package com.core.matrix.resource;
 
-import com.core.matrix.model.Manager;
-import com.core.matrix.request.ManagerRequest;
-import com.core.matrix.service.ManagerService;
-import static com.core.matrix.workflow.model.UserActiviti_.id;
+import com.core.matrix.model.ContactManager;
+import com.core.matrix.request.ContactManagerRequest;
+import com.core.matrix.service.ContactManagerService;
 import org.jboss.logging.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
@@ -27,30 +26,30 @@ import org.springframework.web.bind.annotation.RestController;
  * @author thiag
  */
 @RestController
-@RequestMapping(value = "/api/manager")
-public class ManagerResource {
+@RequestMapping(value = "/api/manager/contact")
+public class ContactManagerResource {
 
     @Autowired
-    private ManagerService managerService;
+    private ContactManagerService contactManagerService;
 
     @RequestMapping(method = RequestMethod.POST)
-    public ResponseEntity post(@RequestBody ManagerRequest request) {
+    public ResponseEntity post(@RequestBody ContactManagerRequest request) {
         try {
-            managerService.save(request);
+            contactManagerService.save(request);
             return ResponseEntity.ok().build();
         } catch (Exception e) {
-            Logger.getLogger(ManagerResource.class.getName()).log(Logger.Level.FATAL, "[post]", e);
+            Logger.getLogger(ContactManagerResource.class.getName()).log(Logger.Level.FATAL, "[post]", e);
             return ResponseEntity.status(HttpStatus.resolve(500)).body(e.getMessage());
         }
     }
 
     @RequestMapping(method = RequestMethod.PUT)
-    public ResponseEntity put(@RequestBody ManagerRequest request) {
+    public ResponseEntity put(@RequestBody ContactManagerRequest request) {
         try {
-            managerService.update(request);
+            contactManagerService.update(request);
             return ResponseEntity.ok().build();
         } catch (Exception e) {
-            Logger.getLogger(ManagerResource.class.getName()).log(Logger.Level.FATAL, "[put]", e);
+            Logger.getLogger(ContactManagerResource.class.getName()).log(Logger.Level.FATAL, "[put]", e);
             return ResponseEntity.status(HttpStatus.resolve(500)).body(e.getMessage());
         }
     }
@@ -58,27 +57,26 @@ public class ManagerResource {
     @RequestMapping(value = "/{id}", method = RequestMethod.DELETE)
     public ResponseEntity delete(@RequestParam(name = "id") Long id) {
         try {
-            managerService.delete(id);
+            contactManagerService.delete(id);
             return ResponseEntity.ok().build();
         } catch (Exception e) {
-            Logger.getLogger(ManagerResource.class.getName()).log(Logger.Level.FATAL, "[delete]", e);
+            Logger.getLogger(ContactManagerResource.class.getName()).log(Logger.Level.FATAL, "[delete]", e);
             return ResponseEntity.status(HttpStatus.resolve(500)).body(e.getMessage());
         }
     }
 
     @RequestMapping(method = RequestMethod.GET)
-    public ResponseEntity get(@RequestParam(name = "companyName", required = false) String companyName,
-            @RequestParam(name = "cnpj", required = false) String cnpj,
+    public ResponseEntity get(@RequestParam(name = "managerId", required = false) Long managerId,
             @RequestParam(name = "page", required = true) int page,
             @RequestParam(name = "size", required = true) int size) {
 
         try {
 
-            Page<Manager> response = managerService.find(companyName, cnpj, PageRequest.of(page, size, Sort.by("companyName").descending()));
+            Page<ContactManager> response = contactManagerService.find(managerId, PageRequest.of(page, size, Sort.by("companyName").descending()));
 
             return ResponseEntity.ok(response);
         } catch (Exception e) {
-            Logger.getLogger(ManagerResource.class.getName()).log(Logger.Level.FATAL, "[delete]", e);
+            Logger.getLogger(ContactManagerResource.class.getName()).log(Logger.Level.FATAL, "[delete]", e);
             return ResponseEntity.status(HttpStatus.resolve(500)).body(e.getMessage());
         }
 

@@ -5,8 +5,12 @@
  */
 package com.core.matrix.model;
 
+import com.core.matrix.request.ContactManagerRequest;
+import com.core.matrix.request.ManagerRequest;
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.stream.Collectors;
+import javax.persistence.CascadeType;
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.FetchType;
@@ -32,6 +36,9 @@ public class Manager {
     @Column(name = "id_gestor")
     private Long id;
     
+    @Column(name = "cnpj")
+    private String cnpj;
+    
     @Column(name = "razao_social")
     private String companyName;
     
@@ -47,8 +54,21 @@ public class Manager {
     @Column(name = "data_ultima_alteracao")
     private LocalDateTime lastUpdate;
     
-    @OneToMany(fetch = FetchType.EAGER)
+    @OneToMany(fetch = FetchType.EAGER, cascade = {CascadeType.PERSIST,CascadeType.REMOVE})
     @JoinColumn(name = "id_gestor")
-    private List<ContactManager> contacts;
+    private List<ContactManager> contacts;   
+    
+    
+    public Manager(){}
+    
+    public Manager(ManagerRequest request){        
+        this.companyName = request.getCompanyName();
+        this.fancyName = request.getFancyName();
+        this.nickName = request.getNickName();
+        this.contacts = request.getContacts().stream().map(cr-> new ContactManager(cr)).collect(Collectors.toList());       
+        
+    }
+    
+    
     
 }

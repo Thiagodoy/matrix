@@ -3,13 +3,13 @@
  * To change this template file, choose Tools | Templates
  * and open the template in the editor.
  */
-package com.core.matrix.repository;
+package com.core.matrix.wbc.repository;
 
-import com.core.matrix.model.ContactManager;
-import com.core.matrix.model.Manager;
+import com.core.matrix.wbc.model.Empresa;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.JpaSpecificationExecutor;
 import org.springframework.stereotype.Repository;
 
 /**
@@ -17,9 +17,11 @@ import org.springframework.stereotype.Repository;
  * @author thiag
  */
 @Repository
-public interface ContactManagerRepository extends JpaRepository<ContactManager, Long> {
+public interface EmpresaRepository extends JpaRepository<Empresa, Long>, JpaSpecificationExecutor<Empresa> {
+ 
     
     
-    Page<ContactManager> findByManager(Manager manager, PageRequest page);
+    Page<Empresa> findBySNrCnpj(String cnpj, PageRequest page);
+    Page<Empresa> findBySNmEmpresa(String razaoSocial, PageRequest page);
     
 }

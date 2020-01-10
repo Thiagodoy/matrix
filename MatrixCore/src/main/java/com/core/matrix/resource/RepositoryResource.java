@@ -95,7 +95,7 @@ public class RepositoryResource {
     @RequestMapping(value = "/diagram", method = RequestMethod.GET)
     public ResponseEntity getDiagram(
             @RequestParam(name = "processDefinitionId", required = true) String processDefinitionId,
-            @RequestParam(name = "processDefinitionInstance", required = false) String processDefinitionInstance,
+            @RequestParam(name = "processInstanceId", required = false) String processDefinitionInstance,
             HttpServletResponse response) {
         
         try {
