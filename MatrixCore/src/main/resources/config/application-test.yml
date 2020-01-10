@@ -38,3 +38,20 @@ matrix:
             port: 3306            
             connectionTestQuery: SELECT 1  
   
+wbc:
+    datasource:        
+        socketTimeout: 30000
+        loginTimeout: 30000
+        minimumIdle: 5
+        maximumPoolSize: 50
+        validationTimeout: 10000
+        idleTimeout: 30000
+        connectionTimeout: 30000
+        autoCommit: false
+        initializationFailFast: false        
+        sqlserver:            
+            dataUrl: jdbc:sqlserver://MEDB\homologacao;databaseName=WBC_ENERGY_DB_HML;user=matrix_portal;password=portal_matrix
+            dataSourceUser: matrix_portal
+            dataSourcePassword: portal_matrix
+            port: 3306            
+            connectionTestQuery: SELECT 1   

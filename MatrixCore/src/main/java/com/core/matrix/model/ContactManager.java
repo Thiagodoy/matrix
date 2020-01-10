@@ -5,6 +5,7 @@
  */
 package com.core.matrix.model;
 
+import com.core.matrix.request.ContactManagerRequest;
 import java.time.LocalDateTime;
 import javax.persistence.Column;
 import javax.persistence.Entity;
@@ -14,6 +15,8 @@ import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.JoinColumn;
 import javax.persistence.OneToOne;
+import javax.persistence.PrePersist;
+import javax.persistence.PreUpdate;
 import javax.persistence.Table;
 import lombok.Data;
 
@@ -58,5 +61,29 @@ public class ContactManager {
 
     @Column(name = "data_ultima_alteracao")
     private LocalDateTime lastUpdate;
+
+    public ContactManager(ContactManagerRequest request) {
+
+        this.email = request.getEmail();
+        this.name = request.getName();
+        this.telephone1 = request.getTelephone1();
+        this.telephone2 = request.getTelephone2();
+        this.telephone3 = request.getTelephone3();
+        this.typeContact = request.getTypeContact();
+    }
+
+    public ContactManager() {
+
+    }
+
+    @PrePersist
+    public void generateDateCreated() {
+        this.createdAt = LocalDateTime.now();
+    }
+
+    @PreUpdate
+    public void generateLastUpdate() {
+        this.lastUpdate = LocalDateTime.now();
+    }
 
 }

@@ -5,7 +5,7 @@
  */
 package com.core.matrix.request;
 
-import java.util.List;
+import javax.persistence.Column;
 import lombok.Data;
 
 /**
@@ -13,12 +13,14 @@ import lombok.Data;
  * @author thiag
  */
 @Data
-public class ManagerRequest {
+public class ContactManagerRequest {
 
     private Long id;
-    private String cnpj;
-    private String companyName;
-    private String fancyName;
-    private String nickName;
-    private List<ContactManagerRequest>contacts;
+    private String name;
+    private String email;
+    private String telephone1;
+    private String telephone2;
+    private String telephone3;
+    private String typeContact;
+
 }

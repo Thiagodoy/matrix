@@ -19,8 +19,8 @@ public class ManagerSpecification {
         return (root, criteriaQuery, criteriaBuilder) -> criteriaBuilder.like(criteriaBuilder.upper(root.get(Manager_.companyName)), name + "%");
     }
     
-    public static Specification<Manager> fancyName(String name){
-        return (root, criteriaQuery, criteriaBuilder) -> criteriaBuilder.like(criteriaBuilder.upper(root.get(Manager_.fancyName)), name + "%");
+    public static Specification<Manager> cnpj(String name){
+        return (root, criteriaQuery, criteriaBuilder) -> criteriaBuilder.like(criteriaBuilder.upper(root.get(Manager_.cnpj)), name + "%");
     }
 
 
