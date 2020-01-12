@@ -18,6 +18,7 @@ public class ContactManagerRequest {
     private Long id;
     private String name;
     private String email;
+    private Long manager;
     private String telephone1;
     private String telephone2;
     private String telephone3;

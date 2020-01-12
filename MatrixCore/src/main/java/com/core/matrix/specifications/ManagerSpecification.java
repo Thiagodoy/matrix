@@ -16,7 +16,7 @@ import org.springframework.data.jpa.domain.Specification;
 public class ManagerSpecification {
 
     public static Specification<Manager> companyName(String name){
-        return (root, criteriaQuery, criteriaBuilder) -> criteriaBuilder.like(criteriaBuilder.upper(root.get(Manager_.companyName)), name + "%");
+        return (root, criteriaQuery, criteriaBuilder) -> criteriaBuilder.like(criteriaBuilder.upper(root.get(Manager_.companyName)), name.toUpperCase() + "%");
     }
     
     public static Specification<Manager> cnpj(String name){

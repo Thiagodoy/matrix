@@ -29,7 +29,7 @@ import org.springframework.web.bind.annotation.RestController;
  * @author thiag
  */
 @RestController
-@RequestMapping(value = "/auth")
+@RequestMapping(value = "/api/auth")
 public class AuthResource {
 
     @Autowired
