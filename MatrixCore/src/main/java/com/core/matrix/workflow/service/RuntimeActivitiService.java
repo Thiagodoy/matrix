@@ -11,9 +11,9 @@ import com.core.matrix.response.ProcessDefinitionResponse;
 import com.core.matrix.response.TaskResponse;
 import com.core.matrix.utils.Utils;
 import com.core.matrix.workflow.model.GroupMemberActiviti;
-import com.core.matrix.workflow.model.UserActiviti;
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
@@ -33,7 +33,6 @@ import org.activiti.engine.impl.persistence.entity.ProcessDefinitionEntity;
 import org.activiti.engine.impl.pvm.PvmTransition;
 import org.activiti.engine.impl.pvm.process.ActivityImpl;
 import org.activiti.engine.impl.task.TaskDefinition;
-import org.activiti.engine.repository.ProcessDefinition;
 //import org.activiti.engine.impl.util.ProcessDefinitionUtil;
 
 import org.activiti.engine.runtime.Execution;
@@ -75,6 +74,12 @@ public class RuntimeActivitiService {
 
     public Optional<TaskResponse> startProcess(StartProcessRequest request, String userId) throws Exception {
 
+        
+        if(!Optional.ofNullable(request.getVariables()).isPresent()){
+            request.setVariables(new HashMap<String,Object>());
+        }
+        
+        
         request.getVariables().put("created_by", userId);
         request.getVariables().put("created_at", Utils.dateTimeNowFormated());
 
