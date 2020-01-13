@@ -5,7 +5,9 @@ import java.util.List;
 import javax.persistence.CascadeType;
 import javax.persistence.Column;
 import javax.persistence.Entity;
+import javax.persistence.FetchType;
 import javax.persistence.Id;
+import javax.persistence.JoinColumn;
 import javax.persistence.OneToMany;
 import javax.persistence.Table;
 import lombok.AllArgsConstructor;
@@ -39,9 +41,12 @@ public class GroupActiviti {
     @Column(name = "TYPE_")
     private String type;
     
-    @OneToMany(mappedBy = "groupId", cascade = CascadeType.ALL)
+    @OneToMany( cascade = {CascadeType.ALL}, fetch = FetchType.EAGER)
+    @JoinColumn(name = "group_id_")
     private List<AbilityActiviti> abilitys;
     
    
+    
+    
             
 }

@@ -7,11 +7,13 @@ package com.core.matrix.workflow.service;
 
 import com.core.matrix.request.CompleteTaskRequest;
 import com.core.matrix.request.StartProcessRequest;
+import com.core.matrix.response.ProcessDefinitionResponse;
 import com.core.matrix.response.TaskResponse;
 import com.core.matrix.utils.Utils;
 import com.core.matrix.workflow.model.GroupMemberActiviti;
 import com.core.matrix.workflow.model.UserActiviti;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
@@ -31,6 +33,7 @@ import org.activiti.engine.impl.persistence.entity.ProcessDefinitionEntity;
 import org.activiti.engine.impl.pvm.PvmTransition;
 import org.activiti.engine.impl.pvm.process.ActivityImpl;
 import org.activiti.engine.impl.task.TaskDefinition;
+import org.activiti.engine.repository.ProcessDefinition;
 //import org.activiti.engine.impl.util.ProcessDefinitionUtil;
 
 import org.activiti.engine.runtime.Execution;
@@ -67,6 +70,9 @@ public class RuntimeActivitiService {
     @Autowired
     private UserActivitiService userActivitiService;
 
+    @Autowired
+    private RepositoryActivitiService repositoryActivitiService;
+
     public Optional<TaskResponse> startProcess(StartProcessRequest request, String userId) throws Exception {
 
         request.getVariables().put("created_by", userId);
@@ -85,19 +91,7 @@ public class RuntimeActivitiService {
         Task currentTask = taskService.createTaskQuery().taskId(request.getTaskId()).singleResult();
         boolean delegated = false;
         String owner = userId;
-        
-        if(request.getVariables().containsKey("_controle")){
-            
-            ProcessInstance processInstance = runtimeService
-                    .createProcessInstanceQuery()
-                    .processInstanceId(request.getProcessInstanceId())
-                    .singleResult();            
-            
-            String exec = processInstance.getSuperExecutionId();
-            runtimeService.setVariable(exec, "_controle",request.getVariables().get("_controle"));
-        }
-        
-        
+
         if (currentTask.getDelegationState() != null && currentTask.getDelegationState().equals(DelegationState.PENDING)) {
             owner = currentTask.getOwner();
             delegated = true;
@@ -116,7 +110,7 @@ public class RuntimeActivitiService {
         }
 
         //a proxima tarefa eh de quem delegou
-        return delegated && !userId.equals(owner) ? null : Optional.ofNullable(new TaskResponse(nextTask, context));
+        return delegated && !userId.equals(owner) ? Optional.empty() : Optional.ofNullable(new TaskResponse(nextTask, context));
 
     }
 
@@ -180,6 +174,9 @@ public class RuntimeActivitiService {
     }
 
     public List<TaskResponse> getCandidateTasks(String user) {
+
+        List<ProcessDefinitionResponse> processDefinitions = Collections.synchronizedList(repositoryActivitiService.listAll());
+
         return taskService
                 .createTaskQuery()
                 .taskCandidateUser(user)
@@ -187,19 +184,34 @@ public class RuntimeActivitiService {
                 .includeTaskLocalVariables()
                 .list()
                 .parallelStream()
-                .map(t -> new TaskResponse(t, context))
+                .map(t -> {
+                    TaskResponse instance = new TaskResponse(t, context);
+                    Optional<ProcessDefinitionResponse> response = processDefinitions.stream().filter(p -> p.getId().equals(t.getProcessDefinitionId())).findFirst();
+                    String name = response.isPresent() ? response.get().getName() : "";
+                    instance.setProcessDefinitionName(name);
+                    return instance;
+                })
                 .collect(Collectors.toList());
 
     }
 
-    public List<TaskResponse> getMyTasks(String user) {
+    public List<TaskResponse> getMyTasks(String user, int page, int size) {
+        
+        List<ProcessDefinitionResponse> processDefinitions = Collections.synchronizedList(repositoryActivitiService.listAll());
+        
         return taskService
                 .createTaskQuery()
                 .taskAssignee(user)
                 .includeProcessVariables()
-                .list()
+                .listPage(page, size)
                 .parallelStream()
-                .map(t -> new TaskResponse(t, context))
+                .map(t -> {
+                    TaskResponse instance = new TaskResponse(t, context);
+                    Optional<ProcessDefinitionResponse> response = processDefinitions.stream().filter(p -> p.getId().equals(t.getProcessDefinitionId())).findFirst();
+                    String name = response.isPresent() ? response.get().getName() : "";
+                    instance.setProcessDefinitionName(name);
+                    return instance;
+                })
                 .collect(Collectors.toList());
 
     }
@@ -216,7 +228,6 @@ public class RuntimeActivitiService {
                 .collect(Collectors.toList());
 
     }
-  
 
     public Task getNextUserTaskByProcessInstanceId(String processInstanceId, String userId, boolean assigneToUser) throws Exception {
 

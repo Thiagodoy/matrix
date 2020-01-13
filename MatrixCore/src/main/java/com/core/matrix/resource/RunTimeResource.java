@@ -30,7 +30,7 @@ import org.springframework.web.bind.annotation.RestController;
  * @author thiag
  */
 @RestController
-@RequestMapping(value = "/workflow/runtime")
+@RequestMapping(value = "/api/workflow/runtime")
 public class RunTimeResource {
 
     @Autowired
@@ -47,7 +47,6 @@ public class RunTimeResource {
         }
     }
 
-    
     @RequestMapping(value = "/getTask", method = RequestMethod.GET)
     public ResponseEntity getTask(@RequestParam(value = "taskId", required = true) String taskId) {
         try {
@@ -58,20 +57,18 @@ public class RunTimeResource {
             return ResponseEntity.status(HttpStatus.resolve(500)).body(e.getMessage());
         }
     }
-    
-    
+
     @RequestMapping(value = "/completeTask", method = RequestMethod.POST)
     public ResponseEntity completeTask(@RequestBody CompleteTaskRequest request, Principal principal) {
         try {
-            Optional<TaskResponse> response = this.service.completeTask(principal.getName(),request);
-            
-            if(response.isPresent()){
+            Optional<TaskResponse> response = this.service.completeTask(principal.getName(), request);
+
+            if (response.isPresent()) {
                 return ResponseEntity.ok(response.get());
-            }else{
+            } else {
                 return ResponseEntity.ok().build();
             }
-            
-            
+
         } catch (Exception e) {
             Logger.getLogger(RunTimeResource.class.getName()).log(Level.SEVERE, "[getTask]", e);
             return ResponseEntity.status(HttpStatus.resolve(500)).body(e.getMessage());
@@ -91,16 +88,18 @@ public class RunTimeResource {
     }
 
     @RequestMapping(value = "/getMyTask", method = RequestMethod.GET)
-    public ResponseEntity getMyTask(Principal principal) {
+    public ResponseEntity getMyTask(@RequestParam(name = "page", required = true, defaultValue = "0") int page,
+            @RequestParam(name = "size", required = true, defaultValue = "10") int size,
+            Principal principal) {
         try {
-            List<TaskResponse> response = this.service.getMyTasks(principal.getName());
+            List<TaskResponse> response = this.service.getMyTasks(principal.getName(), page, size);
             return ResponseEntity.ok(response);
         } catch (Exception e) {
             Logger.getLogger(RunTimeResource.class.getName()).log(Level.SEVERE, "[getMyTask]", e);
             return ResponseEntity.status(HttpStatus.resolve(500)).body(e.getMessage());
         }
     }
-    
+
     @RequestMapping(value = "/getInvolvedTasks", method = RequestMethod.GET)
     public ResponseEntity getInvolvedTasks(Principal principal) {
         try {
@@ -111,7 +110,7 @@ public class RunTimeResource {
             return ResponseEntity.status(HttpStatus.resolve(500)).body(e.getMessage());
         }
     }
-    
+
     @RequestMapping(value = "/getGroupTasks", method = RequestMethod.GET)
     public ResponseEntity getGroupTasks(Principal principal) {
         try {
@@ -122,16 +121,6 @@ public class RunTimeResource {
             return ResponseEntity.status(HttpStatus.resolve(500)).body(e.getMessage());
         }
     }
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
 
     @RequestMapping(value = "/variables", method = RequestMethod.GET)
     public ResponseEntity getVariables(@RequestParam(value = "type", required = true) String type,

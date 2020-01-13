@@ -30,7 +30,7 @@ import org.springframework.web.multipart.MultipartFile;
  * @author thiag
  */
 @RestController
-@RequestMapping(value = "/workflow/repository")
+@RequestMapping(value = "/api/workflow/repository")
 public class RepositoryResource {
 
     @Autowired

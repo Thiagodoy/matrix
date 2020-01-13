@@ -6,15 +6,13 @@
 package com.core.matrix.model;
 
 import com.core.matrix.request.ContactManagerRequest;
+import com.fasterxml.jackson.annotation.JsonFormat;
 import java.time.LocalDateTime;
 import javax.persistence.Column;
 import javax.persistence.Entity;
-import javax.persistence.FetchType;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
-import javax.persistence.JoinColumn;
-import javax.persistence.OneToOne;
 import javax.persistence.PrePersist;
 import javax.persistence.PreUpdate;
 import javax.persistence.Table;
@@ -25,7 +23,7 @@ import lombok.Data;
  * @author thiag
  */
 @Entity
-@Table
+@Table(name = "mtx_contato_gestor")
 @Data
 public class ContactManager {
 
@@ -34,9 +32,10 @@ public class ContactManager {
     @Column(name = "id_contato_gestor")
     private Long id;
 
-    @OneToOne(fetch = FetchType.EAGER)
-    @JoinColumn(name = "id_gestor")
-    private Manager manager;
+    
+    
+    @Column(name = "id_gestor",nullable = false,updatable = false)
+    private Long manager;
 
     @Column(name = "nome")
     private String name;
@@ -56,12 +55,16 @@ public class ContactManager {
     @Column(name = "tipo_contato")
     private String typeContact;
 
+    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss", shape = JsonFormat.Shape.STRING)
     @Column(name = "data_criacao")
     private LocalDateTime createdAt;
 
+    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss", shape = JsonFormat.Shape.STRING)
     @Column(name = "data_ultima_alteracao")
     private LocalDateTime lastUpdate;
-
+    
+    
+    
     public ContactManager(ContactManagerRequest request) {
 
         this.email = request.getEmail();
@@ -69,8 +72,12 @@ public class ContactManager {
         this.telephone1 = request.getTelephone1();
         this.telephone2 = request.getTelephone2();
         this.telephone3 = request.getTelephone3();
-        this.typeContact = request.getTypeContact();
+        this.typeContact = request.getTypeContact();  
+        this.manager = request.getManager();
+        
     }
+
+   
 
     public ContactManager() {
 
@@ -79,6 +86,7 @@ public class ContactManager {
     @PrePersist
     public void generateDateCreated() {
         this.createdAt = LocalDateTime.now();
+        
     }
 
     @PreUpdate

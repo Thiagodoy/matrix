@@ -8,7 +8,6 @@ package com.core.matrix.resource;
 import com.core.matrix.model.Manager;
 import com.core.matrix.request.ManagerRequest;
 import com.core.matrix.service.ManagerService;
-import static com.core.matrix.workflow.model.UserActiviti_.id;
 import org.jboss.logging.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
@@ -16,6 +15,7 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Sort;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
@@ -56,7 +56,7 @@ public class ManagerResource {
     }
 
     @RequestMapping(value = "/{id}", method = RequestMethod.DELETE)
-    public ResponseEntity delete(@RequestParam(name = "id") Long id) {
+    public ResponseEntity delete(@PathVariable(name = "id", required = true) Long id) {
         try {
             managerService.delete(id);
             return ResponseEntity.ok().build();
@@ -69,8 +69,8 @@ public class ManagerResource {
     @RequestMapping(method = RequestMethod.GET)
     public ResponseEntity get(@RequestParam(name = "companyName", required = false) String companyName,
             @RequestParam(name = "cnpj", required = false) String cnpj,
-            @RequestParam(name = "page", required = true) int page,
-            @RequestParam(name = "size", required = true) int size) {
+            @RequestParam(name = "page", required = true, defaultValue = "0") int page,
+            @RequestParam(name = "size", required = true, defaultValue = "10") int size) {
 
         try {
 

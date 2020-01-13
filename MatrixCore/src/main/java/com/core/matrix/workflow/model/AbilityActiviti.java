@@ -5,12 +5,12 @@
  */
 package com.core.matrix.workflow.model;
 
-import com.google.common.base.Optional;
 import java.io.Serializable;
 import javax.persistence.Column;
 import javax.persistence.Entity;
+import javax.persistence.GeneratedValue;
+import javax.persistence.GenerationType;
 import javax.persistence.Id;
-import javax.persistence.PrePersist;
 import javax.persistence.Table;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
@@ -28,8 +28,9 @@ public class AbilityActiviti implements GrantedAuthority, Serializable {
 
     
     @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "id_")
-    private String id;
+    private Long id;
     
     @Column(name = "subject_")
     private String subject;
@@ -37,16 +38,18 @@ public class AbilityActiviti implements GrantedAuthority, Serializable {
     @Column(name = "action_")
     private String action;    
     
-    @Column(name = "group_id_")
-    private String groupId;  
+    @Column(name = "group_id_", nullable = false)
+    private String groupId;   
     
     
-    @PrePersist
-    public void generate(){
-        if(!Optional.fromNullable(id).isPresent()){
-            this.id = String.valueOf(this.hashCode());
-        }
+    public AbilityActiviti(String groupId){
+        this.groupId = groupId;
     }
+    
+    public AbilityActiviti(){
+        
+    }
+   
     
     @Override
     public String getAuthority() {

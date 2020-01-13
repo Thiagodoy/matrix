@@ -24,7 +24,7 @@ import org.springframework.web.bind.annotation.RestController;
  * @author thiag
  */
 @RestController
-@RequestMapping(value = "/group")
+@RequestMapping(value = "/api/group")
 public class GroupResource {
 
     @Autowired
@@ -38,7 +38,7 @@ public class GroupResource {
             return ResponseEntity.ok(response);
 
         } catch (Exception e) {
-            Logger.getLogger(GroupResource.class.getName()).log(Level.SEVERE, "[get]", e.getMessage());
+            Logger.getLogger(GroupResource.class.getName()).log(Level.SEVERE, "[get]", e);
             return ResponseEntity.status(HttpStatus.resolve(500)).build();
         }
     }
@@ -51,7 +51,7 @@ public class GroupResource {
             return ResponseEntity.ok().build();
 
         } catch (Exception e) {
-            Logger.getLogger(GroupResource.class.getName()).log(Level.SEVERE, "[post]", e.getMessage());
+            Logger.getLogger(GroupResource.class.getName()).log(Level.SEVERE, "[post]", e);
             return ResponseEntity.status(HttpStatus.resolve(500)).build();
         }
     }
@@ -63,7 +63,7 @@ public class GroupResource {
             this.service.delete(id);
             return ResponseEntity.ok().build();
         } catch (Exception e) {
-            Logger.getLogger(GroupResource.class.getName()).log(Level.SEVERE, "[post]", e.getMessage());
+            Logger.getLogger(GroupResource.class.getName()).log(Level.SEVERE, "[delete]", e);
             return ResponseEntity.status(HttpStatus.resolve(500)).build();
         }
     }
