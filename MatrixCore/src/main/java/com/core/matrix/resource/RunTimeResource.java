@@ -7,6 +7,7 @@ package com.core.matrix.resource;
 
 import com.core.matrix.request.CompleteTaskRequest;
 import com.core.matrix.request.StartProcessRequest;
+import com.core.matrix.response.PageResponse;
 import com.core.matrix.response.TaskResponse;
 import com.core.matrix.utils.Constants;
 import com.core.matrix.workflow.service.RuntimeActivitiService;
@@ -77,9 +78,10 @@ public class RunTimeResource {
 
     //TODO Create a pagination
     @RequestMapping(value = "/getCandidateTask", method = RequestMethod.GET)
-    public ResponseEntity getCandidateTask(Principal principal) {
+    public ResponseEntity getCandidateTask(@RequestParam(name = "page", required = true, defaultValue = "0") int page,
+            @RequestParam(name = "size", required = true, defaultValue = "10") int size, Principal principal) {
         try {
-            List<TaskResponse> response = this.service.getCandidateTasks(principal.getName());
+            PageResponse<TaskResponse> response = this.service.getCandidateTasks(principal.getName(), page, size);
             return ResponseEntity.ok(response);
         } catch (Exception e) {
             Logger.getLogger(RunTimeResource.class.getName()).log(Level.SEVERE, "[getCandidateTask]", e);
@@ -92,7 +94,7 @@ public class RunTimeResource {
             @RequestParam(name = "size", required = true, defaultValue = "10") int size,
             Principal principal) {
         try {
-            List<TaskResponse> response = this.service.getMyTasks(principal.getName(), page, size);
+            PageResponse<TaskResponse> response = this.service.getMyTasks(principal.getName(), page, size);
             return ResponseEntity.ok(response);
         } catch (Exception e) {
             Logger.getLogger(RunTimeResource.class.getName()).log(Level.SEVERE, "[getMyTask]", e);
@@ -101,9 +103,10 @@ public class RunTimeResource {
     }
 
     @RequestMapping(value = "/getInvolvedTasks", method = RequestMethod.GET)
-    public ResponseEntity getInvolvedTasks(Principal principal) {
+    public ResponseEntity getInvolvedTasks(@RequestParam(name = "page", required = true, defaultValue = "0") int page,
+            @RequestParam(name = "size", required = true, defaultValue = "10") int size, Principal principal) {
         try {
-            List<TaskResponse> response = this.service.getInvolvedTasks(principal.getName());
+            PageResponse<TaskResponse> response = this.service.getInvolvedTasks(principal.getName(), page, size);
             return ResponseEntity.ok(response);
         } catch (Exception e) {
             Logger.getLogger(RunTimeResource.class.getName()).log(Level.SEVERE, "[getInvolvedTasks]", e);

@@ -25,12 +25,14 @@ public class EmpresaService {
     public Page findAll(String cnpj, String razaoSocial, PageRequest page) {
 
         if (Optional.ofNullable(cnpj).isPresent()) {
-            return this.repository.findBySNmEmpresa(cnpj, page);
+            return this.repository.findBySNrCnpjStartingWith(cnpj, page);
         } else if (Optional.ofNullable(razaoSocial).isPresent()) {
-            return this.repository.findBySNmEmpresa(razaoSocial, page);
+            return this.repository.findBySNmEmpresaStartingWith(razaoSocial, page);
         }
 
         return this.repository.findAll(page);
     }
+    
+    
 
 }

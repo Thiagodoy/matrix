@@ -7,6 +7,7 @@ package com.core.matrix.workflow.service;
 
 import com.core.matrix.request.CompleteTaskRequest;
 import com.core.matrix.request.StartProcessRequest;
+import com.core.matrix.response.PageResponse;
 import com.core.matrix.response.ProcessDefinitionResponse;
 import com.core.matrix.response.TaskResponse;
 import com.core.matrix.utils.Utils;
@@ -44,6 +45,7 @@ import org.activiti.engine.task.TaskInfo;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ApplicationContext;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 /**
  *
@@ -82,7 +84,7 @@ public class RuntimeActivitiService {
 
         Task task = this.getNextUserTaskByProcessInstanceId(processInstance.getId(), userId, true);
 
-        return Optional.ofNullable(task).isPresent() ? Optional.of(new TaskResponse(task, context)) : Optional.empty();
+        return Optional.ofNullable(task).isPresent() ? Optional.of(new TaskResponse(task)) : Optional.empty();
 
     }
 
@@ -110,7 +112,7 @@ public class RuntimeActivitiService {
         }
 
         //a proxima tarefa eh de quem delegou
-        return delegated && !userId.equals(owner) ? Optional.empty() : Optional.ofNullable(new TaskResponse(nextTask, context));
+        return delegated && !userId.equals(owner) ? Optional.empty() : Optional.ofNullable(new TaskResponse(nextTask));
 
     }
 
@@ -125,7 +127,7 @@ public class RuntimeActivitiService {
             t = historyService.createHistoricTaskInstanceQuery().taskId(taskId).includeProcessVariables().includeTaskLocalVariables().singleResult();
         }
 
-        return new TaskResponse(t, context);
+        return new TaskResponse(t);
     }
 
     public Map<String, Object> getLocalVariables(String taskId) {
@@ -168,64 +170,96 @@ public class RuntimeActivitiService {
                 + "            act_id_user b ON a.USER_ID_ = b.ID_ where  b.id_ = '" + userId + "')")
                 .list()
                 .stream()
-                .map((t) -> new TaskResponse(t, context))
+                .map((t) -> new TaskResponse(t))
                 .collect(Collectors.toList());
 
     }
 
-    public List<TaskResponse> getCandidateTasks(String user) {
+    public PageResponse<TaskResponse> getCandidateTasks(String user, int page, int size) {
 
         List<ProcessDefinitionResponse> processDefinitions = Collections.synchronizedList(repositoryActivitiService.listAll());
 
-        return taskService
+        
+        Long sizeTotalElements = taskService.createTaskQuery().taskCandidateUser(user).count();
+        Long sizePage = sizeTotalElements / size;
+        
+        List<TaskResponse> response =  taskService
                 .createTaskQuery()
                 .taskCandidateUser(user)
                 .includeProcessVariables()
                 .includeTaskLocalVariables()
-                .list()
-                .parallelStream()
-                .map(t -> {
-                    TaskResponse instance = new TaskResponse(t, context);
-                    Optional<ProcessDefinitionResponse> response = processDefinitions.stream().filter(p -> p.getId().equals(t.getProcessDefinitionId())).findFirst();
-                    String name = response.isPresent() ? response.get().getName() : "";
-                    instance.setProcessDefinitionName(name);
-                    return instance;
-                })
-                .collect(Collectors.toList());
-
-    }
-
-    public List<TaskResponse> getMyTasks(String user, int page, int size) {
-        
-        List<ProcessDefinitionResponse> processDefinitions = Collections.synchronizedList(repositoryActivitiService.listAll());
-        
-        return taskService
-                .createTaskQuery()
-                .taskAssignee(user)
-                .includeProcessVariables()
+                .orderByTaskCreateTime()
+                .desc()
                 .listPage(page, size)
                 .parallelStream()
                 .map(t -> {
-                    TaskResponse instance = new TaskResponse(t, context);
-                    Optional<ProcessDefinitionResponse> response = processDefinitions.stream().filter(p -> p.getId().equals(t.getProcessDefinitionId())).findFirst();
-                    String name = response.isPresent() ? response.get().getName() : "";
+                    TaskResponse instance = new TaskResponse(t);
+                    Optional<ProcessDefinitionResponse> resp = processDefinitions.stream().filter(p -> p.getId().equals(t.getProcessDefinitionId())).findFirst();
+                    String name = resp.isPresent() ? resp.get().getName() : "";
+                    instance.setProcessDefinitionName(name);
+                    return instance;
+                })
+                .collect(Collectors.toList());
+        
+        return new PageResponse<TaskResponse>(response, sizePage, (long) response.size(), sizeTotalElements, (long) page);
+
+    }
+
+    @Transactional(readOnly = true)
+    public PageResponse<TaskResponse> getMyTasks(String user, int page, int size) {
+
+        List<ProcessDefinitionResponse> processDefinitions = Collections.synchronizedList(repositoryActivitiService.listAll());
+
+        Long sizeTotalElements = taskService.createTaskQuery().taskAssignee(user).count();
+        Long sizePage = sizeTotalElements / size;
+
+        List<TaskResponse> response = taskService
+                .createTaskQuery()
+                .taskAssignee(user)
+                .includeProcessVariables()
+                .orderByTaskCreateTime()
+                .desc()
+                .listPage(page, size)
+                .parallelStream()
+                .map(t -> {
+                    TaskResponse instance = new TaskResponse(t);
+                    Optional<ProcessDefinitionResponse> resp = processDefinitions.stream().filter(p -> p.getId().equals(t.getProcessDefinitionId())).findFirst();
+                    String name = resp.isPresent() ? resp.get().getName() : "";
                     instance.setProcessDefinitionName(name);
                     return instance;
                 })
                 .collect(Collectors.toList());
 
+        return new PageResponse<TaskResponse>(response, sizePage, (long) response.size(), sizeTotalElements, (long) page);
+
     }
 
-    public List<TaskResponse> getInvolvedTasks(String user) {
+    @Transactional(readOnly = true)
+    public PageResponse<TaskResponse> getInvolvedTasks(String user, int page, int size) {
 
-        return taskService
+        List<ProcessDefinitionResponse> processDefinitions = Collections.synchronizedList(repositoryActivitiService.listAll());
+
+        Long sizeTotalElements = taskService.createTaskQuery().taskInvolvedUser(user).count();
+        Long sizePage = sizeTotalElements / size;
+
+        List<TaskResponse> response = taskService
                 .createTaskQuery()
                 .taskInvolvedUser(user)
                 .includeProcessVariables()
-                .list()
+                .orderByTaskCreateTime()
+                .desc()
+                .listPage(page, size)
                 .parallelStream()
-                .map(t -> new TaskResponse(t, context))
+                .map(t -> {
+                    TaskResponse instance = new TaskResponse(t);
+                    Optional<ProcessDefinitionResponse> resp = processDefinitions.stream().filter(p -> p.getId().equals(t.getProcessDefinitionId())).findFirst();
+                    String name = resp.isPresent() ? resp.get().getName() : "";
+                    instance.setProcessDefinitionName(name);
+                    return instance;
+                })
                 .collect(Collectors.toList());
+
+        return new PageResponse<TaskResponse>(response, sizePage, (long) response.size(), sizeTotalElements, (long) page);
 
     }
 

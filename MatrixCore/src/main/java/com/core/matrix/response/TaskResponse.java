@@ -14,7 +14,6 @@ import org.activiti.engine.history.HistoricTaskInstance;
 import org.activiti.engine.task.DelegationState;
 import org.activiti.engine.task.Task;
 import org.activiti.engine.task.TaskInfo;
-import org.springframework.context.ApplicationContext;
 
 /**
  *
@@ -39,7 +38,7 @@ public class TaskResponse {
     private String finalized;
     private List<String> breadCrump;
 
-    public TaskResponse(TaskInfo task, ApplicationContext context) {
+    public TaskResponse(TaskInfo task) {
 
         this.name = task.getName();
         this.description = task.getDescription();

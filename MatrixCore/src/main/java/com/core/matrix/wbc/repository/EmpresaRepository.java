@@ -21,7 +21,7 @@ public interface EmpresaRepository extends JpaRepository<Empresa, Long>, JpaSpec
  
     
     
-    Page<Empresa> findBySNrCnpj(String cnpj, PageRequest page);
-    Page<Empresa> findBySNmEmpresa(String razaoSocial, PageRequest page);
+    Page<Empresa> findBySNrCnpjStartingWith(String cnpj, PageRequest page);
+    Page<Empresa> findBySNmEmpresaStartingWith(String razaoSocial, PageRequest page);
     
 }
