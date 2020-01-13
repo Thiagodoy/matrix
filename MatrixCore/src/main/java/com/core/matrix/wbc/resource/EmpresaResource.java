@@ -23,7 +23,7 @@ import org.springframework.web.bind.annotation.RestController;
  * @author thiag
  */
 @RestController
-@RequestMapping(value = "/wbc/empresa")
+@RequestMapping(value = "/api/wbc/empresa")
 public class EmpresaResource {
 
     @Autowired

@@ -104,7 +104,9 @@ public class UserActiviti implements UserDetails, User{
 
     @Override
     public boolean isPictureSet() {
+
        return Optional.ofNullable(this.picture).isPresent();
+
     }
 
 }

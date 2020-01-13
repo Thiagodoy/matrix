@@ -86,6 +86,7 @@
                 <skipTests>true</skipTests>
             </properties>
         </action>
+
     <action>
             <actionName>build</actionName>
             <packagings>
@@ -102,4 +103,5 @@
                 <activatedProfile>test</activatedProfile>
             </activatedProfiles>
         </action>
+
 </actions>
