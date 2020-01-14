@@ -5,11 +5,11 @@
  */
 package com.core.matrix.wbc.resource;
 
-import com.core.matrix.wbc.model.Empresa;
+import com.core.matrix.response.PageResponse;
+import com.core.matrix.wbc.dto.EmpresaDTO;
 import com.core.matrix.wbc.service.EmpresaService;
 import org.jboss.logging.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -23,7 +23,7 @@ import org.springframework.web.bind.annotation.RestController;
  * @author thiag
  */
 @RestController
-@RequestMapping(value = "/api/wbc/empresa")
+@RequestMapping(value = "/api/wbc/company")
 public class EmpresaResource {
 
     @Autowired
@@ -38,7 +38,7 @@ public class EmpresaResource {
 
         try {
 
-            Page<Empresa> response = service.findAll(cnpj,razaoSocial,PageRequest.of(page.intValue(), size.intValue()));
+            PageResponse<EmpresaDTO> response = service.findAll(cnpj,razaoSocial,PageRequest.of(page.intValue(), size.intValue()));
             return ResponseEntity.ok(response);
 
         } catch (Exception e) {

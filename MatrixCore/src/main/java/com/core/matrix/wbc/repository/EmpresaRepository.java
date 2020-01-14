@@ -7,7 +7,7 @@ package com.core.matrix.wbc.repository;
 
 import com.core.matrix.wbc.model.Empresa;
 import org.springframework.data.domain.Page;
-import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.JpaSpecificationExecutor;
 import org.springframework.stereotype.Repository;
@@ -18,10 +18,7 @@ import org.springframework.stereotype.Repository;
  */
 @Repository
 public interface EmpresaRepository extends JpaRepository<Empresa, Long>, JpaSpecificationExecutor<Empresa> {
- 
-    
-    
-    Page<Empresa> findBySNrCnpjStartingWith(String cnpj, PageRequest page);
-    Page<Empresa> findBySNmEmpresaStartingWith(String razaoSocial, PageRequest page);
-    
+    Page<Empresa> findByNrCnpjStartingWith(String cnpj, Pageable page);
+    Page<Empresa> findByEmpresaStartingWith(String razaoSocial, Pageable page);
+
 }

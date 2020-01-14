@@ -5,10 +5,15 @@
  */
 package com.core.matrix.wbc.model;
 
+import com.core.matrix.wbc.dto.EmpresaDTO;
 import java.time.LocalDateTime;
 import javax.persistence.Column;
+import javax.persistence.ColumnResult;
+import javax.persistence.ConstructorResult;
 import javax.persistence.Entity;
 import javax.persistence.Id;
+import javax.persistence.NamedNativeQuery;
+import javax.persistence.SqlResultSetMapping;
 import javax.persistence.Table;
 import lombok.Data;
 
@@ -16,6 +21,17 @@ import lombok.Data;
  *
  * @author thiag
  */
+
+
+//    private Long nCdEmpresa;
+//    private String sNrCnpj;
+//    private String sNmEmpresa;
+//    private String sNmFantasia;
+//    private String sNmApelido;
+//    private Long nCdTipoAgente;
+//    private String sDsTipoAgente;
+
+
 
 
 
@@ -30,10 +46,10 @@ public class Empresa {
     private Long nCdEmpresa;
 
     @Column(name = "sNrCnpj")
-    private String sNrCnpj;
+    public String nrCnpj;
 
     @Column(name = "sNmEmpresa")
-    private String sNmEmpresa;
+    private String empresa;
 
     @Column(name = "sNmFantasia")
     private String sNmFantasia;
@@ -337,5 +353,10 @@ public class Empresa {
 
     @Column(name = "tDtSincronizacao")
     private LocalDateTime tDtSincronizacao;
+    
+    
+    public void teste(){
+        
+    }
 
 }
