@@ -21,6 +21,7 @@ import org.activiti.engine.repository.ProcessDefinition;
 import org.activiti.image.ProcessDiagramGenerator;
 import org.activiti.image.impl.DefaultProcessDiagramGenerator;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Service;
 
 /**
@@ -57,6 +58,7 @@ public class RepositoryActivitiService {
         this.repositoryService.deleteDeployment(processDefinitionId, true);
     }
 
+    @Cacheable("processDefinition")
     public List<ProcessDefinitionResponse> listAll() {
         return this.repositoryService
                 .createProcessDefinitionQuery()

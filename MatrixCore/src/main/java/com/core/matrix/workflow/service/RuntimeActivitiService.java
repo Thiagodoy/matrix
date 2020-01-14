@@ -76,12 +76,10 @@ public class RuntimeActivitiService {
 
     public Optional<TaskResponse> startProcess(StartProcessRequest request, String userId) throws Exception {
 
-        
-        if(!Optional.ofNullable(request.getVariables()).isPresent()){
-            request.setVariables(new HashMap<String,Object>());
+        if (!Optional.ofNullable(request.getVariables()).isPresent()) {
+            request.setVariables(new HashMap<String, Object>());
         }
-        
-        
+
         request.getVariables().put("created_by", userId);
         request.getVariables().put("created_at", Utils.dateTimeNowFormated());
 
@@ -89,7 +87,17 @@ public class RuntimeActivitiService {
 
         Task task = this.getNextUserTaskByProcessInstanceId(processInstance.getId(), userId, true);
 
-        return Optional.ofNullable(task).isPresent() ? Optional.of(new TaskResponse(task)) : Optional.empty();
+        TaskResponse taskResponse = new TaskResponse(task);
+         Optional<ProcessDefinitionResponse> resp = repositoryActivitiService
+                .listAll()
+                .stream()
+                .filter(p -> p.getId().equals(task.getProcessDefinitionId()))
+                .findFirst();
+        
+        String name = resp.isPresent() ? resp.get().getName() : "";
+        taskResponse.setProcessDefinitionName(name);
+        
+        return Optional.ofNullable(task).isPresent() ? Optional.of(taskResponse) : Optional.empty();
 
     }
 
@@ -116,6 +124,23 @@ public class RuntimeActivitiService {
             nextTask.setAssignee(owner);
         }
 
+        
+        if(nextTask != null){
+            TaskResponse taskResponse = new TaskResponse(nextTask);
+            Optional<ProcessDefinitionResponse> resp = repositoryActivitiService
+                   .listAll()
+                   .stream()
+                   .filter(p -> p.getId().equals(nextTask.getProcessDefinitionId()))
+                   .findFirst();
+
+           String name = resp.isPresent() ? resp.get().getName() : "";
+           taskResponse.setProcessDefinitionName(name);
+           
+           return delegated && !userId.equals(owner) ? Optional.empty() : Optional.ofNullable(new TaskResponse(nextTask));
+        }
+        
+        
+        
         //a proxima tarefa eh de quem delegou
         return delegated && !userId.equals(owner) ? Optional.empty() : Optional.ofNullable(new TaskResponse(nextTask));
 
@@ -132,7 +157,17 @@ public class RuntimeActivitiService {
             t = historyService.createHistoricTaskInstanceQuery().taskId(taskId).includeProcessVariables().includeTaskLocalVariables().singleResult();
         }
 
-        return new TaskResponse(t);
+        TaskResponse task = new TaskResponse(t);
+        Optional<ProcessDefinitionResponse> resp = repositoryActivitiService
+                .listAll()
+                .stream()
+                .filter(p -> p.getId().equals(task.getProcessDefinitionId()))
+                .findFirst();
+        
+        String name = resp.isPresent() ? resp.get().getName() : "";
+        task.setProcessDefinitionName(name);
+
+        return task;
     }
 
     public Map<String, Object> getLocalVariables(String taskId) {
@@ -174,21 +209,24 @@ public class RuntimeActivitiService {
                 + "                INNER JOIN\n"
                 + "            act_id_user b ON a.USER_ID_ = b.ID_ where  b.id_ = '" + userId + "')")
                 .list()
-                .stream()
-                .map((t) -> new TaskResponse(t))
+                .parallelStream()
+                .map(t -> {
+                    TaskResponse instance = new TaskResponse(t);
+                    Optional<ProcessDefinitionResponse> resp = repositoryActivitiService.listAll().stream().filter(p -> p.getId().equals(t.getProcessDefinitionId())).findFirst();
+                    String name = resp.isPresent() ? resp.get().getName() : "";
+                    instance.setProcessDefinitionName(name);
+                    return instance;
+                })
                 .collect(Collectors.toList());
 
     }
 
     public PageResponse<TaskResponse> getCandidateTasks(String user, int page, int size) {
 
-        List<ProcessDefinitionResponse> processDefinitions = Collections.synchronizedList(repositoryActivitiService.listAll());
-
-        
         Long sizeTotalElements = taskService.createTaskQuery().taskCandidateUser(user).count();
         Long sizePage = sizeTotalElements / size;
-        
-        List<TaskResponse> response =  taskService
+
+        List<TaskResponse> response = taskService
                 .createTaskQuery()
                 .taskCandidateUser(user)
                 .includeProcessVariables()
@@ -199,13 +237,13 @@ public class RuntimeActivitiService {
                 .parallelStream()
                 .map(t -> {
                     TaskResponse instance = new TaskResponse(t);
-                    Optional<ProcessDefinitionResponse> resp = processDefinitions.stream().filter(p -> p.getId().equals(t.getProcessDefinitionId())).findFirst();
+                    Optional<ProcessDefinitionResponse> resp = repositoryActivitiService.listAll().stream().filter(p -> p.getId().equals(t.getProcessDefinitionId())).findFirst();
                     String name = resp.isPresent() ? resp.get().getName() : "";
                     instance.setProcessDefinitionName(name);
                     return instance;
                 })
                 .collect(Collectors.toList());
-        
+
         return new PageResponse<TaskResponse>(response, sizePage, (long) response.size(), sizeTotalElements, (long) page);
 
     }
@@ -213,7 +251,7 @@ public class RuntimeActivitiService {
     @Transactional(readOnly = true)
     public PageResponse<TaskResponse> getMyTasks(String user, int page, int size) {
 
-        List<ProcessDefinitionResponse> processDefinitions = Collections.synchronizedList(repositoryActivitiService.listAll());
+        
 
         Long sizeTotalElements = taskService.createTaskQuery().taskAssignee(user).count();
         Long sizePage = sizeTotalElements / size;
@@ -228,7 +266,7 @@ public class RuntimeActivitiService {
                 .parallelStream()
                 .map(t -> {
                     TaskResponse instance = new TaskResponse(t);
-                    Optional<ProcessDefinitionResponse> resp = processDefinitions.stream().filter(p -> p.getId().equals(t.getProcessDefinitionId())).findFirst();
+                    Optional<ProcessDefinitionResponse> resp = repositoryActivitiService.listAll().stream().filter(p -> p.getId().equals(t.getProcessDefinitionId())).findFirst();
                     String name = resp.isPresent() ? resp.get().getName() : "";
                     instance.setProcessDefinitionName(name);
                     return instance;
@@ -242,7 +280,7 @@ public class RuntimeActivitiService {
     @Transactional(readOnly = true)
     public PageResponse<TaskResponse> getInvolvedTasks(String user, int page, int size) {
 
-        List<ProcessDefinitionResponse> processDefinitions = Collections.synchronizedList(repositoryActivitiService.listAll());
+        
 
         Long sizeTotalElements = taskService.createTaskQuery().taskInvolvedUser(user).count();
         Long sizePage = sizeTotalElements / size;
@@ -257,7 +295,7 @@ public class RuntimeActivitiService {
                 .parallelStream()
                 .map(t -> {
                     TaskResponse instance = new TaskResponse(t);
-                    Optional<ProcessDefinitionResponse> resp = processDefinitions.stream().filter(p -> p.getId().equals(t.getProcessDefinitionId())).findFirst();
+                    Optional<ProcessDefinitionResponse> resp = repositoryActivitiService.listAll().stream().filter(p -> p.getId().equals(t.getProcessDefinitionId())).findFirst();
                     String name = resp.isPresent() ? resp.get().getName() : "";
                     instance.setProcessDefinitionName(name);
                     return instance;
@@ -270,7 +308,14 @@ public class RuntimeActivitiService {
 
     public Task getNextUserTaskByProcessInstanceId(String processInstanceId, String userId, boolean assigneToUser) throws Exception {
 
-        List<Task> l = taskService.createTaskQuery().active().taskCandidateOrAssigned(userId).processInstanceId(processInstanceId).includeProcessVariables().includeTaskLocalVariables().list();
+        List<Task> l = taskService
+                .createTaskQuery()
+                .active()
+                .taskCandidateOrAssigned(userId)
+                .processInstanceId(processInstanceId)
+                .includeProcessVariables()
+                .includeTaskLocalVariables()
+                .list();
 
         if (l != null && !l.isEmpty()) {
             if (assigneToUser) {
@@ -332,6 +377,9 @@ public class RuntimeActivitiService {
                 return l.get(0);
             }
         }
+        
+        
+        
 
         return null;
 
