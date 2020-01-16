@@ -9,6 +9,7 @@ import java.io.Serializable;
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.Id;
+import javax.persistence.IdClass;
 import javax.persistence.Table;
 import lombok.Data;
 
@@ -19,7 +20,8 @@ import lombok.Data;
 @Entity
 @Table(name = "mtx_empresa_posvenda")
 @Data
-public class CompanyAfterSales {
+@IdClass(CompanyAfterSales.IdClass.class)
+public class CompanyAfterSales implements  Serializable{
     
     @Id
     @Column(name = "wbc_empresa")
