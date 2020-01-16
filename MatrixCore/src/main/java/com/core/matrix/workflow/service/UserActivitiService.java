@@ -50,7 +50,7 @@ public class UserActivitiService {
     }
     
     @Transactional(readOnly = true)
-    public Page<UserActiviti>  list(String firstName, String lastName, String email,  Pageable page){
+    public Page<UserActiviti>  list(String firstName, String lastName, String email, String profile,  Pageable page){
          List<Specification<UserActiviti>> predicates = new ArrayList<>();
 
         if (Optional.ofNullable(firstName).isPresent()) {
@@ -64,6 +64,10 @@ public class UserActivitiService {
         if (Optional.ofNullable(email).isPresent()) {
             predicates.add(UserActivitiSpecification.email(email));
         }    
+        
+        if (Optional.ofNullable(profile).isPresent()) {
+            predicates.add(UserActivitiSpecification.profile(profile));
+        } 
 
         Specification<UserActiviti> specification = predicates.stream().reduce((a, b) -> a.and(b)).orElse(null);
 

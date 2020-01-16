@@ -36,11 +36,12 @@ public class UserResource {
     public ResponseEntity get(@RequestParam(name = "firstName", required = false) String firstName,
             @RequestParam(name = "lastName",required = false) String lastName,
             @RequestParam(name = "email", required = false) String email,
+            @RequestParam(name = "profile", required = false) String profile,
             @RequestParam(name = "page", defaultValue = "0") int page,
             @RequestParam(name = "size", defaultValue = "10") int size) {
         try {
 
-            Page<UserActiviti> response = this.service.list(firstName, lastName, email, PageRequest.of(page, size));
+            Page<UserActiviti> response = this.service.list(firstName, lastName, email, profile, PageRequest.of(page, size));
             return ResponseEntity.ok(response);
 
         } catch (Exception e) {

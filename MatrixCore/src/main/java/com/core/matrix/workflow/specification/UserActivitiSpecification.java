@@ -21,4 +21,8 @@ public class UserActivitiSpecification {
     public static Specification<UserActiviti> email(String email) {
         return (root, criteriaQuery, criteriaBuilder) -> criteriaBuilder.like(root.get(UserActiviti_.email), email + "%");
     }
+    
+     public static Specification<UserActiviti> profile(String profile) {
+        return (root, criteriaQuery, criteriaBuilder) -> criteriaBuilder.like(root.get(UserActiviti_.profile), profile + "%");
+    }
 }

@@ -13,6 +13,7 @@ import javax.persistence.Entity;
 import javax.persistence.FetchType;
 import javax.persistence.Id;
 import javax.persistence.OneToMany;
+import javax.persistence.PrePersist;
 import javax.persistence.Table;
 import lombok.Data;
 import org.activiti.engine.identity.User;
@@ -53,6 +54,9 @@ public class UserActiviti implements UserDetails, User{
 
     @Column(name = "PICTURE_ID_")
     private String picture;
+    
+    @Column(name = "PROFILE_ID_")
+    private  String profile;
 
 //    @Column(name = "USER_MASTER_ID_")
 //    private String userMasterId;    
@@ -67,6 +71,14 @@ public class UserActiviti implements UserDetails, User{
 
     @OneToMany(cascade = CascadeType.ALL, orphanRemoval = true, mappedBy = "userId", fetch = FetchType.EAGER)
     private List<UserInfoActiviti> info;   
+    
+    
+    
+    @PrePersist
+    public void associateUserWithProfile(){
+      Optional<GroupMemberActiviti> opt =  this.groups.stream().findFirst();
+      this.profile = opt.isPresent() ? opt.get().getGroupId() : "without-profile";
+    }
 
     public UserActiviti() {
     }
