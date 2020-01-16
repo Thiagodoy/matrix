@@ -24,7 +24,7 @@ import lombok.Data;
 public class CompanyManager implements  Serializable{
     
     @Id
-    @Column(name = "id_empresa_contrato")
+    @Column(name = "wbc_empresa")
     private Long empresa;
     @Id
     @Column(name = "id_gestor")
