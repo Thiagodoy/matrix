@@ -36,9 +36,9 @@ public class PageResponse<T>  {
     private Long page;
     
     
-    public PageResponse(List<T> content, Long totalPages, Long totalElements, Long size, Long page ){
+    public PageResponse(List<T> content, Long totalElements, Long size, Long page ){
         this.content = content;
-        this.totalPages = totalPages;
+        this.totalPages = (size / totalElements) < 1 ? 1 : (size / totalElements);
         this.totalElements = totalElements;
         this.size = size;  
         this.page = page;   

@@ -13,7 +13,6 @@ import com.core.matrix.response.TaskResponse;
 import com.core.matrix.utils.Utils;
 import com.core.matrix.workflow.model.GroupMemberActiviti;
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -42,7 +41,6 @@ import org.activiti.engine.task.DelegationState;
 import org.activiti.engine.task.Task;
 import org.activiti.engine.task.TaskInfo;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.context.ApplicationContext;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -57,10 +55,7 @@ public class RuntimeActivitiService {
     private RuntimeService runtimeService;
 
     @Autowired
-    private TaskService taskService;
-
-    @Autowired
-    private ApplicationContext context;
+    private TaskService taskService;    
 
     @Autowired
     private HistoryService historyService;
@@ -134,16 +129,14 @@ public class RuntimeActivitiService {
                    .findFirst();
 
            String name = resp.isPresent() ? resp.get().getName() : "";
-           taskResponse.setProcessDefinitionName(name);
+           taskResponse.setProcessDefinitionName(name);   
+
+
            
            return delegated && !userId.equals(owner) ? Optional.empty() : Optional.ofNullable(new TaskResponse(nextTask));
         }
         
-        
-        
-        //a proxima tarefa eh de quem delegou
-        return delegated && !userId.equals(owner) ? Optional.empty() : Optional.ofNullable(new TaskResponse(nextTask));
-
+        return  Optional.empty();
     }
 
     public TaskResponse getTask(String taskId) {
@@ -223,8 +216,7 @@ public class RuntimeActivitiService {
 
     public PageResponse<TaskResponse> getCandidateTasks(String user, int page, int size) {
 
-        Long sizeTotalElements = taskService.createTaskQuery().taskCandidateUser(user).count();
-        Long sizePage = sizeTotalElements / size;
+        Long sizeTotalElements = taskService.createTaskQuery().taskCandidateUser(user).count();       
 
         List<TaskResponse> response = taskService
                 .createTaskQuery()
@@ -244,7 +236,7 @@ public class RuntimeActivitiService {
                 })
                 .collect(Collectors.toList());
 
-        return new PageResponse<TaskResponse>(response, sizePage, (long) response.size(), sizeTotalElements, (long) page);
+        return new PageResponse<TaskResponse>(response, (long) response.size(), sizeTotalElements, (long) page);
 
     }
 
@@ -253,8 +245,7 @@ public class RuntimeActivitiService {
 
         
 
-        Long sizeTotalElements = taskService.createTaskQuery().taskAssignee(user).count();
-        Long sizePage = sizeTotalElements / size;
+        Long sizeTotalElements = taskService.createTaskQuery().taskAssignee(user).count();        
 
         List<TaskResponse> response = taskService
                 .createTaskQuery()
@@ -273,7 +264,7 @@ public class RuntimeActivitiService {
                 })
                 .collect(Collectors.toList());
 
-        return new PageResponse<TaskResponse>(response, sizePage, (long) response.size(), sizeTotalElements, (long) page);
+        return new PageResponse<TaskResponse>(response, (long) response.size(), sizeTotalElements, (long) page);
 
     }
 
@@ -282,8 +273,7 @@ public class RuntimeActivitiService {
 
         
 
-        Long sizeTotalElements = taskService.createTaskQuery().taskInvolvedUser(user).count();
-        Long sizePage = sizeTotalElements / size;
+        Long sizeTotalElements = taskService.createTaskQuery().taskInvolvedUser(user).count();        
 
         List<TaskResponse> response = taskService
                 .createTaskQuery()
@@ -302,7 +292,7 @@ public class RuntimeActivitiService {
                 })
                 .collect(Collectors.toList());
 
-        return new PageResponse<TaskResponse>(response, sizePage, (long) response.size(), sizeTotalElements, (long) page);
+        return new PageResponse<TaskResponse>(response, (long) response.size(), sizeTotalElements, (long) page);
 
     }
 

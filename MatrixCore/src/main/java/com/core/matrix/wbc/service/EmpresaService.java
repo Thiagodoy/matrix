@@ -59,10 +59,10 @@ public class EmpresaService {
                     })
                     .collect(Collectors.toList());
             
-            return new PageResponse<EmpresaDTO>(empresaDTOs,(long)result.getTotalPages(),(long)result.getNumberOfElements(),(long)result.getTotalElements(), (long)page.getPageNumber());
+            return new PageResponse<EmpresaDTO>(empresaDTOs,(long)result.getNumberOfElements(),(long)result.getTotalElements(), (long)page.getPageNumber());
 
         } else {
-            return new PageResponse<EmpresaDTO>(null,0L,0L,0L, 0L);
+            return new PageResponse<EmpresaDTO>(null,0L,0L, 0L);
         }
 
     }
