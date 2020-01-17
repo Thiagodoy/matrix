@@ -7,6 +7,7 @@ package com.core.matrix.workflow.service;
 
 import com.core.matrix.request.UserDeleteRequest;
 import com.core.matrix.utils.Utils;
+import com.core.matrix.workflow.model.GroupMemberActiviti;
 import com.core.matrix.workflow.model.UserActiviti;
 import com.core.matrix.workflow.repository.UserRepository;
 import com.core.matrix.workflow.specification.UserActivitiSpecification;
@@ -32,7 +33,13 @@ public class UserActivitiService {
     
     @Transactional
     public void save(UserActiviti user){        
-        user.setPassword(Utils.encodePassword(user.getPassword()));        
+        user.setPassword(Utils.encodePassword(user.getPassword())); 
+        
+        Optional<GroupMemberActiviti> opt =  user.getGroups().stream().findFirst();
+        String profile = opt.isPresent() ? opt.get().getGroupId() : "without-profile";
+        user.setProfile(profile);
+        
+        
         this.repository.save(user);
     }
     

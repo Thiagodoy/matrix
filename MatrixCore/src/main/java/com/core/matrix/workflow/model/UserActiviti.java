@@ -12,6 +12,7 @@ import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.FetchType;
 import javax.persistence.Id;
+import javax.persistence.JoinColumn;
 import javax.persistence.OneToMany;
 import javax.persistence.PrePersist;
 import javax.persistence.Table;
@@ -66,18 +67,20 @@ public class UserActiviti implements UserDetails, User{
 //    @Column(name = "created_at_")
 //    private LocalDateTime createdAt;
 
-    @OneToMany(cascade = CascadeType.ALL, orphanRemoval = true, mappedBy = "userId", fetch = FetchType.EAGER)
+    @OneToMany(cascade = {CascadeType.ALL}, orphanRemoval = true,  fetch = FetchType.EAGER)
+    @JoinColumn(name = "USER_ID_")
     private Set<GroupMemberActiviti> groups;
 
-    @OneToMany(cascade = CascadeType.ALL, orphanRemoval = true, mappedBy = "userId", fetch = FetchType.EAGER)
+    @OneToMany(cascade = CascadeType.ALL, orphanRemoval = true, fetch = FetchType.EAGER)
+    @JoinColumn(name = "USER_ID_")
     private List<UserInfoActiviti> info;   
     
     
     
     @PrePersist
     public void associateUserWithProfile(){
-      Optional<GroupMemberActiviti> opt =  this.groups.stream().findFirst();
-      this.profile = opt.isPresent() ? opt.get().getGroupId() : "without-profile";
+//      Optional<GroupMemberActiviti> opt =  this.groups.stream().findFirst();
+//      this.profile = opt.isPresent() ? opt.get().getGroupId() : "without-profile";
     }
 
     public UserActiviti() {
