@@ -6,18 +6,8 @@
 package com.core.matrix.response;
 
 
-import java.util.Iterator;
 import java.util.List;
-import java.util.Set;
-import java.util.function.Function;
-import java.util.function.Predicate;
-import java.util.function.Supplier;
-import java.util.stream.Stream;
 import lombok.Data;
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.Pageable;
-import org.springframework.data.domain.Sort;
-import org.springframework.data.util.Streamable;
 
 /**
  *
@@ -38,7 +28,7 @@ public class PageResponse<T>  {
     
     public PageResponse(List<T> content, Long totalElements, Long size, Long page ){
         this.content = content;
-        this.totalPages = (size / totalElements) < 1 ? 1 : (size / totalElements);
+        this.totalPages = (totalElements == 0) || (size / totalElements) < 1 ? 1 : (size / totalElements);
         this.totalElements = totalElements;
         this.size = size;  
         this.page = page;   
