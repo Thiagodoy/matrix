@@ -30,10 +30,9 @@ public class ManagerService {
     private ManagerRepository repository;
 
     @Transactional
-    public void save(ManagerRequest request) {
-
+    public Long  save(ManagerRequest request) {
         Manager manager = new Manager(request);
-        this.repository.save(manager);
+       return this.repository.save(manager).getId();
     }
 
     @Transactional
