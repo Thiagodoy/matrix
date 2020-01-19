@@ -36,8 +36,8 @@ public class ManagerResource {
     @RequestMapping(method = RequestMethod.POST)
     public ResponseEntity post(@RequestBody ManagerRequest request) {
         try {
-            managerService.save(request);
-            return ResponseEntity.ok().build();
+            Long id = managerService.save(request);
+            return ResponseEntity.ok(id);
         } catch (Exception e) {
             Logger.getLogger(ManagerResource.class.getName()).log(Logger.Level.FATAL, "[post]", e);
             return ResponseEntity.status(HttpStatus.resolve(500)).body(e.getMessage());
