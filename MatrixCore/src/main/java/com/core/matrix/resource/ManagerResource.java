@@ -67,7 +67,7 @@ public class ManagerResource {
     }
 
     @RequestMapping(method = RequestMethod.GET)
-    public ResponseEntity get(@RequestParam(name = "companyName", required = false) String companyName,
+    public ResponseEntity get(@RequestParam(name = "razaoSocial", required = false) String companyName,
             @RequestParam(name = "cnpj", required = false) String cnpj,
             @RequestParam(name = "page", required = true, defaultValue = "0") int page,
             @RequestParam(name = "size", required = true, defaultValue = "10") int size) {
