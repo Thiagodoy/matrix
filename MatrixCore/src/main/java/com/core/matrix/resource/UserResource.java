@@ -10,6 +10,7 @@ import com.core.matrix.workflow.model.UserActiviti;
 import com.core.matrix.workflow.service.UserActivitiService;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import org.hibernate.exception.ConstraintViolationException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
@@ -34,7 +35,7 @@ public class UserResource {
 
     @RequestMapping(method = RequestMethod.GET)
     public ResponseEntity get(@RequestParam(name = "firstName", required = false) String firstName,
-            @RequestParam(name = "lastName",required = false) String lastName,
+            @RequestParam(name = "lastName", required = false) String lastName,
             @RequestParam(name = "email", required = false) String email,
             @RequestParam(name = "profile", required = false) String profile,
             @RequestParam(name = "page", defaultValue = "0") int page,
@@ -57,6 +58,9 @@ public class UserResource {
             this.service.save(request);
             return ResponseEntity.ok().build();
 
+        } catch (ConstraintViolationException e) {
+            org.jboss.logging.Logger.getLogger(ManagerResource.class.getName()).log(org.jboss.logging.Logger.Level.FATAL, "[post]", e);
+            return ResponseEntity.status(HttpStatus.resolve(500)).body("Usuário "+ request.getEmail() + " já cadastrado!");
         } catch (Exception e) {
             Logger.getLogger(UserResource.class.getName()).log(Level.SEVERE, "[post]", e);
             return ResponseEntity.status(HttpStatus.resolve(500)).build();

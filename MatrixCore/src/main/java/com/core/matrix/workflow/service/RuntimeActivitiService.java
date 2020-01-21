@@ -5,13 +5,17 @@
  */
 package com.core.matrix.workflow.service;
 
+import com.core.matrix.request.AddComment;
 import com.core.matrix.request.CompleteTaskRequest;
 import com.core.matrix.request.StartProcessRequest;
 import com.core.matrix.response.PageResponse;
 import com.core.matrix.response.ProcessDefinitionResponse;
+import com.core.matrix.response.ProcessDetail;
 import com.core.matrix.response.TaskResponse;
 import com.core.matrix.utils.Utils;
 import com.core.matrix.workflow.model.GroupMemberActiviti;
+import java.io.IOException;
+import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -37,12 +41,15 @@ import org.activiti.engine.impl.task.TaskDefinition;
 
 import org.activiti.engine.runtime.Execution;
 import org.activiti.engine.runtime.ProcessInstance;
+import org.activiti.engine.task.Attachment;
+import org.activiti.engine.task.Comment;
 import org.activiti.engine.task.DelegationState;
 import org.activiti.engine.task.Task;
 import org.activiti.engine.task.TaskInfo;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.multipart.MultipartFile;
 
 /**
  *
@@ -55,7 +62,7 @@ public class RuntimeActivitiService {
     private RuntimeService runtimeService;
 
     @Autowired
-    private TaskService taskService;    
+    private TaskService taskService;
 
     @Autowired
     private HistoryService historyService;
@@ -68,7 +75,12 @@ public class RuntimeActivitiService {
 
     @Autowired
     private RepositoryActivitiService repositoryActivitiService;
+    
+    
+    @Autowired
+    private CommentActivitiService commentActivitiService;
 
+    @Transactional
     public Optional<TaskResponse> startProcess(StartProcessRequest request, String userId) throws Exception {
 
         if (!Optional.ofNullable(request.getVariables()).isPresent()) {
@@ -83,19 +95,20 @@ public class RuntimeActivitiService {
         Task task = this.getNextUserTaskByProcessInstanceId(processInstance.getId(), userId, true);
 
         TaskResponse taskResponse = new TaskResponse(task);
-         Optional<ProcessDefinitionResponse> resp = repositoryActivitiService
+        Optional<ProcessDefinitionResponse> resp = repositoryActivitiService
                 .listAll()
                 .stream()
                 .filter(p -> p.getId().equals(task.getProcessDefinitionId()))
                 .findFirst();
-        
+
         String name = resp.isPresent() ? resp.get().getName() : "";
         taskResponse.setProcessDefinitionName(name);
-        
+
         return Optional.ofNullable(task).isPresent() ? Optional.of(taskResponse) : Optional.empty();
 
     }
 
+    @Transactional
     public Optional<TaskResponse> completeTask(String userId, CompleteTaskRequest request) throws Exception {
 
         Task currentTask = taskService.createTaskQuery().taskId(request.getTaskId()).singleResult();
@@ -119,24 +132,21 @@ public class RuntimeActivitiService {
             nextTask.setAssignee(owner);
         }
 
-        
-        if(nextTask != null){
+        if (nextTask != null) {
             TaskResponse taskResponse = new TaskResponse(nextTask);
             Optional<ProcessDefinitionResponse> resp = repositoryActivitiService
-                   .listAll()
-                   .stream()
-                   .filter(p -> p.getId().equals(nextTask.getProcessDefinitionId()))
-                   .findFirst();
+                    .listAll()
+                    .stream()
+                    .filter(p -> p.getId().equals(nextTask.getProcessDefinitionId()))
+                    .findFirst();
 
-           String name = resp.isPresent() ? resp.get().getName() : "";
-           taskResponse.setProcessDefinitionName(name);   
+            String name = resp.isPresent() ? resp.get().getName() : "";
+            taskResponse.setProcessDefinitionName(name);
 
-
-           
-           return delegated && !userId.equals(owner) ? Optional.empty() : Optional.ofNullable(new TaskResponse(nextTask));
+            return delegated && !userId.equals(owner) ? Optional.empty() : Optional.ofNullable(new TaskResponse(nextTask));
         }
-        
-        return  Optional.empty();
+
+        return Optional.empty();
     }
 
     public TaskResponse getTask(String taskId) {
@@ -156,7 +166,7 @@ public class RuntimeActivitiService {
                 .stream()
                 .filter(p -> p.getId().equals(task.getProcessDefinitionId()))
                 .findFirst();
-        
+
         String name = resp.isPresent() ? resp.get().getName() : "";
         task.setProcessDefinitionName(name);
 
@@ -216,7 +226,7 @@ public class RuntimeActivitiService {
 
     public PageResponse<TaskResponse> getCandidateTasks(String user, int page, int size) {
 
-        Long sizeTotalElements = taskService.createTaskQuery().taskCandidateUser(user).count();       
+        Long sizeTotalElements = taskService.createTaskQuery().taskCandidateUser(user).count();
 
         List<TaskResponse> response = taskService
                 .createTaskQuery()
@@ -243,9 +253,7 @@ public class RuntimeActivitiService {
     @Transactional(readOnly = true)
     public PageResponse<TaskResponse> getMyTasks(String user, int page, int size) {
 
-        
-
-        Long sizeTotalElements = taskService.createTaskQuery().taskAssignee(user).count();        
+        Long sizeTotalElements = taskService.createTaskQuery().taskAssignee(user).count();
 
         List<TaskResponse> response = taskService
                 .createTaskQuery()
@@ -271,9 +279,7 @@ public class RuntimeActivitiService {
     @Transactional(readOnly = true)
     public PageResponse<TaskResponse> getInvolvedTasks(String user, int page, int size) {
 
-        
-
-        Long sizeTotalElements = taskService.createTaskQuery().taskInvolvedUser(user).count();        
+        Long sizeTotalElements = taskService.createTaskQuery().taskInvolvedUser(user).count();
 
         List<TaskResponse> response = taskService
                 .createTaskQuery()
@@ -296,6 +302,7 @@ public class RuntimeActivitiService {
 
     }
 
+    @Transactional
     public Task getNextUserTaskByProcessInstanceId(String processInstanceId, String userId, boolean assigneToUser) throws Exception {
 
         List<Task> l = taskService
@@ -309,7 +316,7 @@ public class RuntimeActivitiService {
 
         if (l != null && !l.isEmpty()) {
             if (assigneToUser) {
-                taskService.claim(l.get(0).getId(), userId);
+                taskService.setAssignee(l.get(0).getId(), userId);
             }
 
             generateQuestionBar(l.get(0));
@@ -367,9 +374,6 @@ public class RuntimeActivitiService {
                 return l.get(0);
             }
         }
-        
-        
-        
 
         return null;
 
@@ -424,6 +428,49 @@ public class RuntimeActivitiService {
                 }
             }
         }
+    }
+
+    public ProcessDetail getDetail(String processInstanceId) {
+
+        ProcessDetail detail = new ProcessDetail();
+        detail.setComments(taskService.getProcessInstanceComments(processInstanceId));
+        detail.setAttachments(taskService.getProcessInstanceAttachments(processInstanceId));
+
+        HistoricProcessInstance instance = historyService.createHistoricProcessInstanceQuery().processDefinitionId(processInstanceId).singleResult();
+
+        detail.setProcessCreatedDate(instance.getStartTime());
+        detail.setProcessCreatedUser(instance.getStartUserId());
+
+        return detail;
+
+    }
+
+    @Transactional
+    public Comment addComment(AddComment request, String user) {
+        
+        Comment comment = taskService.addComment(null, request.getProcessInstanceId(), request.getMessage());
+        
+        commentActivitiService.setUser(comment.getId(), user);
+        comment = taskService.getComment(comment.getId());
+        return comment;
+    }
+
+    @Transactional
+    public void deleteComment(String id) {
+        taskService.deleteComment(id);
+    }
+
+    @Transactional
+    public void createAttachament(String processInstance, MultipartFile file) throws IOException {
+        taskService.createAttachment(file.getContentType(), null, processInstance, file.getOriginalFilename(), "attachmentDescription", file.getInputStream());
+    }
+    
+    public InputStream getAttachamentContent(String attachamentId){
+        return taskService.getAttachmentContent(attachamentId);
+    }
+    
+    public Attachment getAttachament(String attachamentId){
+        return taskService.getAttachment(attachamentId);
     }
 
 }

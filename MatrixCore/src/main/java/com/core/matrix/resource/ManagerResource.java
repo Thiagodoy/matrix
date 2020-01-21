@@ -8,6 +8,7 @@ package com.core.matrix.resource;
 import com.core.matrix.model.Manager;
 import com.core.matrix.request.ManagerRequest;
 import com.core.matrix.service.ManagerService;
+import org.hibernate.exception.ConstraintViolationException;
 import org.jboss.logging.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
@@ -38,7 +39,11 @@ public class ManagerResource {
         try {
             Long id = managerService.save(request);
             return ResponseEntity.ok(id);
-        } catch (Exception e) {
+        }catch(ConstraintViolationException e){
+            Logger.getLogger(ManagerResource.class.getName()).log(Logger.Level.FATAL, "[post]", e);
+            return ResponseEntity.status(HttpStatus.resolve(500)).body("Gestor já cadastrado!");
+        }        
+        catch (Exception e) {
             Logger.getLogger(ManagerResource.class.getName()).log(Logger.Level.FATAL, "[post]", e);
             return ResponseEntity.status(HttpStatus.resolve(500)).body(e.getMessage());
         }

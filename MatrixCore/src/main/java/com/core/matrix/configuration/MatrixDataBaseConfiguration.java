@@ -74,10 +74,13 @@ public class MatrixDataBaseConfiguration {
         hikariConfig.setUsername(matrixProperties.getDatasource().getSqlserver().getDataSourceUser());
         hikariConfig.setPassword(matrixProperties.getDatasource().getSqlserver().getDataSourcePassword());
         hikariConfig.setPoolName(NAME_POOL);
+        
         hikariConfig.setConnectionTestQuery(matrixProperties.getDatasource().getSqlserver().getConnectionTestQuery());
 
         dataSource = new HikariDataSource(hikariConfig);       
-
+        
+        
+        
         return dataSource;
     }
 

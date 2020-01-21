@@ -5,26 +5,35 @@
  */
 package com.core.matrix.resource;
 
+import com.core.matrix.request.AddComment;
 import com.core.matrix.request.CompleteTaskRequest;
 import com.core.matrix.request.StartProcessRequest;
 import com.core.matrix.response.PageResponse;
+import com.core.matrix.response.ProcessDetail;
 import com.core.matrix.response.TaskResponse;
 import com.core.matrix.utils.Constants;
 import com.core.matrix.workflow.service.RuntimeActivitiService;
+import java.io.InputStream;
 import java.security.Principal;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import javax.servlet.http.HttpServletResponse;
+import org.activiti.engine.task.Attachment;
+import org.activiti.engine.task.Comment;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.RequestPart;
 import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.multipart.MultipartFile;
 
 /**
  *
@@ -136,6 +145,75 @@ public class RunTimeResource {
             return ResponseEntity.ok(response);
         } catch (Exception e) {
             Logger.getLogger(RunTimeResource.class.getName()).log(Level.SEVERE, "[getVariables]", e);
+            return ResponseEntity.status(HttpStatus.resolve(500)).body(e.getMessage());
+        }
+    }
+
+    @RequestMapping(value = "/comment", method = RequestMethod.POST)
+    public ResponseEntity addComment(@RequestBody AddComment request, Principal principal) {
+        try {
+
+            Comment response = service.addComment(request, principal.getName());
+            return ResponseEntity.ok(response);
+        } catch (Exception e) {
+            Logger.getLogger(RunTimeResource.class.getName()).log(Level.SEVERE, "[addComment]", e);
+            return ResponseEntity.status(HttpStatus.resolve(500)).body(e.getMessage());
+        }
+    }
+
+    @RequestMapping(value = "/comment/{id}", method = RequestMethod.DELETE)
+    public ResponseEntity deleteComment(@PathVariable(name = "id") String id) {
+        try {
+
+            service.deleteComment(id);
+            return ResponseEntity.ok().build();
+        } catch (Exception e) {
+            Logger.getLogger(RunTimeResource.class.getName()).log(Level.SEVERE, "[deleteComment]", e);
+            return ResponseEntity.status(HttpStatus.resolve(500)).body(e.getMessage());
+        }
+    }
+
+    @RequestMapping(value = "/detail/{id}", method = RequestMethod.DELETE)
+    public ResponseEntity detail(@PathVariable(name = "id") String id) {
+        try {
+
+            ProcessDetail response = service.getDetail(id);
+            return ResponseEntity.ok(response);
+        } catch (Exception e) {
+            Logger.getLogger(RunTimeResource.class.getName()).log(Level.SEVERE, "[detail]", e);
+            return ResponseEntity.status(HttpStatus.resolve(500)).body(e.getMessage());
+        }
+    }
+
+    @RequestMapping(value = "/attachment", method = RequestMethod.POST)
+    public ResponseEntity createAttachment(@RequestPart(value = "file") MultipartFile file,
+            @RequestPart(value = "processInstance") String processInstance) {
+        try {
+            this.service.createAttachament(processInstance, file);
+            return ResponseEntity.ok().build();
+        } catch (Exception e) {
+            Logger.getLogger(RepositoryResource.class.getName()).log(Level.SEVERE, "[post]", e);
+            return ResponseEntity.status(HttpStatus.resolve(500)).body(e.getMessage());
+        }
+    }
+
+    @RequestMapping(value = "/attachment", method = RequestMethod.GET)
+    public ResponseEntity downloadAttachment(@RequestParam(value = "attachamentId") String attachamentId,
+            @RequestPart(value = "processInstance") String processInstance, HttpServletResponse response) {
+        try {
+
+            Attachment at = service.getAttachament(attachamentId);
+            InputStream attachment = service.getAttachamentContent(attachamentId);
+
+            org.apache.commons.io.IOUtils.copy(attachment, response.getOutputStream());
+            response.flushBuffer();
+
+            response.setContentType(at.getType());
+            response.setHeader("Content-disposition", "attachment; filename=" + at.getName());
+
+            return ResponseEntity.ok().build();
+        } catch (Exception e) {
+            Logger.getLogger(RepositoryResource.class.getName()).log(Level.SEVERE, "[post]", e);
             return ResponseEntity.status(HttpStatus.resolve(500)).body(e.getMessage());
         }
     }
