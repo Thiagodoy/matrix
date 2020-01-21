@@ -90,7 +90,7 @@ import lombok.Data;
 "   AND CT.[nCdSituacaoContrato] = SC.nCdSituacaoContrato\n" +
 "   AND CT.[nCdAgrupador] = CA.nCdAgrupador\n" +
 "   AND CT.[nCdSituacaoContrato] = 8\n" +
-"   AND CT.[nCdContrato] = :contractId", name = "Contract.shortInfomation", resultSetMapping = "contractDTO")
+"   AND CT.[sNrContrato] = :contractId", name = "Contract.shortInfomation", resultSetMapping = "contractDTO")
 
 @Entity
 @Table(name = "CE_CONTRATO")
