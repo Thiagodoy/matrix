@@ -72,6 +72,7 @@ public class RuntimeActivitiService {
 
     @Autowired
     private UserActivitiService userActivitiService;
+    
 
     @Autowired
     private RepositoryActivitiService repositoryActivitiService;
@@ -227,10 +228,11 @@ public class RuntimeActivitiService {
     public PageResponse<TaskResponse> getCandidateTasks(String user, int page, int size) {
 
         Long sizeTotalElements = taskService.createTaskQuery().taskCandidateUser(user).count();
+       // grou
 
         List<TaskResponse> response = taskService
                 .createTaskQuery()
-                .taskCandidateUser(user)
+                .taskCandidateGroup(user)
                 .includeProcessVariables()
                 .includeTaskLocalVariables()
                 .orderByTaskCreateTime()

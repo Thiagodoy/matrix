@@ -7,6 +7,7 @@ package com.core.matrix.workflow.service;
 
 import com.core.matrix.request.UserDeleteRequest;
 import com.core.matrix.utils.Utils;
+import com.core.matrix.workflow.model.GroupActiviti;
 import com.core.matrix.workflow.model.GroupMemberActiviti;
 import com.core.matrix.workflow.model.UserActiviti;
 import com.core.matrix.workflow.repository.UserRepository;
@@ -81,5 +82,8 @@ public class UserActivitiService {
         return repository.findAll(specification, page);
     }
     
+    public GroupActiviti getProfile(){
+        return null;
+    }
     
 }
