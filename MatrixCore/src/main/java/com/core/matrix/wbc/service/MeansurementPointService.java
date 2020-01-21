@@ -5,9 +5,10 @@
  */
 package com.core.matrix.wbc.service;
 
-import com.core.matrix.wbc.model.MeansurementPoint;
 import com.core.matrix.wbc.repository.MeansurementPointRepository;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -27,8 +28,13 @@ public class MeansurementPointService {
     }
     
     @Transactional(readOnly = true)
-    public MeansurementPoint getPoint(String point) {
-        return this.repository.findByCode(point).get();
+    public Page list(Long company , String point, PageRequest page) {        
+        
+        if(company != null && point != null){
+            return this.repository.findByCompanyAndCode(company, point, page);
+        }else{
+            return this.repository.findByCompany(company, page);
+        }
     }
 
 }

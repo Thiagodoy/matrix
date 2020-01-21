@@ -5,11 +5,12 @@
  */
 package com.core.matrix.wbc.resource;
 
-import com.core.matrix.wbc.model.MeansurementPoint;
 import com.core.matrix.wbc.service.MeansurementPointService;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -29,9 +30,12 @@ public class MeansurementPointResource {
     private MeansurementPointService service;
 
     @RequestMapping(method = RequestMethod.GET)
-    public ResponseEntity getPoint(@RequestParam(name = "point") String point) {
+    public ResponseEntity list(@RequestParam(name = "point",required = false) String point,
+                               @RequestParam(name = "company",required = true) Long company,
+                               @RequestParam(name = "page",required = true, defaultValue = "0") int page,
+                               @RequestParam(name = "size",required = true, defaultValue = "10") int size) {
         try {
-            MeansurementPoint response = service.getPoint(point);
+            Page response = service.list(company,point,PageRequest.of(page, size));
             return ResponseEntity.ok(response);
         } catch (Exception e) {
             Logger.getLogger(MeansurementPointResource.class.getName()).log(Level.SEVERE, "[getPoint]", e);

@@ -37,7 +37,7 @@ public class EmpresaService {
         if (Optional.ofNullable(cnpj).isPresent()) {
             result = this.repository.findByNrCnpjStartingWith(cnpj, page);
         } else if (Optional.ofNullable(razaoSocial).isPresent()) {
-            result = this.repository.findByEmpresaStartingWith(razaoSocial, page);
+            result = this.repository.findByEmpresaContaining(razaoSocial, page);
         } else {
             result = this.repository.findAll(page);
         }
