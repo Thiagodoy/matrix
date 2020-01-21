@@ -14,9 +14,9 @@ activiti:
         autoCommit: false
         initializationFailFast: false        
         sqlserver:            
-            dataUrl: jdbc:mysql://localhost:3306/activiti?rewriteBatchedStatements=true&useTimezone=true&serverTimezone=UTC&useLegacyDatetimeCode=false&autoReconnect=true            
-            dataSourceUser: root
-            dataSourcePassword: root
+            dataUrl: jdbc:mysql://bd-hml-portal-atendimento-matrix.mysql.database.azure.com:3306/activiti?rewriteBatchedStatements=true&useTimezone=true&serverTimezone=UTC&useLegacyDatetimeCode=false&autoReconnect=true            
+            dataSourceUser: bd_hml_admin@bd-hml-portal-atendimento-matrix
+            dataSourcePassword: iP9w5tux*
             port: 3306            
             connectionTestQuery: SELECT 1  
  
@@ -32,9 +32,9 @@ matrix:
         autoCommit: false
         initializationFailFast: false        
         sqlserver:            
-            dataUrl: jdbc:mysql://localhost:3306/matrix?rewriteBatchedStatements=true&useTimezone=true&serverTimezone=UTC&useLegacyDatetimeCode=false&autoReconnect=true            
-            dataSourceUser: root
-            dataSourcePassword: root
+            dataUrl: jdbc:mysql://bd-hml-portal-atendimento-matrix.mysql.database.azure.com:3306/matrix?rewriteBatchedStatements=true&useTimezone=true&serverTimezone=UTC&useLegacyDatetimeCode=false&autoReconnect=true            
+            dataSourceUser: bd_hml_admin@bd-hml-portal-atendimento-matrix
+            dataSourcePassword: iP9w5tux*
             port: 3306            
             connectionTestQuery: SELECT 1  
   

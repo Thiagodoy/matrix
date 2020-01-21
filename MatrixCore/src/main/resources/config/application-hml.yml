@@ -50,7 +50,7 @@ wbc:
         autoCommit: false
         initializationFailFast: false        
         sqlserver:            
-            dataUrl: jdbc:sqlserver://MEDB\homologacao;databaseName=WBC_ENERGY_DB_HML;user=matrix_portal;password=portal_matrix
+            dataUrl: jdbc:sqlserver://192.168.0.22\homologacao;databaseName=WBC_ENERGY_DB_HML;user=matrix_portal;password=portal_matrix
             dataSourceUser: matrix_portal
             dataSourcePassword: portal_matrix
             port: 3306            
