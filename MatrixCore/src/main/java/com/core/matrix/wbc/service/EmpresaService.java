@@ -31,13 +31,15 @@ public class EmpresaService {
     @Autowired
     private AgentTypeService agentTypeService;
 
-    public PageResponse<EmpresaDTO> findAll(String cnpj, String razaoSocial, PageRequest page) {
+    public PageResponse<EmpresaDTO> findAll(String cnpj, String razaoSocial,String apelido, PageRequest page) {
 
         Page<Empresa> result = null;
         if (Optional.ofNullable(cnpj).isPresent()) {
             result = this.repository.findByNrCnpjStartingWith(cnpj, page);
         } else if (Optional.ofNullable(razaoSocial).isPresent()) {
             result = this.repository.findByEmpresaContaining(razaoSocial, page);
+        } else if(Optional.ofNullable(apelido).isPresent()){
+            result = this.repository.findByApelidoContaining(apelido, page);
         } else {
             result = this.repository.findAll(page);
         }

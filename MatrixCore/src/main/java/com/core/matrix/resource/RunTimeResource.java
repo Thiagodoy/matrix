@@ -8,6 +8,7 @@ package com.core.matrix.resource;
 import com.core.matrix.request.AddComment;
 import com.core.matrix.request.CompleteTaskRequest;
 import com.core.matrix.request.StartProcessRequest;
+import com.core.matrix.response.AttachmentResponse;
 import com.core.matrix.response.PageResponse;
 import com.core.matrix.response.ProcessDetail;
 import com.core.matrix.response.TaskResponse;
@@ -189,17 +190,29 @@ public class RunTimeResource {
     public ResponseEntity createAttachment(@RequestPart(value = "file") MultipartFile file,
             @RequestPart(value = "processInstance") String processInstance) {
         try {
-            this.service.createAttachament(processInstance, file);
-            return ResponseEntity.ok().build();
+            AttachmentResponse response =  this.service.createAttachament(processInstance, file);
+            return ResponseEntity.ok(response);
         } catch (Exception e) {
             Logger.getLogger(RepositoryResource.class.getName()).log(Level.SEVERE, "[post]", e);
             return ResponseEntity.status(HttpStatus.resolve(500)).body(e.getMessage());
         }
     }
 
+    @RequestMapping(value = "/attachment/{attachmentId}", method = RequestMethod.DELETE)
+    public ResponseEntity deleteAttachment(@PathVariable(value = "attachmentId") String attachmentId) {
+        try {
+            this.service.deleteAttachment(attachmentId);
+            return ResponseEntity.ok().build();
+        } catch (Exception e) {
+            Logger.getLogger(RepositoryResource.class.getName()).log(Level.SEVERE, "[post]", e);
+            return ResponseEntity.status(HttpStatus.resolve(500)).body(e.getMessage());
+        }
+    }
+    
+    
     @RequestMapping(value = "/attachment", method = RequestMethod.GET)
     public ResponseEntity downloadAttachment(@RequestParam(value = "attachamentId") String attachamentId,
-            @RequestPart(value = "processInstance") String processInstance, HttpServletResponse response) {
+             HttpServletResponse response) {
         try {
 
             Attachment at = service.getAttachament(attachamentId);

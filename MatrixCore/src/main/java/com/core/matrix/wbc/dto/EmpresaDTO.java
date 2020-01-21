@@ -30,7 +30,7 @@ public class EmpresaDTO {
         this.sNrCnpj = empresa.getNrCnpj();
         this.sNmEmpresa = empresa.getEmpresa();
         this.sNmFantasia = empresa.getSNmFantasia();
-        this.sNmApelido = empresa.getSNmApelido();
+        this.sNmApelido = empresa.getApelido();
         this.nCdTipoAgente = empresa.getNCdTipoAgente();
         this.sDsTipoAgente = dsTipoAgent;
     }

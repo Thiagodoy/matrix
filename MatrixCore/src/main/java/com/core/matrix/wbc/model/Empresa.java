@@ -62,7 +62,7 @@ public class Empresa {
     private Long nStEmpresa;
 
     @Column(name = "sNmApelido")
-    private String sNmApelido;
+    private String apelido;
 
     @Column(name = "sCdUsuarioLiberacao")
     private String sCdUsuarioLiberacao;

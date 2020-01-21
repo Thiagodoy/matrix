@@ -20,5 +20,6 @@ import org.springframework.stereotype.Repository;
 public interface EmpresaRepository extends JpaRepository<Empresa, Long>, JpaSpecificationExecutor<Empresa> {
     Page<Empresa> findByNrCnpjStartingWith(String cnpj, Pageable page);
     Page<Empresa> findByEmpresaContaining(String razaoSocial, Pageable page);
+    Page<Empresa> findByApelidoContaining(String apelido, Pageable page);
 
 }

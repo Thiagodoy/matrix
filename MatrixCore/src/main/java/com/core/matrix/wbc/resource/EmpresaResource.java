@@ -33,12 +33,13 @@ public class EmpresaResource {
     public ResponseEntity get(
             @RequestParam(name = "cnpj", required = false) String cnpj,
             @RequestParam(name = "razaoSocial", required = false) String razaoSocial,
+            @RequestParam(name = "apelido", required = false) String apelido,
             @RequestParam(name = "page", required = true) Long page,
             @RequestParam(name = "size", required = true) Long size) {
 
         try {
 
-            PageResponse<EmpresaDTO> response = service.findAll(cnpj,razaoSocial,PageRequest.of(page.intValue(), size.intValue()));
+            PageResponse<EmpresaDTO> response = service.findAll(cnpj,razaoSocial,apelido,PageRequest.of(page.intValue(), size.intValue()));
             return ResponseEntity.ok(response);
 
         } catch (Exception e) {

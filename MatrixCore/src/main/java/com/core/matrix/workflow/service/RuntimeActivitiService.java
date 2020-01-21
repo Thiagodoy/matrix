@@ -8,6 +8,7 @@ package com.core.matrix.workflow.service;
 import com.core.matrix.request.AddComment;
 import com.core.matrix.request.CompleteTaskRequest;
 import com.core.matrix.request.StartProcessRequest;
+import com.core.matrix.response.AttachmentResponse;
 import com.core.matrix.response.PageResponse;
 import com.core.matrix.response.ProcessDefinitionResponse;
 import com.core.matrix.response.ProcessDetail;
@@ -72,12 +73,10 @@ public class RuntimeActivitiService {
 
     @Autowired
     private UserActivitiService userActivitiService;
-    
 
     @Autowired
     private RepositoryActivitiService repositoryActivitiService;
-    
-    
+
     @Autowired
     private CommentActivitiService commentActivitiService;
 
@@ -228,7 +227,7 @@ public class RuntimeActivitiService {
     public PageResponse<TaskResponse> getCandidateTasks(String user, int page, int size) {
 
         Long sizeTotalElements = taskService.createTaskQuery().taskCandidateUser(user).count();
-       // grou
+        // grou
 
         List<TaskResponse> response = taskService
                 .createTaskQuery()
@@ -449,9 +448,9 @@ public class RuntimeActivitiService {
 
     @Transactional
     public Comment addComment(AddComment request, String user) {
-        
+
         Comment comment = taskService.addComment(null, request.getProcessInstanceId(), request.getMessage());
-        
+
         commentActivitiService.setUser(comment.getId(), user);
         comment = taskService.getComment(comment.getId());
         return comment;
@@ -463,16 +462,30 @@ public class RuntimeActivitiService {
     }
 
     @Transactional
-    public void createAttachament(String processInstance, MultipartFile file) throws IOException {
-        taskService.createAttachment(file.getContentType(), null, processInstance, file.getOriginalFilename(), "attachmentDescription", file.getInputStream());
+    public AttachmentResponse createAttachament(String processInstance, MultipartFile file) throws IOException {
+        
+        Attachment attachment = taskService
+                .createAttachment(file.getContentType(), null, processInstance, file.getOriginalFilename(), "attachmentDescription", file.getInputStream());
+        
+        
+        
+        return new AttachmentResponse(attachment);
     }
+
     
-    public InputStream getAttachamentContent(String attachamentId){
+    @Transactional(readOnly = true)
+    public InputStream getAttachamentContent(String attachamentId) {
         return taskService.getAttachmentContent(attachamentId);
     }
-    
-    public Attachment getAttachament(String attachamentId){
+
+    @Transactional(readOnly = true)
+    public Attachment getAttachament(String attachamentId) {
         return taskService.getAttachment(attachamentId);
+    }
+    
+    @Transactional
+    public void deleteAttachment(String attachment){
+        taskService.deleteAttachment(attachment);
     }
 
 }
