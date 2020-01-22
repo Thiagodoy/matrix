@@ -5,6 +5,7 @@
  */
 package com.core.matrix.workflow.model;
 
+import com.core.matrix.dto.FileDetailDTO;
 import java.time.LocalDateTime;
 import javax.persistence.Column;
 import javax.persistence.Entity;
@@ -54,4 +55,12 @@ public class MeansurementFileDetail {
 
     @Column(name = "reativa_consumo")
     private Double consumptionReactivate;
+    
+    
+     
+    public MeansurementFileDetail(FileDetailDTO detail){
+        
+        
+        
+    }
 }

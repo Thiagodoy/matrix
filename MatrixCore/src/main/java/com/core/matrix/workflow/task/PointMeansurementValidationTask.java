@@ -14,11 +14,27 @@ import org.springframework.stereotype.Component;
  * @author thiag
  */
 @Component
-public class PointMeansurementValidationTask implements JavaDelegate{
+public class PointMeansurementValidationTask implements JavaDelegate {
+
+    private final static String FILE_MEANSUREMENT_ID = "";
+    
+    
 
     @Override
     public void execute(DelegateExecution de) throws Exception {
+
+        try {            
+            Long id = Long.getLong(String.valueOf(de.getVariable(FILE_MEANSUREMENT_ID)));           
+            
+        } catch (Exception e) {
+            
+            throw e;
+        }
+ 
         
+        
+        
+
     }
-    
+
 }

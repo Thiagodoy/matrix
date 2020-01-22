@@ -5,7 +5,6 @@
  */
 package com.core.matrix.request;
 
-import javax.persistence.Column;
 import lombok.Data;
 
 /**

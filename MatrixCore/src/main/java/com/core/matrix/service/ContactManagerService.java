@@ -31,9 +31,9 @@ public class ContactManagerService {
     private ManagerRepository managerRepository;
 
     @Transactional
-    public void save(ContactManagerRequest request) {
+    public Long save(ContactManagerRequest request) {
         ContactManager contactManager = new ContactManager(request);
-        this.repository.save(contactManager);
+        return this.repository.save(contactManager).getId();
     }
 
     @Transactional

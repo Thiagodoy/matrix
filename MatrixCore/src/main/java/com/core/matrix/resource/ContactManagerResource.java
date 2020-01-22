@@ -36,8 +36,8 @@ public class ContactManagerResource {
     @RequestMapping(method = RequestMethod.POST)
     public ResponseEntity post(@RequestBody ContactManagerRequest request) {
         try {
-            contactManagerService.save(request);
-            return ResponseEntity.ok().build();
+            Long id  = contactManagerService.save(request);
+            return ResponseEntity.ok(id);
         } catch (Exception e) {
             Logger.getLogger(ContactManagerResource.class.getName()).log(Logger.Level.FATAL, "[post]", e);
             return ResponseEntity.status(HttpStatus.resolve(500)).body(e.getMessage());

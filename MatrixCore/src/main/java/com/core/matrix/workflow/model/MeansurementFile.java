@@ -5,6 +5,7 @@
  */
 package com.core.matrix.workflow.model;
 
+import com.core.matrix.dto.FileDetailDTO;
 import java.time.LocalDateTime;
 import java.util.List;
 import javax.persistence.CascadeType;
@@ -40,7 +41,7 @@ public class MeansurementFile {
     private Long year;
 
     @Column(name = "arquivo")
-    private Long file;
+    private String file;
 
     @Column(name = "status")
     private String status;
@@ -58,6 +59,11 @@ public class MeansurementFile {
     @OneToMany(cascade = CascadeType.ALL, fetch = FetchType.EAGER)
     @JoinColumn(name = "id_arquivo_de_medicao")
     private List<MeansurementFileDetail>details;
+    
+    
+    
+    
+   
     
 
 }
