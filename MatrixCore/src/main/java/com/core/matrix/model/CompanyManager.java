@@ -30,10 +30,15 @@ public class CompanyManager implements  Serializable{
     @Column(name = "id_gestor")
     private Long manager;
     
+    @Id
+    @Column(name = "id_contato_gestor")
+    private Long contact;
+    
     @Data
     public static class IdClass implements Serializable {
         private Long empresa;
         private Long manager;
+        private Long contact;
     }
     
 }
