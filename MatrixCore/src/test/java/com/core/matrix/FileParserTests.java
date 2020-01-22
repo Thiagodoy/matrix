@@ -36,7 +36,7 @@ class FileParserTests {
             FileInputStream inputStream = new FileInputStream(new File("medidas-consolidadas-conimel.csv"));
             
             
-            Optional<FileParsedDTO> fileParsed = reader.<FileParsedDTO>parse(inputStream, Stream.FILE_LAYOUT_PARSER);;
+           // Optional<FileParsedDTO> fileParsed = reader.<FileParsedDTO>parse(inputStream, Stream.FILE_LAYOUT_PARSER);;
             
             
             

@@ -10,7 +10,7 @@ import com.core.matrix.request.CompleteTaskRequest;
 import com.core.matrix.request.StartProcessRequest;
 import com.core.matrix.response.AttachmentResponse;
 import com.core.matrix.response.PageResponse;
-import com.core.matrix.response.ProcessDetail;
+import com.core.matrix.response.ProcessDetailResponse;
 import com.core.matrix.response.TaskResponse;
 import com.core.matrix.utils.Constants;
 import com.core.matrix.workflow.service.RuntimeActivitiService;
@@ -174,11 +174,11 @@ public class RunTimeResource {
         }
     }
 
-    @RequestMapping(value = "/detail/{id}", method = RequestMethod.DELETE)
+    @RequestMapping(value = "/detail/{id}", method = RequestMethod.GET)
     public ResponseEntity detail(@PathVariable(name = "id") String id) {
         try {
 
-            ProcessDetail response = service.getDetail(id);
+            ProcessDetailResponse response = service.getDetail(id);
             return ResponseEntity.ok(response);
         } catch (Exception e) {
             Logger.getLogger(RunTimeResource.class.getName()).log(Level.SEVERE, "[detail]", e);

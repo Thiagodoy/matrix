@@ -3,7 +3,7 @@
  * To change this template file, choose Tools | Templates
  * and open the template in the editor.
  */
-package com.core.matrix.workflow.model;
+package com.core.matrix.model;
 
 import com.core.matrix.dto.FileDetailDTO;
 import java.time.LocalDateTime;

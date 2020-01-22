@@ -3,14 +3,16 @@
  * To change this template file, choose Tools | Templates
  * and open the template in the editor.
  */
-package com.core.matrix.workflow.model;
+package com.core.matrix.model;
 
-import com.core.matrix.dto.FileDetailDTO;
+import com.core.matrix.utils.MeansurementFileStatus;
 import java.time.LocalDateTime;
 import java.util.List;
 import javax.persistence.CascadeType;
 import javax.persistence.Column;
 import javax.persistence.Entity;
+import javax.persistence.EnumType;
+import javax.persistence.Enumerated;
 import javax.persistence.FetchType;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
@@ -43,8 +45,9 @@ public class MeansurementFile {
     @Column(name = "arquivo")
     private String file;
 
+    @Enumerated(EnumType.STRING)
     @Column(name = "status")
-    private String status;
+    private MeansurementFileStatus status;
 
     @Column(name = "act_id_usuario")
     private String user;

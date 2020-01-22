@@ -5,25 +5,34 @@
  */
 package com.core.matrix.workflow.task;
 
+import static com.core.matrix.utils.Constants.*;
+
 import com.core.matrix.dto.FileDetailDTO;
 import com.core.matrix.dto.FileParsedDTO;
 import com.core.matrix.io.BeanIoReader;
 import com.core.matrix.io.Stream;
-import com.core.matrix.workflow.model.MeansurementFile;
-import com.core.matrix.workflow.model.MeansurementFileDetail;
+import com.core.matrix.model.Log;
+import com.core.matrix.model.MeansurementFile;
+import com.core.matrix.model.MeansurementFileDetail;
+import com.core.matrix.service.MeansurementFileService;
+import com.core.matrix.utils.MeansurementFileStatus;
 import java.io.InputStream;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Optional;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+import java.util.stream.Collectors;
 import org.activiti.engine.TaskService;
 import org.activiti.engine.delegate.DelegateExecution;
 import org.activiti.engine.delegate.JavaDelegate;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
+
 
 /**
  *
@@ -35,16 +44,18 @@ public class FileValidationTask implements JavaDelegate {
     @Autowired
     private TaskService taskService;
 
-    private static final String ATTACHMENT_ID = "";
-    private static final String USER_ID = "";
+    @Autowired
+    private MeansurementFileService service;
+
+    
 
     @Override
     public void execute(DelegateExecution de) throws Exception {
 
-        try {
+        final String attachmentId = de.getVariable(ATTACHMENT_ID, String.class);
+        final String userId = de.getVariable(USER_ID, String.class);
 
-            final String attachmentId = de.getVariable(ATTACHMENT_ID, String.class);
-            final String userId = de.getVariable(USER_ID, String.class);
+        try {
 
             InputStream stream = taskService.getAttachmentContent(attachmentId);
             BeanIoReader reader = new BeanIoReader();
@@ -52,19 +63,23 @@ public class FileValidationTask implements JavaDelegate {
 
             if (fileParsed.isPresent()) {
                 MeansurementFile meansurementFile = mountFile(fileParsed.get(), attachmentId, userId);
-            } else {
-                // TODO LAYOU INVALIDO    
+                service.saveFile(meansurementFile);
+                de.setVariable(CONTROLE, RESPONSE_LAYOUT_VALID);
             }
 
         } catch (Exception e) {
-
+            Logger.getLogger(MeansurementFileService.class.getName()).log(Level.SEVERE, "[execute]", e);
+            Log log = new Log();
+            log.setAttachment(attachmentId);
+            log.setMessage(e.getMessage());
+            de.setVariable(CONTROLE, RESPONSE_LAYOUT_INVALID);
         }
     }
 
     private MeansurementFile mountFile(FileParsedDTO fileParsedDTO, String idFile, String userId) throws Exception {
 
-        final String reportType = fileParsedDTO.informations.get(0).getValue();
-        final String agentType = fileParsedDTO.informations.get(1).getValue();
+        //final String reportType = fileParsedDTO.informations.get(0).getValue();
+        //final String agentType = fileParsedDTO.informations.get(1).getValue();
         final String period = fileParsedDTO.informations.get(2).getValue();
 
         MeansurementFile meansurementFile = new MeansurementFile();
@@ -76,25 +91,26 @@ public class FileValidationTask implements JavaDelegate {
         meansurementFile.setYear(date.get(1).longValue());
 
         // TODO Definir como será tratado esse 
-        meansurementFile.setStatus("");
+        meansurementFile.setStatus(MeansurementFileStatus.SUCCESS);
         meansurementFile.setUser(userId);
+
+        meansurementFile.setDetails(this.mountDetail(fileParsedDTO.getDetails()));
 
         return meansurementFile;
 
     }
 
     private List<MeansurementFileDetail> mountDetail(List<FileDetailDTO> details) {
-
-        details.parallelStream().map(d -> new MeansurementFileDetail(d));
-
-        return null;
-
+        return details
+                .parallelStream()
+                .map(d -> new MeansurementFileDetail(d))
+                .collect(Collectors.toList());
     }
 
     private List<Integer> extractMonthAndYear(String value) throws Exception {
 
         Pattern p = Pattern.compile("[0-3]?[0-9]/[0-3]?[0-9]/(?:[0-9]{2})?[0-9]{2}", Pattern.MULTILINE);
-        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("d/MM/yyyy");
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd/MM/yyyy");
 
         Matcher m = p.matcher(value);
 

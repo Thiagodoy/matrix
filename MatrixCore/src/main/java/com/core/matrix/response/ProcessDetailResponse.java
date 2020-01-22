@@ -16,10 +16,10 @@ import org.activiti.engine.task.Comment;
  * @author thiag
  */
 @Data
-public class ProcessDetail {
+public class ProcessDetailResponse {
 
     private List<Comment> comments;
-    private List<Attachment> attachments;
+    private List<AttachmentResponse> attachments;
     private Date processCreatedDate;
     private String processCreatedUser;    
 

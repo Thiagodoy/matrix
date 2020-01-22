@@ -11,7 +11,7 @@ import com.core.matrix.request.StartProcessRequest;
 import com.core.matrix.response.AttachmentResponse;
 import com.core.matrix.response.PageResponse;
 import com.core.matrix.response.ProcessDefinitionResponse;
-import com.core.matrix.response.ProcessDetail;
+import com.core.matrix.response.ProcessDetailResponse;
 import com.core.matrix.response.TaskResponse;
 import com.core.matrix.utils.Utils;
 import com.core.matrix.workflow.model.GroupMemberActiviti;
@@ -431,16 +431,17 @@ public class RuntimeActivitiService {
         }
     }
 
-    public ProcessDetail getDetail(String processInstanceId) {
+    public ProcessDetailResponse getDetail(String processInstanceId) {
 
-        ProcessDetail detail = new ProcessDetail();
+        ProcessDetailResponse detail = new ProcessDetailResponse();
         detail.setComments(taskService.getProcessInstanceComments(processInstanceId));
-        detail.setAttachments(taskService.getProcessInstanceAttachments(processInstanceId));
+        List<AttachmentResponse> attachmentResponses = taskService.getProcessInstanceAttachments(processInstanceId).parallelStream().map(a-> new AttachmentResponse(a)).collect(Collectors.toList());
+        detail.setAttachments(attachmentResponses);
 
-        HistoricProcessInstance instance = historyService.createHistoricProcessInstanceQuery().processDefinitionId(processInstanceId).singleResult();
+        //HistoricProcessInstance instance = historyService.createHistoricProcessInstanceQuery().processDefinitionId(processInstanceId).singleResult();
 
-        detail.setProcessCreatedDate(instance.getStartTime());
-        detail.setProcessCreatedUser(instance.getStartUserId());
+       // detail.setProcessCreatedDate(instance.getStartTime());
+        //detail.setProcessCreatedUser(instance.getStartUserId());
 
         return detail;
 

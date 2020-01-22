@@ -23,7 +23,7 @@ public class BeanIoReader {
 
     private final String ENCODING = "ISO-8859-1";
 
-    public <T> Optional<T> parse(InputStream inputStream, Stream stream) {
+    public <T> Optional<T> parse(InputStream inputStream, Stream stream) throws Exception {
 
         
 
@@ -39,6 +39,7 @@ public class BeanIoReader {
             record = (T) reader.read();
         } catch (Exception ex) {
             Logger.getLogger(BeanIoReader.class.getName()).log(Level.SEVERE, "[parse]", ex);
+            throw ex;
         }
 
         reader.close();       

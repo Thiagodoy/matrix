@@ -27,12 +27,14 @@ public class Log {
     @Column(name = "id_log")
     private Long id;
     
-    @Column(name = "arquivo")
-    private String file;
+    @Column(name = "anexo")
+    private String attachment;    
     
+    @Column(name = "id_arquivo")
+    private Long fileId;    
     
-    
-    
+    @Column(name = "mensagem")
+    private String message;
     
     
 }
