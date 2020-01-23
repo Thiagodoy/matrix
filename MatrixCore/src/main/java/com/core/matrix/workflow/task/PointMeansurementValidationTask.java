@@ -61,7 +61,7 @@ public class PointMeansurementValidationTask implements JavaDelegate {
                         if (!existsPoint) {
                             synchronized (hasError) {
                                 hasError = Boolean.TRUE;
-                                de.setVariable(CONTROLE, MEANSUREMENT_POINT_INVALID);
+                                de.setVariable(CONTROLE, RESPONSE_MEANSUREMENT_POINT_INVALID);
                                 Log log = new Log();
                                 log.setFileId(id);
                                 log.setMessage(MessageFormat.format("Ponto de medição [ {0} ] não foi localizado ! ", point));
@@ -72,16 +72,16 @@ public class PointMeansurementValidationTask implements JavaDelegate {
 
             if (hasError) {
                 meansurementFileService.updateStatus(MeansurementFileStatus.POINT_ERROR, id);
-                de.setVariable(CONTROLE, MEANSUREMENT_POINT_INVALID);
+                de.setVariable(CONTROLE, RESPONSE_MEANSUREMENT_POINT_INVALID);
             } else {
                 meansurementFileService.updateStatus(MeansurementFileStatus.SUCCESS, id);
-                de.setVariable(CONTROLE, MEANSUREMENT_POINT_VALID);
+                de.setVariable(CONTROLE, RESPONSE_MEANSUREMENT_POINT_VALID);
             }
 
         } catch (Exception e) {            
             Logger.getLogger(PointMeansurementValidationTask.class.getName()).log(Level.SEVERE, "[execute]", e);
             meansurementFileService.updateStatus(MeansurementFileStatus.POINT_ERROR, id);
-            de.setVariable(CONTROLE, MEANSUREMENT_POINT_INVALID);
+            de.setVariable(CONTROLE, RESPONSE_MEANSUREMENT_POINT_INVALID);
         }
 
     }

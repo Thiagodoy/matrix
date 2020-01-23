@@ -6,6 +6,8 @@
 package com.core.matrix.workflow.service;
 
 import com.core.matrix.request.UserDeleteRequest;
+import com.core.matrix.request.UserInfoRequest;
+import com.core.matrix.response.UserInfoResponse;
 import com.core.matrix.utils.Utils;
 import com.core.matrix.workflow.model.GroupActiviti;
 import com.core.matrix.workflow.model.GroupMemberActiviti;
@@ -15,6 +17,7 @@ import com.core.matrix.workflow.specification.UserActivitiSpecification;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -56,6 +59,11 @@ public class UserActivitiService {
                 findById(id)
                 .orElseThrow(()-> new Exception("User not found."));
     }
+    
+    public List<UserInfoResponse> getUserInfo(UserInfoRequest request){       
+        return this.repository.findAllById(request.getUsers()).parallelStream().map( u -> new UserInfoResponse(u)).collect(Collectors.toList());
+    }
+
     
     @Transactional(readOnly = true)
     public Page<UserActiviti>  list(String firstName, String lastName, String email, String profile,  Pageable page){

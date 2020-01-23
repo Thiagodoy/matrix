@@ -18,6 +18,7 @@ import com.core.matrix.workflow.model.GroupMemberActiviti;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.ArrayList;
+import java.util.Comparator;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -434,7 +435,14 @@ public class RuntimeActivitiService {
     public ProcessDetailResponse getDetail(String processInstanceId) {
 
         ProcessDetailResponse detail = new ProcessDetailResponse();
-        detail.setComments(taskService.getProcessInstanceComments(processInstanceId));
+        
+        List<Comment> comments = taskService
+                .getProcessInstanceComments(processInstanceId)
+                .stream()
+                .sorted(Comparator.comparing(Comment::getTime).reversed())
+                .collect(Collectors.toList());
+        
+        detail.setComments(comments);
         List<AttachmentResponse> attachmentResponses = taskService.getProcessInstanceAttachments(processInstanceId).parallelStream().map(a-> new AttachmentResponse(a)).collect(Collectors.toList());
         detail.setAttachments(attachmentResponses);
 

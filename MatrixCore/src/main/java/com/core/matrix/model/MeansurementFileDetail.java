@@ -6,7 +6,8 @@
 package com.core.matrix.model;
 
 import com.core.matrix.dto.FileDetailDTO;
-import java.time.LocalDateTime;
+import java.time.LocalDate;
+import java.time.format.DateTimeFormatter;
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
@@ -14,6 +15,7 @@ import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.Table;
 import lombok.Data;
+import lombok.NoArgsConstructor;
 
 /**
  *
@@ -22,6 +24,7 @@ import lombok.Data;
 @Entity
 @Table(name = "mtx_arquivo_de_medicao_detalhe")
 @Data
+@NoArgsConstructor
 public class MeansurementFileDetail {
 
     @Id
@@ -36,7 +39,7 @@ public class MeansurementFileDetail {
     private String meansurementPoint;
 
     @Column(name = "data")
-    private LocalDateTime date;
+    private LocalDate date;
 
     @Column(name = "hora")
     private Long hour;
@@ -55,12 +58,27 @@ public class MeansurementFileDetail {
 
     @Column(name = "reativa_consumo")
     private Double consumptionReactivate;
-    
-    
-     
-    public MeansurementFileDetail(FileDetailDTO detail){
-        
-        
-        
+
+    public MeansurementFileDetail(LocalDate date) {
+        this.date = date;
+    }
+
+    public MeansurementFileDetail(LocalDate date, Long hour) {
+        this.date = date;
+        this.hour = hour;
+    }
+
+    public MeansurementFileDetail(FileDetailDTO detail) {
+
+        this.meansurementPoint = detail.getMeansurementPoint();
+        DateTimeFormatter formater = DateTimeFormatter.ofPattern("dd/MM/yyyy");
+        this.date = LocalDate.parse(detail.getDate(), formater);
+        this.hour = Long.valueOf(detail.getHour());
+        this.energyType = detail.getEnergyType();
+        this.generationActive = Double.parseDouble(detail.getGenerationActive());
+        this.consumptionActive = Double.parseDouble(detail.getConsumptionActive());
+        this.generationReactivate = Double.parseDouble(detail.getGenerationReactivate());
+        this.consumptionReactivate = Double.parseDouble(detail.getGenerationReactivate());
+
     }
 }

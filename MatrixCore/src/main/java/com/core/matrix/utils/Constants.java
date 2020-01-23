@@ -24,8 +24,15 @@ public class Constants {
     public static final String RESPONSE_LAYOUT_VALID = "Layout Valido";
     public static final String RESPONSE_LAYOUT_INVALID = "Layout Inválido";
     
-    public static final String MEANSUREMENT_POINT_VALID = "Ponto de Medição Válido";
-    public static final String MEANSUREMENT_POINT_INVALID = "Ponto de Medição Inválido";
+    public static final String RESPONSE_MEANSUREMENT_POINT_VALID = "Ponto de Medição Válido";
+    public static final String RESPONSE_MEANSUREMENT_POINT_INVALID = "Ponto de Medição Inválido";
+    
+    public static final String RESPONSE_NO_DATA_FOUND = "Dados Ausentes";
+    public static final String RESPONSE_CALENDAR_INVALID = "Calendário Inválido";
+    public static final String RESPONSE_DATA_IS_VALID = "Dados Válidos";
+    
+    public static final String RESPONSE_RESULT = "result";
+    public static final String RESPONSE_RESULT_MESSAGE = "resultMessage";
     
     
 }

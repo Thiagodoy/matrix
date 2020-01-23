@@ -6,8 +6,11 @@
 package com.core.matrix.resource;
 
 import com.core.matrix.request.UserDeleteRequest;
+import com.core.matrix.request.UserInfoRequest;
+import com.core.matrix.response.UserInfoResponse;
 import com.core.matrix.workflow.model.UserActiviti;
 import com.core.matrix.workflow.service.UserActivitiService;
+import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import org.hibernate.exception.ConstraintViolationException;
@@ -32,6 +35,17 @@ public class UserResource {
 
     @Autowired
     private UserActivitiService service;
+
+    @RequestMapping(value = "/info", method = RequestMethod.POST)
+    public ResponseEntity getUserInfo(@RequestBody UserInfoRequest request) {
+        try {
+            List<UserInfoResponse> response = this.service.getUserInfo(request);
+            return ResponseEntity.ok(response);
+        } catch (Exception e) {
+            Logger.getLogger(UserResource.class.getName()).log(Level.SEVERE, "[getUserInfo]", e.getMessage());
+            return ResponseEntity.status(HttpStatus.resolve(500)).build();
+        }
+    }
 
     @RequestMapping(method = RequestMethod.GET)
     public ResponseEntity get(@RequestParam(name = "firstName", required = false) String firstName,
@@ -60,7 +74,7 @@ public class UserResource {
 
         } catch (ConstraintViolationException e) {
             org.jboss.logging.Logger.getLogger(ManagerResource.class.getName()).log(org.jboss.logging.Logger.Level.FATAL, "[post]", e);
-            return ResponseEntity.status(HttpStatus.resolve(500)).body("Usuário "+ request.getEmail() + " já cadastrado!");
+            return ResponseEntity.status(HttpStatus.resolve(500)).body("Usuário " + request.getEmail() + " já cadastrado!");
         } catch (Exception e) {
             Logger.getLogger(UserResource.class.getName()).log(Level.SEVERE, "[post]", e);
             return ResponseEntity.status(HttpStatus.resolve(500)).build();

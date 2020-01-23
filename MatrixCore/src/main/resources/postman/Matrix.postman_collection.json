@@ -1,0 +1,1552 @@
+{
+	"info": {
+		"_postman_id": "a68c9d28-52e9-49f3-bf62-2c00402bbb4f",
+		"name": "Matrix",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+	},
+	"item": [
+		{
+			"name": "auth",
+			"item": [
+				{
+					"name": "Authentication",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"name": "Content-Type",
+								"type": "text",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n\t\"username\":\"admin@admin.com\",\n\t\"password\":\"123456\"\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "http://localhost:8004/api/auth",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "8004",
+							"path": [
+								"api",
+								"auth"
+							]
+						}
+					},
+					"response": []
+				}
+			],
+			"protocolProfileBehavior": {}
+		},
+		{
+			"name": "manager",
+			"item": [
+				{
+					"name": "Register manager",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer eyJhbGciOiJIUzUxMiJ9.eyJzdWIiOiJhZG1pbkBhZG1pbi5jb20iLCJleHAiOjE1Nzg4NDYxOTcsImlhdCI6MTU3ODgyODE5N30.7Xpazf12opSsVXxntS0m0gDxZEfV81-7-X9SZfgN1ZrH2b_i3LvEez2G2j44yDGuTDYs7_jxaBA3epaRkEhmAg",
+								"type": "text"
+							},
+							{
+								"key": "Content-Type",
+								"name": "Content-Type",
+								"value": "application/json",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n\t\"id\": null,\n\t\"cnpj\":\"111111111\",\n\t\"companyName\":\"Nestle SA\",\n\t\"fancyName\":\"Yakult SA\",\n\t\"nickName\":\"Não entendi o seginifcado desse campo\",\n\t\"contacts\":[\n\t\t{\n\t\t\t\"id\":null,\n\t\t\t\"name\":\"Senhor dos Anéis\",\n\t\t\t\"email\":\"senhor@senhor.com.br\",\n\t\t\t\"telephone1\":\"(16)991491842\"\n\t\t}\n\t\t\n\t]\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "http://localhost:8004/api/manager",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "8004",
+							"path": [
+								"api",
+								"manager"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "List manager",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer eyJhbGciOiJIUzUxMiJ9.eyJzdWIiOiJhZG1pbkBhZG1pbi5jb20iLCJleHAiOjE1Nzg4NDYxOTcsImlhdCI6MTU3ODgyODE5N30.7Xpazf12opSsVXxntS0m0gDxZEfV81-7-X9SZfgN1ZrH2b_i3LvEez2G2j44yDGuTDYs7_jxaBA3epaRkEhmAg",
+								"type": "text"
+							}
+						],
+						"url": {
+							"raw": "http://localhost:8004/api/manager?",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "8004",
+							"path": [
+								"api",
+								"manager"
+							],
+							"query": [
+								{
+									"key": "cnpj",
+									"value": "5",
+									"disabled": true
+								},
+								{
+									"key": "companyName",
+									"value": "Nestle ",
+									"disabled": true
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Delete Manager",
+					"request": {
+						"method": "DELETE",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer eyJhbGciOiJIUzUxMiJ9.eyJzdWIiOiJhZG1pbkBhZG1pbi5jb20iLCJleHAiOjE1Nzg4NDYxOTcsImlhdCI6MTU3ODgyODE5N30.7Xpazf12opSsVXxntS0m0gDxZEfV81-7-X9SZfgN1ZrH2b_i3LvEez2G2j44yDGuTDYs7_jxaBA3epaRkEhmAg",
+								"type": "text"
+							}
+						],
+						"url": {
+							"raw": "http://localhost:8004/api/manager/9",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "8004",
+							"path": [
+								"api",
+								"manager",
+								"9"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Update manager",
+					"request": {
+						"method": "PUT",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer eyJhbGciOiJIUzUxMiJ9.eyJzdWIiOiJhZG1pbkBhZG1pbi5jb20iLCJleHAiOjE1Nzg4NDYxOTcsImlhdCI6MTU3ODgyODE5N30.7Xpazf12opSsVXxntS0m0gDxZEfV81-7-X9SZfgN1ZrH2b_i3LvEez2G2j44yDGuTDYs7_jxaBA3epaRkEhmAg",
+								"type": "text"
+							},
+							{
+								"key": "Content-Type",
+								"name": "Content-Type",
+								"value": "application/json",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n\t\"id\": 8,\n\t\"cnpj\":\"111111111\",\n\t\"companyName\":\"company\",\n\t\"fancyName\":\"Fancy\",\n\t\"nickName\":\"nickName\"\n\t\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "http://localhost:8004/api/manager",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "8004",
+							"path": [
+								"api",
+								"manager"
+							]
+						}
+					},
+					"response": []
+				}
+			],
+			"protocolProfileBehavior": {}
+		},
+		{
+			"name": "contact-manager",
+			"item": [
+				{
+					"name": "Save contact manager",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"name": "Content-Type",
+								"value": "application/json",
+								"type": "text"
+							},
+							{
+								"key": "Authorization",
+								"value": "Bearer eyJhbGciOiJIUzUxMiJ9.eyJzdWIiOiJhZG1pbkBhZG1pbi5jb20iLCJleHAiOjE1Nzg4NDYxOTcsImlhdCI6MTU3ODgyODE5N30.7Xpazf12opSsVXxntS0m0gDxZEfV81-7-X9SZfgN1ZrH2b_i3LvEez2G2j44yDGuTDYs7_jxaBA3epaRkEhmAg",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "\r\n{\r\n\t\"name\":\"Thiago Godoy\",\r\n\t\"email\":\"thiago@thiago.com\",\r\n\t\"manager\":9,\r\n\t\"telephone1\":\"33241382\"\r\n}\r\n\r\n",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "http://localhost:8004/api/manager/contact",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "8004",
+							"path": [
+								"api",
+								"manager",
+								"contact"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "List contact manager",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer eyJhbGciOiJIUzUxMiJ9.eyJzdWIiOiJhZG1pbkBhZG1pbi5jb20iLCJleHAiOjE1Nzg4NDYxOTcsImlhdCI6MTU3ODgyODE5N30.7Xpazf12opSsVXxntS0m0gDxZEfV81-7-X9SZfgN1ZrH2b_i3LvEez2G2j44yDGuTDYs7_jxaBA3epaRkEhmAg",
+								"type": "text"
+							}
+						],
+						"url": {
+							"raw": "http://localhost:8004/api/manager/contact",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "8004",
+							"path": [
+								"api",
+								"manager",
+								"contact"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Delete a contact manager",
+					"request": {
+						"method": "DELETE",
+						"header": [
+							{
+								"key": "Authorization",
+								"type": "text",
+								"value": "Bearer eyJhbGciOiJIUzUxMiJ9.eyJzdWIiOiJhZG1pbkBhZG1pbi5jb20iLCJleHAiOjE1Nzg4NDYxOTcsImlhdCI6MTU3ODgyODE5N30.7Xpazf12opSsVXxntS0m0gDxZEfV81-7-X9SZfgN1ZrH2b_i3LvEez2G2j44yDGuTDYs7_jxaBA3epaRkEhmAg"
+							}
+						],
+						"url": {
+							"raw": "http://localhost:8004/api/manager/contact/3",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "8004",
+							"path": [
+								"api",
+								"manager",
+								"contact",
+								"3"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Update contact manager",
+					"request": {
+						"method": "PUT",
+						"header": [
+							{
+								"key": "Content-Type",
+								"name": "Content-Type",
+								"value": "application/json",
+								"type": "text"
+							},
+							{
+								"key": "Authorization",
+								"value": "Bearer eyJhbGciOiJIUzUxMiJ9.eyJzdWIiOiJhZG1pbkBhZG1pbi5jb20iLCJleHAiOjE1Nzg4NDYxOTcsImlhdCI6MTU3ODgyODE5N30.7Xpazf12opSsVXxntS0m0gDxZEfV81-7-X9SZfgN1ZrH2b_i3LvEez2G2j44yDGuTDYs7_jxaBA3epaRkEhmAg",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n\t\n\t\"id\": 8,\n    \"manager\": 10,\n    \"name\": \"Felipe\",\n    \"email\": \"felipe@felipe\",\n    \"telephone1\": \"(16)3333333\"\n\t\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "http://localhost:8004/api/manager/contact",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "8004",
+							"path": [
+								"api",
+								"manager",
+								"contact"
+							]
+						}
+					},
+					"response": []
+				}
+			],
+			"protocolProfileBehavior": {}
+		},
+		{
+			"name": "profile",
+			"item": [
+				{
+					"name": "Save a profile",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer eyJhbGciOiJIUzUxMiJ9.eyJzdWIiOiJhZG1pbkBhZG1pbi5jb20iLCJleHAiOjE1Nzg4NzI5OTMsImlhdCI6MTU3ODg1NDk5M30.nBgx55bG6hTC3X-FDCVMvTa5zeVoTk5tnPRtaYDWRsK-MGBdBBAMrqWwcPu7BVj6jUbX7DjAl-U3HjKRTX63eA",
+								"type": "text"
+							},
+							{
+								"key": "Content-Type",
+								"name": "Content-Type",
+								"value": "application/json",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n\t\n\t\"id\":\"profile-validate-file\",\n\t\"rev\":\"1\",\n\t\"name\":\"Validate File\",\n\t\"type\":\"profile\",\n\t\"abilitys\":[\n\t\t{\n\t\t\t\"id\":null,\n\t\t\t\"subject\":\"Modulo-1\",\n\t\t\t\"action\":\"manage\"\n\t\t}\t\n\t]\n\t\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "http://localhost:8004/api/group",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "8004",
+							"path": [
+								"api",
+								"group"
+							],
+							"query": [
+								{
+									"key": "Auth",
+									"value": "",
+									"disabled": true
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "List profile",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer eyJhbGciOiJIUzUxMiJ9.eyJzdWIiOiJhZG1pbkBhZG1pbi5jb20iLCJleHAiOjE1Nzg4NzI5OTMsImlhdCI6MTU3ODg1NDk5M30.nBgx55bG6hTC3X-FDCVMvTa5zeVoTk5tnPRtaYDWRsK-MGBdBBAMrqWwcPu7BVj6jUbX7DjAl-U3HjKRTX63eA",
+								"type": "text"
+							}
+						],
+						"url": {
+							"raw": "http://localhost:8004/api/group",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "8004",
+							"path": [
+								"api",
+								"group"
+							],
+							"query": [
+								{
+									"key": "",
+									"value": ""
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Delete a profile",
+					"request": {
+						"method": "DELETE",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer eyJhbGciOiJIUzUxMiJ9.eyJzdWIiOiJhZG1pbkBhZG1pbi5jb20iLCJleHAiOjE1Nzg4NzI5OTMsImlhdCI6MTU3ODg1NDk5M30.nBgx55bG6hTC3X-FDCVMvTa5zeVoTk5tnPRtaYDWRsK-MGBdBBAMrqWwcPu7BVj6jUbX7DjAl-U3HjKRTX63eA",
+								"type": "text"
+							}
+						],
+						"url": {
+							"raw": "http://localhost:8004/api/group/profile-validate-file",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "8004",
+							"path": [
+								"api",
+								"group",
+								"profile-validate-file"
+							]
+						}
+					},
+					"response": []
+				}
+			],
+			"protocolProfileBehavior": {}
+		},
+		{
+			"name": "wbc",
+			"item": [
+				{
+					"name": "List companys",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer eyJhbGciOiJIUzUxMiJ9.eyJzdWIiOiJhZG1pbkBhZG1pbi5jb20iLCJleHAiOjE1NzkwNDY1MTcsImlhdCI6MTU3OTAyODUxN30.aSXUJBT4v3zKhevaZrux21Sa_ENT4-ggyc1xrv8Js7Y-GwQrEXw_pzkkaww3pz1W6WsyHmaORuMTIxLglnOnUA",
+								"type": "text"
+							},
+							{
+								"key": "cnpj",
+								"value": "",
+								"type": "text"
+							}
+						],
+						"url": {
+							"raw": "http://localhost:8004/api/wbc/company?size=10&page=0&razaoSocial=E",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "8004",
+							"path": [
+								"api",
+								"wbc",
+								"company"
+							],
+							"query": [
+								{
+									"key": "size",
+									"value": "10"
+								},
+								{
+									"key": "page",
+									"value": "0"
+								},
+								{
+									"key": "cnpj",
+									"value": "",
+									"disabled": true
+								},
+								{
+									"key": "razaoSocial",
+									"value": "E"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "List contracts",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer eyJhbGciOiJIUzUxMiJ9.eyJzdWIiOiJhZG1pbkBhZG1pbi5jb20iLCJleHAiOjE1Nzk2MjY1MTksImlhdCI6MTU3OTYwODUxOX0.5DeZtBnJPococZApDZmPIavhlPeD3oOCObY8zttyP4YGIwKFYInhi8jjOSbhrnfE2vX8zgfWAhYmHKGiYLL7ug",
+								"type": "text"
+							}
+						],
+						"url": {
+							"raw": "http://localhost:8004/api/wbc/contract?contractId=67929",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "8004",
+							"path": [
+								"api",
+								"wbc",
+								"contract"
+							],
+							"query": [
+								{
+									"key": "contractId",
+									"value": "67929"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Check point meansurement",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer eyJhbGciOiJIUzUxMiJ9.eyJzdWIiOiJhZG1pbkBhZG1pbi5jb20iLCJleHAiOjE1Nzk2MjY1MTksImlhdCI6MTU3OTYwODUxOX0.5DeZtBnJPococZApDZmPIavhlPeD3oOCObY8zttyP4YGIwKFYInhi8jjOSbhrnfE2vX8zgfWAhYmHKGiYLL7ug",
+								"type": "text"
+							}
+						],
+						"url": {
+							"raw": "http://localhost:8004/api/wbc/point-meansurement/check?point=SPSBBRENTR101",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "8004",
+							"path": [
+								"api",
+								"wbc",
+								"point-meansurement",
+								"check"
+							],
+							"query": [
+								{
+									"key": "point",
+									"value": "SPSBBRENTR101"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Get point meansurement",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer eyJhbGciOiJIUzUxMiJ9.eyJzdWIiOiJhZG1pbkBhZG1pbi5jb20iLCJleHAiOjE1Nzk2MjY1MTksImlhdCI6MTU3OTYwODUxOX0.5DeZtBnJPococZApDZmPIavhlPeD3oOCObY8zttyP4YGIwKFYInhi8jjOSbhrnfE2vX8zgfWAhYmHKGiYLL7ug",
+								"type": "text"
+							}
+						],
+						"url": {
+							"raw": "http://localhost:8004/api/wbc/point-meansurement?company=447",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "8004",
+							"path": [
+								"api",
+								"wbc",
+								"point-meansurement"
+							],
+							"query": [
+								{
+									"key": "company",
+									"value": "447"
+								}
+							]
+						}
+					},
+					"response": []
+				}
+			],
+			"protocolProfileBehavior": {}
+		},
+		{
+			"name": "company-manager",
+			"item": [
+				{
+					"name": "Associate a company with manager",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer eyJhbGciOiJIUzUxMiJ9.eyJzdWIiOiJhZG1pbkBhZG1pbi5jb20iLCJleHAiOjE1Nzg5NDkyODksImlhdCI6MTU3ODkzMTI4OX0.snE3d_3toqm2dJ72hIcutqvW65FMx1md_BmdqhDW-IAMxpVQREaDBcPetFQJzEmPRfVKOPDmeM0avlAdm6-NDw",
+								"type": "text"
+							},
+							{
+								"key": "Content-Type",
+								"name": "Content-Type",
+								"value": "application/json",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n\t\n\t\"empresa\": 12,\n\t\"manager\": 10\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "http://localhost:8004/api/company/manager",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "8004",
+							"path": [
+								"api",
+								"company",
+								"manager"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Delele association",
+					"request": {
+						"method": "DELETE",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer eyJhbGciOiJIUzUxMiJ9.eyJzdWIiOiJhZG1pbkBhZG1pbi5jb20iLCJleHAiOjE1Nzg5NDkyODksImlhdCI6MTU3ODkzMTI4OX0.snE3d_3toqm2dJ72hIcutqvW65FMx1md_BmdqhDW-IAMxpVQREaDBcPetFQJzEmPRfVKOPDmeM0avlAdm6-NDw",
+								"type": "text"
+							}
+						],
+						"url": {
+							"raw": "http://localhost:8004/api/company/manager/12/10",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "8004",
+							"path": [
+								"api",
+								"company",
+								"manager",
+								"12",
+								"10"
+							]
+						}
+					},
+					"response": []
+				}
+			],
+			"protocolProfileBehavior": {}
+		},
+		{
+			"name": "user",
+			"item": [
+				{
+					"name": "Delete a user",
+					"request": {
+						"method": "DELETE",
+						"header": [
+							{
+								"key": "Authorization",
+								"type": "text",
+								"value": "Bearer eyJhbGciOiJIUzUxMiJ9.eyJzdWIiOiJ0aGlhZ29kb3lAaG90bWFpbC5jb20iLCJleHAiOjE1Nzc4MDk3MDcsImlhdCI6MTU3Nzc5MTcwN30.EcSgtLb0mUJjbk88ZXwN6HE3rP-sFVDNfyin5T2nxbqe8XzNotv-kgcDrARRvDWwkvcMRj9eP7aTD_BWZJiJbw"
+							},
+							{
+								"key": "Content-Type",
+								"name": "Content-Type",
+								"type": "text",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n\t\"email\":\"gustavo@gustavo.com\"\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "http://localhost:8004/api/user",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "8004",
+							"path": [
+								"api",
+								"user"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "List users",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Authorization",
+								"type": "text",
+								"value": "Bearer eyJhbGciOiJIUzUxMiJ9.eyJzdWIiOiJhZG1pbkBhZG1pbi5jb20iLCJleHAiOjE1NzkyNDEwNzMsImlhdCI6MTU3OTIyMzA3M30.fj3tsFIxW80X_Rs4i02glyn_IAh3-et-1xn8EX6fGdSfjZKTrU2pRjiJq6ayU7x6ZtPi-qsWKxrwypeqMjAHRw"
+							}
+						],
+						"url": {
+							"raw": "http://localhost:8004/api/user?profile=profile-gestor-portal",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "8004",
+							"path": [
+								"api",
+								"user"
+							],
+							"query": [
+								{
+									"key": "firstName",
+									"value": "gustavo",
+									"disabled": true
+								},
+								{
+									"key": "lastName",
+									"value": "",
+									"disabled": true
+								},
+								{
+									"key": "email",
+									"value": "",
+									"disabled": true
+								},
+								{
+									"key": "page",
+									"value": "",
+									"disabled": true
+								},
+								{
+									"key": "size",
+									"value": "",
+									"disabled": true
+								},
+								{
+									"key": "profile",
+									"value": "profile-gestor-portal"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Save a user",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"name": "Content-Type",
+								"type": "text",
+								"value": "application/json"
+							},
+							{
+								"key": "Authorization",
+								"type": "text",
+								"value": "Bearer eyJhbGciOiJIUzUxMiJ9.eyJzdWIiOiJhZG1pbkBhZG1pbi5jb20iLCJleHAiOjE1Nzk1ODgxMTEsImlhdCI6MTU3OTU3MDExMX0._XCvbuqgAz4vE5J34yGbkc152pRp_z3TOzOJiBByEkxQTzvKCCw9E7O44aRRmXbo7s_CdaDYkDb30Bri9Zdizg"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n\t\n\t\"id\":\"gustavo@gustavo.com\",\n\t\"rev\":\"1\",\n\t\"firstName\":\"Gustavo\",\n\t\"lastName\":\"Godoy\",\n\t\"email\":\"gustavo@gustavo.com\",\n\t\"password\":\"123456\",\n\t\"picture\":\"\",\n\t\"groups\":[\n\t\t{\n\t\t\t\"userId\":\"gustavo@gustavo.com\",\n\t\t\t\"groupId\":\"profile-client\"\n\t\t}\n\t\t\t\n\t],\n\t\"info\":[\n\t\t{\n\t\t\t\"key\":\"telephone1\",\n\t\t\t\"value\":\"888888888\",\n\t\t\t\"userId\":\"gustavo@gustavo.com\"\n\t\t}\n\t\n\t]\n\t\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "http://localhost:8004/api/user",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "8004",
+							"path": [
+								"api",
+								"user"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "List basic information about users",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"name": "Content-Type",
+								"value": "application/json",
+								"type": "text"
+							},
+							{
+								"key": "Authorization",
+								"value": "Bearer eyJhbGciOiJIUzUxMiJ9.eyJzdWIiOiJhZG1pbkBhZG1pbi5jb20iLCJleHAiOjE1Nzk4MDQyNTgsImlhdCI6MTU3OTc4NjI1OH0.XyZQSIhHWCqa9YJl3zk_pTBWdvqeja5xM-XQKgjGnVE33daMxrt--YxHMtxFRRrcpsClO59ESY_raZgvLJwp8A",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n\t\"users\":[\n\t\t\"admin@admin.com\"\n\t\t]\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "http://localhost:8004/api/user/info",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "8004",
+							"path": [
+								"api",
+								"user",
+								"info"
+							]
+						}
+					},
+					"response": []
+				}
+			],
+			"protocolProfileBehavior": {}
+		},
+		{
+			"name": "company-after-sales",
+			"item": [
+				{
+					"name": "Associate company with user",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"name": "Content-Type",
+								"value": "application/json",
+								"type": "text"
+							},
+							{
+								"key": "Authorization",
+								"value": "Bearer  eyJhbGciOiJIUzUxMiJ9.eyJzdWIiOiJhZG1pbkBhZG1pbi5jb20iLCJleHAiOjE1Nzk1Mzk0ODksImlhdCI6MTU3OTUyMTQ4OX0.RL_4yWzGA92QxWoycdyDDV_WIWzpLPlDdyr1ICdsaAzEaJkjmwm5LQ5aJDoVFK8_YkI6jAIh59kLmfVDzwqOQw",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n\t\"company\": 1,\n\t\"user\":\"thiagodoy@hotmail.com\"\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "http://localhost:8004/api/company/aftersales",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "8004",
+							"path": [
+								"api",
+								"company",
+								"aftersales"
+							]
+						}
+					},
+					"response": []
+				}
+			],
+			"protocolProfileBehavior": {}
+		},
+		{
+			"name": "runtime",
+			"item": [
+				{
+					"name": "startProcess",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer eyJhbGciOiJIUzUxMiJ9.eyJzdWIiOiJhZG1pbkBhZG1pbi5jb20iLCJleHAiOjE1Nzk2NTQ3MTQsImlhdCI6MTU3OTYzNjcxNH0.9jfAHBebsbWW76jnfl1qsXRi4NdI2hN8s9rAhsmldkynmcUfhsmkr5fobVPPLKJLtUGkd4yPrvYCRxp-JNsNIg",
+								"type": "text"
+							},
+							{
+								"key": "Content-Type",
+								"name": "Content-Type",
+								"value": "application/json",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n\t\"key\":\"process-associate-manager-v2\",\n\t\"variables\":{\n\t\t\"project\": \"Matrix Corp\",\n\t\t\"Actor\":\"Morpheu\"\n\t}\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "http://localhost:8004/api/workflow/runtime/startProcess",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "8004",
+							"path": [
+								"api",
+								"workflow",
+								"runtime",
+								"startProcess"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "getTask",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer eyJhbGciOiJIUzUxMiJ9.eyJzdWIiOiJhZG1pbkBhZG1pbi5jb20iLCJleHAiOjE1Nzk1NzQ3MjEsImlhdCI6MTU3OTU1NjcyMX0.f3-78nLa3PnPa6gMcwd_bzNA_s1ygyjCXDXg8fR7WXlocwvzUYaSZmGVWeLyubGWZiPAKWNFK3iVnZKapl-u5Q",
+								"type": "text"
+							}
+						],
+						"url": {
+							"raw": "http://localhost:8004/api/workflow/runtime/getTask?taskId=90008",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "8004",
+							"path": [
+								"api",
+								"workflow",
+								"runtime",
+								"getTask"
+							],
+							"query": [
+								{
+									"key": "taskId",
+									"value": "90008"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "completeTask",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer eyJhbGciOiJIUzUxMiJ9.eyJzdWIiOiJhZG1pbkBhZG1pbi5jb20iLCJleHAiOjE1Nzk1NzQ3MjEsImlhdCI6MTU3OTU1NjcyMX0.f3-78nLa3PnPa6gMcwd_bzNA_s1ygyjCXDXg8fR7WXlocwvzUYaSZmGVWeLyubGWZiPAKWNFK3iVnZKapl-u5Q",
+								"type": "text"
+							},
+							{
+								"key": "Content-Type",
+								"name": "Content-Type",
+								"value": "application/json",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\t\n\t\"processInstanceId\":\"90001\",\n\t\"taskId\":\"90008\",\n\t\"variables\":{\n\t\t\"_controle\":\"Cancelar\"\n\t}\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "http://localhost:8004/api/workflow/runtime/completeTask",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "8004",
+							"path": [
+								"api",
+								"workflow",
+								"runtime",
+								"completeTask"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "http://localhost:8004/workflow/runtime/getMyTask?size=2",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer eyJhbGciOiJIUzUxMiJ9.eyJzdWIiOiJhZG1pbkBhZG1pbi5jb20iLCJleHAiOjE1Nzg3NjYxMzEsImlhdCI6MTU3ODc0ODEzMX0.TmHn3UA5l-tcge1OpVJ1T7vgeLtoOzOY987FlyzG4IxnfEyDvnORKbNqUxAlQiD9jLgrwayvKyTtpQOUQo8zrQ",
+								"type": "text"
+							}
+						],
+						"url": {
+							"raw": "http://localhost:8004/api/workflow/runtime/getMyTask?size=2",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "8004",
+							"path": [
+								"api",
+								"workflow",
+								"runtime",
+								"getMyTask"
+							],
+							"query": [
+								{
+									"key": "size",
+									"value": "2"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Add comment",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"name": "Content-Type",
+								"value": "application/json",
+								"type": "text"
+							},
+							{
+								"key": "Authorization",
+								"value": "Bearer eyJhbGciOiJIUzUxMiJ9.eyJzdWIiOiJhZG1pbkBhZG1pbi5jb20iLCJleHAiOjE1Nzk2NTQ3MTQsImlhdCI6MTU3OTYzNjcxNH0.9jfAHBebsbWW76jnfl1qsXRi4NdI2hN8s9rAhsmldkynmcUfhsmkr5fobVPPLKJLtUGkd4yPrvYCRxp-JNsNIg",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n\t\"processInstanceId\": \"130001\",\n\t\"message\": \"Message teste\"\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "http://localhost:8004/api/workflow/runtime/comment",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "8004",
+							"path": [
+								"api",
+								"workflow",
+								"runtime",
+								"comment"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Add attachment",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"name": "Content-Type",
+								"value": "application/x-www-form-urlencoded",
+								"type": "text"
+							},
+							{
+								"key": "Authorization",
+								"value": "Bearer eyJhbGciOiJIUzUxMiJ9.eyJzdWIiOiJhZG1pbkBhZG1pbi5jb20iLCJleHAiOjE1Nzk2NTQ3MTQsImlhdCI6MTU3OTYzNjcxNH0.9jfAHBebsbWW76jnfl1qsXRi4NdI2hN8s9rAhsmldkynmcUfhsmkr5fobVPPLKJLtUGkd4yPrvYCRxp-JNsNIg",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "formdata",
+							"formdata": [
+								{
+									"key": "file",
+									"type": "file",
+									"src": "/C:/Users/thiag/Desktop/teste imagem clicktop/WhatsApp Image 2020-01-18 at 16.34.44(1).jpeg"
+								},
+								{
+									"key": "processInstance",
+									"value": "132501",
+									"type": "text"
+								}
+							]
+						},
+						"url": {
+							"raw": "http://localhost:8004/api/workflow/runtime/attachment",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "8004",
+							"path": [
+								"api",
+								"workflow",
+								"runtime",
+								"attachment"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Delete attachment",
+					"request": {
+						"method": "DELETE",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer eyJhbGciOiJIUzUxMiJ9.eyJzdWIiOiJhZG1pbkBhZG1pbi5jb20iLCJleHAiOjE1Nzk2NTQ3MTQsImlhdCI6MTU3OTYzNjcxNH0.9jfAHBebsbWW76jnfl1qsXRi4NdI2hN8s9rAhsmldkynmcUfhsmkr5fobVPPLKJLtUGkd4yPrvYCRxp-JNsNIg",
+								"type": "text"
+							}
+						],
+						"url": {
+							"raw": "http://localhost:8004/api/workflow/runtime/attachment/137507",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "8004",
+							"path": [
+								"api",
+								"workflow",
+								"runtime",
+								"attachment",
+								"137507"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Download attachment",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer eyJhbGciOiJIUzUxMiJ9.eyJzdWIiOiJhZG1pbkBhZG1pbi5jb20iLCJleHAiOjE1Nzk2NTQ3MTQsImlhdCI6MTU3OTYzNjcxNH0.9jfAHBebsbWW76jnfl1qsXRi4NdI2hN8s9rAhsmldkynmcUfhsmkr5fobVPPLKJLtUGkd4yPrvYCRxp-JNsNIg",
+								"type": "text"
+							},
+							{
+								"key": "",
+								"value": "137510",
+								"type": "text",
+								"disabled": true
+							}
+						],
+						"url": {
+							"raw": "http://localhost:8004/api/workflow/runtime/attachment?attachamentId=137510",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "8004",
+							"path": [
+								"api",
+								"workflow",
+								"runtime",
+								"attachment"
+							],
+							"query": [
+								{
+									"key": "attachamentId",
+									"value": "137510"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "List details about a process instance",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer eyJhbGciOiJIUzUxMiJ9.eyJzdWIiOiJhZG1pbkBhZG1pbi5jb20iLCJleHAiOjE1Nzk3NDYwNzEsImlhdCI6MTU3OTcyODA3MX0.jcZbBkntZDxBKiRLJeP45M2FFju6bAR9yoRc0onVP-ZgvNslFcjpISj8AtANc4qvWLEXrofN6R6rjzXyGFOFLw",
+								"type": "text"
+							}
+						],
+						"url": {
+							"raw": "http://localhost:8004/api/workflow/runtime/detail/153538",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "8004",
+							"path": [
+								"api",
+								"workflow",
+								"runtime",
+								"detail",
+								"153538"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Delete a comment",
+					"request": {
+						"method": "DELETE",
+						"header": [],
+						"url": {
+							"raw": "http://localhost:8004/api/workflow/runtime/comment/13232",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "8004",
+							"path": [
+								"api",
+								"workflow",
+								"runtime",
+								"comment",
+								"13232"
+							]
+						}
+					},
+					"response": []
+				}
+			],
+			"protocolProfileBehavior": {}
+		},
+		{
+			"name": "repository",
+			"item": [
+				{
+					"name": "Upload a new process definition",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer eyJhbGciOiJIUzUxMiJ9.eyJzdWIiOiJhZG1pbkBhZG1pbi5jb20iLCJleHAiOjE1Nzk2NTQ3MTQsImlhdCI6MTU3OTYzNjcxNH0.9jfAHBebsbWW76jnfl1qsXRi4NdI2hN8s9rAhsmldkynmcUfhsmkr5fobVPPLKJLtUGkd4yPrvYCRxp-JNsNIg",
+								"type": "text"
+							},
+							{
+								"key": "",
+								"value": "",
+								"type": "text",
+								"disabled": true
+							},
+							{
+								"key": "Content-Type",
+								"name": "Content-Type",
+								"value": "application/x-www-form-urlencoded",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "formdata",
+							"formdata": [
+								{
+									"key": "file",
+									"value": "",
+									"type": "text",
+									"disabled": true
+								},
+								{
+									"key": "file",
+									"type": "file",
+									"src": "/E:/Documentos/Projeto - Matrix/processos-matrix/src/main/resources/diagrams/Associar Gestor.bpmn"
+								}
+							]
+						},
+						"url": {
+							"raw": "http://localhost:8004/api/workflow/repository",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "8004",
+							"path": [
+								"api",
+								"workflow",
+								"repository"
+							]
+						},
+						"description": "Endpoint criado com a finalidade de realizar os upload do processDefinition"
+					},
+					"response": []
+				},
+				{
+					"name": "Download processDefinition  image",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Authorization",
+								"type": "text",
+								"value": "Bearer eyJhbGciOiJIUzUxMiJ9.eyJzdWIiOiJ0aGlhZ29kb3lAaG90bWFpbC5jb20iLCJleHAiOjE1NzgwMDIxNTgsImlhdCI6MTU3Nzk4NDE1OH0.jlpy3Xuo3nlgvKeb7MS5hvUdMZLXIiZZMYEo-TsKxjycbWuFK8mWoGQfdt3Gn4ImzjdB2keBhoU3uyxfnRNB_A"
+							}
+						],
+						"url": {
+							"raw": "http://localhost:8004/api/workflow/repository/diagram?processDefinitionId=process_pool1:1:2504",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "8004",
+							"path": [
+								"api",
+								"workflow",
+								"repository",
+								"diagram"
+							],
+							"query": [
+								{
+									"key": "processDefinitionId",
+									"value": "process_pool1:1:2504"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "List process actived",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer eyJhbGciOiJIUzUxMiJ9.eyJzdWIiOiJhZG1pbkBhZG1pbi5jb20iLCJleHAiOjE1Nzk2NTQ3MTQsImlhdCI6MTU3OTYzNjcxNH0.9jfAHBebsbWW76jnfl1qsXRi4NdI2hN8s9rAhsmldkynmcUfhsmkr5fobVPPLKJLtUGkd4yPrvYCRxp-JNsNIg",
+								"type": "text"
+							}
+						],
+						"url": {
+							"raw": "http://localhost:8004/api/workflow/repository",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "8004",
+							"path": [
+								"api",
+								"workflow",
+								"repository"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Delete a process definition",
+					"request": {
+						"method": "DELETE",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer eyJhbGciOiJIUzUxMiJ9.eyJzdWIiOiJhZG1pbkBhZG1pbi5jb20iLCJleHAiOjE1Nzg0MzgyNzksImlhdCI6MTU3ODQyMDI3OX0.2IzDczX62yt7XYgQK93cYzjJSmL_0fsyFc_SyPVlBCWYwG9Hye9ElzjAfX5BaCUgoew7CfY9ljuqfkCOsMd5Aw",
+								"type": "text"
+							}
+						],
+						"url": {
+							"raw": "http://localhost:8004/api/workflow/repository/1",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "8004",
+							"path": [
+								"api",
+								"workflow",
+								"repository",
+								"1"
+							]
+						}
+					},
+					"response": []
+				}
+			],
+			"protocolProfileBehavior": {}
+		},
+		{
+			"name": "complement-information",
+			"item": [
+				{
+					"name": "Save complement the information about contract",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"name": "Content-Type",
+								"value": "application/json",
+								"type": "text"
+							},
+							{
+								"key": "Authorization",
+								"value": "Bearer eyJhbGciOiJIUzUxMiJ9.eyJzdWIiOiJhZG1pbkBhZG1pbi5jb20iLCJleHAiOjE1Nzk2MjY1MTksImlhdCI6MTU3OTYwODUxOX0.5DeZtBnJPococZApDZmPIavhlPeD3oOCObY8zttyP4YGIwKFYInhi8jjOSbhrnfE2vX8zgfWAhYmHKGiYLL7ug",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n\t\"percentOfLoss\": 100.000001,\n\t\"factorAttendanceCharge\": 100.000001,\n\t\"proinfa\": 100.000001,\n\t\"wbcContract\":\"67928\"\n\t\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "http://localhost:8004/api/complement/information",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "8004",
+							"path": [
+								"api",
+								"complement",
+								"information"
+							]
+						}
+					},
+					"response": []
+				}
+			],
+			"protocolProfileBehavior": {}
+		},
+		{
+			"name": "contract-point",
+			"item": [
+				{
+					"name": "Associate contract with point meansurement",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer eyJhbGciOiJIUzUxMiJ9.eyJzdWIiOiJhZG1pbkBhZG1pbi5jb20iLCJleHAiOjE1Nzk2MjY1MTksImlhdCI6MTU3OTYwODUxOX0.5DeZtBnJPococZApDZmPIavhlPeD3oOCObY8zttyP4YGIwKFYInhi8jjOSbhrnfE2vX8zgfWAhYmHKGiYLL7ug",
+								"type": "text"
+							},
+							{
+								"key": "Content-Type",
+								"name": "Content-Type",
+								"value": "application/json",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n\t\"wbcContract\": 123,\n\t\"point\":\"XPDMIYRBBKKUFF\"\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "http://localhost:8004/api/associate/point",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "8004",
+							"path": [
+								"api",
+								"associate",
+								"point"
+							]
+						}
+					},
+					"response": []
+				}
+			],
+			"protocolProfileBehavior": {}
+		}
+	],
+	"protocolProfileBehavior": {}
+}
