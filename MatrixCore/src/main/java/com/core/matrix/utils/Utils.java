@@ -12,7 +12,10 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.text.SimpleDateFormat;
+import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.time.Month;
+import java.time.YearMonth;
 import java.time.format.DateTimeFormatter;
 import java.util.Date;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
@@ -59,5 +62,10 @@ public class Utils {
         return new FileInputStream(convFile);
         
     }
+    
+    public static int  getDaysOfMonth(LocalDate date){
+        return YearMonth.of(date.getYear(), Month.of(date.getMonthValue())).lengthOfMonth();
+    }
+
 
 }

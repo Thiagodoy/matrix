@@ -71,6 +71,7 @@
                 <maven.surefire.debug>-Xdebug -Xrunjdwp:transport=dt_socket,server=n,address=${jpda.address}</maven.surefire.debug>
                 <jpda.listen>true</jpda.listen>
                 <spring.profiles.active>test</spring.profiles.active>
+                <file.encoding>UTF-8</file.encoding>
             </properties>
         </action>
     <action>

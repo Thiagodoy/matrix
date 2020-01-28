@@ -6,6 +6,7 @@
 package com.core.matrix.dto;
 
 import java.util.List;
+import lombok.AllArgsConstructor;
 import lombok.Data;
 
 /**
@@ -13,10 +14,10 @@ import lombok.Data;
  * @author thiag
  */
 @Data
-public class FileParsedDTO {
+@AllArgsConstructor
+public class ErrorInformation<T> {
 
-    public List<InformationDTO> informations;
-    public HeaderDTO header;
-    public List<FileDetailDTO> details;
-    public String type;
+    private String information;
+    private List<T> errors;
+
 }

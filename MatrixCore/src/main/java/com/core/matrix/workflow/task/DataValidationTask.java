@@ -5,6 +5,7 @@
  */
 package com.core.matrix.workflow.task;
 
+import com.core.matrix.dto.ErrorInformation;
 import com.core.matrix.model.MeansurementFile;
 import com.core.matrix.model.MeansurementFileDetail;
 import com.core.matrix.service.MeansurementFileService;
@@ -48,12 +49,38 @@ public class DataValidationTask implements JavaDelegate {
             MeansurementFile file = fileService.findById(id);
             this.checkDays(file);
             this.checkCalendar(file);
-            this.checkHour(file);
+            this.checkHour(file);            
+            delegateExecution.setVariable(CONTROLE, RESPONSE_DATA_IS_VALID, true);
+            
+            
 
         } catch (Exception e) {
             Logger.getLogger(DataValidationTask.class.getName()).log(Level.SEVERE, "[execute]", e);
         }
 
+    }
+    
+    private List<MeansurementFileDetail>getDetails(MeansurementFile file) throws Exception{
+        
+        switch (file.getType()) {
+            case LAYOUT_A:
+                return file.getDetails()
+                        .parallelStream()                        
+                        .collect(Collectors.toList());
+            case LAYOUT_B:
+                return file.getDetails()
+                        .parallelStream()
+                        .filter(d -> d.getEnergyType().equalsIgnoreCase(TYPE_ENERGY_LIQUID))                        
+                        .collect(Collectors.toList());
+            case LAYOUT_C:
+                return file.getDetails()
+                        .stream()
+                        .filter(detail -> detail.getMeansurementPoint().contains("(L)"))                        
+                        .collect(Collectors.toList());
+            default:
+                throw new Exception("Não foi possivel selecionar os ponto de medição");
+        }
+        
     }
 
     private void checkCalendar(MeansurementFile file) throws Exception {
@@ -62,10 +89,11 @@ public class DataValidationTask implements JavaDelegate {
         LocalDate init = LocalDate.of(file.getYear().intValue(), file.getMonth().intValue(), 1);
         LocalDate end = LocalDate.of(file.getYear().intValue(), file.getMonth().intValue(), daysOnMonth);
 
-        List<MeansurementFileDetail> detail = file.getDetails().parallelStream().filter(d -> d.getDate().isAfter(end) || d.getDate().isBefore(init)).collect(Collectors.toList());
+        List<MeansurementFileDetail> detail = this.getDetails(file).parallelStream().filter(d -> d.getDate().isAfter(end) || d.getDate().isBefore(init)).collect(Collectors.toList());
 
         if (detail.isEmpty()) {
-            delegateExecution.setVariable(RESPONSE_RESULT, detail);
+            ErrorInformation<MeansurementFileDetail> error = new ErrorInformation<>("Calendário apresenta registros fora do ciclo de faturamento",detail);
+            delegateExecution.setVariable(RESPONSE_RESULT, error);
             delegateExecution.setVariable(RESPONSE_RESULT_MESSAGE, "Calendário apresenta registros fora do ciclo de avaliação!");
             delegateExecution.setVariable(CONTROLE, RESPONSE_CALENDAR_INVALID, true);
             throw new Exception("Calendário inválido! arquivo ->" + file.getId());
@@ -75,8 +103,8 @@ public class DataValidationTask implements JavaDelegate {
 
     private void checkHour(MeansurementFile file) throws Exception {
 
-        Map<LocalDate, Long> days = file
-                .getDetails()
+        Map<LocalDate, Long> days = 
+                this.getDetails(file)
                 .stream()
                 .collect(Collectors.groupingBy(MeansurementFileDetail::getDate, Collectors.counting()));
 
@@ -89,7 +117,7 @@ public class DataValidationTask implements JavaDelegate {
             daysInvalids.forEach(day -> {
                 for (int i = 1; i <= 24; i++) {
                     if (this.hourIsNotPresent((long) i, file, day)) {
-                        hoursOut.add(new MeansurementFileDetail(day, (long) i));
+                        hoursOut.add(new MeansurementFileDetail(day, (long) i, file.getId()));
                     }
                 }
             });
@@ -101,7 +129,10 @@ public class DataValidationTask implements JavaDelegate {
                                 .comparing(MeansurementFileDetail::getDate)
                                 .thenComparing(MeansurementFileDetail::getHour));
 
-                delegateExecution.setVariable(RESPONSE_RESULT, hoursOut);
+                ErrorInformation<MeansurementFileDetail> error = new ErrorInformation<>("Arquivo esta com a consolidação diária das hora inválida",hoursOut);
+                
+                
+                delegateExecution.setVariable(RESPONSE_RESULT, error);
                 delegateExecution.setVariable(RESPONSE_RESULT_MESSAGE, "Arquivo esta com a consolidação diária das hora inválida");
                 delegateExecution.setVariable(CONTROLE, Constants.RESPONSE_NO_DATA_FOUND, true);
                 throw new Exception("Arquivo esta com a consolidação diária das hora inválida arquivo -> " + file.getId());
@@ -124,8 +155,8 @@ public class DataValidationTask implements JavaDelegate {
 
         int daysOnMonth = YearMonth.of(file.getYear().intValue(), Month.of(file.getMonth().intValue())).lengthOfMonth();
 
-        Map<LocalDate, Long> days = file
-                .getDetails()
+        Map<LocalDate, Long> days = 
+                this.getDetails(file)
                 .stream()
                 .collect(Collectors.groupingBy(MeansurementFileDetail::getDate, Collectors.counting()));
 
@@ -137,15 +168,18 @@ public class DataValidationTask implements JavaDelegate {
             for (int day = 1; day <= daysOnMonth; day++) {
 
                 if (!days.containsKey(checkDay)) {
-                    detailsOut.add(new MeansurementFileDetail(checkDay));
+                    detailsOut.add(new MeansurementFileDetail(checkDay, file.getId()));
                 }
                 checkDay = checkDay.plusDays(1L);
             }
         }
 
         if (!detailsOut.isEmpty()) {
-            delegateExecution.setVariable(RESPONSE_RESULT, detailsOut);
-            delegateExecution.setVariable(RESPONSE_RESULT_MESSAGE, "Arquivo esta com o calendário  de apuração com dias faltantes");
+            
+            ErrorInformation<MeansurementFileDetail> error = new ErrorInformation<>("Arquivo esta com o calendário  de apuração com dias faltantes!", detailsOut);
+            
+            delegateExecution.setVariable(RESPONSE_RESULT, error);
+            delegateExecution.setVariable(RESPONSE_RESULT_MESSAGE, "Arquivo esta com o calendário de apuração com dias faltantes");
             delegateExecution.setVariable(CONTROLE, Constants.RESPONSE_NO_DATA_FOUND, true);
             throw new Exception("Dados ausentes no arquivo -> " + file.getId());
         }

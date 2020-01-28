@@ -3,16 +3,16 @@
  * To change this template file, choose Tools | Templates
  * and open the template in the editor.
  */
-package com.core.matrix.dto;
-
-import lombok.Data;
+package com.core.matrix.utils;
 
 /**
  *
  * @author thiag
  */
-@Data
-public class InformationDTO {
-    public String value;    
-    
+public enum MeansurementFileType {
+
+    LAYOUT_A,
+    LAYOUT_B,
+    LAYOUT_C
+
 }

@@ -6,14 +6,17 @@
 package com.core.matrix.model;
 
 import com.core.matrix.dto.FileDetailDTO;
+import com.core.matrix.utils.MeansurementFileType;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
+import java.util.List;
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.Table;
+import javax.persistence.Transient;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
@@ -59,26 +62,77 @@ public class MeansurementFileDetail {
     @Column(name = "reativa_consumo")
     private Double consumptionReactivate;
 
-    public MeansurementFileDetail(LocalDate date) {
+    @Column(name = "situacao_da_medida")
+    private String situation;
+
+    @Column(name = "motivo_da_situacao")
+    private String reasonOfSituation;
+
+    @Column(name = "intervalo")
+    private Long range;
+
+    @Column(name = "origem_coleta")
+    private String sourceCollection;
+
+    @Column(name = "notificacao_coleta")
+    private String notificationCollection;
+
+    @Column(name = "agente")
+    private String agent;
+
+    @Column(name = "qualidade")
+    private String quality;
+
+    @Column(name = "origem")
+    private String origem;
+
+    @Transient
+    private List<String> erros;
+
+    public MeansurementFileDetail(LocalDate date, Long fileId) {
         this.date = date;
+        this.idMeansurementFile = fileId;
     }
 
-    public MeansurementFileDetail(LocalDate date, Long hour) {
+    public MeansurementFileDetail(LocalDate date, Long hour, Long fileId) {
         this.date = date;
         this.hour = hour;
+        this.idMeansurementFile = fileId;
     }
 
-    public MeansurementFileDetail(FileDetailDTO detail) {
+    public MeansurementFileDetail(FileDetailDTO detail, MeansurementFileType type) {
 
-        this.meansurementPoint = detail.getMeansurementPoint();
         DateTimeFormatter formater = DateTimeFormatter.ofPattern("dd/MM/yyyy");
-        this.date = LocalDate.parse(detail.getDate(), formater);
-        this.hour = Long.valueOf(detail.getHour());
-        this.energyType = detail.getEnergyType();
-        this.generationActive = Double.parseDouble(detail.getGenerationActive());
-        this.consumptionActive = Double.parseDouble(detail.getConsumptionActive());
-        this.generationReactivate = Double.parseDouble(detail.getGenerationReactivate());
-        this.consumptionReactivate = Double.parseDouble(detail.getGenerationReactivate());
+
+        switch (type) {
+            case LAYOUT_A:
+                this.meansurementPoint = detail.getMeansurementPoint();
+                this.date = LocalDate.parse(detail.getDate(), formater);
+                this.hour = Long.valueOf(detail.getHour());
+                this.energyType = detail.getEnergyType();
+                this.generationActive = Double.parseDouble(detail.getGenerationActive().replaceAll(",", "."));
+                this.consumptionActive = Double.parseDouble(detail.getConsumptionActive().replaceAll(",", "."));
+                this.generationReactivate = Double.parseDouble(detail.getGenerationReactivate().replaceAll(",", "."));
+                this.consumptionReactivate = Double.parseDouble(detail.getGenerationReactivate().replaceAll(",", "."));
+                break;
+
+            case LAYOUT_B:
+                this.meansurementPoint = detail.getMeansurementPoint();
+                this.date = LocalDate.parse(detail.getDate(), formater);
+                this.hour = Long.valueOf(detail.getHour());
+                this.energyType = detail.getEnergyType();
+                this.generationActive = Double.parseDouble(detail.getGenerationActive().replaceAll(",", "."));
+                this.consumptionActive = Double.parseDouble(detail.getConsumptionActive().replaceAll(",", "."));
+                this.generationReactivate = Double.parseDouble(detail.getGenerationReactivate().replaceAll(",", "."));
+                this.consumptionReactivate = Double.parseDouble(detail.getGenerationReactivate().replaceAll(",", "."));
+                this.sourceCollection = detail.getSourceCollection();
+                this.notificationCollection = detail.getNotificationCollection();
+                break;
+            case LAYOUT_C:
+
+                break;
+        }
 
     }
+
 }

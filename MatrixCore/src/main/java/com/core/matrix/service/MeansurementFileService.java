@@ -24,8 +24,8 @@ public class MeansurementFileService {
     private MeansurementFileRepository repository;
     
     @Transactional 
-    public void saveFile(MeansurementFile file){
-        this.repository.save(file);
+    public MeansurementFile saveFile(MeansurementFile file){
+        return this.repository.save(file);
     }
     
     @Transactional

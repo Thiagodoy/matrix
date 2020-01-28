@@ -6,6 +6,7 @@
 package com.core.matrix.model;
 
 import com.core.matrix.utils.MeansurementFileStatus;
+import com.core.matrix.utils.MeansurementFileType;
 import java.time.LocalDateTime;
 import java.util.List;
 import javax.persistence.CascadeType;
@@ -57,7 +58,10 @@ public class MeansurementFile {
 
     @Column(name = "data_ultima_alteracao")
     private LocalDateTime updatedAt;
-    
+
+    @Column(name = "tipo_arquivo")
+    @Enumerated(EnumType.STRING)
+    private MeansurementFileType type;
     
     @OneToMany(cascade = CascadeType.ALL, fetch = FetchType.EAGER)
     @JoinColumn(name = "id_arquivo_de_medicao")

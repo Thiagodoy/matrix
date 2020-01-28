@@ -5,6 +5,7 @@
  */
 package com.core.matrix.dto;
 
+import javax.persistence.Column;
 import lombok.Data;
 
 /**
@@ -13,8 +14,8 @@ import lombok.Data;
  */
 @Data
 public class FileDetailDTO {
-
     
+    public String agent;
     public String meansurementPoint;
     public String date;
     public String hour;
@@ -26,4 +27,8 @@ public class FileDetailDTO {
     public String range;
     public String situation;
     public String reason;
+    public String sourceCollection;
+    public String notificationCollection;   
+    public String quality;
+    public String origem;
 }

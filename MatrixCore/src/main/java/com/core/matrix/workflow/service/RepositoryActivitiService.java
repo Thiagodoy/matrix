@@ -58,7 +58,7 @@ public class RepositoryActivitiService {
         this.repositoryService.deleteDeployment(processDefinitionId, true);
     }
 
-    @Cacheable("processDefinition")
+    //@Cacheable("processDefinition")
     public List<ProcessDefinitionResponse> listAll() {
         return this.repositoryService
                 .createProcessDefinitionQuery()
