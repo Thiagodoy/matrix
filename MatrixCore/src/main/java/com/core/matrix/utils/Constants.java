@@ -45,5 +45,18 @@ public class Constants {
     
     public static final String TYPE_ENERGY_LIQUID = "Liguida";
     
+    public static final String CONST_SITUATION_1 = "Consistido";
+    public static final String CONST_SITUATION_2 = "Coleta Diária";
+    public static final String CONST_SITUATION_3 = "Hora Ajustada";
+    public static final String CONST_SITUATION_4 = "Inspeção Lógica";
+    
+    
+    public static final String CONST_SOURCE_COLLECTION_1 = "Consistido";
+    public static final String CONST_SOURCE_COLLECTION_2 = "Coleta Diária";
+    public static final String CONST_SOURCE_COLLECTION_3 = "Hora Ajustada";
+    
+    public static final String CONST_QUALITY_COMPLETE = "Completo";
+    
+    
     
 }

@@ -71,13 +71,8 @@
             <artifactId>commons-io</artifactId>
             <version>2.2</version>
             <type>jar</type>
-        </dependency>  
-        
-        <dependency>
-            <groupId>org.apache.tika</groupId>
-            <artifactId>tika-core</artifactId>
-            <version>1.18</version>
-        </dependency>
+        </dependency>     
+       
         
         <dependency>
             <groupId>org.springframework.boot</groupId>
@@ -123,19 +118,9 @@
             <groupId>com.microsoft.sqlserver</groupId>
             <artifactId>sqljdbc42</artifactId>
             <version>4.2</version>
-        </dependency>
-
-        <dependency>
-            <groupId>org.apache.tika</groupId>
-            <artifactId>tika-core</artifactId>
-            <version>1.23</version>
-        </dependency>
+        </dependency>     
         
-        <dependency>
-            <groupId>org.apache.tika</groupId>
-            <artifactId>tika-parsers</artifactId>
-            <version>1.23</version>
-        </dependency>
+       
         
         <!-- https://mvnrepository.com/artifact/org.apache.commons/commons-text -->
         <dependency>

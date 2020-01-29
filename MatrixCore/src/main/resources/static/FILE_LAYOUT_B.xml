@@ -36,7 +36,7 @@
                 <field type="string" name="generationReactivate" trim="true"  regex="[0-9]+(,?[0-9]+)?" />
                 <field type="string" name="consumptionReactivate" trim="true" regex="[0-9]+(,?[0-9]+)?"/>
                 <field type="string" name="sourceCollection" trim="true" required="true" />
-                <field type="string" name="notificationCollection" trim="true" regex="[a-zA-Z\s]*"/> 
+                <field type="string" name="notificationCollection" trim="true"/> 
             </record>
         </group>
     </stream>  

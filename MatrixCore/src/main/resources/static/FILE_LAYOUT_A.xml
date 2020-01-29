@@ -6,12 +6,11 @@
     
     
     <stream name="file-matrix" format="csv"  resourceBundle="beanio/messages">  
-        
-        
-        
         <parser>
            <property name="delimiter" value=";" />
         </parser>
+        
+        <!--<typeHandler name="situationHandler" class="com.core.matrix.io.ReasonSituationHandler"/>-->
         
         <group name="file" class="com.core.matrix.dto.FileParsedDTO">            
             <record  name="informations" class="com.core.matrix.dto.InformationDTO"  minOccurs="1" maxOccurs="3" collection="list" order="1" >

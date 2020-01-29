@@ -2,6 +2,8 @@ package com.core.matrix;
 
 import com.core.matrix.dto.FileParsedDTO;
 import com.core.matrix.io.BeanIoReader;
+import com.core.matrix.utils.Constants;
+import com.core.matrix.utils.Utils;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
@@ -22,6 +24,9 @@ class FileParserTests {
         FileInputStream inputStream = new FileInputStream(new File("TIPO C.csv"));
         
        Optional<FileParsedDTO> opt = reader.<FileParsedDTO>parse(inputStream);
+       
+       
+        System.out.println("result ->" + Utils.checkDistance(Constants.CONST_SOURCE_COLLECTION_2, "Coleta Dixria"));
        
        
         //inputStream.close();

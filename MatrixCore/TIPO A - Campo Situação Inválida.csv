@@ -1,0 +1,29 @@
+﻿Tipo de Relatório: Medidas Consolidadas;;;;;;;;;;
+Tipo de Agente: Conectante | Nome: BARBOSA 1;;;;;;;;;;
+Periodo Solicitado de 01/12/2019 até 31/12/2019;;;;;;;;;;
+Ponto de Medição;Data de Consolidação;Hora de Consolidação;Tipo de Energia;Ativa Geração (kWh);Ativa Consumo (kWh);Reativa Geração (kVArh);Reativa Consumo (kVArh);Qt Intervalos Faltantes;Situação da Medida;Motivo da Situação
+SPSIBOENTR101;01/12/2019;1;Bruta;0;56,432;0;19,264;0;Hora Completa Consistente;Consistido
+SPSIBOENTR101;26/12/2019;1;Bruta;0;0;0;0;12;Hora Incompleta Faltante;Hora Faltante
+SPSIBOENTR101;26/12/2019;2;Bruta;0;0;0;0;12;Hora Incompleta Faltante;Hora Faltante
+SPSIBOENTR101;26/12/2019;3;Bruta;0;0;0;0;12;Hora Incompleta Faltante;Hora Faltante
+SPSIBOENTR101;26/12/2019;4;Bruta;0;0;0;0;12;Hora Incompleta Faltante;Hora Faltante
+SPSIBOENTR101;26/12/2019;5;Bruta;0;0;0;0;12;Hora Incompleta Faltante;Hora Faltante
+SPSIBOENTR101;26/12/2019;6;Bruta;0;0;0;0;12;Hora Incompleta Faltante;Hora Faltante
+SPSIBOENTR101;26/12/2019;7;Bruta;0;0;0;0;12;Hora Incompleta Faltante;Hora Faltante
+SPSIBOENTR101;26/12/2019;8;Bruta;0;0;0;0;12;Hora Incompleta Faltante;Hora Faltante
+SPSIBOENTR101;26/12/2019;9;Bruta;0;0;0;0;12;Hora Incompleta Faltante;Hora Faltante
+SPSIBOENTR101;26/12/2019;10;Bruta;0;0;0;0;12;Hora Incompleta Faltante;Hora Faltante
+SPSIBOENTR101;26/12/2019;11;Bruta;0;0;0;0;12;Hora Incompleta Faltante;Hora Faltante
+SPSIBOENTR101;26/12/2019;12;Bruta;0;0;0;0;12;Hora Incompleta Faltante;Hora Faltante
+SPSIBOENTR101;26/12/2019;13;Bruta;0;0;0;0;12;Hora Incompleta Faltante;Hora Faltante
+SPSIBOENTR101;26/12/2019;14;Bruta;0;0;0;0;12;Hora Incompleta Faltante;Hora Faltante
+SPSIBOENTR101;26/12/2019;15;Bruta;0;0;0;0;12;Hora Incompleta Faltante;Hora Faltante
+SPSIBOENTR101;26/12/2019;16;Bruta;0;0;0;0;12;Hora Incompleta Faltante;Hora Faltante
+SPSIBOENTR101;26/12/2019;17;Bruta;0;0;0;0;12;Hora Incompleta Faltante;Hora Faltante
+SPSIBOENTR101;26/12/2019;18;Bruta;0;0;0;0;12;Hora Incompleta Faltante;Hora Faltante
+SPSIBOENTR101;26/12/2019;19;Bruta;0;0;0;0;12;Hora Incompleta Faltante;Hora Faltante
+SPSIBOENTR101;26/12/2019;20;Bruta;0;0;0;0;12;Hora Incompleta Faltante;Hora Faltante
+SPSIBOENTR101;26/12/2019;21;Bruta;0;0;0;0;12;Hora Incompleta Faltante;Hora Faltante
+SPSIBOENTR101;26/12/2019;22;Bruta;0;0;0;0;12;Hora Incompleta Faltante;Hora Faltante
+SPSIBOENTR101;26/12/2019;23;Bruta;0;0;0;0;12;Hora Incompleta Faltante;Hora Faltante
+SPSIBOENTR101;26/12/2019;24;Bruta;0;0;0;0;12;Hora Incompleta Faltante;Hora Faltante

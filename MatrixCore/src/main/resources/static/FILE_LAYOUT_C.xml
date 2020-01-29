@@ -14,16 +14,16 @@
             </record>    
             
             <record  name="header" class="com.core.matrix.dto.HeaderDTO"  minOccurs="1" maxOccurs="1" order="2" >
-                <field name="headeragent" trim="true" type="string" literal="Agente" />
-                <field name="headermeansurementPoint" trim="true" type="string" literal="Ponto / Grupo" />
-                <field name="headerdate" trim="true" type="string" literal="Data" />
-                <field name="headerhour" trim="true" type="string" literal="Hora" />
-                <field name="headerconsumptionActive" trim="true" type="string" literal="Ativa C (kWh)" />
-                <field name="headergenerationActive" trim="true" type="string" literal="Ativa G (kWh)" />
-                <field name="headerconsumptionReactivate" trim="true" type="string" literal="Reativa C (kVArh)" />
-                <field name="headergenerationReactivate" trim="true" type="string" literal="Reativa G (kVArh)" />
-                <field name="headerquality" trim="true" type="string" literal="Qualidade" />
-                <field name="headerorigem" trim="true" type="string" literal="Origem" />                             
+                <field name="headeragent" trim="true" type="string" />
+                <field name="headermeansurementPoint" trim="true" type="string"  />
+                <field name="headerdate" trim="true" type="string"  />
+                <field name="headerhour" trim="true" type="string"  />
+                <field name="headerconsumptionActive" trim="true" type="string"  />
+                <field name="headergenerationActive" trim="true" type="string"  />
+                <field name="headerconsumptionReactivate" trim="true" type="string"  />
+                <field name="headergenerationReactivate" trim="true" type="string"  />
+                <field name="headerquality" trim="true" type="string"  />
+                <field name="headerorigem" trim="true" type="string"  />                             
             </record> 
             
             

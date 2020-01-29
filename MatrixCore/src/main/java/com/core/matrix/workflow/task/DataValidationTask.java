@@ -12,8 +12,10 @@ import com.core.matrix.model.MeansurementFileDetail;
 import com.core.matrix.service.MeansurementFileService;
 import com.core.matrix.utils.Constants;
 import static com.core.matrix.utils.Constants.*;
+import com.core.matrix.utils.Utils;
 import com.core.matrix.wbc.dto.EmpresaDTO;
 import com.core.matrix.wbc.service.EmpresaService;
+import java.text.MessageFormat;
 import java.time.LocalDate;
 import java.time.Month;
 import java.time.YearMonth;
@@ -28,6 +30,7 @@ import java.util.logging.Logger;
 import java.util.stream.Collectors;
 import org.activiti.engine.delegate.DelegateExecution;
 import org.activiti.engine.delegate.JavaDelegate;
+import org.beanio.types.TypeConversionException;
 import org.springframework.context.ApplicationContext;
 
 /**
@@ -80,17 +83,62 @@ public class DataValidationTask implements JavaDelegate {
             case LAYOUT_A:
                 return file.getDetails()
                         .parallelStream()
+                        .filter(d -> d.getEnergyType().equalsIgnoreCase(TYPE_ENERGY_LIQUID))
+                        .filter(d -> {
+                            if ((d.getReasonOfSituation() != null && d.getReasonOfSituation().length() > 0)
+                                    && (Utils.checkDistance(CONST_SITUATION_1, d.getReasonOfSituation()) > 0.95
+                                    || (Utils.checkDistance(CONST_SITUATION_2, d.getReasonOfSituation()) > 0.95)
+                                    || (Utils.checkDistance(CONST_SITUATION_3, d.getReasonOfSituation()) > 0.95)
+                                    || (Utils.checkDistance(CONST_SITUATION_4, d.getReasonOfSituation()) > 0.95))) {
+                                return true;
+                            } else {
+                                return false;
+                            }
+                        })
                         .collect(Collectors.toList());
             case LAYOUT_B:
                 return file.getDetails()
                         .parallelStream()
                         .filter(d -> d.getEnergyType().equalsIgnoreCase(TYPE_ENERGY_LIQUID))
+                        .filter(d -> {
+                            if ((d.getSourceCollection() != null && d.getSourceCollection().length() > 0)
+                                    && (Utils.checkDistance(CONST_SOURCE_COLLECTION_1, d.getSourceCollection()) > 0.95
+                                    || (Utils.checkDistance(CONST_SOURCE_COLLECTION_2, d.getSourceCollection()) > 0.95)
+                                    || (Utils.checkDistance(CONST_SOURCE_COLLECTION_3, d.getSourceCollection()) > 0.95))) {
+                                return true;
+                            } else {
+                                return false;
+                            }
+                        })
                         .collect(Collectors.toList());
             case LAYOUT_C:
-                return file.getDetails()
-                        .stream()
+                List<MeansurementFileDetail> result = file.getDetails()
+                        .parallelStream()
                         .filter(detail -> detail.getMeansurementPoint().contains("(L)"))
+                        .filter(d -> {
+                            if ((d.getQuality() != null && d.getQuality().length() > 0)
+                                    && Utils.checkDistance(CONST_QUALITY_COMPLETE, d.getSourceCollection()) > 0.95) {
+                                return true;
+                            } else {
+                                return false;
+                            }
+                        })
+                        .filter(d -> {
+                            if ((d.getReasonOfSituation() != null && d.getReasonOfSituation().length() > 0)
+                                    && ((Utils.checkDistance(CONST_SITUATION_2, d.getReasonOfSituation()) > 0.95)
+                                    || (Utils.checkDistance(CONST_SITUATION_3, d.getReasonOfSituation()) > 0.95)
+                                    || (Utils.checkDistance(CONST_SITUATION_4, d.getReasonOfSituation()) > 0.95))) {
+                                return true;
+                            } else {
+                                return false;
+                            }
+                        })
                         .collect(Collectors.toList());
+                
+                result.parallelStream().forEach(d->{
+                     d.setMeansurementPoint(d.getMeansurementPoint().replaceAll("\\((L|B)\\)", "").trim());
+                });
+                return result;
             default:
                 throw new Exception("Não foi possivel selecionar os ponto de medição");
         }
@@ -128,13 +176,11 @@ public class DataValidationTask implements JavaDelegate {
 
         });
 
-       
-
         if (!lotesErrors.isEmpty()) {
 
             LoteDTO lote = new LoteDTO();
-            lote.setLotes(lotesErrors);           
-            
+            lote.setLotes(lotesErrors);
+
             delegateExecution.setVariable(RESPONSE_RESULT, lote);
             delegateExecution.setVariable(RESPONSE_RESULT_MESSAGE, "Lote apresenta registros fora do ciclo de avaliação!");
             delegateExecution.setVariable(CONTROLE, RESPONSE_CALENDAR_INVALID, true);

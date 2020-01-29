@@ -5,6 +5,7 @@
  */
 package com.core.matrix.utils;
 
+import static com.core.matrix.utils.Constants.CONTENT_ID_LAYOUT_A;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
@@ -18,6 +19,7 @@ import java.time.Month;
 import java.time.YearMonth;
 import java.time.format.DateTimeFormatter;
 import java.util.Date;
+import org.apache.commons.text.similarity.JaroWinklerDistance;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Component;
 import org.springframework.web.multipart.MultipartFile;
@@ -31,13 +33,18 @@ public class Utils {
 
     private static BCryptPasswordEncoder bcpe;
     private static SimpleDateFormat sdfHour;
-    
+    private static  JaroWinklerDistance n = new JaroWinklerDistance();
     
     static {
         bcpe = new BCryptPasswordEncoder();
         sdfHour = new SimpleDateFormat("yyyy-MM-dd HH:mm");
     }
 
+    
+    public static synchronized double checkDistance(String one, String two){
+        return n.apply(one.toUpperCase(), two.toUpperCase());
+    }
+    
     public static String encodePassword(String in) {
         return bcpe.encode(in);
     }

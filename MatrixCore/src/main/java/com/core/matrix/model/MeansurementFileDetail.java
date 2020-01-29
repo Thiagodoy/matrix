@@ -118,7 +118,10 @@ public class MeansurementFileDetail implements Serializable {
                 this.generationActive = Double.parseDouble(detail.getGenerationActive().replaceAll(",", "."));
                 this.consumptionActive = Double.parseDouble(detail.getConsumptionActive().replaceAll(",", "."));
                 this.generationReactivate = Double.parseDouble(detail.getGenerationReactivate().replaceAll(",", "."));
-                this.consumptionReactivate = Double.parseDouble(detail.getGenerationReactivate().replaceAll(",", "."));
+                this.consumptionReactivate = Double.parseDouble(detail.getConsumptionReactivate().replaceAll(",", "."));
+                this.range = Long.parseLong(detail.getRange());
+                this.situation = detail.getSituation();
+                this.reasonOfSituation = detail.getReason();
                 break;
 
             case LAYOUT_B:
@@ -129,12 +132,21 @@ public class MeansurementFileDetail implements Serializable {
                 this.generationActive = Double.parseDouble(detail.getGenerationActive().replaceAll(",", "."));
                 this.consumptionActive = Double.parseDouble(detail.getConsumptionActive().replaceAll(",", "."));
                 this.generationReactivate = Double.parseDouble(detail.getGenerationReactivate().replaceAll(",", "."));
-                this.consumptionReactivate = Double.parseDouble(detail.getGenerationReactivate().replaceAll(",", "."));
+                this.consumptionReactivate = Double.parseDouble(detail.getConsumptionReactivate().replaceAll(",", "."));
                 this.sourceCollection = detail.getSourceCollection();
                 this.notificationCollection = detail.getNotificationCollection();
                 break;
             case LAYOUT_C:
-
+                this.agent = detail.getAgent();
+                this.meansurementPoint = detail.getMeansurementPoint();
+                this.date = LocalDate.parse(detail.getDate(), formater);
+                this.hour = Long.valueOf(detail.getHour());
+                this.consumptionActive = Double.parseDouble(detail.getConsumptionActive().replaceAll(",", "."));
+                this.generationActive = Double.parseDouble(detail.getGenerationActive().replaceAll(",", "."));
+                this.consumptionReactivate = Double.parseDouble(detail.getConsumptionReactivate().replaceAll(",", "."));
+                this.generationReactivate = Double.parseDouble(detail.getGenerationReactivate().replaceAll(",", "."));
+                this.quality = detail.getQuality();
+                this.origem = detail.getOrigem();
                 break;
         }
 
