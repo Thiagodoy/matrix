@@ -6,6 +6,7 @@
 package com.core.matrix.workflow.task;
 
 import com.core.matrix.dto.ErrorInformation;
+import com.core.matrix.dto.PointDTO;
 import com.core.matrix.model.MeansurementFile;
 import com.core.matrix.service.ContractMeasurementPointService;
 import com.core.matrix.service.MeansurementFileService;
@@ -30,7 +31,6 @@ import org.springframework.stereotype.Component;
  *
  * @author thiag
  */
-
 public class PointMeansurementValidationTask implements JavaDelegate {
 
     private MeansurementPointService pointService;
@@ -59,7 +59,7 @@ public class PointMeansurementValidationTask implements JavaDelegate {
 
         MeansurementFile file = meansurementFileService.findById(id);
 
-        List<String> invalidPoints = Collections.synchronizedList(new ArrayList<String>());
+        List<PointDTO> invalidPoints = Collections.synchronizedList(new ArrayList<PointDTO>());
 
         try {
 
@@ -72,17 +72,20 @@ public class PointMeansurementValidationTask implements JavaDelegate {
                             if (result.isPresent()) {
                                 // TODO: Nada a declarar
                             } else {
-                                invalidPoints.add(MessageFormat.format("Ponto de medição [ {0} ] não esta associado no portal! ", point));
+
+                                PointDTO pointDTO = new PointDTO(point, "PORTAL", MessageFormat.format("Ponto de medição [ {0} ] não esta associado no portal! ", point));
+                                invalidPoints.add(pointDTO);
                             }
                         } else {
-                            invalidPoints.add(MessageFormat.format("Ponto de medição [ {0} ] não esta associado no WBC ! ", point));
+                            PointDTO pointDTO = new PointDTO(point, "WBC", MessageFormat.format("Ponto de medição [ {0} ] não esta associado no portal! ", point));
+                            invalidPoints.add(pointDTO);
                         }
 
                     });
 
             if (!invalidPoints.isEmpty()) {
                 meansurementFileService.updateStatus(MeansurementFileStatus.POINT_ERROR, id);
-                ErrorInformation<String> errors = new ErrorInformation<>("Pontos de medição que não foram encontrados!", invalidPoints);
+                ErrorInformation<PointDTO> errors = new ErrorInformation<>("Pontos de medição que não foram encontrados!", invalidPoints);
                 de.setVariable(RESPONSE_RESULT, errors);
                 de.setVariable(CONTROLE, RESPONSE_MEANSUREMENT_POINT_INVALID);
             } else {

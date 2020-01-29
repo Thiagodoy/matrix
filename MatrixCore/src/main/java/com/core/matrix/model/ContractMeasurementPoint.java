@@ -27,7 +27,7 @@ public class ContractMeasurementPoint {
     
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = "")
+    @Column(name = "id_ponto_de_medicao")
     private Long id;
     
     @Column(name = "wbc_contrato")

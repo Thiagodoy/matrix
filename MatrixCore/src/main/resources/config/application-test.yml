@@ -22,7 +22,7 @@ activiti:
         autoCommit: false
         initializationFailFast: false        
         sqlserver:            
-            dataUrl: jdbc:mysql://localhost:3306/activiti?rewriteBatchedStatements=true&useTimezone=true&serverTimezone=UTC&useLegacyDatetimeCode=false&autoReconnect=true            
+            dataUrl: jdbc:mysql://localhost:3306/activiti?rewriteBatchedStatements=true&useTimezone=true&serverTimezone=America/Cuiaba&useLegacyDatetimeCode=false&autoReconnect=true            
             dataSourceUser: root
             dataSourcePassword: root
             port: 3306            
@@ -40,7 +40,7 @@ matrix:
         autoCommit: false
         initializationFailFast: false        
         sqlserver:            
-            dataUrl: jdbc:mysql://localhost:3306/matrix?rewriteBatchedStatements=true&useTimezone=true&serverTimezone=UTC&useLegacyDatetimeCode=false&autoReconnect=true            
+            dataUrl: jdbc:mysql://localhost:3306/matrix?rewriteBatchedStatements=true&useTimezone=true&serverTimezone=America/Cuiaba&useLegacyDatetimeCode=false&autoReconnect=true            
             dataSourceUser: root
             dataSourcePassword: root
             port: 3306            

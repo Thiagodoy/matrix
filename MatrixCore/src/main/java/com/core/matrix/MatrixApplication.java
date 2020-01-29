@@ -3,6 +3,8 @@ package com.core.matrix;
 import com.core.matrix.properties.ActivitiProperties;
 import com.core.matrix.properties.MatrixProperties;
 import com.core.matrix.properties.WbcProperties;
+import java.util.TimeZone;
+import javax.annotation.PostConstruct;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.EnableAutoConfiguration;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
@@ -25,6 +27,11 @@ public class MatrixApplication {
 
     public static void main(String[] args) {
         SpringApplication.run(MatrixApplication.class, args);
+    }
+    
+    @PostConstruct
+    public void setTimeZone(){
+        TimeZone.setDefault(TimeZone.getTimeZone("America/Cuiaba"));
     }
 
 }

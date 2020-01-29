@@ -7,6 +7,8 @@ package com.core.matrix.model;
 
 import com.core.matrix.dto.FileDetailDTO;
 import com.core.matrix.utils.MeansurementFileType;
+import com.fasterxml.jackson.annotation.JsonFormat;
+import java.io.Serializable;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 import java.util.List;
@@ -28,7 +30,7 @@ import lombok.NoArgsConstructor;
 @Table(name = "mtx_arquivo_de_medicao_detalhe")
 @Data
 @NoArgsConstructor
-public class MeansurementFileDetail {
+public class MeansurementFileDetail implements Serializable {
 
     @Id
     @Column(name = "id_arquivo_de_medicao_detalhe")
@@ -41,6 +43,7 @@ public class MeansurementFileDetail {
     @Column(name = "ponto_medicao")
     private String meansurementPoint;
 
+    @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd")
     @Column(name = "data")
     private LocalDate date;
 
@@ -89,15 +92,17 @@ public class MeansurementFileDetail {
     @Transient
     private List<String> erros;
 
-    public MeansurementFileDetail(LocalDate date, Long fileId) {
+    public MeansurementFileDetail(LocalDate date, Long fileId, String meansurementPoint) {
         this.date = date;
         this.idMeansurementFile = fileId;
+        this.meansurementPoint = meansurementPoint;
     }
 
-    public MeansurementFileDetail(LocalDate date, Long hour, Long fileId) {
+    public MeansurementFileDetail(LocalDate date, Long hour, Long fileId, String meansurementPoint) {
         this.date = date;
         this.hour = hour;
         this.idMeansurementFile = fileId;
+        this.meansurementPoint = meansurementPoint;
     }
 
     public MeansurementFileDetail(FileDetailDTO detail, MeansurementFileType type) {
