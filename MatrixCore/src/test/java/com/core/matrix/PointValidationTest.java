@@ -3,15 +3,21 @@
  * To change this template file, choose Tools | Templates
  * and open the template in the editor.
  */
-package com.core.matrix.workflow.task;
+package com.core.matrix;
 
 import com.core.matrix.dto.ErrorInformation;
 import com.core.matrix.model.MeansurementFile;
 import com.core.matrix.service.ContractMeasurementPointService;
 import com.core.matrix.service.MeansurementFileService;
-import static com.core.matrix.utils.Constants.*;
+import static com.core.matrix.utils.Constants.CONTROLE;
+import static com.core.matrix.utils.Constants.FILE_MEANSUREMENT_ID;
+import static com.core.matrix.utils.Constants.RESPONSE_MEANSUREMENT_POINT_INVALID;
+import static com.core.matrix.utils.Constants.RESPONSE_MEANSUREMENT_POINT_VALID;
+import static com.core.matrix.utils.Constants.RESPONSE_RESULT;
+import static com.core.matrix.utils.Constants.TYPE_ENERGY_LIQUID;
 import com.core.matrix.utils.MeansurementFileStatus;
 import com.core.matrix.wbc.service.MeansurementPointService;
+import com.core.matrix.workflow.task.PointMeansurementValidationTask;
 import java.text.MessageFormat;
 import java.util.ArrayList;
 import java.util.Collections;
@@ -21,38 +27,52 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 import java.util.stream.Collectors;
 import org.activiti.engine.delegate.DelegateExecution;
-import org.activiti.engine.delegate.JavaDelegate;
+import org.junit.After;
+import org.junit.AfterClass;
+import org.junit.Before;
+import org.junit.BeforeClass;
+import org.junit.Test;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.context.ApplicationContext;
-import org.springframework.stereotype.Component;
 
 /**
  *
  * @author thiag
  */
+public class PointValidationTest {
+    
+    public PointValidationTest() {
+    }
+    
+    @BeforeClass
+    public static void setUpClass() {
+    }
+    
+    @AfterClass
+    public static void tearDownClass() {
+    }
+    
+    @Before
+    public void setUp() {
+    }
+    
+    @After
+    public void tearDown() {
+    }
 
-public class PointMeansurementValidationTask implements JavaDelegate {
-
+    // TODO add test methods here.
+    // The methods must be annotated with annotation @Test. For example:
+    //
+    // @Test
+       @Autowired
     private MeansurementPointService pointService;
+
+    @Autowired
     private ContractMeasurementPointService contractMeasurementPointService;
+
+    @Autowired
     private MeansurementFileService meansurementFileService;
 
-    private static ApplicationContext context;
-
-    public PointMeansurementValidationTask() {
-
-        synchronized (PointMeansurementValidationTask.context) {
-            this.pointService = PointMeansurementValidationTask.context.getBean(MeansurementPointService.class);
-            this.contractMeasurementPointService = PointMeansurementValidationTask.context.getBean(ContractMeasurementPointService.class);
-            this.meansurementFileService = PointMeansurementValidationTask.context.getBean(MeansurementFileService.class);
-        }
-    }
-
-    public PointMeansurementValidationTask(ApplicationContext context) {
-        PointMeansurementValidationTask.context = context;
-    }
-
-    @Override
+    @Test
     public void execute(DelegateExecution de) throws Exception {
 
         Long id = de.getVariable(FILE_MEANSUREMENT_ID, Long.class);
@@ -107,26 +127,22 @@ public class PointMeansurementValidationTask implements JavaDelegate {
                 return file.getDetails()
                         .parallelStream()
                         .map(detail -> detail.getMeansurementPoint())
-                        .distinct()
                         .collect(Collectors.toList());
             case LAYOUT_B:
                 return file.getDetails()
                         .parallelStream()
                         .filter(d -> d.getEnergyType().equalsIgnoreCase(TYPE_ENERGY_LIQUID))
                         .map(d -> d.getMeansurementPoint())
-                        .distinct()
                         .collect(Collectors.toList());
             case LAYOUT_C:
                 return file.getDetails()
                         .stream()
                         .filter(detail -> detail.getMeansurementPoint().contains("(L)"))
                         .map(detail -> detail.getMeansurementPoint().replaceAll("\\((L|B)\\)", "").trim())
-                        .distinct()
                         .collect(Collectors.toList());
             default:
                 throw new Exception("Não foi possivel selecionar os ponto de medição");
         }
 
     }
-
 }

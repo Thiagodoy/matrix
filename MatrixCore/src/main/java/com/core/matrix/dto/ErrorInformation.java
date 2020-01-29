@@ -5,6 +5,7 @@
  */
 package com.core.matrix.dto;
 
+import java.io.Serializable;
 import java.util.List;
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -15,7 +16,7 @@ import lombok.Data;
  */
 @Data
 @AllArgsConstructor
-public class ErrorInformation<T> {
+public class ErrorInformation<T> implements Serializable{
 
     private String information;
     private List<T> errors;

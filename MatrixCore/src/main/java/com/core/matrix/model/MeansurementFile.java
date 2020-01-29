@@ -53,7 +53,7 @@ public class MeansurementFile {
     @Column(name = "act_id_usuario")
     private String user;
 
-    @Column(name = "data_criação")
+    @Column(name = "data_criacao")
     private LocalDateTime createdAt;
 
     @Column(name = "data_ultima_alteracao")
@@ -63,7 +63,7 @@ public class MeansurementFile {
     @Enumerated(EnumType.STRING)
     private MeansurementFileType type;
     
-    @OneToMany(cascade = CascadeType.ALL, fetch = FetchType.EAGER)
+    @OneToMany(cascade = {CascadeType.PERSIST, CascadeType.REMOVE }, orphanRemoval = true, fetch = FetchType.EAGER)
     @JoinColumn(name = "id_arquivo_de_medicao")
     private List<MeansurementFileDetail>details;
     

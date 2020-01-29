@@ -38,19 +38,26 @@
             <artifactId>lombok</artifactId>
             <optional>true</optional>
         </dependency>
-        <!-- https://mvnrepository.com/artifact/org.activiti/activiti-engine -->
+        
+         <!--https://mvnrepository.com/artifact/org.activiti/activiti-engine--> 
         <dependency>
             <groupId>org.activiti</groupId>
             <artifactId>activiti-engine</artifactId>
             <version>5.22.0</version>
         </dependency>
         
-        <!-- https://mvnrepository.com/artifact/org.activiti/activiti-image-generator -->
+         <!--https://mvnrepository.com/artifact/org.activiti/activiti-image-generator--> 
         <dependency>
             <groupId>org.activiti</groupId>
             <artifactId>activiti-image-generator</artifactId>
             <version>5.22.0</version>
         </dependency>
+        
+<!--        <dependency>
+            <groupId>org.activiti</groupId>
+            <artifactId>activiti-spring-boot-starter-basic</artifactId>
+            <version>5.23.0</version>
+        </dependency>-->
         
         <!-- https://mvnrepository.com/artifact/io.jsonwebtoken/jjwt -->
         <dependency>

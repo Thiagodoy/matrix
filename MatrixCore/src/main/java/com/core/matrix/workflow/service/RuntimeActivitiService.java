@@ -90,7 +90,7 @@ public class RuntimeActivitiService {
 
         request.getVariables().put("created_by", userId);
         request.getVariables().put("created_at", Utils.dateTimeNowFormated());
-
+        //request.getVariables().put("taskSe", taskService);
         ProcessInstance processInstance = this.runtimeService.startProcessInstanceByKey(request.getKey(), request.getVariables());
 
         Task task = this.getNextUserTaskByProcessInstanceId(processInstance.getId(), userId, true);
@@ -495,6 +495,11 @@ public class RuntimeActivitiService {
     @Transactional
     public void deleteAttachment(String attachment){
         taskService.deleteAttachment(attachment);
+    }
+    
+    @Transactional
+    public void deleteProcess(String id){
+        runtimeService.deleteProcessInstance(id, null);
     }
 
 }

@@ -6,6 +6,10 @@
 package com.core.matrix.configuration;
 
 import com.core.matrix.properties.ActivitiProperties;
+import com.core.matrix.workflow.task.CalculateTask;
+import com.core.matrix.workflow.task.DataValidationTask;
+import com.core.matrix.workflow.task.FileValidationTask;
+import com.core.matrix.workflow.task.PointMeansurementValidationTask;
 import com.zaxxer.hikari.HikariConfig;
 import com.zaxxer.hikari.HikariDataSource;
 import java.util.HashMap;
@@ -22,6 +26,7 @@ import org.activiti.engine.RuntimeService;
 import org.activiti.engine.TaskService;
 import org.activiti.engine.impl.cfg.StandaloneProcessEngineConfiguration;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.ApplicationContext;
 import org.springframework.context.EnvironmentAware;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -127,7 +132,7 @@ public class ActivitiCoreConfiguration implements EnvironmentAware {
                 
                 //.setPro
                 // .setAsyncExecutorEnabled(true)
-                .setAsyncExecutorActivate(true)
+                
                 .setDataSource(this.dataSource())
                 .setAsyncFailedJobWaitTime(2147483647)
                 .setDefaultFailedJobWaitTime(2147483647);
@@ -166,5 +171,23 @@ public class ActivitiCoreConfiguration implements EnvironmentAware {
         return this.processEngine().getHistoryService();
     }
     
+    @Bean
+    public FileValidationTask fileValidationTask(ApplicationContext context){
+        return new FileValidationTask(context);
+    }
     
+    @Bean 
+    public PointMeansurementValidationTask pointMeansurementValidationTask(ApplicationContext context){
+        return new PointMeansurementValidationTask(context);
+    }
+    
+    @Bean
+    public DataValidationTask dataValidationTask(ApplicationContext context){
+        return new DataValidationTask(context);
+    }
+    
+    @Bean
+    public CalculateTask calculateTask(ApplicationContext context){
+        return new CalculateTask(context);
+    }
 }

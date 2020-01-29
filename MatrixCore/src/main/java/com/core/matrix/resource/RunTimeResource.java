@@ -230,5 +230,17 @@ public class RunTimeResource {
             return ResponseEntity.status(HttpStatus.resolve(500)).body(e.getMessage());
         }
     }
+    
+    
+     @RequestMapping(value = "/process/{id}", method = RequestMethod.DELETE)
+    public ResponseEntity downloadAttachment(@PathVariable(name = "id") String id) {
+        try {
+            service.deleteProcess(id);
+            return ResponseEntity.ok().build();
+        } catch (Exception e) {
+            Logger.getLogger(RepositoryResource.class.getName()).log(Level.SEVERE, "[post]", e);
+            return ResponseEntity.status(HttpStatus.resolve(500)).body(e.getMessage());
+        }
+    }
 
 }

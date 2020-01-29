@@ -4,6 +4,7 @@ import com.core.matrix.properties.ActivitiProperties;
 import com.core.matrix.properties.MatrixProperties;
 import com.core.matrix.properties.WbcProperties;
 import org.springframework.boot.SpringApplication;
+import org.springframework.boot.autoconfigure.EnableAutoConfiguration;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.boot.autoconfigure.jdbc.DataSourceAutoConfiguration;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
@@ -15,7 +16,7 @@ import springfox.documentation.swagger2.annotations.EnableSwagger2;
 @SpringBootApplication(exclude = {DataSourceAutoConfiguration.class})
 @EnableConfigurationProperties({ActivitiProperties.class, MatrixProperties.class, WbcProperties.class})
 
-//@EnableAutoConfiguration
+@EnableAutoConfiguration
 @ComponentScan()
 @EnableWebMvc
 @EnableCaching

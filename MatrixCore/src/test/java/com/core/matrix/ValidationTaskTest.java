@@ -5,14 +5,7 @@
  */
 package com.core.matrix;
 
-import com.core.matrix.workflow.task.FileValidationTask;
-import org.activiti.engine.delegate.DelegateExecution;
-import org.junit.After;
-import org.junit.AfterClass;
-import org.junit.Before;
-import org.junit.BeforeClass;
 import org.junit.Test;
-import org.mockito.Mockito;
 
 /**
  *
@@ -27,8 +20,8 @@ public class ValidationTaskTest {
     public void run() throws Exception {
 
      //   DelegateExecution delegateExecution = Mockito.mock(DelegateExecution.class);
-        FileValidationTask task = new FileValidationTask();
-        task.execute(null);
+//        FileValidationTask task = new FileValidationTask();
+  //      task.execute(null);
 
     }
 }

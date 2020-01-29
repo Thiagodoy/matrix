@@ -28,7 +28,7 @@ public class MeansurementFileService {
         return this.repository.save(file);
     }
     
-    @Transactional
+    @Transactional(transactionManager = "matrixTransactionManager")
     public void updateStatus(MeansurementFileStatus status, Long id){
         this.repository.updateStatus(status, id);
     }

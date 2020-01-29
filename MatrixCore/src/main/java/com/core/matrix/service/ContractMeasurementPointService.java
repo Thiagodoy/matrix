@@ -7,6 +7,7 @@ package com.core.matrix.service;
 
 import com.core.matrix.model.ContractMeasurementPoint;
 import com.core.matrix.repository.ContractMeasurementPointRepository;
+import java.util.Optional;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -24,6 +25,11 @@ public class ContractMeasurementPointService {
     @Transactional
     public void save(ContractMeasurementPoint entity) {
         this.repository.save(entity);
+    }
+    
+    @Transactional(readOnly = true)
+    public Optional<ContractMeasurementPoint> findByPoint(String point){
+        return repository.findByPoint(point);
     }
 
 }

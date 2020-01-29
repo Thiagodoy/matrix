@@ -24,18 +24,29 @@ import java.util.logging.Logger;
 import java.util.stream.Collectors;
 import org.activiti.engine.delegate.DelegateExecution;
 import org.activiti.engine.delegate.JavaDelegate;
-import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.ApplicationContext;
 
 /**
  *
  * @author thiag
  */
 public class DataValidationTask implements JavaDelegate {
-
-    @Autowired
+    
     private MeansurementFileService fileService;
-
     private DelegateExecution delegateExecution;
+    private static ApplicationContext context;
+    
+    
+    
+    public DataValidationTask(){
+        synchronized(DataValidationTask.context){
+            this.fileService = DataValidationTask.context.getBean(MeansurementFileService.class);
+        }
+    }
+    
+    public DataValidationTask(ApplicationContext context){
+        DataValidationTask.context = context;
+    }
 
     @Override
     public void execute(DelegateExecution de) throws Exception {

@@ -5,8 +5,7 @@
  */
 package com.core.matrix.repository;
 
-import com.core.matrix.model.ContractMeasurementPoint;
-import java.util.Optional;
+import com.core.matrix.model.MeansurementFileDetail;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 
@@ -15,8 +14,6 @@ import org.springframework.stereotype.Repository;
  * @author thiag
  */
 @Repository
-public interface ContractMeasurementPointRepository extends JpaRepository<ContractMeasurementPoint, Long> {
-    
-    Optional<ContractMeasurementPoint> findByPoint(String point);
-    
+public interface MeansurementFileDetailRepository extends JpaRepository<MeansurementFileDetail, Long> {    
+
 }
