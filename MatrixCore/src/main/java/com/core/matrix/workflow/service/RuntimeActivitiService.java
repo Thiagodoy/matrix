@@ -232,7 +232,7 @@ public class RuntimeActivitiService {
 
         List<TaskResponse> response = taskService
                 .createTaskQuery()
-                .taskCandidateGroup(user)
+                .taskCandidateUser(user)
                 .includeProcessVariables()
                 .includeTaskLocalVariables()
                 .orderByTaskCreateTime()

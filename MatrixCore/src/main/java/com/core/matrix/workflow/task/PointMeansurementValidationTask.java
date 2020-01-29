@@ -85,7 +85,7 @@ public class PointMeansurementValidationTask implements JavaDelegate {
 
             if (!invalidPoints.isEmpty()) {
                 meansurementFileService.updateStatus(MeansurementFileStatus.POINT_ERROR, id);
-                ErrorInformationDTO<PointDTO> errors = new ErrorInformationDTO<>("Pontos de medição que não foram encontrados!", invalidPoints);
+                ErrorInformationDTO<PointDTO> errors = new ErrorInformationDTO<>("Pontos de medição que não foram encontrados!", invalidPoints, null);
                 de.setVariable(RESPONSE_RESULT, errors);
                 de.setVariable(CONTROLE, RESPONSE_MEANSUREMENT_POINT_INVALID);
             } else {
@@ -95,7 +95,7 @@ public class PointMeansurementValidationTask implements JavaDelegate {
 
         } catch (Exception e) {
             Logger.getLogger(PointMeansurementValidationTask.class.getName()).log(Level.SEVERE, "[execute]", e);
-            ErrorInformationDTO<String> errors = new ErrorInformationDTO<>(e.getMessage(), null);
+            ErrorInformationDTO<String> errors = new ErrorInformationDTO<>(e.getMessage(), null, null);
             de.setVariable(RESPONSE_RESULT, errors);
             // meansurementFileService.updateStatus(MeansurementFileStatus.POINT_ERROR, id);
             de.setVariable(CONTROLE, RESPONSE_MEANSUREMENT_POINT_INVALID);
