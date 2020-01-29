@@ -5,7 +5,7 @@
  */
 package com.core.matrix.workflow.task;
 
-import com.core.matrix.dto.ErrorInformation;
+import com.core.matrix.dto.ErrorInformationDTO;
 import com.core.matrix.dto.PointDTO;
 import com.core.matrix.model.MeansurementFile;
 import com.core.matrix.service.ContractMeasurementPointService;
@@ -85,7 +85,7 @@ public class PointMeansurementValidationTask implements JavaDelegate {
 
             if (!invalidPoints.isEmpty()) {
                 meansurementFileService.updateStatus(MeansurementFileStatus.POINT_ERROR, id);
-                ErrorInformation<PointDTO> errors = new ErrorInformation<>("Pontos de medição que não foram encontrados!", invalidPoints);
+                ErrorInformationDTO<PointDTO> errors = new ErrorInformationDTO<>("Pontos de medição que não foram encontrados!", invalidPoints);
                 de.setVariable(RESPONSE_RESULT, errors);
                 de.setVariable(CONTROLE, RESPONSE_MEANSUREMENT_POINT_INVALID);
             } else {
@@ -95,7 +95,7 @@ public class PointMeansurementValidationTask implements JavaDelegate {
 
         } catch (Exception e) {
             Logger.getLogger(PointMeansurementValidationTask.class.getName()).log(Level.SEVERE, "[execute]", e);
-            ErrorInformation<String> errors = new ErrorInformation<>(e.getMessage(), null);
+            ErrorInformationDTO<String> errors = new ErrorInformationDTO<>(e.getMessage(), null);
             de.setVariable(RESPONSE_RESULT, errors);
             // meansurementFileService.updateStatus(MeansurementFileStatus.POINT_ERROR, id);
             de.setVariable(CONTROLE, RESPONSE_MEANSUREMENT_POINT_INVALID);

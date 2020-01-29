@@ -5,10 +5,15 @@
  */
 package com.core.matrix.wbc.model;
 
+import com.core.matrix.wbc.dto.EmpresaDTO;
 import java.time.LocalDateTime;
 import javax.persistence.Column;
+import javax.persistence.ColumnResult;
+import javax.persistence.ConstructorResult;
 import javax.persistence.Entity;
 import javax.persistence.Id;
+import javax.persistence.NamedNativeQuery;
+import javax.persistence.SqlResultSetMapping;
 import javax.persistence.Table;
 import lombok.Data;
 
@@ -27,8 +32,28 @@ import lombok.Data;
 //    private String sDsTipoAgente;
 
 
+@SqlResultSetMapping(name = "empresaDTO", 
+        classes = @ConstructorResult(
+                targetClass = EmpresaDTO.class,
+                columns = {
+                        @ColumnResult(name = "nCdEmpresa", type = Long.class),
+                        @ColumnResult(name = "sNrCnpj", type = String.class),
+                        @ColumnResult(name = "sNmEmpresa", type = String.class),
+                        @ColumnResult(name = "sNmFantasia", type = String.class),
+                        @ColumnResult(name = "sNmApelido", type = String.class),                                    
+                    
+                }))
 
-
+@NamedNativeQuery(name = "Empresa.listByPoint",
+        resultSetMapping = "empresaDTO",
+        query = "SELECT TOP (1000) A.[nCdEmpresa]\n" +
+"      ,A.[sNrCnpj]\n" +
+"      ,A.[sNmEmpresa]\n" +
+"      ,A.[sNmFantasia]\n" +
+"      ,A.[sNmApelido]      \n" +
+"  FROM [WBC_ENERGY_DB_HML].[dbo].[EMPRESA] as A INNER JOIN [WBC_ENERGY_DB_HML].[dbo].[CE_PONTO_MEDICAO] AS B \n" +
+"	ON A.[nCdEmpresa] = B.[nCdEmpresa]  \n" +
+"  WHERE B.[sCdImportacaoPontoMedicao] = :point")
 
 
 @Table

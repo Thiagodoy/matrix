@@ -5,11 +5,15 @@
  */
 package com.core.matrix.wbc.repository;
 
+import com.core.matrix.wbc.dto.EmpresaDTO;
 import com.core.matrix.wbc.model.Empresa;
+import java.util.Optional;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.JpaSpecificationExecutor;
+import org.springframework.data.jpa.repository.Query;
+import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
 /**
@@ -21,5 +25,8 @@ public interface EmpresaRepository extends JpaRepository<Empresa, Long>, JpaSpec
     Page<Empresa> findByNrCnpjStartingWith(String cnpj, Pageable page);
     Page<Empresa> findByEmpresaContaining(String razaoSocial, Pageable page);
     Page<Empresa> findByApelidoContaining(String apelido, Pageable page);
+    
+    @Query(nativeQuery = true)
+    Optional<EmpresaDTO> listByPoint(@Param("point")String point);
 
 }

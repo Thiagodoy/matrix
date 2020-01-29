@@ -17,6 +17,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 /**
  *
@@ -30,6 +31,12 @@ public class EmpresaService {
 
     @Autowired
     private AgentTypeService agentTypeService;
+    
+    
+    @Transactional(readOnly = true)
+    public Optional<EmpresaDTO>listByPoint(String point){
+       return this.repository.listByPoint(point);
+    }
 
     public PageResponse<EmpresaDTO> findAll(String cnpj, String razaoSocial,String apelido, PageRequest page) {
 

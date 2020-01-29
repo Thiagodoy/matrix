@@ -5,7 +5,7 @@
  */
 package com.core.matrix;
 
-import com.core.matrix.dto.ErrorInformation;
+import com.core.matrix.dto.ErrorInformationDTO;
 import com.core.matrix.model.MeansurementFile;
 import com.core.matrix.service.ContractMeasurementPointService;
 import com.core.matrix.service.MeansurementFileService;
@@ -102,7 +102,7 @@ public class PointValidationTest {
 
             if (!invalidPoints.isEmpty()) {
                 meansurementFileService.updateStatus(MeansurementFileStatus.POINT_ERROR, id);
-                ErrorInformation<String> errors = new ErrorInformation<>("Pontos de medição que não foram encontrados!", invalidPoints);
+                ErrorInformationDTO<String> errors = new ErrorInformationDTO<>("Pontos de medição que não foram encontrados!", invalidPoints);
                 de.setVariable(RESPONSE_RESULT, errors);
                 de.setVariable(CONTROLE, RESPONSE_MEANSUREMENT_POINT_INVALID);
             } else {
@@ -112,7 +112,7 @@ public class PointValidationTest {
 
         } catch (Exception e) {
             Logger.getLogger(PointMeansurementValidationTask.class.getName()).log(Level.SEVERE, "[execute]", e);
-            ErrorInformation<String> errors = new ErrorInformation<>(e.getMessage(), null);
+            ErrorInformationDTO<String> errors = new ErrorInformationDTO<>(e.getMessage(), null);
             de.setVariable(RESPONSE_RESULT, errors);
             // meansurementFileService.updateStatus(MeansurementFileStatus.POINT_ERROR, id);
             de.setVariable(CONTROLE, RESPONSE_MEANSUREMENT_POINT_INVALID);
