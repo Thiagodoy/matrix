@@ -37,6 +37,7 @@ public class TaskResponse {
     private String delegate;
     private String finalized;
     private List<String> breadCrump;
+    private String key;
 
     public TaskResponse(TaskInfo task) {
 
@@ -49,6 +50,9 @@ public class TaskResponse {
         this.createTime = Utils.dateToString(task.getCreateTime());
         this.globalVariables = task.getProcessVariables();
         this.localVariables = task.getTaskLocalVariables();
+        this.key = task.getProcessDefinitionId().split(":")[0];
+        
+        
         
         if(task instanceof Task){
             Task t = (Task) task;

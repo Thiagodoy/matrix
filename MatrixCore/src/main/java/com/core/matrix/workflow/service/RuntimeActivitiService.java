@@ -13,6 +13,7 @@ import com.core.matrix.response.PageResponse;
 import com.core.matrix.response.ProcessDefinitionResponse;
 import com.core.matrix.response.ProcessDetailResponse;
 import com.core.matrix.response.TaskResponse;
+import com.core.matrix.utils.Constants;
 import com.core.matrix.utils.Utils;
 import com.core.matrix.workflow.model.GroupMemberActiviti;
 import java.io.IOException;
@@ -88,8 +89,8 @@ public class RuntimeActivitiService {
             request.setVariables(new HashMap<String, Object>());
         }
 
-        request.getVariables().put("created_by", userId);
-        request.getVariables().put("created_at", Utils.dateTimeNowFormated());
+        request.getVariables().put(Constants.CREATED_BY, userId);
+        request.getVariables().put(Constants.CREATED_AT, Utils.dateTimeNowFormated());
         //request.getVariables().put("taskSe", taskService);
         ProcessInstance processInstance = this.runtimeService.startProcessInstanceByKey(request.getKey(), request.getVariables());
 
@@ -266,8 +267,10 @@ public class RuntimeActivitiService {
                 .listPage(page, size)
                 .parallelStream()
                 .map(t -> {
-                    TaskResponse instance = new TaskResponse(t);
-                    Optional<ProcessDefinitionResponse> resp = repositoryActivitiService.listAll().stream().filter(p -> p.getId().equals(t.getProcessDefinitionId())).findFirst();
+                    TaskResponse instance = new TaskResponse(t);                 
+                    
+                    
+                    Optional<ProcessDefinitionResponse> resp = repositoryActivitiService.listAll().stream().filter(p -> p.getKey().equals(instance.getKey())).findFirst();
                     String name = resp.isPresent() ? resp.get().getName() : "";
                     instance.setProcessDefinitionName(name);
                     return instance;
