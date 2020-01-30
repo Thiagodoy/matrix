@@ -76,6 +76,10 @@ public class FileValidationTask implements JavaDelegate {
         try {
 
             InputStream stream = taskService.getAttachmentContent(attachmentId);
+            String fileName = taskService.getAttachment(attachmentId).getName();
+            
+            delegateExecution.setVariable(VAR_FILE_NAME, fileName);
+            
             BeanIoReader reader = new BeanIoReader();
             Optional<FileParsedDTO> fileParsed = reader.<FileParsedDTO>parse(stream);
             
