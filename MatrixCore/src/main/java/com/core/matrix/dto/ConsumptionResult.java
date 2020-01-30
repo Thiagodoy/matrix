@@ -5,6 +5,7 @@
  */
 package com.core.matrix.dto;
 
+import java.io.Serializable;
 import lombok.Data;
 
 /**
@@ -12,7 +13,7 @@ import lombok.Data;
  * @author thiag
  */
 @Data
-public class ConsumptionResult {
+public class ConsumptionResult implements Serializable{
     
     private String meansurementPoint;
     private Double result = 0D;
