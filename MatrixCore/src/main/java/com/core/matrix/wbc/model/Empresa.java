@@ -51,7 +51,7 @@ import lombok.Data;
 "      ,A.[sNmEmpresa]\n" +
 "      ,A.[sNmFantasia]\n" +
 "      ,A.[sNmApelido]      \n" +
-"  FROM [WBC_ENERGY_DB_HML].[dbo].[EMPRESA] as A INNER JOIN [WBC_ENERGY_DB_HML].[dbo].[CE_PONTO_MEDICAO] AS B \n" +
+"  FROM [EMPRESA] as A INNER JOIN [CE_PONTO_MEDICAO] AS B \n" +
 "	ON A.[nCdEmpresa] = B.[nCdEmpresa]  \n" +
 "  WHERE B.[sCdImportacaoPontoMedicao] = :point")
 

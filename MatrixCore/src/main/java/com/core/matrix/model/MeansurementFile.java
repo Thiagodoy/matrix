@@ -20,6 +20,7 @@ import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.JoinColumn;
 import javax.persistence.OneToMany;
+import javax.persistence.PrePersist;
 import javax.persistence.Table;
 import lombok.Data;
 
@@ -66,6 +67,13 @@ public class MeansurementFile {
     @OneToMany(cascade = {CascadeType.PERSIST, CascadeType.REMOVE }, orphanRemoval = true, fetch = FetchType.EAGER)
     @JoinColumn(name = "id_arquivo_de_medicao")
     private List<MeansurementFileDetail>details;
+    
+    
+    
+    @PrePersist
+    public void generateCreatedAt(){
+        this.createdAt = LocalDateTime.now();
+    }
     
     
     

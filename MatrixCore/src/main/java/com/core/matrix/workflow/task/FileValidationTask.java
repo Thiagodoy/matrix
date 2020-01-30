@@ -75,7 +75,7 @@ public class FileValidationTask implements JavaDelegate {
         delegateExecution = de;
 
         final String attachmentId = de.getVariable(ATTACHMENT_ID, String.class);
-        final String userId = de.getVariable(USER_ID, String.class);
+        final String userId = de.getVariable(CREATED_BY, String.class);
 
         try {
 
@@ -157,7 +157,7 @@ public class FileValidationTask implements JavaDelegate {
         });
 
         detailService.save(details);
-
+        delegateExecution.setVariable(TYPE_LAYOUT_FILE, meansurementFile.getType().toString());
         delegateExecution.setVariable(FILE_MEANSUREMENT_ID, meansurementFile.getId());
         delegateExecution.setVariable(CONTROLE, RESPONSE_LAYOUT_VALID);
 

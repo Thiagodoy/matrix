@@ -7,13 +7,19 @@ package com.core.matrix.workflow.task;
 
 import com.core.matrix.dto.ConsumptionResult;
 import com.core.matrix.dto.ContractInformationDTO;
+import com.core.matrix.model.ContractMeasurementPoint;
 import com.core.matrix.model.MeansurementFile;
 import com.core.matrix.model.MeansurementFileDetail;
+import com.core.matrix.model.MeansurementFileResult;
 import com.core.matrix.service.ContractCompInformationService;
+import com.core.matrix.service.ContractMeasurementPointService;
+import com.core.matrix.service.MeansurementFileResultService;
 import com.core.matrix.service.MeansurementFileService;
 import static com.core.matrix.utils.Constants.FILE_MEANSUREMENT_ID;
 import static com.core.matrix.utils.Constants.RESPONSE_RESULT;
 import static com.core.matrix.utils.Constants.RESPONSE_RESULT_MESSAGE;
+import com.core.matrix.wbc.dto.EmpresaDTO;
+import com.core.matrix.wbc.service.EmpresaService;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
@@ -35,12 +41,19 @@ public class CalculateTask implements Task {
 
     private MeansurementFileService fileService;
     private ContractCompInformationService contractService;
+    private EmpresaService empresaService;
+    private ContractMeasurementPointService pointService;
+    private MeansurementFileResultService resultService;
 
     public CalculateTask() {
 
         synchronized (CalculateTask.context) {
             this.fileService = CalculateTask.context.getBean(MeansurementFileService.class);
             this.contractService = CalculateTask.context.getBean(ContractCompInformationService.class);
+            this.empresaService = CalculateTask.context.getBean(EmpresaService.class);
+            this.pointService = CalculateTask.context.getBean(ContractMeasurementPointService.class);
+            this.resultService = CalculateTask.context.getBean(MeansurementFileResultService.class);
+
         }
 
     }
@@ -85,11 +98,25 @@ public class CalculateTask implements Task {
                             
                             double consumptionTotal = (((sum / 1000) * percentLoss) - proinfa) * factorAtt;
 
+                            Optional<EmpresaDTO> optEmp = this.empresaService.listByPoint(point);
                             result.setResult(consumptionTotal);
                             result.setContractId(informationDTO.getContractId());
                             result.setPercentLoss(percentLoss);
                             result.setFactorAtt(factorAtt);
                             result.setProinfa(proinfa);
+                            result.setEmpresa(optEmp.get());
+                            
+                            Optional<ContractMeasurementPoint> optional =  pointService.findByPoint(point);
+                            MeansurementFileResult fileResult = new MeansurementFileResult();
+                            fileResult.setMeansurementFileId(id);
+                            fileResult.setPercentLoss(percentLoss);
+                            fileResult.setFactorAtt(factorAtt);
+                            fileResult.setProinfa(proinfa);
+                            fileResult.setMeansurementPointId(optional.get().getId());
+                            
+                            resultService.save(fileResult);
+                            
+                            
 
                         } else {
                             result.setError("Não existe cadastro do contrato associado ao ponto!");
@@ -105,5 +132,5 @@ public class CalculateTask implements Task {
         }
 
     }
-
+    
 }

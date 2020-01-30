@@ -12,7 +12,6 @@ import com.core.matrix.model.MeansurementFileDetail;
 import com.core.matrix.service.MeansurementFileService;
 import com.core.matrix.utils.Constants;
 import static com.core.matrix.utils.Constants.*;
-import com.core.matrix.utils.Utils;
 import com.core.matrix.wbc.dto.EmpresaDTO;
 import com.core.matrix.wbc.service.EmpresaService;
 import java.time.LocalDate;
@@ -28,7 +27,6 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 import java.util.stream.Collectors;
 import org.activiti.engine.delegate.DelegateExecution;
-import org.activiti.engine.delegate.JavaDelegate;
 import org.springframework.context.ApplicationContext;
 
 /**
@@ -63,8 +61,7 @@ public class DataValidationTask implements Task {
 
         try {
 
-            MeansurementFile file = fileService.findById(id);
-            delegateExecution.setVariable(TYPE_LAYOUT_FILE, file.getType().toString(), true);
+            MeansurementFile file = fileService.findById(id);            
             this.checkDays(file);
             this.checkCalendar(file);
             this.checkHour(file);

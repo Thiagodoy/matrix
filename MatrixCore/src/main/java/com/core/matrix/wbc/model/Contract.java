@@ -76,13 +76,13 @@ import lombok.Data;
 "      ,CT.[sNrReferencia]\n" +
 "      ,CT.[nCdAgrupador]\n" +
 "      ,CA.[sDsAgrupador]\n" +
-"  FROM [WBC_ENERGY_DB_HML].[dbo].[CE_CONTRATO] CT\n" +
-"      ,[WBC_ENERGY_DB_HML].[dbo].[CE_SUBMERCADO] SM\n" +
-"	  ,[WBC_ENERGY_DB_HML].[dbo].[CE_TIPO_CONTRATO] TP\n" +
-"	  ,[WBC_ENERGY_DB_HML].[dbo].[EMPRESA] EPCA\n" +
-"	  ,[WBC_ENERGY_DB_HML].[dbo].[EMPRESA] EPCE\n" +
-"	  ,[WBC_ENERGY_DB_HML].[dbo].[CE_SITUACAO_CONTRATO] SC\n" +
-"	  ,[WBC_ENERGY_DB_HML].[dbo].[CE_CONTRATO_AGRUPADOR] CA\n" +
+"  FROM [CE_CONTRATO] CT\n" +
+"      ,[CE_SUBMERCADO] SM\n" +
+"	  ,[CE_TIPO_CONTRATO] TP\n" +
+"	  ,[EMPRESA] EPCA\n" +
+"	  ,[EMPRESA] EPCE\n" +
+"	  ,[CE_SITUACAO_CONTRATO] SC\n" +
+"	  ,[CE_CONTRATO_AGRUPADOR] CA\n" +
 " WHERE CT.nCdSubmercado = SM.nCdSubmercado\n" +
 "   AND CT.nCdTipo = TP.nCdTipo\n" +
 "   AND CT.nCdEmpresaContratada = EPCA.[nCdEmpresa]\n" +
