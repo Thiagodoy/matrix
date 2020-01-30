@@ -80,7 +80,7 @@ public class FileValidationTask implements JavaDelegate {
             Optional<FileParsedDTO> fileParsed = reader.<FileParsedDTO>parse(stream);
             
             if(!reader.getErrors().isEmpty()){
-                delegateExecution.setVariable(RESPONSE_RESULT, reader.getErrors());
+                delegateExecution.setVariable(RESPONSE_RESULT, reader.getErrors().stream().distinct().collect(Collectors.toList()));
                 delegateExecution.setVariable(RESPONSE_RESULT_MESSAGE, "Layout/registros estão inválidos!");
                 delegateExecution.setVariable(CONTROLE, RESPONSE_LAYOUT_INVALID);
             }else if (fileParsed.isPresent()) {
@@ -89,7 +89,7 @@ public class FileValidationTask implements JavaDelegate {
 
         } catch (Exception e) {
             Logger.getLogger(MeansurementFileService.class.getName()).log(Level.SEVERE, "[execute]", e);    
-            delegateExecution.setVariable(RESPONSE_RESULT_MESSAGE, e.getMessage());
+            delegateExecution.setVariable(RESPONSE_RESULT_MESSAGE, new String[]{e.getMessage()});
             de.setVariable(CONTROLE, RESPONSE_LAYOUT_INVALID);
         }
     }
