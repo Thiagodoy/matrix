@@ -15,7 +15,6 @@ import static com.core.matrix.utils.Constants.*;
 import com.core.matrix.utils.Utils;
 import com.core.matrix.wbc.dto.EmpresaDTO;
 import com.core.matrix.wbc.service.EmpresaService;
-import java.text.MessageFormat;
 import java.time.LocalDate;
 import java.time.Month;
 import java.time.YearMonth;
@@ -30,7 +29,6 @@ import java.util.logging.Logger;
 import java.util.stream.Collectors;
 import org.activiti.engine.delegate.DelegateExecution;
 import org.activiti.engine.delegate.JavaDelegate;
-import org.beanio.types.TypeConversionException;
 import org.springframework.context.ApplicationContext;
 
 /**
@@ -66,6 +64,7 @@ public class DataValidationTask implements JavaDelegate {
         try {
 
             MeansurementFile file = fileService.findById(id);
+
             this.checkDays(file);
             this.checkCalendar(file);
             this.checkHour(file);
@@ -79,9 +78,11 @@ public class DataValidationTask implements JavaDelegate {
 
     private List<MeansurementFileDetail> getDetails(MeansurementFile file) throws Exception {
 
+        List<MeansurementFileDetail> result = new ArrayList<>();
+
         switch (file.getType()) {
             case LAYOUT_A:
-                return file.getDetails()
+                result = file.getDetails()
                         .parallelStream()
                         .filter(d -> d.getEnergyType().equalsIgnoreCase(TYPE_ENERGY_LIQUID))
                         .filter(d -> {
@@ -96,8 +97,9 @@ public class DataValidationTask implements JavaDelegate {
                             }
                         })
                         .collect(Collectors.toList());
+                break;
             case LAYOUT_B:
-                return file.getDetails()
+                result = file.getDetails()
                         .parallelStream()
                         .filter(d -> d.getEnergyType().equalsIgnoreCase(TYPE_ENERGY_LIQUID))
                         .filter(d -> {
@@ -111,8 +113,9 @@ public class DataValidationTask implements JavaDelegate {
                             }
                         })
                         .collect(Collectors.toList());
+                break;
             case LAYOUT_C:
-                List<MeansurementFileDetail> result = file.getDetails()
+                result = file.getDetails()
                         .parallelStream()
                         .filter(detail -> detail.getMeansurementPoint().contains("(L)"))
                         .filter(d -> {
@@ -134,13 +137,19 @@ public class DataValidationTask implements JavaDelegate {
                             }
                         })
                         .collect(Collectors.toList());
-                
-                result.parallelStream().forEach(d->{
-                     d.setMeansurementPoint(d.getMeansurementPoint().replaceAll("\\((L|B)\\)", "").trim());
+
+                result.parallelStream().forEach(d -> {
+                    d.setMeansurementPoint(d.getMeansurementPoint().replaceAll("\\((L|B)\\)", "").trim());
                 });
-                return result;
-            default:
-                throw new Exception("Não foi possivel selecionar os ponto de medição");
+                break;
+        }
+
+        if (result.isEmpty()) {            
+            delegateExecution.setVariable(RESPONSE_RESULT_MESSAGE, "Não existe nenhum registro para realizar as validações!");            
+            delegateExecution.setVariable(CONTROLE, RESPONSE_CALENDAR_INVALID, true);            
+            throw new Exception("Não existe dados Suficiente");
+        } else {
+            return result;
         }
 
     }

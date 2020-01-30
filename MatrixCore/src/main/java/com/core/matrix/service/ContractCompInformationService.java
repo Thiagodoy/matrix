@@ -5,11 +5,13 @@
  */
 package com.core.matrix.service;
 
+import com.core.matrix.dto.ContractInformationDTO;
 import com.core.matrix.model.ContractCompInformation;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import com.core.matrix.repository.ContractCompInformationRepository;
+import java.util.Optional;
 
 /**
  *
@@ -24,6 +26,11 @@ public class ContractCompInformationService {
     @Transactional
     public void save(ContractCompInformation information) {
         this.repository.save(information);
+    }
+    
+    @Transactional(readOnly = true)
+    public Optional<ContractInformationDTO> listByPoint(String point){
+        return this.repository.listByPoint(point);
     }
 
 }

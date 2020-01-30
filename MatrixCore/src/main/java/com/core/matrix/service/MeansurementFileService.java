@@ -28,6 +28,11 @@ public class MeansurementFileService {
         return this.repository.save(file);
     }
     
+    @Transactional 
+    public void delete(Long id){
+         this.repository.deleteById(id);
+    }
+    
     @Transactional(transactionManager = "matrixTransactionManager")
     public void updateStatus(MeansurementFileStatus status, Long id){
         this.repository.updateStatus(status, id);

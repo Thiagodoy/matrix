@@ -5,8 +5,12 @@
  */
 package com.core.matrix.repository;
 
+import com.core.matrix.dto.ContractInformationDTO;
 import com.core.matrix.model.ContractCompInformation;
+import java.util.Optional;
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Query;
+import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
 /**
@@ -16,4 +20,7 @@ import org.springframework.stereotype.Repository;
 @Repository
 public interface ContractCompInformationRepository extends JpaRepository<ContractCompInformation, Long> {
     
+    
+    @Query(nativeQuery = true)
+    Optional<ContractInformationDTO> listByPoint(@Param("point") String point);
 }
