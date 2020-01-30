@@ -23,6 +23,7 @@ public class Constants {
     public static final String ATTACHMENT_ID = "attachment_id";
     public static final String USER_ID = "";
     public static final String CONTROLE = "_controle";
+    public static final String VAR_FILE_NAME = "file_name";
 
     public static final String RESPONSE_LAYOUT_VALID = "Layout Válido";
     public static final String RESPONSE_LAYOUT_INVALID = "Layout Inválido";
