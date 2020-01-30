@@ -22,13 +22,12 @@ import org.beanio.StreamFactory;
  *
  * @author Thiago H. Godoy <thiagodoy@hotmail.com>
  */
-
 @Data
 public class BeanIoReader {
 
     private final String ENCODING = "ISO-8859-1";
 
-    public  List<String> errors = new ArrayList<>();    
+    public List<String> errors = new ArrayList<>();
 
     public Optional<FileParsedDTO> parse(InputStream inputStream) throws Exception {
 
@@ -37,32 +36,27 @@ public class BeanIoReader {
         BeanReader reader = null;
         BeanErrorHandler errorHandler = new BeanErrorHandler();
         FileParsedDTO record = null;
-        
-        
-         byte[] byteArray = IOUtils.toByteArray(inputStream);
+
+        byte[] byteArray = IOUtils.toByteArray(inputStream);
         InputStream header = new ByteArrayInputStream(byteArray);
         InputStream file = new ByteArrayInputStream(byteArray);
-        
-        
+
         MeansurementFileType type = getType(header);
         Stream stream = Stream.getByLayoutFile(type);
-        
+
         try {
             StreamFactory factory = StreamFactory.newInstance();
             InputStream str = factory.getClass().getClassLoader().getResourceAsStream(stream.getStreamFile());
             factory.load(str);
-            Reader rr = new InputStreamReader(file,ENCODING);
+            Reader rr = new InputStreamReader(file, ENCODING);
             reader = factory.createReader(stream.getStreamId(), rr);
             reader.setErrorHandler(errorHandler);
             record = (FileParsedDTO) reader.read();
-            
-            
-            if(record != null){
+
+            if (record != null) {
                 record.setType(type.toString());
-            }   
-        
-            
-            
+            }
+
             if (!errorHandler.getListErrors().isEmpty()) {
                 errors.addAll(errorHandler.getListErrors());
             }
@@ -77,30 +71,29 @@ public class BeanIoReader {
         }
 
         return Optional.ofNullable(record);
-    }   
-    
-    
+    }
+
     public MeansurementFileType getType(InputStream inputStream) throws Exception {
 
         errors.clear();
         Stream stream = Stream.CHECK_LAYOUT_PARSER;
         BeanReader reader = null;
-        FileParsedDTO record = null;        
-        
+        FileParsedDTO record = null;
+
         try {
             StreamFactory factory = StreamFactory.newInstance();
             InputStream str = factory.getClass().getClassLoader().getResourceAsStream(stream.getStreamFile());
             factory.load(str);
-            Reader rr = new InputStreamReader(inputStream,ENCODING);
+            Reader rr = new InputStreamReader(inputStream, ENCODING);
             reader = factory.createReader(stream.getStreamId(), rr);
             record = (FileParsedDTO) reader.read();
-            
-            String content  = record.getInformations().get(0).getValue();
+
+            String content = record.getInformations().get(0).getValue();
             JaroWinklerDistance n = new JaroWinklerDistance();
-            
+
             if (n.apply(CONTENT_ID_LAYOUT_A, content) >= 0.8) {
                 return MeansurementFileType.LAYOUT_A;
-            } else if (n.apply(CONTENT_ID_LAYOUT_B,content) >= 0.8) {
+            } else if (n.apply(CONTENT_ID_LAYOUT_B, content) >= 0.8) {
                 return MeansurementFileType.LAYOUT_B;
             } else if (n.apply(CONTENT_ID_LAYOUT_C, content) >= 0.8) {
                 return MeansurementFileType.LAYOUT_C;
@@ -113,12 +106,10 @@ public class BeanIoReader {
             throw ex;
         } finally {
             if (reader != null) {
-               // reader.close();
+                // reader.close();
             }
         }
 
     }
-    
-    
 
 }

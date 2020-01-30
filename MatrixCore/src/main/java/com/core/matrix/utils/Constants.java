@@ -43,7 +43,7 @@ public class Constants {
     public static final String CONTENT_ID_LAYOUT_C = "Módulo de Análise: Origem de Dados da Coleta";
     
     
-    public static final String TYPE_ENERGY_LIQUID = "Liguida";
+    public static final String TYPE_ENERGY_LIQUID = "Liquida";
     
     public static final String CONST_SITUATION_1 = "Consistido";
     public static final String CONST_SITUATION_2 = "Coleta Diária";

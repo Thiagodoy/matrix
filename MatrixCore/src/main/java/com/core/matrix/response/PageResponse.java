@@ -28,7 +28,7 @@ public class PageResponse<T>  {
     
     public PageResponse(List<T> content, Long totalElements, Long size, Long page ){
         this.content = content;
-        this.totalPages = (totalElements == 0) || (size / totalElements) < 1 ? 1 : (size / totalElements);
+        this.totalPages = (totalElements == 0) || (size / (double)totalElements) < 1 ? 1 : (size / totalElements);
         this.totalElements = totalElements;
         this.size = size;  
         this.page = page;   
