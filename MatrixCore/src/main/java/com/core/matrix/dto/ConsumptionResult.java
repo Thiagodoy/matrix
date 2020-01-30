@@ -16,6 +16,10 @@ public class ConsumptionResult {
     
     private String meansurementPoint;
     private Double result = 0D;
-    private String error;    
+    private String error;
+    private Long contractId;
+    private Double factorAtt;
+    private Double percentLoss;
+    private Double proinfa;
     
 }

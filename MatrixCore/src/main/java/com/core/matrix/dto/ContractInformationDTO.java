@@ -5,7 +5,6 @@
  */
 package com.core.matrix.dto;
 
-import javax.persistence.Column;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 

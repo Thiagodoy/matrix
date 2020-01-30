@@ -77,7 +77,7 @@ public class PointMeansurementValidationTask implements JavaDelegate {
                                 invalidPoints.add(pointDTO);
                             }
                         } else {
-                            PointDTO pointDTO = new PointDTO(point, "WBC", MessageFormat.format("Ponto de medição [ {0} ] não esta associado no portal! ", point));
+                            PointDTO pointDTO = new PointDTO(point, "WBC", MessageFormat.format("Ponto de medição [ {0} ] não esta cadastrado no WBC! ", point));
                             invalidPoints.add(pointDTO);
                         }
 

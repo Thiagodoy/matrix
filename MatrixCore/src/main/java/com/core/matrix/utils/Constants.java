@@ -21,6 +21,7 @@ public class Constants {
     public final static String FILE_MEANSUREMENT_ID = "file_meansurement_id";
     
     public static final String ATTACHMENT_ID = "attachment_id";
+    public static final String ATTACHMENT_ERROR_ID = "attachment_error_id";
     public static final String USER_ID = "";
     public static final String CONTROLE = "_controle";
     public static final String VAR_FILE_NAME = "file_name";
@@ -56,7 +57,8 @@ public class Constants {
     public static final String CONST_SOURCE_COLLECTION_2 = "Coleta Diária";
     public static final String CONST_SOURCE_COLLECTION_3 = "Hora Ajustada";
     
-    public static final String CONST_QUALITY_COMPLETE = "Completo";
+    public static final String CONST_QUALITY_COMPLETE = "Completo";    
+    public static final String TYPE_LAYOUT_FILE = "type_layout_file";
     
     
     

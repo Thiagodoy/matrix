@@ -83,9 +83,13 @@ public class CalculateTask implements Task {
                                     .mapToDouble(MeansurementFileDetail::getConsumptionActive)
                                     .reduce(0, Double::sum);
                             
-                            double consumptionTotal = (((sum / 1000) * percentLoss) - proinfa);
+                            double consumptionTotal = (((sum / 1000) * percentLoss) - proinfa) * factorAtt;
 
                             result.setResult(consumptionTotal);
+                            result.setContractId(informationDTO.getContractId());
+                            result.setPercentLoss(percentLoss);
+                            result.setFactorAtt(factorAtt);
+                            result.setProinfa(proinfa);
 
                         } else {
                             result.setError("Não existe cadastro do contrato associado ao ponto!");

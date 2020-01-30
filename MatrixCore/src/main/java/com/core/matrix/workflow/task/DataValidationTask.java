@@ -35,7 +35,7 @@ import org.springframework.context.ApplicationContext;
  *
  * @author thiag
  */
-public class DataValidationTask implements JavaDelegate {
+public class DataValidationTask implements Task {
 
     private MeansurementFileService fileService;
     private EmpresaService empresaService;
@@ -64,7 +64,7 @@ public class DataValidationTask implements JavaDelegate {
         try {
 
             MeansurementFile file = fileService.findById(id);
-
+            delegateExecution.setVariable(TYPE_LAYOUT_FILE, file.getType().toString(), true);
             this.checkDays(file);
             this.checkCalendar(file);
             this.checkHour(file);
@@ -74,85 +74,7 @@ public class DataValidationTask implements JavaDelegate {
             Logger.getLogger(DataValidationTask.class.getName()).log(Level.SEVERE, "[execute]", e);
         }
 
-    }
-
-    private List<MeansurementFileDetail> getDetails(MeansurementFile file) throws Exception {
-
-        List<MeansurementFileDetail> result = new ArrayList<>();
-
-        switch (file.getType()) {
-            case LAYOUT_A:
-                result = file.getDetails()
-                        .parallelStream()
-                        .filter(d -> d.getEnergyType().equalsIgnoreCase(TYPE_ENERGY_LIQUID))
-                        .filter(d -> {
-                            if ((d.getReasonOfSituation() != null && d.getReasonOfSituation().length() > 0)
-                                    && (Utils.checkDistance(CONST_SITUATION_1, d.getReasonOfSituation()) > 0.95
-                                    || (Utils.checkDistance(CONST_SITUATION_2, d.getReasonOfSituation()) > 0.95)
-                                    || (Utils.checkDistance(CONST_SITUATION_3, d.getReasonOfSituation()) > 0.95)
-                                    || (Utils.checkDistance(CONST_SITUATION_4, d.getReasonOfSituation()) > 0.95))) {
-                                return true;
-                            } else {
-                                return false;
-                            }
-                        })
-                        .collect(Collectors.toList());
-                break;
-            case LAYOUT_B:
-                result = file.getDetails()
-                        .parallelStream()
-                        .filter(d -> d.getEnergyType().equalsIgnoreCase(TYPE_ENERGY_LIQUID))
-                        .filter(d -> {
-                            if ((d.getSourceCollection() != null && d.getSourceCollection().length() > 0)
-                                    && (Utils.checkDistance(CONST_SOURCE_COLLECTION_1, d.getSourceCollection()) > 0.95
-                                    || (Utils.checkDistance(CONST_SOURCE_COLLECTION_2, d.getSourceCollection()) > 0.95)
-                                    || (Utils.checkDistance(CONST_SOURCE_COLLECTION_3, d.getSourceCollection()) > 0.95))) {
-                                return true;
-                            } else {
-                                return false;
-                            }
-                        })
-                        .collect(Collectors.toList());
-                break;
-            case LAYOUT_C:
-                result = file.getDetails()
-                        .parallelStream()
-                        .filter(detail -> detail.getMeansurementPoint().contains("(L)"))
-                        .filter(d -> {
-                            if ((d.getQuality() != null && d.getQuality().length() > 0)
-                                    && Utils.checkDistance(CONST_QUALITY_COMPLETE, d.getSourceCollection()) > 0.95) {
-                                return true;
-                            } else {
-                                return false;
-                            }
-                        })
-                        .filter(d -> {
-                            if ((d.getReasonOfSituation() != null && d.getReasonOfSituation().length() > 0)
-                                    && ((Utils.checkDistance(CONST_SITUATION_2, d.getReasonOfSituation()) > 0.95)
-                                    || (Utils.checkDistance(CONST_SITUATION_3, d.getReasonOfSituation()) > 0.95)
-                                    || (Utils.checkDistance(CONST_SITUATION_4, d.getReasonOfSituation()) > 0.95))) {
-                                return true;
-                            } else {
-                                return false;
-                            }
-                        })
-                        .collect(Collectors.toList());
-
-                result.parallelStream().forEach(d -> {
-                    d.setMeansurementPoint(d.getMeansurementPoint().replaceAll("\\((L|B)\\)", "").trim());
-                });
-                break;
-        }
-
-        if (result.isEmpty()) {            
-            delegateExecution.setVariable(RESPONSE_RESULT_MESSAGE, "Não existe nenhum registro para realizar as validações!");            
-            delegateExecution.setVariable(CONTROLE, RESPONSE_CALENDAR_INVALID, true);            
-            throw new Exception("Não existe dados Suficiente");
-        } else {
-            return result;
-        }
-
-    }
+    }   
 
     private void checkCalendar(MeansurementFile file) throws Exception {
 
@@ -162,7 +84,7 @@ public class DataValidationTask implements JavaDelegate {
 
         Map<String, ErrorInformationDTO<MeansurementFileDetail>> lotesErrors = new HashMap<>();
 
-        Map<String, List<MeansurementFileDetail>> lotes = this.getDetails(file)
+        Map<String, List<MeansurementFileDetail>> lotes = this.getDetails(file,delegateExecution)
                 .stream()
                 .collect(Collectors.groupingBy(MeansurementFileDetail::getMeansurementPoint));
 
@@ -202,7 +124,7 @@ public class DataValidationTask implements JavaDelegate {
 
         Map<String, ErrorInformationDTO<MeansurementFileDetail>> lotesErrors = new HashMap<>();
 
-        Map<String, List<MeansurementFileDetail>> lotes = this.getDetails(file)
+        Map<String, List<MeansurementFileDetail>> lotes = this.getDetails(file,delegateExecution)
                 .stream()
                 .collect(Collectors.groupingBy(MeansurementFileDetail::getMeansurementPoint));
 
@@ -274,7 +196,7 @@ public class DataValidationTask implements JavaDelegate {
 
         Map<String, ErrorInformationDTO<MeansurementFileDetail>> lotesErrors = new HashMap<>();
 
-        Map<String, List<MeansurementFileDetail>> lotes = this.getDetails(file)
+        Map<String, List<MeansurementFileDetail>> lotes = this.getDetails(file,delegateExecution)
                 .stream()
                 .collect(Collectors.groupingBy(MeansurementFileDetail::getMeansurementPoint));
 

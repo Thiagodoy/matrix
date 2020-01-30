@@ -16,6 +16,10 @@ import com.core.matrix.service.MeansurementFileDetailService;
 import com.core.matrix.service.MeansurementFileService;
 import com.core.matrix.utils.MeansurementFileStatus;
 import com.core.matrix.utils.MeansurementFileType;
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileWriter;
+import java.io.IOException;
 import java.io.InputStream;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
@@ -31,6 +35,9 @@ import lombok.Data;
 import org.activiti.engine.TaskService;
 import org.activiti.engine.delegate.DelegateExecution;
 import org.activiti.engine.delegate.JavaDelegate;
+import org.activiti.engine.task.Attachment;
+import org.apache.commons.io.FileUtils;
+import org.apache.tomcat.util.http.fileupload.FileItem;
 import org.springframework.context.ApplicationContext;
 
 /**
@@ -41,28 +48,25 @@ import org.springframework.context.ApplicationContext;
 
 public class FileValidationTask implements JavaDelegate {
 
-    
     private static ApplicationContext context;
-    
-    private TaskService taskService;    
+
+    private TaskService taskService;
     private MeansurementFileService service;
     private MeansurementFileDetailService detailService;
     private DelegateExecution delegateExecution;
-    
-    
-    public FileValidationTask(){
-        
-        synchronized(FileValidationTask.context){
+
+    public FileValidationTask() {
+
+        synchronized (FileValidationTask.context) {
             this.taskService = FileValidationTask.context.getBean(TaskService.class);
             this.service = FileValidationTask.context.getBean(MeansurementFileService.class);
             this.detailService = FileValidationTask.context.getBean(MeansurementFileDetailService.class);
         }
-        
+
     }
-    
-    
-    public FileValidationTask(ApplicationContext context ){
-          FileValidationTask.context = context; 
+
+    public FileValidationTask(ApplicationContext context) {
+        FileValidationTask.context = context;
     }
 
     @Override
@@ -77,30 +81,59 @@ public class FileValidationTask implements JavaDelegate {
 
             InputStream stream = taskService.getAttachmentContent(attachmentId);
             String fileName = taskService.getAttachment(attachmentId).getName();
-            
+
             delegateExecution.setVariable(VAR_FILE_NAME, fileName);
-            
+
             BeanIoReader reader = new BeanIoReader();
             Optional<FileParsedDTO> fileParsed = reader.<FileParsedDTO>parse(stream);
-            
-            if(!reader.getErrors().isEmpty()){
-                delegateExecution.setVariable(RESPONSE_RESULT, reader.getErrors().stream().distinct().collect(Collectors.toList()));
+
+            if (!reader.getErrors().isEmpty()) {
+                writeFile(reader.getErrors(), de);
                 delegateExecution.setVariable(RESPONSE_RESULT_MESSAGE, "Layout/registros estão inválidos!");
                 delegateExecution.setVariable(CONTROLE, RESPONSE_LAYOUT_INVALID);
-            }else if (fileParsed.isPresent()) {
+            } else if (fileParsed.isPresent()) {
                 mountFile(fileParsed.get(), attachmentId, userId);
             }
 
         } catch (Exception e) {
-            Logger.getLogger(MeansurementFileService.class.getName()).log(Level.SEVERE, "[execute]", e);    
+            Logger.getLogger(MeansurementFileService.class.getName()).log(Level.SEVERE, "[execute]", e);
             delegateExecution.setVariable(RESPONSE_RESULT_MESSAGE, new String[]{e.getMessage()});
             de.setVariable(CONTROLE, RESPONSE_LAYOUT_INVALID);
         }
     }
 
-   
-    
-    
+    private void writeFile(List<String> errors, DelegateExecution de) {
+
+        FileWriter writer = null;
+        File file = null;
+
+        try {
+
+            file = File.createTempFile("erros", ".txt");
+            writer = new FileWriter(file);
+
+            String content = errors.stream().collect(Collectors.joining("\n"));
+            writer.write(content);
+            writer.flush();
+            writer.close();
+
+            Attachment attachment = taskService.createAttachment("text/plain", null, de.getProcessInstanceId(), "Erros.txt", "attachmentDescription", new FileInputStream(file));
+            delegateExecution.setVariable(ATTACHMENT_ERROR_ID, attachment.getId());
+        } catch (IOException ex) {
+            Logger.getLogger(FileValidationTask.class.getName()).log(Level.SEVERE, "[ writeFile ]", ex);
+        } finally {
+
+            if (file != null) {
+                try {
+                    FileUtils.forceDelete(file);
+                } catch (IOException ex) {
+                }
+            }
+
+        }
+
+    }
+
     private void mountFile(FileParsedDTO fileParsedDTO, String idFile, String userId) throws Exception {
 
         final String period = fileParsedDTO.informations.get(2).getValue();
@@ -108,25 +141,23 @@ public class FileValidationTask implements JavaDelegate {
         MeansurementFile meansurementFile = new MeansurementFile();
         meansurementFile.setFile(idFile);
         LocalDate date = extractMonthAndYear(period);
-        meansurementFile.setMonth((long)date.getMonthValue());
-        meansurementFile.setYear((long)date.getYear());
-        
+        meansurementFile.setMonth((long) date.getMonthValue());
+        meansurementFile.setYear((long) date.getYear());
+
         meansurementFile.setStatus(MeansurementFileStatus.SUCCESS);
         meansurementFile.setUser(userId);
-        
+
         meansurementFile.setType(MeansurementFileType.valueOf(fileParsedDTO.getType()));
-        
-       
-       
+
         meansurementFile = service.saveFile(meansurementFile);
         final Long id = meansurementFile.getId();
-        List<MeansurementFileDetail> details = this.mountDetail(fileParsedDTO.getDetails(),meansurementFile.getType());
-        details.parallelStream().forEach(d->{
+        List<MeansurementFileDetail> details = this.mountDetail(fileParsedDTO.getDetails(), meansurementFile.getType());
+        details.parallelStream().forEach(d -> {
             d.setIdMeansurementFile(id);
         });
-        
+
         detailService.save(details);
-        
+
         delegateExecution.setVariable(FILE_MEANSUREMENT_ID, meansurementFile.getId());
         delegateExecution.setVariable(CONTROLE, RESPONSE_LAYOUT_VALID);
 
@@ -147,15 +178,15 @@ public class FileValidationTask implements JavaDelegate {
         Matcher m = p.matcher(value);
 
         if (m.find()) {
-            
+
             String stringDate = m.group(0);
-            
-            if(stringDate.length() == 7){
+
+            if (stringDate.length() == 7) {
                 stringDate = "01/" + stringDate;
-            }            
-            LocalDate localDate = LocalDate.parse(stringDate, formatter);           
+            }
+            LocalDate localDate = LocalDate.parse(stringDate, formatter);
             return localDate;
-        } else {            
+        } else {
             throw new Exception("Não foi possivel extrair o periodo");
         }
 
