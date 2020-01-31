@@ -51,7 +51,14 @@ import lombok.Data;
                 }))
 
 
- 
+ @NamedNativeQuery(query = "SELECT COUNT AS 'TOTALDECONTRATOS'\n" +
+"  FROM [CE_CONTRATO] CT\n" +
+" WHERE CT.[nCdSituacaoContrato] in (2,8)\n" +
+"   AND CT.[sNrContrato] IN (SELECT CC.[nCdContrato]\n" +
+"  FROM [CE_CONTRATO_CLASSIFICADOR] CC,\n" +
+"       [CE_CLASSIFICADOR] CL\n" +
+"  WHERE CC.sCdClassificador = CL.sCdClassificador\n" +
+"    AND CL.[sNmClassificador] = 'PORTAL')", name = "Contract.countContract")
 
 
 @NamedNativeQuery(query = "SELECT "

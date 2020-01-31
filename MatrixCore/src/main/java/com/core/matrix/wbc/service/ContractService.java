@@ -26,4 +26,9 @@ public class ContractService {
     public Page findAll(Long contractId, PageRequest page) {
         return this.repository.shortInfomation(contractId, page);
     }
+    
+    @Transactional(readOnly = true)
+    public Long countContract(){
+        return this.repository.countContract();
+    }
 }

@@ -31,8 +31,8 @@ import lombok.Data;
                         @ColumnResult(name = "wbc_contrato", type = Long.class),
                         @ColumnResult(name = "wbc_ponto_de_medicao", type = String.class),
                         @ColumnResult(name = "percentual_de_perda", type = Double.class),
-                        @ColumnResult(name = "proinfa", type = Double.class),
-                        @ColumnResult(name = "fator_atendimento_carga", type = Double.class),                                   
+                        @ColumnResult(name = "fator_atendimento_carga", type = Double.class),
+                        @ColumnResult(name = "proinfa", type = Double.class),                        
                     
                 }))
 

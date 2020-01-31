@@ -91,7 +91,7 @@ public class CalculateTask implements Task {
                             ContractInformationDTO informationDTO = opt.get();
                             final double factorAtt = informationDTO.getFactorAttendanceCharge() / 100;
                             final double percentLoss = informationDTO.getPercentOfLoss() / 100;
-                            final double proinfa = informationDTO.getProinfa() / 100;
+                            final double proinfa = informationDTO.getProinfa();
                             final double sum = lote.stream()
                                     .mapToDouble(MeansurementFileDetail::getConsumptionActive)
                                     .reduce(0, Double::sum);
@@ -113,6 +113,7 @@ public class CalculateTask implements Task {
                             fileResult.setFactorAtt(factorAtt);
                             fileResult.setProinfa(proinfa);
                             fileResult.setMeansurementPointId(optional.get().getId());
+                            fileResult.setResult(consumptionTotal);
                             
                             resultService.save(fileResult);
                             

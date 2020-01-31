@@ -19,8 +19,18 @@ import org.springframework.stereotype.Repository;
  * @author thiag
  */
 @Repository
-public interface ContractRepository extends JpaRepository<Contract, Long>{    
-    
+public interface ContractRepository extends JpaRepository<Contract, Long> {
+
     @Query(nativeQuery = true)
-    Page<ContractDTO> shortInfomation(@Param("contractId")Long contractId, Pageable page);
+    Page<ContractDTO> shortInfomation(@Param("contractId") Long contractId, Pageable page);
+
+    @Query(nativeQuery = true, value = "SELECT COUNT(1) \n"
+            + "  FROM [CE_CONTRATO] CT\n"
+            + " WHERE CT.[nCdSituacaoContrato] in (2,8)\n"
+            + "   AND CT.[sNrContrato] IN (SELECT CC.[nCdContrato]\n"
+            + "  FROM [CE_CONTRATO_CLASSIFICADOR] CC,\n"
+            + "       [CE_CLASSIFICADOR] CL\n"
+            + "  WHERE CC.sCdClassificador = CL.sCdClassificador\n"
+            + "    AND CL.[sNmClassificador] = 'PORTAL')")
+    Long countContract();
 }

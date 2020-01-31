@@ -5,12 +5,16 @@
  */
 package com.core.matrix.model;
 
+import com.core.matrix.dto.MeansurementFileStatusDTO;
 import com.core.matrix.utils.MeansurementFileStatus;
 import com.core.matrix.utils.MeansurementFileType;
+import com.core.matrix.wbc.dto.EmpresaDTO;
 import java.time.LocalDateTime;
 import java.util.List;
 import javax.persistence.CascadeType;
 import javax.persistence.Column;
+import javax.persistence.ColumnResult;
+import javax.persistence.ConstructorResult;
 import javax.persistence.Entity;
 import javax.persistence.EnumType;
 import javax.persistence.Enumerated;
@@ -19,8 +23,10 @@ import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.JoinColumn;
+import javax.persistence.NamedNativeQuery;
 import javax.persistence.OneToMany;
 import javax.persistence.PrePersist;
+import javax.persistence.SqlResultSetMapping;
 import javax.persistence.Table;
 import lombok.Data;
 
@@ -28,6 +34,23 @@ import lombok.Data;
  *
  * @author thiag
  */
+
+
+@SqlResultSetMapping(name = "statusDTO", 
+        classes = @ConstructorResult(
+                targetClass = MeansurementFileStatusDTO.class,
+                columns = {
+                        @ColumnResult(name = "Status", type = String.class),
+                        @ColumnResult(name = "qtd", type = Long.class),                                                       
+                    
+                }))
+
+@NamedNativeQuery(name = "MeansurementFile.getStatus",
+        query = "select 'RECEIVED' as status, count(1) as qtd from matrix.mtx_arquivo_de_medicao a where a.data_criacao between :start and :end\n" +
+                "union all\n" +
+                "select status , count(1) from matrix.mtx_arquivo_de_medicao a where a.data_criacao between :start and :end group by status ",
+        resultSetMapping = "statusDTO")
+
 @Entity
 @Table(name = "mtx_arquivo_de_medicao")
 @Data

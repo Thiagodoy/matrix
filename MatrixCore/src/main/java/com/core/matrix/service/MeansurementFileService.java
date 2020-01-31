@@ -5,9 +5,15 @@
  */
 package com.core.matrix.service;
 
+import com.core.matrix.dto.MeansurementFileStatusDTO;
 import com.core.matrix.model.MeansurementFile;
 import com.core.matrix.repository.MeansurementFileRepository;
 import com.core.matrix.utils.MeansurementFileStatus;
+import com.core.matrix.utils.Utils;
+import java.time.LocalDate;
+import java.time.LocalDateTime;
+import java.time.Month;
+import java.util.List;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -41,6 +47,16 @@ public class MeansurementFileService {
     @Transactional(readOnly = true)
     public MeansurementFile findById(Long id) throws Exception{
         return this.repository.findById(id).orElseThrow(()-> new Exception("Arquivo não encontrado"));
+    }
+    
+    public List<MeansurementFileStatusDTO> getStatus(int year, int month){        
+        
+        LocalDate referenceMonth = LocalDate.of(year, Month.of(month), 1);
+        LocalDateTime start = referenceMonth.atStartOfDay();
+        referenceMonth = referenceMonth.plusDays(Utils.getDaysOfMonth(referenceMonth));        
+        LocalDateTime end = referenceMonth.atStartOfDay();
+        
+        return this.repository.getStatus(start, end);
     }
 
     
