@@ -75,6 +75,7 @@
             </properties>
         </action>
     <action>
+
             <actionName>build-with-dependencies</actionName>
             <reactor>also-make</reactor>
             <packagings>
@@ -87,6 +88,7 @@
                 <skipTests>true</skipTests>
             </properties>
         </action>
+
 
     <action>
             <actionName>build</actionName>

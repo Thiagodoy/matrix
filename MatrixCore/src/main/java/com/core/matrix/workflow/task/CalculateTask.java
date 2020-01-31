@@ -20,6 +20,8 @@ import static com.core.matrix.utils.Constants.RESPONSE_RESULT;
 import static com.core.matrix.utils.Constants.RESPONSE_RESULT_MESSAGE;
 import com.core.matrix.wbc.dto.EmpresaDTO;
 import com.core.matrix.wbc.service.EmpresaService;
+import java.math.BigDecimal;
+import java.math.RoundingMode;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
@@ -96,10 +98,12 @@ public class CalculateTask implements Task {
                                     .mapToDouble(MeansurementFileDetail::getConsumptionActive)
                                     .reduce(0, Double::sum);
                             
-                            double consumptionTotal = (((sum / 1000) * percentLoss) - proinfa) * factorAtt;
-
+                            double consumptionTotal = ((sum / 1000) + ((sum / 1000) * percentLoss) - proinfa) * factorAtt;
+                            
+                            BigDecimal consumptionTotalArredondado = new BigDecimal(consumptionTotal).setScale(3, RoundingMode.HALF_EVEN);
+                            
                             Optional<EmpresaDTO> optEmp = this.empresaService.listByPoint(point);
-                            result.setResult(consumptionTotal);
+                            result.setResult(consumptionTotalArredondado.doubleValue());
                             result.setContractId(informationDTO.getContractId());
                             result.setPercentLoss(percentLoss);
                             result.setFactorAtt(factorAtt);
@@ -113,7 +117,7 @@ public class CalculateTask implements Task {
                             fileResult.setFactorAtt(factorAtt);
                             fileResult.setProinfa(proinfa);
                             fileResult.setMeansurementPointId(optional.get().getId());
-                            fileResult.setResult(consumptionTotal);
+                            fileResult.setResult(consumptionTotalArredondado.doubleValue());
                             
                             resultService.save(fileResult);
                             
