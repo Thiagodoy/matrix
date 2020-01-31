@@ -190,7 +190,7 @@ public class RunTimeResource {
     public ResponseEntity createAttachment(@RequestPart(value = "file") MultipartFile file,
             @RequestPart(value = "processInstance") String processInstance) {
         try {
-            AttachmentResponse response =  this.service.createAttachament(processInstance, file);
+            AttachmentResponse response = this.service.createAttachament(processInstance, file);
             return ResponseEntity.ok(response);
         } catch (Exception e) {
             Logger.getLogger(RepositoryResource.class.getName()).log(Level.SEVERE, "[post]", e);
@@ -208,11 +208,10 @@ public class RunTimeResource {
             return ResponseEntity.status(HttpStatus.resolve(500)).body(e.getMessage());
         }
     }
-    
-    
+
     @RequestMapping(value = "/attachment", method = RequestMethod.GET)
     public ResponseEntity downloadAttachment(@RequestParam(value = "attachamentId") String attachamentId,
-             HttpServletResponse response) {
+            HttpServletResponse response) {
         try {
 
             Attachment at = service.getAttachament(attachamentId);
@@ -230,9 +229,8 @@ public class RunTimeResource {
             return ResponseEntity.status(HttpStatus.resolve(500)).body(e.getMessage());
         }
     }
-    
-    
-     @RequestMapping(value = "/process/{id}", method = RequestMethod.DELETE)
+
+    @RequestMapping(value = "/process/{id}", method = RequestMethod.DELETE)
     public ResponseEntity downloadAttachment(@PathVariable(name = "id") String id) {
         try {
             service.deleteProcess(id);

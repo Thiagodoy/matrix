@@ -117,7 +117,7 @@ public class RuntimeActivitiService {
         boolean delegated = false;
         String owner = userId;
 
-        if (currentTask.getDelegationState() != null && currentTask.getDelegationState().equals(DelegationState.PENDING)) {
+        if (currentTask != null && currentTask.getDelegationState() != null && currentTask.getDelegationState().equals(DelegationState.PENDING)) {
             owner = currentTask.getOwner();
             delegated = true;
             taskService.resolveTask(request.getTaskId(), request.getVariables());
