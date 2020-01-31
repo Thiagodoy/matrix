@@ -1,0 +1,67 @@
+## YAML Template.
+---
+## YAML Template.
+server:
+    port: 8004
+    
+    
+spring:
+    servlet:
+        multipart:
+            max-file-size: -1
+            max-request-size: -1
+ 
+      
+activiti:
+    datasource:        
+        socketTimeout: 30000
+        loginTimeout: 30000
+        minimumIdle: 5
+        maximumPoolSize: 50
+        validationTimeout: 10000
+        idleTimeout: 30000
+        connectionTimeout: 30000
+        autoCommit: false
+        initializationFailFast: false        
+        sqlserver:            
+            dataUrl: jdbc:mysql://bd-hml-portal-atendimento-matrix.mysql.database.azure.com:3306/activiti?rewriteBatchedStatements=true&useTimezone=true&serverTimezone=America/Cuiaba&useLegacyDatetimeCode=false&autoReconnect=true            
+            dataSourceUser: bd_hml_admin@bd-hml-portal-atendimento-matrix
+            dataSourcePassword: iP9w5tux*
+            port: 3306            
+            connectionTestQuery: SELECT 1  
+ 
+matrix:
+    datasource:        
+        socketTimeout: 30000
+        loginTimeout: 30000
+        minimumIdle: 5
+        maximumPoolSize: 50
+        validationTimeout: 10000
+        idleTimeout: 30000
+        connectionTimeout: 30000
+        autoCommit: false
+        initializationFailFast: false        
+        sqlserver:            
+            dataUrl: jdbc:mysql://bd-hml-portal-atendimento-matrix.mysql.database.azure.com:3306/matrix?rewriteBatchedStatements=true&useTimezone=true&serverTimezone=America/Cuiaba&useLegacyDatetimeCode=false&autoReconnect=true            
+            dataSourceUser: bd_hml_admin@bd-hml-portal-atendimento-matrix
+            dataSourcePassword: iP9w5tux*
+            port: 3306            
+            connectionTestQuery: SELECT 1  
+  
+wbc:
+    datasource:        
+        socketTimeout: 30000
+        loginTimeout: 30000
+        minimumIdle: 5
+        maximumPoolSize: 50
+        validationTimeout: 10000
+        idleTimeout: 30000
+        connectionTimeout: 30000
+        autoCommit: false
+        initializationFailFast: false        
+        sqlserver:            
+            dataUrl: jdbc:sqlserver://192.168.0.22;databaseName=WBC_ENERGY_DB;user=Matrix_portal;password=Matrix_portal
+            dataSourceUser: Matrix_portal
+            dataSourcePassword: Matrix_portal
+            port: 3306            
+            connectionTestQuery: SELECT 1   
