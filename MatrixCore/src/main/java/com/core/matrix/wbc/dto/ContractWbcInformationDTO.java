@@ -6,6 +6,7 @@
 package com.core.matrix.wbc.dto;
 
 import java.io.Serializable;
+import lombok.AllArgsConstructor;
 import lombok.Data;
 
 /**
@@ -13,6 +14,7 @@ import lombok.Data;
  * @author thiag
  */
 @Data
+@AllArgsConstructor
 public class ContractWbcInformationDTO implements Serializable{
 
     private String nrContract;
