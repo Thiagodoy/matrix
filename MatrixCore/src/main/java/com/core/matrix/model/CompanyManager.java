@@ -23,6 +23,8 @@ import lombok.Data;
 @IdClass(CompanyManager.IdClass.class)
 public class CompanyManager implements  Serializable{
     
+    
+    
     @Id
     @Column(name = "wbc_empresa")
     private Long empresa;

@@ -16,6 +16,9 @@ import lombok.Data;
 @Data
 @AllArgsConstructor
 public class PointDTO implements Serializable{   
+    
+    
+    
     private String point;
     private String origem;
     private String message;       

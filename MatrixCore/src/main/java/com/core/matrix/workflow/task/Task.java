@@ -81,17 +81,17 @@ public interface Task extends JavaDelegate{
                         .filter(detail -> detail.getMeansurementPoint().contains("(L)"))
                         .filter(d -> {
                             if ((d.getQuality() != null && d.getQuality().length() > 0)
-                                    && Utils.checkDistance(CONST_QUALITY_COMPLETE, d.getSourceCollection()) > 0.95) {
+                                    && Utils.checkDistance(CONST_QUALITY_COMPLETE, d.getQuality()) > 0.95) {
                                 return true;
                             } else {
                                 return false;
                             }
                         })
                         .filter(d -> {
-                            if ((d.getReasonOfSituation() != null && d.getReasonOfSituation().length() > 0)
-                                    && ((Utils.checkDistance(CONST_SITUATION_2, d.getReasonOfSituation()) > 0.95)
-                                    || (Utils.checkDistance(CONST_SITUATION_3, d.getReasonOfSituation()) > 0.95)
-                                    || (Utils.checkDistance(CONST_SITUATION_4, d.getReasonOfSituation()) > 0.95))) {
+                            if ((d.getOrigem() != null && d.getOrigem().length() > 0)
+                                    && ((Utils.checkDistance(CONST_SITUATION_2, d.getOrigem()) > 0.95)
+                                    || (Utils.checkDistance(CONST_SITUATION_3, d.getOrigem()) > 0.95)
+                                    || (Utils.checkDistance(CONST_SITUATION_4, d.getOrigem()) > 0.95))) {
                                 return true;
                             } else {
                                 return false;
@@ -99,9 +99,9 @@ public interface Task extends JavaDelegate{
                         })
                         .collect(Collectors.toList());
 
-                result.parallelStream().forEach(d -> {
-                    d.setMeansurementPoint(d.getMeansurementPoint().replaceAll("\\((L|B)\\)", "").trim());
-                });
+//                result.parallelStream().forEach(d -> {
+//                    d.setMeansurementPoint(d.getMeansurementPoint().replaceAll("\\((L|B)\\)", "").trim());
+//                });
                 break;
         }
 

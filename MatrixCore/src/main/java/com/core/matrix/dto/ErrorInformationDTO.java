@@ -17,8 +17,10 @@ import lombok.Data;
  */
 @Data
 @AllArgsConstructor
-public class ErrorInformationDTO<T> implements Serializable{
 
+public class ErrorInformationDTO<T> implements Serializable{
+    
+    
     private String information;
     private List<T> errors;
     private EmpresaDTO company;

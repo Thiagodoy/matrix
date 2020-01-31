@@ -14,6 +14,9 @@ import lombok.Data;
  * @author thiag
  */
 @Data
-public class LoteDTO<T,S> implements Serializable{    
+public class LoteDTO<T,S> implements Serializable{   
+    
+    
+    
     private Map<T,S> lotes;    
 }

@@ -1,6 +1,84 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <actions>
+<<<<<<< HEAD
         <action>
+=======
+    <action>
+        <actionName>run</actionName>
+        <packagings>
+            <packaging>jar</packaging>
+        </packagings>
+        <goals>
+            <goal>spring-boot:run</goal>
+        </goals>
+        <properties>
+            <spring-boot.run.jvmArguments>-noverify -XX:TieredStopAtLevel=1</spring-boot.run.jvmArguments>
+            <spring-boot.run.mainClass>com.core.matrix.MatrixApplication</spring-boot.run.mainClass>
+            <Env.SPRING_OUTPUT_ANSI_ENABLED>always</Env.SPRING_OUTPUT_ANSI_ENABLED>
+        </properties>
+    </action>
+    <action>
+        <actionName>debug</actionName>
+        <packagings>
+            <packaging>jar</packaging>
+        </packagings>
+        <goals>
+            <goal>spring-boot:run</goal>
+        </goals>
+        <properties>
+            <spring-boot.run.jvmArguments>-Xdebug -Xrunjdwp:transport=dt_socket,server=n,address=${jpda.address} -noverify -XX:TieredStopAtLevel=1 -Dspring.profiles.active=test</spring-boot.run.jvmArguments>
+            <spring-boot.run.mainClass>com.core.matrix.MatrixApplication</spring-boot.run.mainClass>
+            <Env.SPRING_OUTPUT_ANSI_ENABLED>always</Env.SPRING_OUTPUT_ANSI_ENABLED>
+            <jpda.listen>true</jpda.listen>
+        </properties>
+    </action>
+    <action>
+        <actionName>profile</actionName>
+        <packagings>
+            <packaging>jar</packaging>
+        </packagings>
+        <goals>
+            <goal>process-classes</goal>
+            <goal>org.codehaus.mojo:exec-maven-plugin:1.2.1:exec</goal>
+        </goals>
+        <properties>
+            <exec.args>-classpath %classpath com.core.matrix.MatrixApplication</exec.args>
+            <exec.executable>java</exec.executable>
+        </properties>
+    </action>
+    <action>
+            <actionName>rebuild</actionName>
+            <packagings>
+                <packaging>*</packaging>
+            </packagings>
+            <goals>
+                <goal>clean</goal>
+                <goal>install</goal>
+            </goals>
+            <properties>
+                <skipTests>true</skipTests>
+            </properties>
+        </action>
+    <action>
+            <actionName>debug.test.single</actionName>
+            <packagings>
+                <packaging>*</packaging>
+            </packagings>
+            <goals>
+                <goal>test-compile</goal>
+                <goal>surefire:test</goal>
+            </goals>
+            <properties>
+                <test>${packageClassName}</test>
+                <forkMode>once</forkMode>
+                <maven.surefire.debug>-Xdebug -Xrunjdwp:transport=dt_socket,server=n,address=${jpda.address}</maven.surefire.debug>
+                <jpda.listen>true</jpda.listen>
+                <spring.profiles.active>test</spring.profiles.active>
+                
+            </properties>
+        </action>
+    <action>
+>>>>>>> 3defbb755b66f162aa7ec5c912757822ea7644c4
             <actionName>build-with-dependencies</actionName>
             <reactor>also-make</reactor>
             <packagings>
@@ -13,4 +91,37 @@
                 <skipTests>true</skipTests>
             </properties>
         </action>
+<<<<<<< HEAD
     </actions>
+=======
+
+    <action>
+            <actionName>build</actionName>
+            <packagings>
+                <packaging>*</packaging>
+            </packagings>
+            <goals>
+                <goal>install</goal>
+            </goals>
+            <properties>
+                <spring.profiles.active>test</spring.profiles.active>
+                
+            </properties>
+            <activatedProfiles>
+                <activatedProfile>test</activatedProfile>
+            </activatedProfiles>
+        </action>
+
+    <action>
+            <actionName>CUSTOM-Depurar projeto dev</actionName>
+            <displayName>Depurar projeto dev</displayName>
+            <properties>
+                <spring-boot.run.jvmArguments>-Xdebug -Xrunjdwp:transport=dt_socket,server=n,address=${jpda.address} -noverify -XX:TieredStopAtLevel=1 -Dspring.profiles.active=test</spring-boot.run.jvmArguments>
+                <spring-boot.run.mainClass>com.core.matrix.MatrixApplication</spring-boot.run.mainClass>
+                <Env.SPRING_OUTPUT_ANSI_ENABLED>always</Env.SPRING_OUTPUT_ANSI_ENABLED>
+                <jpda.listen>true</jpda.listen>
+            </properties>
+        </action>
+
+</actions>
+>>>>>>> 3defbb755b66f162aa7ec5c912757822ea7644c4

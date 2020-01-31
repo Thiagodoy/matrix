@@ -31,6 +31,8 @@ import lombok.NoArgsConstructor;
 @Data
 @NoArgsConstructor
 public class MeansurementFileDetail implements Serializable {
+    
+    
 
     @Id
     @Column(name = "id_arquivo_de_medicao_detalhe")

@@ -18,7 +18,7 @@ import lombok.NoArgsConstructor;
 @Data
 @AllArgsConstructor()
 @NoArgsConstructor
-public class EmpresaDTO implements Serializable{
+public class EmpresaDTO implements Serializable {
 
     private Long nCdEmpresa;
     private String sNrCnpj;

@@ -17,7 +17,7 @@ import lombok.Data;
 public class ConsumptionResult implements Serializable{
     
     
-    private static final long serialVersionUID = 109345709234532L;
+    
     
     private String meansurementPoint;
     private Double result = 0D;
