@@ -18,7 +18,9 @@ import com.core.matrix.service.MeansurementFileService;
 import static com.core.matrix.utils.Constants.FILE_MEANSUREMENT_ID;
 import static com.core.matrix.utils.Constants.RESPONSE_RESULT;
 import static com.core.matrix.utils.Constants.RESPONSE_RESULT_MESSAGE;
+import com.core.matrix.wbc.dto.ContractWbcInformationDTO;
 import com.core.matrix.wbc.dto.EmpresaDTO;
+import com.core.matrix.wbc.service.ContractService;
 import com.core.matrix.wbc.service.EmpresaService;
 import java.math.BigDecimal;
 import java.math.RoundingMode;
@@ -46,6 +48,7 @@ public class CalculateTask implements Task {
     private EmpresaService empresaService;
     private ContractMeasurementPointService pointService;
     private MeansurementFileResultService resultService;
+    private ContractService contractWbcService;
 
     public CalculateTask() {
 
@@ -55,6 +58,7 @@ public class CalculateTask implements Task {
             this.empresaService = CalculateTask.context.getBean(EmpresaService.class);
             this.pointService = CalculateTask.context.getBean(ContractMeasurementPointService.class);
             this.resultService = CalculateTask.context.getBean(MeansurementFileResultService.class);
+            this.contractWbcService = CalculateTask.context.getBean(ContractService.class);
 
         }
 
@@ -85,7 +89,7 @@ public class CalculateTask implements Task {
 
                         String point = lote.stream().findFirst().get().getMeansurementPoint().replaceAll("\\((L|B)\\)", "").trim();
                         Optional<ContractInformationDTO> opt = this.contractService.listByPoint(point);
-
+                        Optional<ContractWbcInformationDTO> optWbc = this.contractWbcService.getInformation(file.getYear(), file.getMonth(), opt.get().getContractId());
                         final ConsumptionResult result = new ConsumptionResult();
                         result.setMeansurementPoint(point);
 
@@ -109,6 +113,7 @@ public class CalculateTask implements Task {
                             result.setFactorAtt(factorAtt);
                             result.setProinfa(proinfa);
                             result.setEmpresa(optEmp.get());
+                            result.setInformation(optWbc.get());
                             
                             Optional<ContractMeasurementPoint> optional =  pointService.findByPoint(point);
                             MeansurementFileResult fileResult = new MeansurementFileResult();

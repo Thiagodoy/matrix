@@ -5,7 +5,9 @@
  */
 package com.core.matrix.wbc.service;
 
+import com.core.matrix.wbc.dto.ContractWbcInformationDTO;
 import com.core.matrix.wbc.repository.ContractRepository;
+import java.util.Optional;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
@@ -30,5 +32,10 @@ public class ContractService {
     @Transactional(readOnly = true)
     public Long countContract(){
         return this.repository.countContract();
+    }
+    
+    @Transactional(readOnly = true)
+    public Optional<ContractWbcInformationDTO> getInformation(Long year, Long month, Long contract){
+        return this.repository.getInformation(year, month, contract);
     }
 }

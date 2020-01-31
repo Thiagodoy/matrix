@@ -6,7 +6,9 @@
 package com.core.matrix.wbc.repository;
 
 import com.core.matrix.wbc.dto.ContractDTO;
+import com.core.matrix.wbc.dto.ContractWbcInformationDTO;
 import com.core.matrix.wbc.model.Contract;
+import java.util.Optional;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
@@ -33,4 +35,7 @@ public interface ContractRepository extends JpaRepository<Contract, Long> {
             + "  WHERE CC.sCdClassificador = CL.sCdClassificador\n"
             + "    AND CL.[sNmClassificador] = 'PORTAL')")
     Long countContract();
+    
+    @Query(nativeQuery = true)
+    Optional<ContractWbcInformationDTO> getInformation(@Param("year")Long year, @Param("month")Long month, @Param("contractId")Long contractId);
 }
