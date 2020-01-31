@@ -23,6 +23,8 @@ import lombok.Data;
 @IdClass(CompanyAfterSales.IdClass.class)
 public class CompanyAfterSales implements  Serializable{
     
+    private static final long serialVersionUID = 9345709234532L;
+    
     @Id
     @Column(name = "wbc_empresa")
     private Long company;

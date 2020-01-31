@@ -81,7 +81,7 @@ public class CalculateTask implements Task {
                     .parallelStream()
                     .forEach(lote -> {
 
-                        String point = lote.stream().findFirst().get().getMeansurementPoint();
+                        String point = lote.stream().findFirst().get().getMeansurementPoint().replaceAll("\\((L|B)\\)", "").trim();
                         Optional<ContractInformationDTO> opt = this.contractService.listByPoint(point);
 
                         final ConsumptionResult result = new ConsumptionResult();
