@@ -35,8 +35,8 @@ public class MeansurementFileDetailResource {
             this.service.save(request);
             return ResponseEntity.ok().build();
         } catch (Exception e) {
-            Logger.getLogger(MeansurementFileDetailResource.class.getName()).log(Level.SEVERE, "[post]", e.getMessage());
-            return ResponseEntity.status(HttpStatus.resolve(500)).body(e);
+            Logger.getLogger(MeansurementFileDetailResource.class.getName()).log(Level.SEVERE, "[post]", e);
+            return ResponseEntity.status(HttpStatus.resolve(500)).body(e.getMessage());
         }
     }
 

@@ -94,7 +94,7 @@ public class DataValidationTask implements Task {
 
             if (!detail.isEmpty()) {
                 String point = detail.stream().findFirst().get().getMeansurementPoint();
-                Optional<EmpresaDTO> opt = this.empresaService.listByPoint(point);
+                Optional<EmpresaDTO> opt = this.empresaService.listByPoint(point.replaceAll("\\((L|B)\\)", "").trim());
                 ErrorInformationDTO<MeansurementFileDetail> error = new ErrorInformationDTO<>("Lote apresenta registros fora do ciclo de faturamento", detail, opt.orElse(new EmpresaDTO()));
 
                 synchronized (lotesErrors) {
@@ -153,7 +153,8 @@ public class DataValidationTask implements Task {
                                     .comparing(MeansurementFileDetail::getDate)
                                     .thenComparing(MeansurementFileDetail::getHour));
 
-                    Optional<EmpresaDTO> opt = this.empresaService.listByPoint(point);
+                    String p = point.replaceAll("\\((L|B)\\)", "").trim();
+                    Optional<EmpresaDTO> opt = this.empresaService.listByPoint(p);
                     ErrorInformationDTO<MeansurementFileDetail> error = new ErrorInformationDTO<>("Arquivo esta com a consolidação diária das hora inválida", hoursOut, opt.orElse(new EmpresaDTO()));
 
                     synchronized (lotesErrors) {
@@ -223,7 +224,8 @@ public class DataValidationTask implements Task {
             }
 
             if (!detailsOut.isEmpty()) {
-                Optional<EmpresaDTO> opt = this.empresaService.listByPoint(point);
+                String p = point.replaceAll("\\((L|B)\\)", "").trim();
+                Optional<EmpresaDTO> opt = this.empresaService.listByPoint(p);
                 ErrorInformationDTO<MeansurementFileDetail> error = new ErrorInformationDTO<>("Arquivo esta com o calendário  de apuração com dias faltantes!", detailsOut, opt.orElse(new EmpresaDTO()));
 
                 synchronized (lotesErrors) {
