@@ -29,5 +29,6 @@ public class ConsumptionResult implements Serializable{
     private Double proinfa;
     private EmpresaDTO empresa;
     private ContractWbcInformationDTO information;
+    private Double SolicitadoLiquido;
     
 }

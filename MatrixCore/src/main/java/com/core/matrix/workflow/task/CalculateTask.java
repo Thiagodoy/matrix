@@ -85,7 +85,7 @@ public class CalculateTask implements Task {
             lotes
                     .values()
                     .parallelStream()
-                    .forEach(lote -> {
+                    .forEach((List<MeansurementFileDetail> lote) -> {
 
                         String point = lote.stream().findFirst().get().getMeansurementPoint().replaceAll("\\((L|B)\\)", "").trim();
                         Optional<ContractInformationDTO> opt = this.contractService.listByPoint(point);
@@ -106,6 +106,23 @@ public class CalculateTask implements Task {
                             
                             BigDecimal consumptionTotalArredondado = new BigDecimal(consumptionTotal).setScale(3, RoundingMode.HALF_EVEN);
                             
+                            BigDecimal solicitadoLiquido = new BigDecimal(0).setScale(3, RoundingMode.HALF_EVEN);
+                            
+                            if (consumptionTotalArredondado.doubleValue() < optWbc.get().getNrQtd() && consumptionTotalArredondado.doubleValue() > optWbc.get().getNrQtdMin()) {
+                                
+                                solicitadoLiquido = new BigDecimal(consumptionTotal).setScale(3, RoundingMode.HALF_EVEN);
+                                
+                            } else if (consumptionTotalArredondado.doubleValue() > optWbc.get().getNrQtd() && consumptionTotalArredondado.doubleValue() < optWbc.get().getNrQtdMax()) {
+                            
+                                    solicitadoLiquido = new BigDecimal(consumptionTotal).setScale(3, RoundingMode.HALF_EVEN);
+                                                
+                                   } else if (consumptionTotalArredondado.doubleValue() > optWbc.get().getNrQtd() && consumptionTotalArredondado.doubleValue() > optWbc.get().getNrQtdMax()) {
+                                       
+                                            solicitadoLiquido = new BigDecimal(optWbc.get().getNrQtdMax()).setScale(3, RoundingMode.HALF_EVEN);
+                                        
+                                          }
+                                
+                                    
                             Optional<EmpresaDTO> optEmp = this.empresaService.listByPoint(point);
                             result.setResult(consumptionTotalArredondado.doubleValue());
                             result.setContractId(informationDTO.getContractId());
@@ -114,6 +131,7 @@ public class CalculateTask implements Task {
                             result.setProinfa(proinfa);
                             result.setEmpresa(optEmp.get());
                             result.setInformation(optWbc.get());
+                            result.setSolicitadoLiquido(solicitadoLiquido.doubleValue());
                             
                             Optional<ContractMeasurementPoint> optional =  pointService.findByPoint(point);
                             MeansurementFileResult fileResult = new MeansurementFileResult();
@@ -123,6 +141,7 @@ public class CalculateTask implements Task {
                             fileResult.setProinfa(proinfa);
                             fileResult.setMeansurementPointId(optional.get().getId());
                             fileResult.setResult(consumptionTotalArredondado.doubleValue());
+                            fileResult.setMontanteLiquido(solicitadoLiquido.doubleValue());
                             
                             resultService.save(fileResult);
                             

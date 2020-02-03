@@ -24,9 +24,9 @@ activiti:
         autoCommit: false
         initializationFailFast: false        
         sqlserver:            
-            dataUrl: jdbc:mysql://bd-hml-portal-atendimento-matrix.mysql.database.azure.com:3306/activiti?rewriteBatchedStatements=true&useTimezone=true&serverTimezone=America/Cuiaba&useLegacyDatetimeCode=false&autoReconnect=true            
-            dataSourceUser: bd_hml_admin@bd-hml-portal-atendimento-matrix
-            dataSourcePassword: iP9w5tux*
+            dataUrl: jdbc:mysql://bd-prd-portal-atendimento-matrix.mysql.database.azure.com:3306/activiti?rewriteBatchedStatements=true&useTimezone=true&serverTimezone=America/Cuiaba&useLegacyDatetimeCode=false&autoReconnect=true            
+            dataSourceUser: bd_prd_admin@bd-prd-portal-atendimento-matrix
+            dataSourcePassword: yR5q8kmc
             port: 3306            
             connectionTestQuery: SELECT 1  
  
@@ -42,9 +42,9 @@ matrix:
         autoCommit: false
         initializationFailFast: false        
         sqlserver:            
-            dataUrl: jdbc:mysql://bd-hml-portal-atendimento-matrix.mysql.database.azure.com:3306/matrix?rewriteBatchedStatements=true&useTimezone=true&serverTimezone=America/Cuiaba&useLegacyDatetimeCode=false&autoReconnect=true            
-            dataSourceUser: bd_hml_admin@bd-hml-portal-atendimento-matrix
-            dataSourcePassword: iP9w5tux*
+            dataUrl: jdbc:mysql://bd-prd-portal-atendimento-matrix.mysql.database.azure.com:3306/matrix?rewriteBatchedStatements=true&useTimezone=true&serverTimezone=America/Cuiaba&useLegacyDatetimeCode=false&autoReconnect=true            
+            dataSourceUser: bd_prd_admin@bd-prd-portal-atendimento-matrix
+            dataSourcePassword: yR5q8kmc
             port: 3306            
             connectionTestQuery: SELECT 1  
   
@@ -60,8 +60,8 @@ wbc:
         autoCommit: false
         initializationFailFast: false        
         sqlserver:            
-            dataUrl: jdbc:sqlserver://192.168.0.22;databaseName=WBC_ENERGY_DB;user=Matrix_portal;password=Matrix_portal
-            dataSourceUser: Matrix_portal
-            dataSourcePassword: Matrix_portal
+            dataUrl: jdbc:sqlserver://192.168.0.22;databaseName=WBC_ENERGY_DB;user=matrix_portal;password=portal_matrix
+            dataSourceUser: matrix_portal
+            dataSourcePassword: portal_matrix
             port: 3306            
             connectionTestQuery: SELECT 1   

@@ -45,4 +45,6 @@ public class MeansurementFileResult {
     @Column(name = "montante")
     private Double result;
 
+    @Column(name = "montante_liquido")
+    private Double montanteLiquido;
 }
