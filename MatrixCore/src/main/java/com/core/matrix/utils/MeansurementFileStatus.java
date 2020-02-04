@@ -10,7 +10,7 @@ package com.core.matrix.utils;
  * @author thiag
  */
 public enum MeansurementFileStatus {
-    
+    FILE_ERROR,
     POINT_ERROR,
     DATA_ERROR,
     LAYOUT_ERROR,

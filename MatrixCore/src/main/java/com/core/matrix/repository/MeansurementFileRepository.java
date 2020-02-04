@@ -8,7 +8,6 @@ package com.core.matrix.repository;
 import com.core.matrix.dto.MeansurementFileStatusDTO;
 import com.core.matrix.model.MeansurementFile;
 import com.core.matrix.utils.MeansurementFileStatus;
-import java.time.LocalDateTime;
 import java.util.List;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Modifying;
@@ -28,6 +27,6 @@ public interface MeansurementFileRepository extends JpaRepository<MeansurementFi
     void updateStatus(MeansurementFileStatus status, Long id);
 
     @Query(nativeQuery = true)
-    List<MeansurementFileStatusDTO> getStatus(@Param("start") LocalDateTime start, @Param("end") LocalDateTime end);
+    List<MeansurementFileStatusDTO> getStatus(@Param("year") Long year, @Param("month") Long month);
 
 }

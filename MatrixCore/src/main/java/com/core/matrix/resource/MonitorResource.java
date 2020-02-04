@@ -38,7 +38,7 @@ public class MonitorResource {
 
         try {
             
-            List<MeansurementFileStatusDTO> response = meansurementFileService.getStatus(year.intValue(), month.intValue());
+            List<MeansurementFileStatusDTO> response = meansurementFileService.getStatus(year, month);
             Long countContract = contractService.countContract();
             MeansurementFileStatusDTO file = new MeansurementFileStatusDTO("CONTRACT", countContract);
             response.add(file);

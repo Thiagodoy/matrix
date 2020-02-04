@@ -46,9 +46,9 @@ import lombok.Data;
                 }))
 
 @NamedNativeQuery(name = "MeansurementFile.getStatus",
-        query = "select 'RECEIVED' as status, count(1) as qtd from matrix.mtx_arquivo_de_medicao a where a.data_criacao between :start and :end\n" +
+        query = "select 'RECEIVED' as status, count(1) as qtd from matrix.mtx_arquivo_de_medicao a where a.mes = :month and a.ano = :year\n" +
                 "union all\n" +
-                "select status , count(1) from matrix.mtx_arquivo_de_medicao a where a.data_criacao between :start and :end group by status ",
+                "select status , count(1) from matrix.mtx_arquivo_de_medicao a where a.mes = :month and a.ano = :year group by status ",
         resultSetMapping = "statusDTO")
 
 @Entity

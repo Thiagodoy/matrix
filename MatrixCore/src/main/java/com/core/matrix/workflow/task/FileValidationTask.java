@@ -37,7 +37,6 @@ import org.activiti.engine.delegate.DelegateExecution;
 import org.activiti.engine.delegate.JavaDelegate;
 import org.activiti.engine.task.Attachment;
 import org.apache.commons.io.FileUtils;
-import org.apache.tomcat.util.http.fileupload.FileItem;
 import org.springframework.context.ApplicationContext;
 
 /**
@@ -151,10 +150,21 @@ public class FileValidationTask implements JavaDelegate {
 
         meansurementFile = service.saveFile(meansurementFile);
         final Long id = meansurementFile.getId();
-        List<MeansurementFileDetail> details = this.mountDetail(fileParsedDTO.getDetails(), meansurementFile.getType());
-        details.parallelStream().forEach(d -> {
-            d.setIdMeansurementFile(id);
-        });
+
+        List<MeansurementFileDetail> details =  null;
+        try {
+            
+            details = this.mountDetail(fileParsedDTO.getDetails(), meansurementFile.getType());
+            details.parallelStream().forEach(d -> {
+                d.setIdMeansurementFile(id);
+            });
+            
+        } catch (Exception e) {
+            Logger.getLogger(FileValidationTask.class.getName()).log(Level.SEVERE, "[ mountDetail ]", e);
+            meansurementFile.setStatus(MeansurementFileStatus.FILE_ERROR);
+            service.saveFile(meansurementFile);
+            throw  e;
+        }
 
         detailService.save(details);
         delegateExecution.setVariable(TYPE_LAYOUT_FILE, meansurementFile.getType().toString());

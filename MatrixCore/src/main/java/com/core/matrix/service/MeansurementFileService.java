@@ -49,14 +49,14 @@ public class MeansurementFileService {
         return this.repository.findById(id).orElseThrow(()-> new Exception("Arquivo não encontrado"));
     }
     
-    public List<MeansurementFileStatusDTO> getStatus(int year, int month){        
+    public List<MeansurementFileStatusDTO> getStatus(Long year, Long month){        
         
-        LocalDate referenceMonth = LocalDate.of(year, Month.of(month), 1);
-        LocalDateTime start = referenceMonth.atStartOfDay();
-        referenceMonth = referenceMonth.plusDays(Utils.getDaysOfMonth(referenceMonth));        
-        LocalDateTime end = referenceMonth.atStartOfDay();
+//        LocalDate referenceMonth = LocalDate.of(year, Month.of(month), 1);
+//        LocalDateTime start = referenceMonth.atStartOfDay();
+//        referenceMonth = referenceMonth.plusDays(Utils.getDaysOfMonth(referenceMonth));        
+//        LocalDateTime end = referenceMonth.atStartOfDay();
         
-        return this.repository.getStatus(start, end);
+        return this.repository.getStatus(year, month);
     }
 
     
