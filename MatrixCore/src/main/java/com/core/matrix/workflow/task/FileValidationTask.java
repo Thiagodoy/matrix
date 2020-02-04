@@ -16,11 +16,15 @@ import com.core.matrix.service.MeansurementFileDetailService;
 import com.core.matrix.service.MeansurementFileService;
 import com.core.matrix.utils.MeansurementFileStatus;
 import com.core.matrix.utils.MeansurementFileType;
+import java.io.BufferedReader;
+import java.io.ByteArrayInputStream;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.InputStreamReader;
+import java.nio.charset.Charset;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 
@@ -31,6 +35,7 @@ import java.util.logging.Logger;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
+import static javassist.CtMethod.ConstParameter.string;
 import lombok.Data;
 import org.activiti.engine.TaskService;
 import org.activiti.engine.delegate.DelegateExecution;
@@ -79,6 +84,9 @@ public class FileValidationTask implements JavaDelegate {
         try {
 
             InputStream stream = taskService.getAttachmentContent(attachmentId);
+
+            stream = removeLinesEmpty(stream);
+
             String fileName = taskService.getAttachment(attachmentId).getName();
 
             delegateExecution.setVariable(VAR_FILE_NAME, fileName);
@@ -111,7 +119,7 @@ public class FileValidationTask implements JavaDelegate {
             file = File.createTempFile("erros", ".txt");
             writer = new FileWriter(file);
 
-            String content = errors.stream().collect(Collectors.joining("\n"));
+            String content = errors.stream().distinct().collect(Collectors.joining("\n"));
             writer.write(content);
             writer.flush();
             writer.close();
@@ -151,19 +159,19 @@ public class FileValidationTask implements JavaDelegate {
         meansurementFile = service.saveFile(meansurementFile);
         final Long id = meansurementFile.getId();
 
-        List<MeansurementFileDetail> details =  null;
+        List<MeansurementFileDetail> details = null;
         try {
-            
+
             details = this.mountDetail(fileParsedDTO.getDetails(), meansurementFile.getType());
             details.parallelStream().forEach(d -> {
                 d.setIdMeansurementFile(id);
             });
-            
+
         } catch (Exception e) {
             Logger.getLogger(FileValidationTask.class.getName()).log(Level.SEVERE, "[ mountDetail ]", e);
             meansurementFile.setStatus(MeansurementFileStatus.FILE_ERROR);
             service.saveFile(meansurementFile);
-            throw  e;
+            throw e;
         }
 
         detailService.save(details);
@@ -199,6 +207,25 @@ public class FileValidationTask implements JavaDelegate {
         } else {
             throw new Exception("Não foi possivel extrair o periodo");
         }
+
+    }
+
+    private InputStream removeLinesEmpty(InputStream stream) throws IOException {
+
+        StringBuilder sb = new StringBuilder();
+
+        BufferedReader br = new BufferedReader(new InputStreamReader(stream));
+
+        String line;
+        while ((line = br.readLine()) != null) {
+
+            if (line.split(";").length > 0) {
+                sb.append(line + System.lineSeparator());
+            }
+        }
+
+        InputStream inputStream = new ByteArrayInputStream(sb.toString().getBytes(Charset.forName("ISO-8859-1")));
+        return inputStream;
 
     }
 
