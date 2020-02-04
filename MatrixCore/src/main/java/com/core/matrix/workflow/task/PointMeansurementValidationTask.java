@@ -107,14 +107,14 @@ public class PointMeansurementValidationTask implements JavaDelegate {
             case LAYOUT_A:
                 return file.getDetails()
                         .parallelStream()
-                        .map(detail -> detail.getMeansurementPoint())
+                        .map(detail -> detail.getMeansurementPoint().replaceAll("\\((L|B)\\)", "").trim())
                         .distinct()
                         .collect(Collectors.toList());
             case LAYOUT_B:
                 return file.getDetails()
                         .parallelStream()
                         .filter(d -> d.getEnergyType().equalsIgnoreCase(TYPE_ENERGY_LIQUID))
-                        .map(d -> d.getMeansurementPoint())
+                        .map(d -> d.getMeansurementPoint().replaceAll("\\((L|B)\\)", "").trim())
                         .distinct()
                         .collect(Collectors.toList());
             case LAYOUT_C:
