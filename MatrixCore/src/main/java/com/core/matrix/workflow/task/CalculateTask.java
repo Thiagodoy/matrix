@@ -19,7 +19,7 @@ import static com.core.matrix.utils.Constants.FILE_MEANSUREMENT_ID;
 import static com.core.matrix.utils.Constants.RESPONSE_RESULT;
 import static com.core.matrix.utils.Constants.RESPONSE_RESULT_MESSAGE;
 import com.core.matrix.wbc.dto.ContractWbcInformationDTO;
-import com.core.matrix.wbc.dto.EmpresaDTO;
+import com.core.matrix.wbc.dto.CompanyDTO;
 import com.core.matrix.wbc.service.ContractService;
 import com.core.matrix.wbc.service.EmpresaService;
 import java.math.BigDecimal;
@@ -123,7 +123,7 @@ public class CalculateTask implements Task {
                                           }
                                 
                                     
-                            Optional<EmpresaDTO> optEmp = this.empresaService.listByPoint(point);
+                            Optional<CompanyDTO> optEmp = this.empresaService.listByPoint(point);
                             result.setResult(consumptionTotalArredondado.doubleValue());
                             result.setContractId(informationDTO.getContractId());
                             result.setPercentLoss(percentLoss);

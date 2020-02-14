@@ -9,11 +9,8 @@ package com.core.matrix.utils;
  *
  * @author thiag
  */
-public enum MeansurementFileStatus {
-    FILE_PENDING,
-    FILE_ERROR,
-    POINT_ERROR,
-    DATA_ERROR,
-    LAYOUT_ERROR,
-    SUCCESS;    
+public enum MeansurementFileDetailStatus {
+    ERROR_HOUR,
+    ERROR_DAY,
+    SUCCESS
 }

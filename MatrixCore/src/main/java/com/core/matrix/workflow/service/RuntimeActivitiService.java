@@ -16,6 +16,7 @@ import com.core.matrix.response.TaskResponse;
 import com.core.matrix.utils.Constants;
 import com.core.matrix.utils.Utils;
 import com.core.matrix.workflow.model.GroupMemberActiviti;
+import com.core.matrix.workflow.model.UserActiviti;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.ArrayList;
@@ -23,6 +24,7 @@ import java.util.Comparator;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import java.util.Optional;
 import java.util.stream.Collectors;
 import org.activiti.engine.ActivitiTaskAlreadyClaimedException;
@@ -81,6 +83,11 @@ public class RuntimeActivitiService {
 
     @Autowired
     private CommentActivitiService commentActivitiService;
+
+    @Transactional
+    public void startProcessoByMessage(String message, Map<String, Object> variables) {
+        this.runtimeService.startProcessInstanceByMessage(message, variables);
+    }
 
     @Transactional
     public Optional<TaskResponse> startProcess(StartProcessRequest request, String userId) throws Exception {
@@ -162,6 +169,10 @@ public class RuntimeActivitiService {
             t = historyService.createHistoricTaskInstanceQuery().taskId(taskId).includeProcessVariables().includeTaskLocalVariables().singleResult();
         }
 
+        if (t == null) {
+            return null;
+        }
+
         TaskResponse task = new TaskResponse(t);
         Optional<ProcessDefinitionResponse> resp = repositoryActivitiService
                 .listAll()
@@ -226,19 +237,24 @@ public class RuntimeActivitiService {
 
     }
 
-    public PageResponse<TaskResponse> getCandidateTasks(String user, int page, int size) {
+    public PageResponse<TaskResponse> getCandidateTasks(UserActiviti user, int page, int size) {
 
-        Long sizeTotalElements = taskService.createTaskQuery().taskCandidateUser(user).count();
+        List<String> groups = user.getGroups().stream().map(g-> g.getGroupId()).filter(Objects::nonNull).collect(Collectors.toList());
+        
+        Long sizeTotalElements = taskService.createTaskQuery().taskCandidateGroupIn(groups).count();
         // grou
 
+        int min = page * size;
+        //int max = min + size;
+        
         List<TaskResponse> response = taskService
                 .createTaskQuery()
-                .taskCandidateUser(user)
+                .taskCandidateGroupIn(groups)
                 .includeProcessVariables()
                 .includeTaskLocalVariables()
                 .orderByTaskCreateTime()
                 .desc()
-                .listPage(page, size)
+                .listPage(min, size)
                 .parallelStream()
                 .map(t -> {
                     TaskResponse instance = new TaskResponse(t);
@@ -267,9 +283,8 @@ public class RuntimeActivitiService {
                 .listPage(page, size)
                 .parallelStream()
                 .map(t -> {
-                    TaskResponse instance = new TaskResponse(t);                 
-                    
-                    
+                    TaskResponse instance = new TaskResponse(t);
+
                     Optional<ProcessDefinitionResponse> resp = repositoryActivitiService.listAll().stream().filter(p -> p.getKey().equals(instance.getKey())).findFirst();
                     String name = resp.isPresent() ? resp.get().getName() : "";
                     instance.setProcessDefinitionName(name);
@@ -438,22 +453,20 @@ public class RuntimeActivitiService {
     public ProcessDetailResponse getDetail(String processInstanceId) {
 
         ProcessDetailResponse detail = new ProcessDetailResponse();
-        
+
         List<Comment> comments = taskService
                 .getProcessInstanceComments(processInstanceId)
                 .stream()
                 .sorted(Comparator.comparing(Comment::getTime).reversed())
                 .collect(Collectors.toList());
-        
+
         detail.setComments(comments);
-        List<AttachmentResponse> attachmentResponses = taskService.getProcessInstanceAttachments(processInstanceId).parallelStream().map(a-> new AttachmentResponse(a)).collect(Collectors.toList());
+        List<AttachmentResponse> attachmentResponses = taskService.getProcessInstanceAttachments(processInstanceId).parallelStream().map(a -> new AttachmentResponse(a)).collect(Collectors.toList());
         detail.setAttachments(attachmentResponses);
 
         //HistoricProcessInstance instance = historyService.createHistoricProcessInstanceQuery().processDefinitionId(processInstanceId).singleResult();
-
-       // detail.setProcessCreatedDate(instance.getStartTime());
+        // detail.setProcessCreatedDate(instance.getStartTime());
         //detail.setProcessCreatedUser(instance.getStartUserId());
-
         return detail;
 
     }
@@ -475,16 +488,13 @@ public class RuntimeActivitiService {
 
     @Transactional
     public AttachmentResponse createAttachament(String processInstance, MultipartFile file) throws IOException {
-        
+
         Attachment attachment = taskService
                 .createAttachment(file.getContentType(), null, processInstance, file.getOriginalFilename(), "attachmentDescription", file.getInputStream());
-        
-        
-        
+
         return new AttachmentResponse(attachment);
     }
 
-    
     @Transactional(readOnly = true)
     public InputStream getAttachamentContent(String attachamentId) {
         return taskService.getAttachmentContent(attachamentId);
@@ -494,14 +504,14 @@ public class RuntimeActivitiService {
     public Attachment getAttachament(String attachamentId) {
         return taskService.getAttachment(attachamentId);
     }
-    
+
     @Transactional
-    public void deleteAttachment(String attachment){
+    public void deleteAttachment(String attachment) {
         taskService.deleteAttachment(attachment);
     }
-    
+
     @Transactional
-    public void deleteProcess(String id){
+    public void deleteProcess(String id) {
         runtimeService.deleteProcessInstance(id, null);
     }
 

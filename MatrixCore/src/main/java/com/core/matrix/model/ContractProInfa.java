@@ -18,29 +18,33 @@ import lombok.Data;
  * @author thiag
  */
 @Entity
-@Table(name = "mtx_empresa_posvenda")
+@Table(name = "mtx_contrato_proinfa")
+@IdClass(value = ContractProInfa.IdClass.class)
 @Data
-@IdClass(CompanyAfterSales.IdClass.class)
-public class CompanyAfterSales implements  Serializable{
-    
-    private static final long serialVersionUID = 9345709234532L;
-    
+public class ContractProInfa {
+
     @Id
-    @Column(name = "wbc_empresa")
-    private Long company;
-    
+    @Column(name = "wbc_contrato")
+    private Long wbcContract;
+
     @Id
-    @Column(name = "act_usuario")
-    private String user; 
-    
-    
-    
-    
+    @Column(name = "wbc_ponto_de_medicao")
+    private String meansurementPoint;
+
+    @Column(name = "ano")
+    private Long year;
+
+    @Column(name = "mes")
+    private Long month;
+
+    @Column(name = "proinfa")
+    private Double proinfa;
+
     @Data
     public static class IdClass implements Serializable {
-        private Long company;
-        private String user;
+
+        private Long wbcContract;
+        private String meansurementPoint;
     }
-    
-    
+
 }

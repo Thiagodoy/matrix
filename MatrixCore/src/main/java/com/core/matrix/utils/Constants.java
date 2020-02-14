@@ -60,6 +60,12 @@ public class Constants {
     public static final String CONST_QUALITY_COMPLETE = "Completo";    
     public static final String TYPE_LAYOUT_FILE = "type_layout_file";
     
+    public static final String LIST_DELETE_FILES = "list_delete_files";
+    public static final String LIST_CONTRACTS_FOR_BILLING = "list_contracts_for_biling";
+    
+    public static final String PROCESS_MEANSUREMENT_FILE_MESSAGE_EVENT = "p132";
+    
+    
     
     
 }

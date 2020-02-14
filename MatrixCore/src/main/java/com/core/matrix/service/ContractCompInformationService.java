@@ -25,12 +25,26 @@ public class ContractCompInformationService {
 
     @Transactional
     public void save(ContractCompInformation information) {
+        
+        
+         if(information.getProinfas() != null){
+            information.getProinfas().stream().forEach(p->{            
+                p.setWbcContract(information.getWbcContract());
+                p.setMeansurementPoint(information.getMeansurementPoint());
+            });
+        }
+        
         this.repository.save(information);
     }
     
     @Transactional(readOnly = true)
     public Optional<ContractInformationDTO> listByPoint(String point){
         return this.repository.listByPoint(point);
+    }   
+    
+    @Transactional(readOnly = true)
+    public Optional<ContractCompInformation> findByContract(Long contract){
+        return this.repository.findByWbcContract(contract);
     }
 
 }

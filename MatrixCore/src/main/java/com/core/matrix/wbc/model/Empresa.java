@@ -5,7 +5,7 @@
  */
 package com.core.matrix.wbc.model;
 
-import com.core.matrix.wbc.dto.EmpresaDTO;
+import com.core.matrix.wbc.dto.CompanyDTO;
 import java.time.LocalDateTime;
 import javax.persistence.Column;
 import javax.persistence.ColumnResult;
@@ -34,7 +34,7 @@ import lombok.Data;
 
 @SqlResultSetMapping(name = "empresaDTO", 
         classes = @ConstructorResult(
-                targetClass = EmpresaDTO.class,
+                targetClass = CompanyDTO.class,
                 columns = {
                         @ColumnResult(name = "nCdEmpresa", type = Long.class),
                         @ColumnResult(name = "sNrCnpj", type = String.class),

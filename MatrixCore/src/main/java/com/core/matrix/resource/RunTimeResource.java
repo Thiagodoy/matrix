@@ -13,6 +13,7 @@ import com.core.matrix.response.PageResponse;
 import com.core.matrix.response.ProcessDetailResponse;
 import com.core.matrix.response.TaskResponse;
 import com.core.matrix.utils.Constants;
+import com.core.matrix.workflow.model.UserActiviti;
 import com.core.matrix.workflow.service.RuntimeActivitiService;
 import java.io.InputStream;
 import java.security.Principal;
@@ -27,6 +28,7 @@ import org.activiti.engine.task.Comment;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -89,9 +91,9 @@ public class RunTimeResource {
     //TODO Create a pagination
     @RequestMapping(value = "/getCandidateTask", method = RequestMethod.GET)
     public ResponseEntity getCandidateTask(@RequestParam(name = "page", required = true, defaultValue = "0") int page,
-            @RequestParam(name = "size", required = true, defaultValue = "10") int size, Principal principal) {
+            @RequestParam(name = "size", required = true, defaultValue = "10") int size, UsernamePasswordAuthenticationToken principal) {
         try {
-            PageResponse<TaskResponse> response = this.service.getCandidateTasks(principal.getName(), page, size);
+            PageResponse<TaskResponse> response = this.service.getCandidateTasks((UserActiviti)principal.getPrincipal(), page, size);
             return ResponseEntity.ok(response);
         } catch (Exception e) {
             Logger.getLogger(RunTimeResource.class.getName()).log(Level.SEVERE, "[getCandidateTask]", e);
@@ -110,6 +112,18 @@ public class RunTimeResource {
             Logger.getLogger(RunTimeResource.class.getName()).log(Level.SEVERE, "[getMyTask]", e);
             return ResponseEntity.status(HttpStatus.resolve(500)).body(e.getMessage());
         }
+    }
+    
+    @RequestMapping(value = "/assigneeTask", method = RequestMethod.POST)
+    public ResponseEntity assigneeTask(@RequestParam(name = "taskId")String taskId, Principal principal){
+        try {
+            this.service.assigneeTask(taskId, principal.getName());
+            return ResponseEntity.ok().build();
+        } catch (Exception e) {
+            Logger.getLogger(RunTimeResource.class.getName()).log(Level.SEVERE, "[assigneeTask]", e);
+            return ResponseEntity.status(HttpStatus.resolve(500)).body(e.getMessage());
+        }
+        
     }
 
     @RequestMapping(value = "/getInvolvedTasks", method = RequestMethod.GET)

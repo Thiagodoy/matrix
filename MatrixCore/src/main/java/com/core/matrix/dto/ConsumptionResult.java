@@ -6,7 +6,7 @@
 package com.core.matrix.dto;
 
 import com.core.matrix.wbc.dto.ContractWbcInformationDTO;
-import com.core.matrix.wbc.dto.EmpresaDTO;
+import com.core.matrix.wbc.dto.CompanyDTO;
 import java.io.Serializable;
 import lombok.Data;
 
@@ -27,7 +27,7 @@ public class ConsumptionResult implements Serializable{
     private Double factorAtt;
     private Double percentLoss;
     private Double proinfa;
-    private EmpresaDTO empresa;
+    private CompanyDTO empresa;
     private ContractWbcInformationDTO information;
     private Double SolicitadoLiquido;
     

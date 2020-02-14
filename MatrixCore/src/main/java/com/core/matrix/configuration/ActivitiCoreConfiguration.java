@@ -6,6 +6,7 @@
 package com.core.matrix.configuration;
 
 import com.core.matrix.properties.ActivitiProperties;
+import com.core.matrix.workflow.task.BillingContractsTask;
 import com.core.matrix.workflow.task.CalculateTask;
 import com.core.matrix.workflow.task.DataValidationTask;
 import com.core.matrix.workflow.task.FileValidationTask;
@@ -190,4 +191,10 @@ public class ActivitiCoreConfiguration implements EnvironmentAware {
     public CalculateTask calculateTask(ApplicationContext context){
         return new CalculateTask(context);
     }
+    
+    @Bean
+    public BillingContractsTask billingContractsTask(ApplicationContext context){
+        return new BillingContractsTask(context);
+    }
+    
 }

@@ -9,10 +9,12 @@ import com.core.matrix.dto.ErrorInformationDTO;
 import com.core.matrix.dto.LoteDTO;
 import com.core.matrix.model.MeansurementFile;
 import com.core.matrix.model.MeansurementFileDetail;
+import com.core.matrix.service.MeansurementFileDetailService;
 import com.core.matrix.service.MeansurementFileService;
 import com.core.matrix.utils.Constants;
 import static com.core.matrix.utils.Constants.*;
-import com.core.matrix.wbc.dto.EmpresaDTO;
+import com.core.matrix.utils.MeansurementFileDetailStatus;
+import com.core.matrix.wbc.dto.CompanyDTO;
 import com.core.matrix.wbc.service.EmpresaService;
 import java.time.LocalDate;
 import java.time.Month;
@@ -36,6 +38,7 @@ import org.springframework.context.ApplicationContext;
 public class DataValidationTask implements Task {
 
     private MeansurementFileService fileService;
+    private MeansurementFileDetailService meansurementFileDetailService;
     private EmpresaService empresaService;
 
     private DelegateExecution delegateExecution;
@@ -45,6 +48,7 @@ public class DataValidationTask implements Task {
         synchronized (DataValidationTask.context) {
             this.fileService = DataValidationTask.context.getBean(MeansurementFileService.class);
             this.empresaService = DataValidationTask.context.getBean(EmpresaService.class);
+            this.meansurementFileDetailService = DataValidationTask.context.getBean(MeansurementFileDetailService.class);
         }
     }
 
@@ -94,8 +98,8 @@ public class DataValidationTask implements Task {
 
             if (!detail.isEmpty()) {
                 String point = detail.stream().findFirst().get().getMeansurementPoint();
-                Optional<EmpresaDTO> opt = this.empresaService.listByPoint(point.replaceAll("\\((L|B)\\)", "").trim());
-                ErrorInformationDTO<MeansurementFileDetail> error = new ErrorInformationDTO<>("Lote apresenta registros fora do ciclo de faturamento", detail, opt.orElse(new EmpresaDTO()));
+                Optional<CompanyDTO> opt = this.empresaService.listByPoint(point.replaceAll("\\((L|B)\\)", "").trim());
+                ErrorInformationDTO<MeansurementFileDetail> error = new ErrorInformationDTO<>("Lote apresenta registros fora do ciclo de faturamento", detail, opt.orElse(new CompanyDTO()));
 
                 synchronized (lotesErrors) {
                     lotesErrors.put(point, error);
@@ -154,8 +158,8 @@ public class DataValidationTask implements Task {
                                     .thenComparing(MeansurementFileDetail::getHour));
 
                     String p = point.replaceAll("\\((L|B)\\)", "").trim();
-                    Optional<EmpresaDTO> opt = this.empresaService.listByPoint(p);
-                    ErrorInformationDTO<MeansurementFileDetail> error = new ErrorInformationDTO<>("Arquivo esta com a consolidação diária das hora inválida", hoursOut, opt.orElse(new EmpresaDTO()));
+                    Optional<CompanyDTO> opt = this.empresaService.listByPoint(p);
+                    ErrorInformationDTO<MeansurementFileDetail> error = new ErrorInformationDTO<>("Arquivo esta com a consolidação diária das hora inválida", hoursOut, opt.orElse(new CompanyDTO()));
 
                     synchronized (lotesErrors) {
                         lotesErrors.put(point, error);
@@ -213,7 +217,6 @@ public class DataValidationTask implements Task {
                 for (int day = 1; day <= daysOnMonth; day++) {
 
                     if (!days.containsKey(checkDay)) {
-
                         // Make de hours of day
                         for (int i = 1; i <= 24; i++) {
                             detailsOut.add(new MeansurementFileDetail(checkDay, (long) i, file.getId(), point));
@@ -221,12 +224,20 @@ public class DataValidationTask implements Task {
                     }
                     checkDay = checkDay.plusDays(1L);
                 }
+                
+                
+                detailsOut.parallelStream().forEach(e->{
+                    e.setStatus(MeansurementFileDetailStatus.ERROR_HOUR);
+                });
+                
+                this.meansurementFileDetailService.save(detailsOut);
+                
             }
 
             if (!detailsOut.isEmpty()) {
                 String p = point.replaceAll("\\((L|B)\\)", "").trim();
-                Optional<EmpresaDTO> opt = this.empresaService.listByPoint(p);
-                ErrorInformationDTO<MeansurementFileDetail> error = new ErrorInformationDTO<>("Arquivo esta com o calendário  de apuração com dias faltantes!", detailsOut, opt.orElse(new EmpresaDTO()));
+                Optional<CompanyDTO> opt = this.empresaService.listByPoint(p);
+                ErrorInformationDTO<MeansurementFileDetail> error = new ErrorInformationDTO<>("Arquivo esta com o calendário  de apuração com dias faltantes!", detailsOut, opt.orElse(new CompanyDTO()));
 
                 synchronized (lotesErrors) {
                     lotesErrors.put(point, error);

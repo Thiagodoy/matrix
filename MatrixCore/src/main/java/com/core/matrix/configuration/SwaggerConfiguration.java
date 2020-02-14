@@ -1,12 +1,14 @@
 package com.core.matrix.configuration;
 
 import com.google.common.base.Predicates;
+import java.util.Arrays;
 import java.util.Collections;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import springfox.documentation.builders.PathSelectors;
 import springfox.documentation.builders.RequestHandlerSelectors;
 import springfox.documentation.service.ApiInfo;
+import springfox.documentation.service.ApiKey;
 import springfox.documentation.service.Contact;
 import springfox.documentation.spi.DocumentationType;
 import springfox.documentation.spring.web.plugins.Docket;
@@ -19,8 +21,6 @@ import springfox.documentation.swagger2.annotations.EnableSwagger2;
 @Configuration
 @EnableSwagger2
 public class SwaggerConfiguration {
-    
-    
 
     @Bean
     public Docket api() {
@@ -29,8 +29,12 @@ public class SwaggerConfiguration {
                 .apis(RequestHandlerSelectors.any())
                 .paths(Predicates.not(PathSelectors.regex("/error")))
                 .build()
-               // .host("localhost:" + serverProperties.getPort())
+                .securitySchemes(Arrays.asList(apiKey()))
                 .apiInfo(apiInfo());
+    }
+
+    private ApiKey apiKey() {
+        return new ApiKey("authkey", "Authorization", "header");
     }
 
     private ApiInfo apiInfo() {
@@ -43,5 +47,5 @@ public class SwaggerConfiguration {
                 new Contact("Thiago H. Godoy", "", ""),
                 "License of API", "API license URL", Collections.emptyList());
     }
-    
+
 }

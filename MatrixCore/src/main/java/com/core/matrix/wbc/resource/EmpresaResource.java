@@ -6,7 +6,7 @@
 package com.core.matrix.wbc.resource;
 
 import com.core.matrix.response.PageResponse;
-import com.core.matrix.wbc.dto.EmpresaDTO;
+import com.core.matrix.wbc.dto.CompanyDTO;
 import com.core.matrix.wbc.service.EmpresaService;
 import org.jboss.logging.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -39,7 +39,7 @@ public class EmpresaResource {
 
         try {
 
-            PageResponse<EmpresaDTO> response = service.findAll(cnpj,razaoSocial,apelido,PageRequest.of(page.intValue(), size.intValue()));
+            PageResponse<CompanyDTO> response = service.findAll(cnpj,razaoSocial,apelido,PageRequest.of(page.intValue(), size.intValue()));
             return ResponseEntity.ok(response);
 
         } catch (Exception e) {

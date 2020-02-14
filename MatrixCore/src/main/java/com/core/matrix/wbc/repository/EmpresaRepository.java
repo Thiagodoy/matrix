@@ -5,7 +5,7 @@
  */
 package com.core.matrix.wbc.repository;
 
-import com.core.matrix.wbc.dto.EmpresaDTO;
+import com.core.matrix.wbc.dto.CompanyDTO;
 import com.core.matrix.wbc.model.Empresa;
 import java.util.Optional;
 import org.springframework.data.domain.Page;
@@ -27,6 +27,6 @@ public interface EmpresaRepository extends JpaRepository<Empresa, Long>, JpaSpec
     Page<Empresa> findByApelidoContaining(String apelido, Pageable page);
     
     @Query(nativeQuery = true)
-    Optional<EmpresaDTO> listByPoint(@Param("point")String point);
+    Optional<CompanyDTO> listByPoint(@Param("point")String point);
 
 }

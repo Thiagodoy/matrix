@@ -6,7 +6,7 @@
 package com.core.matrix.wbc.service;
 
 import com.core.matrix.response.PageResponse;
-import com.core.matrix.wbc.dto.EmpresaDTO;
+import com.core.matrix.wbc.dto.CompanyDTO;
 import com.core.matrix.wbc.model.AgentType;
 import com.core.matrix.wbc.model.Empresa;
 import com.core.matrix.wbc.repository.EmpresaRepository;
@@ -34,11 +34,11 @@ public class EmpresaService {
     
     
     @Transactional(readOnly = true)
-    public Optional<EmpresaDTO>listByPoint(String point){
+    public Optional<CompanyDTO>listByPoint(String point){
        return this.repository.listByPoint(point);
     }
 
-    public PageResponse<EmpresaDTO> findAll(String cnpj, String razaoSocial,String apelido, PageRequest page) {
+    public PageResponse<CompanyDTO> findAll(String cnpj, String razaoSocial,String apelido, PageRequest page) {
 
         Page<Empresa> result = null;
         if (Optional.ofNullable(cnpj).isPresent()) {
@@ -53,7 +53,7 @@ public class EmpresaService {
 
         if (result != null && result.hasContent()) {
 
-            List<EmpresaDTO> empresaDTOs = result
+            List<CompanyDTO> empresaDTOs = result
                     .getContent()
                     .parallelStream()
                     .map(e -> {
@@ -64,14 +64,14 @@ public class EmpresaService {
                                 .filter(a -> a.getNCdTipoAgente().equals(e.getNCdTipoAgente()))
                                 .findFirst();
 
-                        return new EmpresaDTO(e, opt.isPresent() ? opt.get().getSDsTipoAgente() : "");
+                        return new CompanyDTO(e, opt.isPresent() ? opt.get().getSDsTipoAgente() : "");
                     })
                     .collect(Collectors.toList());
             
-            return new PageResponse<EmpresaDTO>(empresaDTOs,(long)result.getNumberOfElements(),(long)result.getTotalElements(), (long)page.getPageNumber());
+            return new PageResponse<CompanyDTO>(empresaDTOs,(long)result.getNumberOfElements(),(long)result.getTotalElements(), (long)page.getPageNumber());
 
         } else {
-            return new PageResponse<EmpresaDTO>(null,0L,0L, 0L);
+            return new PageResponse<CompanyDTO>(null,0L,0L, 0L);
         }
 
     }

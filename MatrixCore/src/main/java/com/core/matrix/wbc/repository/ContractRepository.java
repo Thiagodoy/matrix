@@ -8,6 +8,7 @@ package com.core.matrix.wbc.repository;
 import com.core.matrix.wbc.dto.ContractDTO;
 import com.core.matrix.wbc.dto.ContractWbcInformationDTO;
 import com.core.matrix.wbc.model.Contract;
+import java.util.List;
 import java.util.Optional;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -25,6 +26,9 @@ public interface ContractRepository extends JpaRepository<Contract, Long> {
 
     @Query(nativeQuery = true)
     Page<ContractDTO> shortInfomation(@Param("contractId") Long contractId, Pageable page);
+    
+    @Query(nativeQuery = true)
+    Page<ContractDTO> fullInformation(@Param("numeroDoContrato") Long contractId, Pageable page);
 
     @Query(nativeQuery = true, value = "SELECT COUNT(1) \n"
             + "  FROM [CE_CONTRATO] CT\n"
@@ -38,4 +42,7 @@ public interface ContractRepository extends JpaRepository<Contract, Long> {
     
     @Query(nativeQuery = true)
     Optional<ContractWbcInformationDTO> getInformation(@Param("year")Long year, @Param("month")Long month, @Param("contractId")Long contractId);
+    
+    @Query(nativeQuery = true)
+    List<ContractDTO>listForBilling();
 }

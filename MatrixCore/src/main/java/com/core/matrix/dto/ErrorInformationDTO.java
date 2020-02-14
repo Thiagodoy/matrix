@@ -5,7 +5,7 @@
  */
 package com.core.matrix.dto;
 
-import com.core.matrix.wbc.dto.EmpresaDTO;
+import com.core.matrix.wbc.dto.CompanyDTO;
 import java.io.Serializable;
 import java.util.List;
 import lombok.AllArgsConstructor;
@@ -23,6 +23,6 @@ public class ErrorInformationDTO<T> implements Serializable{
     
     private String information;
     private List<T> errors;
-    private EmpresaDTO company;
+    private CompanyDTO company;
 
 }

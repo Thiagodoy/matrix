@@ -6,6 +6,7 @@
 package com.core.matrix.model;
 
 import com.core.matrix.dto.FileDetailDTO;
+import com.core.matrix.utils.MeansurementFileDetailStatus;
 import com.core.matrix.utils.MeansurementFileType;
 import com.fasterxml.jackson.annotation.JsonFormat;
 import java.io.Serializable;
@@ -16,6 +17,8 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.persistence.Column;
 import javax.persistence.Entity;
+import javax.persistence.EnumType;
+import javax.persistence.Enumerated;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
@@ -33,8 +36,6 @@ import lombok.NoArgsConstructor;
 @Data
 @NoArgsConstructor
 public class MeansurementFileDetail implements Serializable {
-    
-    
 
     @Id
     @Column(name = "id_arquivo_de_medicao_detalhe")
@@ -89,9 +90,13 @@ public class MeansurementFileDetail implements Serializable {
 
     @Column(name = "qualidade")
     private String quality;
-
+    
     @Column(name = "origem")
     private String origem;
+    
+    @Enumerated(EnumType.STRING)
+    @Column(name = "status")
+    private MeansurementFileDetailStatus status;
 
     @Transient
     private List<String> erros;

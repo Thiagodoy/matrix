@@ -5,11 +5,13 @@
  */
 package com.core.matrix.model;
 
+import java.time.LocalDateTime;
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
+import javax.persistence.PrePersist;
 import javax.persistence.Table;
 import lombok.Data;
 
@@ -31,10 +33,23 @@ public class Log {
     private String attachment;    
     
     @Column(name = "id_arquivo")
-    private Long fileId;    
+    private Long fileId;  
+    
+    @Column(name = "nome_processo")
+    private String nameProcesso;  
     
     @Column(name = "mensagem")
     private String message;
+    
+    @Column(name = "data_criacao")
+    private LocalDateTime createAt;
+    
+    
+    @PrePersist
+    public void generateDate(){
+        this.createAt = LocalDateTime.now();
+    }
+    
     
     
 }

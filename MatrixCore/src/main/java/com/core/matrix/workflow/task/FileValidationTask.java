@@ -35,7 +35,6 @@ import java.util.logging.Logger;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
-import static javassist.CtMethod.ConstParameter.string;
 import lombok.Data;
 import org.activiti.engine.TaskService;
 import org.activiti.engine.delegate.DelegateExecution;

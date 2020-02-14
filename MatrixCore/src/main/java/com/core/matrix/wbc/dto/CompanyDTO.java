@@ -18,7 +18,7 @@ import lombok.NoArgsConstructor;
 @Data
 @AllArgsConstructor()
 @NoArgsConstructor
-public class EmpresaDTO implements Serializable {
+public class CompanyDTO implements Serializable {
 
     private Long nCdEmpresa;
     private String sNrCnpj;
@@ -28,7 +28,7 @@ public class EmpresaDTO implements Serializable {
     private Long nCdTipoAgente;
     private String sDsTipoAgente;
 
-    public EmpresaDTO(Empresa empresa, String dsTipoAgent) {
+    public CompanyDTO(Empresa empresa, String dsTipoAgent) {
         this.nCdEmpresa = empresa.getNCdEmpresa();
         this.sNrCnpj = empresa.getNrCnpj();
         this.sNmEmpresa = empresa.getEmpresa();
@@ -38,7 +38,7 @@ public class EmpresaDTO implements Serializable {
         this.sDsTipoAgente = dsTipoAgent;
     }
 
-    public EmpresaDTO(Long nCdEmpresa, String sNrCnpj, String sNmEmpresa, String sNmFantasia, String sNmApelido) {
+    public CompanyDTO(Long nCdEmpresa, String sNrCnpj, String sNmEmpresa, String sNmFantasia, String sNmApelido) {
         this.nCdEmpresa = nCdEmpresa;
         this.sNrCnpj = sNrCnpj;
         this.sNmEmpresa = sNmEmpresa;

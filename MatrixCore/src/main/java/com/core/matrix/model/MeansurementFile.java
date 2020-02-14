@@ -8,7 +8,7 @@ package com.core.matrix.model;
 import com.core.matrix.dto.MeansurementFileStatusDTO;
 import com.core.matrix.utils.MeansurementFileStatus;
 import com.core.matrix.utils.MeansurementFileType;
-import com.core.matrix.wbc.dto.EmpresaDTO;
+import com.core.matrix.wbc.dto.ContractDTO;
 import java.time.LocalDateTime;
 import java.util.List;
 import javax.persistence.CascadeType;
@@ -29,6 +29,7 @@ import javax.persistence.PrePersist;
 import javax.persistence.SqlResultSetMapping;
 import javax.persistence.Table;
 import lombok.Data;
+import lombok.NoArgsConstructor;
 
 /**
  *
@@ -54,6 +55,7 @@ import lombok.Data;
 @Entity
 @Table(name = "mtx_arquivo_de_medicao")
 @Data
+@NoArgsConstructor
 public class MeansurementFile {
 
     @Id
@@ -61,6 +63,15 @@ public class MeansurementFile {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
+    @Column(name = "wbc_contrato")
+    private Long wbcContract;
+    
+    @Column(name = "wbc_ponto_de_medicao")
+    private String meansurementPoint;
+    
+    @Column(name = "act_id_processo")
+    private String processInstanceId;
+    
     @Column(name = "mes")
     private Long month;
 
@@ -89,8 +100,7 @@ public class MeansurementFile {
     
     @OneToMany(cascade = {CascadeType.PERSIST, CascadeType.REMOVE }, orphanRemoval = true, fetch = FetchType.EAGER)
     @JoinColumn(name = "id_arquivo_de_medicao")
-    private List<MeansurementFileDetail>details;
-    
+    private List<MeansurementFileDetail>details;    
     
     
     @PrePersist
@@ -99,7 +109,12 @@ public class MeansurementFile {
     }
     
     
-    
+    public MeansurementFile(ContractDTO dTO, String processInstance, String meansurementPoint){        
+        this.status  = MeansurementFileStatus.FILE_PENDING;
+        this.wbcContract = dTO.getNCdContrato();
+        this.meansurementPoint = meansurementPoint;
+        this.processInstanceId = processInstance;
+    }
     
    
     
