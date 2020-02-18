@@ -212,7 +212,7 @@ public class ContractDTO implements Serializable{
     
     @Override
     public String toString(){
-        return  MessageFormat.format("Contrato : {0}\nEmpresa Contratada : {1}\nEmpresa Contratante : {2} ", this.sNmContrato,this.sNmEmpresaEpca,this.sNmEmpresaEpca);
+        return  MessageFormat.format("Contrato : {0}\nEmpresa Contratada : {1}\nEmpresa Contratante : {2} ", this.sNrContrato,this.sNmEmpresaEpca,this.sNmEmpresaEpca);
     }
 
 }

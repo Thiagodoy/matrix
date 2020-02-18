@@ -5,8 +5,8 @@
  */
 package com.core.matrix.service;
 
-import com.core.matrix.model.Log;
-import com.core.matrix.repository.LogRepository;
+import com.core.matrix.model.ContractProInfa;
+import com.core.matrix.repository.ContractProInfaRepository;
 import java.util.List;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -17,25 +17,21 @@ import org.springframework.transaction.annotation.Transactional;
  * @author thiag
  */
 @Service
-public class LogService {
+public class ContractProInfaService {
 
     @Autowired
-    private LogRepository repository;
+    private ContractProInfaRepository repository;
 
     @Transactional
-    public void save(Log log) {
-        this.repository.save(log);
+    public void delete(ContractProInfa.IdClass id) {
+        this.repository.deleteById(id);
     }
-    
-    
+
     @Transactional
-    public void save(List<Log> log) {
-        this.repository.saveAll(log);
+    public void saveAll(List<ContractProInfa> list) {
+        this.repository.saveAll(list);
     }
     
-    @Transactional
-    public void deleteLogsByFile(Long id) {
-        this.repository.deleteByFileId(id);
-    }
+    
 
 }

@@ -7,11 +7,13 @@ package com.core.matrix.repository;
 
 import com.core.matrix.model.CompanyAfterSales;
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.stereotype.Repository;
 
 /**
  *
  * @author thiag
  */
+@Repository
 public interface CompanyAfterSalesRepository extends JpaRepository<CompanyAfterSales, CompanyAfterSales.IdClass>{
     
 }

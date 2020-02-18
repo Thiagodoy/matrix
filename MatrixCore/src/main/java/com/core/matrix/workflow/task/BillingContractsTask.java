@@ -15,6 +15,7 @@ import com.core.matrix.utils.Constants;
 import com.core.matrix.wbc.dto.ContractDTO;
 import com.core.matrix.wbc.service.ContractService;
 import java.text.MessageFormat;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.Comparator;
@@ -92,6 +93,8 @@ public class BillingContractsTask implements JavaDelegate {
         try {
             List<ContractDTO> contracts = Collections.synchronizedList(this.contractService.listForBilling());
 
+            List<Log> logs = new ArrayList<>();
+
             //Contracts without rateio
             contracts.stream()
                     .filter(contract -> contract.getBFlRateio().equals(0L))
@@ -112,7 +115,7 @@ public class BillingContractsTask implements JavaDelegate {
                                 Log log = new Log();
                                 log.setMessage(message);
                                 log.setNameProcesso(execution.getProcessDefinitionId());
-                                this.logService.save(log);
+                                logs.add(log);
                             }
 
                         } catch (Exception e) {
@@ -120,10 +123,15 @@ public class BillingContractsTask implements JavaDelegate {
                             Log log = new Log();
                             log.setMessage(e.getMessage());
                             log.setNameProcesso(execution.getProcessDefinitionId());
-                            this.logService.save(log);
+                            logs.add(log);
                         }
 
                     });
+
+            if (!logs.isEmpty()) {
+                this.logService.save(logs);
+                logs.clear();
+            }
 
             //Contracts with rateio
             contracts
@@ -145,14 +153,14 @@ public class BillingContractsTask implements JavaDelegate {
                                     Log log = new Log();
                                     log.setMessage(message);
                                     log.setNameProcesso(execution.getProcessDefinitionId());
-                                    this.logService.save(log);
+                                    logs.add(log);
                                 }
                             } catch (Exception e) {
                                 Logger.getLogger(BillingContractsTask.class.getName()).log(Level.SEVERE, "[execute]", e);
                                 Log log = new Log();
                                 log.setMessage(e.getMessage());
                                 log.setNameProcesso(execution.getProcessDefinitionId());
-                                this.logService.save(log);
+                                 logs.add(log);
 
                             }
 
@@ -176,6 +184,14 @@ public class BillingContractsTask implements JavaDelegate {
                         }
 
                     });
+            
+            
+            if (!logs.isEmpty()) {
+                this.logService.save(logs);
+            }
+            
+            
+            
 
         } catch (Exception e) {
             Logger.getLogger(BillingContractsTask.class.getName()).log(Level.SEVERE, "[ execute ]", e);

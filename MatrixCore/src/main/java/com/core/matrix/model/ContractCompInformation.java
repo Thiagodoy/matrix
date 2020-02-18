@@ -9,6 +9,7 @@ import com.core.matrix.dto.ContractInformationDTO;
 import java.io.Serializable;
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.Optional;
 import javax.persistence.CascadeType;
 import javax.persistence.Column;
 import javax.persistence.ColumnResult;
@@ -93,10 +94,11 @@ public class ContractCompInformation {
     @Column(name = "data_ultima_alteracao")
     private LocalDateTime lastUpdate;
 
-    @OneToMany(fetch = FetchType.EAGER,  orphanRemoval = true, cascade = CascadeType.ALL)
+    @OneToMany(fetch = FetchType.EAGER, orphanRemoval = true, cascade = CascadeType.ALL)
     @JoinColumns({
-        @JoinColumn(name = "wbc_ponto_de_medicao",columnDefinition = "wbc_ponto_de_medicao" ),
-        @JoinColumn(name = "wbc_contrato" , columnDefinition = "wbc_contrato")
+        @JoinColumn(name = "wbc_ponto_de_medicao", columnDefinition = "wbc_ponto_de_medicao")
+        ,
+        @JoinColumn(name = "wbc_contrato", columnDefinition = "wbc_contrato")
     })
     private List<ContractProInfa> proinfas;
 
@@ -115,6 +117,38 @@ public class ContractCompInformation {
 
         private Long wbcContract;
         private String meansurementPoint;
+    }
+
+    public void update(ContractCompInformation entity) {
+
+        if (Optional.ofNullable(entity.getWbcContract()).isPresent() && !entity.getWbcContract().equals(this.wbcContract)) {
+            this.wbcContract = entity.getWbcContract();
+        }
+
+        if (Optional.ofNullable(entity.getMeansurementPoint()).isPresent() && !entity.getMeansurementPoint().equals(this.meansurementPoint)) {
+            this.meansurementPoint = entity.getMeansurementPoint();
+        }
+
+        if (Optional.ofNullable(entity.getCodeWbcContract()).isPresent() && !entity.getCodeWbcContract().equals(this.codeWbcContract)) {
+            this.codeWbcContract = entity.getCodeWbcContract();
+        }
+
+        if (Optional.ofNullable(entity.getIsApportionment()).isPresent() && !entity.getIsApportionment().equals(this.isApportionment)) {
+            this.isApportionment = entity.getIsApportionment();
+        }
+
+        if (Optional.ofNullable(entity.getCodeContractApportionment()).isPresent() && !entity.getCodeContractApportionment().equals(this.codeContractApportionment)) {
+            this.codeContractApportionment = entity.getCodeContractApportionment();
+        }
+
+        if (Optional.ofNullable(entity.getPercentOfLoss()).isPresent() && !entity.getPercentOfLoss().equals(this.percentOfLoss)) {
+            this.percentOfLoss = entity.getPercentOfLoss();
+        }
+
+        if (Optional.ofNullable(entity.getFactorAttendanceCharge()).isPresent() && !entity.getFactorAttendanceCharge().equals(this.factorAttendanceCharge)) {
+            this.factorAttendanceCharge = entity.getFactorAttendanceCharge();
+        }
+
     }
 
 }

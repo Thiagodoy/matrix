@@ -7,7 +7,9 @@ package com.core.matrix.workflow.task;
 
 import com.core.matrix.dto.ConsumptionResult;
 import com.core.matrix.dto.ContractInformationDTO;
+import com.core.matrix.model.ContractCompInformation;
 import com.core.matrix.model.ContractMeasurementPoint;
+import com.core.matrix.model.ContractProInfa;
 import com.core.matrix.model.MeansurementFile;
 import com.core.matrix.model.MeansurementFileDetail;
 import com.core.matrix.model.MeansurementFileResult;
@@ -68,37 +70,127 @@ public class CalculateTask implements Task {
         CalculateTask.context = context;
     }
 
-//    @Override
-//    public void execute(DelegateExecution de) {
-//
-//        List<MeansurementFile> files = fileService.findByProcessInstanceId(de.getProcessInstanceId());
-//
-//        
-//        List<ConsumptionResult> results = Collections.synchronizedList(new ArrayList<>());
-//        
-//        files.stream().forEach(file -> {
-//
-//            Optional<ContractCompInformation> opt = contractService.findByWbcContractAndMeansurementPoint(file.getWbcContract(), file.getMeansurementPoint());
-//            
-//            
-//            
-//            
-//            
-//            
-//
-//        });
-//
-//    }
-    
-    
-    public void calculateWithRateio(){
-        
+    public void executee(DelegateExecution de) {
+
+        List<MeansurementFile> files = fileService.findByProcessInstanceId(de.getProcessInstanceId());
+
+        if (files.size() > 1) {
+            this.calculateWithRateio(de,files);
+        } else {
+            this.calculateWithoutRateio(de, files.get(0));
+        }
+
     }
-    
-    public void calculate(){
-        
+
+    public void calculateWithoutRateio(DelegateExecution de, MeansurementFile file) {
+
+        try {
+
+            List<MeansurementFileDetail> details = this
+                    .getDetails(file, de)
+                    .stream()
+                    .filter(detail -> detail.getMeansurementPoint().equals(file.getMeansurementPoint()))
+                    .collect(Collectors.toList());
+
+            ContractCompInformation compInformation = contractService
+                    .findByWbcContractAndMeansurementPoint(file.getWbcContract(), file.getMeansurementPoint())
+                    .orElseThrow(() -> new Exception("[Matrix] -> Não foi possivel encontrar as informações complementares do contrato!"));
+
+            ContractWbcInformationDTO contractWbcInformationDTO = this.contractWbcService
+                    .getInformation(file.getYear(), file.getMonth(), file.getWbcContract())
+                    .orElseThrow(() -> new Exception("[WBC] -> Não foi possivel carregar as informações complementares! "));
+
+            final ConsumptionResult result = new ConsumptionResult();
+            result.setMeansurementPoint(file.getMeansurementPoint());
+
+            final double factorAtt = compInformation.getFactorAttendanceCharge() / 100;
+            final double percentLoss = compInformation.getPercentOfLoss() / 100;
+            final double proinfa = this.getProinfa(file, compInformation.getProinfas());
+            final double sum = this.getSumConsumptionActive(details);
+
+            double consumptionTotal = ((sum / 1000) + ((sum / 1000) * percentLoss) - proinfa) * factorAtt;
+
+            BigDecimal consumptionTotalArredondado = new BigDecimal(consumptionTotal).setScale(3, RoundingMode.HALF_EVEN);
+            Double solicitadoLiquido = solicitadoLiquido(consumptionTotal, contractWbcInformationDTO);
+
+            String point = file.getMeansurementPoint().replaceAll("\\((L|B)\\)", "").trim();
+
+            Optional<CompanyDTO> optEmp = this.empresaService.listByPoint(file.getMeansurementPoint());
+            result.setResult(consumptionTotalArredondado.doubleValue());
+            result.setContractId(file.getWbcContract());
+            result.setPercentLoss(percentLoss);
+            result.setFactorAtt(factorAtt);
+            result.setProinfa(proinfa);
+            result.setEmpresa(optEmp.get());
+            result.setInformation(contractWbcInformationDTO);
+            result.setSolicitadoLiquido(solicitadoLiquido.doubleValue());
+
+            Optional<ContractMeasurementPoint> optional = pointService.findByPoint(point);
+            MeansurementFileResult fileResult = new MeansurementFileResult();
+            fileResult.setMeansurementFileId(file.getId());
+            fileResult.setPercentLoss(percentLoss);
+            fileResult.setFactorAtt(factorAtt);
+            fileResult.setProinfa(proinfa);
+            fileResult.setMeansurementPointId(optional.get().getId());
+            fileResult.setResult(consumptionTotalArredondado.doubleValue());
+            fileResult.setMontanteLiquido(solicitadoLiquido.doubleValue());
+
+            resultService.save(fileResult);
+
+        } catch (Exception e) {
+        }
+
     }
-    
+
+    public void calculateWithRateio(DelegateExecution de, List<MeansurementFile>files) {
+
+    }
+
+    private Double solicitadoLiquido(Double consumptionTotal, ContractWbcInformationDTO contractWbcInformationDTO) {
+
+        BigDecimal consumptionTotalArredondado = new BigDecimal(consumptionTotal).setScale(3, RoundingMode.HALF_EVEN);
+
+        BigDecimal solicitadoLiquido = new BigDecimal(0).setScale(3, RoundingMode.HALF_EVEN);
+
+        if (consumptionTotalArredondado.doubleValue() < contractWbcInformationDTO.getNrQtd() && consumptionTotalArredondado.doubleValue() > contractWbcInformationDTO.getNrQtdMin()) {
+
+            solicitadoLiquido = new BigDecimal(consumptionTotal).setScale(3, RoundingMode.HALF_EVEN);
+
+        } else if (consumptionTotalArredondado.doubleValue() > contractWbcInformationDTO.getNrQtd() && consumptionTotalArredondado.doubleValue() < contractWbcInformationDTO.getNrQtdMax()) {
+
+            solicitadoLiquido = new BigDecimal(consumptionTotal).setScale(3, RoundingMode.HALF_EVEN);
+
+        } else if (consumptionTotalArredondado.doubleValue() > contractWbcInformationDTO.getNrQtd() && consumptionTotalArredondado.doubleValue() > contractWbcInformationDTO.getNrQtdMax()) {
+
+            solicitadoLiquido = new BigDecimal(contractWbcInformationDTO.getNrQtdMax()).setScale(3, RoundingMode.HALF_EVEN);
+
+        }
+
+        return solicitadoLiquido.doubleValue();
+
+    }
+
+    private Double getSumConsumptionActive(List<MeansurementFileDetail> details) {
+        return details.stream()
+                .mapToDouble(MeansurementFileDetail::getConsumptionActive)
+                .reduce(0, Double::sum);
+    }
+
+    private Double getProinfa(MeansurementFile file, List<ContractProInfa> proInfas) throws Exception {
+
+        ContractProInfa contractProInfa = proInfas
+                .stream()
+                .filter(infa -> infa.getMonth().equals(file.getMonth()) && infa.getYear().equals(file.getYear()))
+                .findFirst()
+                .orElseThrow(() -> new Exception("Não foi encontrado nenhum proinfa cadastrada para esse contrato"));
+
+        return contractProInfa.getProinfa();
+
+    }
+
+    public void calculate() {
+
+    }
 
     @Override
     public void execute(DelegateExecution de) throws Exception {
@@ -189,6 +281,6 @@ public class CalculateTask implements Task {
             Logger.getLogger(CalculateTask.class.getName()).log(Level.SEVERE, "[execute]", e);
         }
 
-    }  
+    }
 
 }

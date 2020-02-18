@@ -88,6 +88,12 @@ public class RuntimeActivitiService {
     public void startProcessoByMessage(String message, Map<String, Object> variables) {
         this.runtimeService.startProcessInstanceByMessage(message, variables);
     }
+    
+    
+    @Transactional
+    public  String startProcessByMessage(String message){
+        return runtimeService.startProcessInstanceByMessage(message).getProcessInstanceId();
+    }
 
     @Transactional
     public Optional<TaskResponse> startProcess(StartProcessRequest request, String userId) throws Exception {
