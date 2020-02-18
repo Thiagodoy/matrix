@@ -33,7 +33,7 @@ public class ContractService {
     
     @Transactional(readOnly = true)
     public Page findAll(Long contractId, PageRequest page) {
-        return this.repository.shortInfomation(contractId, page);
+        return this.repository.fullInformation(contractId, page);
     }
     
     @Transactional(readOnly = true)

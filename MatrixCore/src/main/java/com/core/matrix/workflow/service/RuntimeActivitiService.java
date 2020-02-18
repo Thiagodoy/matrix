@@ -274,13 +274,15 @@ public class RuntimeActivitiService {
 
         Long sizeTotalElements = taskService.createTaskQuery().taskAssignee(user).count();
 
+        int min = page * size;
+        
         List<TaskResponse> response = taskService
                 .createTaskQuery()
                 .taskAssignee(user)
                 .includeProcessVariables()
                 .orderByTaskCreateTime()
                 .desc()
-                .listPage(page, size)
+                .listPage(min, size)
                 .parallelStream()
                 .map(t -> {
                     TaskResponse instance = new TaskResponse(t);

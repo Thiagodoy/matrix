@@ -17,10 +17,11 @@ public class Constants {
     
     public static final String CREATED_AT = "created_at";
     public static final String CREATED_BY = "created_by";
+    public static final String USER_UPLOAD = "user_upload";
     
     public final static String FILE_MEANSUREMENT_ID = "file_meansurement_id";
     
-    public static final String ATTACHMENT_ID = "attachment_id";
+    public static final String LIST_ATTACHMENT_ID = "list_attachment_id";
     public static final String ATTACHMENT_ERROR_ID = "attachment_error_id";
     public static final String USER_ID = "";
     public static final String CONTROLE = "_controle";
@@ -31,6 +32,9 @@ public class Constants {
     
     public static final String RESPONSE_MEANSUREMENT_POINT_VALID = "Ponto de Medição Válido";
     public static final String RESPONSE_MEANSUREMENT_POINT_INVALID = "Ponto de Medição Inválido";
+    
+    public static final String RESPONSE_INVALID_DATA = "Dados Inválidos";
+    public static final String RESPONSE_INCONSISTENT_DATA = "Dados Não Consistidos";
     
     public static final String RESPONSE_NO_DATA_FOUND = "Dados Ausentes";
     public static final String RESPONSE_CALENDAR_INVALID = "Calendário Inválido";

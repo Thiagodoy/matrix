@@ -13,7 +13,9 @@ public enum MeansurementFileStatus {
     FILE_PENDING,
     FILE_ERROR,
     POINT_ERROR,
-    DATA_ERROR,
+    DATA_HOUR_ERROR,
+    DATA_DAY_ERROR,
+    DATA_CALENDAR_ERROR,
     LAYOUT_ERROR,
     SUCCESS;    
 }

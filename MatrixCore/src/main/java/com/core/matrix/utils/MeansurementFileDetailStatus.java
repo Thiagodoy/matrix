@@ -10,7 +10,8 @@ package com.core.matrix.utils;
  * @author thiag
  */
 public enum MeansurementFileDetailStatus {
-    ERROR_HOUR,
-    ERROR_DAY,
+    HOUR_ERROR,
+    DAY_ERROR,
+    CALENDAR_ERROR,
     SUCCESS
 }

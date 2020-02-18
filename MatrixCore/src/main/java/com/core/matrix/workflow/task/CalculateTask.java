@@ -68,6 +68,38 @@ public class CalculateTask implements Task {
         CalculateTask.context = context;
     }
 
+//    @Override
+//    public void execute(DelegateExecution de) {
+//
+//        List<MeansurementFile> files = fileService.findByProcessInstanceId(de.getProcessInstanceId());
+//
+//        
+//        List<ConsumptionResult> results = Collections.synchronizedList(new ArrayList<>());
+//        
+//        files.stream().forEach(file -> {
+//
+//            Optional<ContractCompInformation> opt = contractService.findByWbcContractAndMeansurementPoint(file.getWbcContract(), file.getMeansurementPoint());
+//            
+//            
+//            
+//            
+//            
+//            
+//
+//        });
+//
+//    }
+    
+    
+    public void calculateWithRateio(){
+        
+    }
+    
+    public void calculate(){
+        
+    }
+    
+
     @Override
     public void execute(DelegateExecution de) throws Exception {
 
@@ -101,28 +133,27 @@ public class CalculateTask implements Task {
                             final double sum = lote.stream()
                                     .mapToDouble(MeansurementFileDetail::getConsumptionActive)
                                     .reduce(0, Double::sum);
-                            
+
                             double consumptionTotal = ((sum / 1000) + ((sum / 1000) * percentLoss) - proinfa) * factorAtt;
-                            
+
                             BigDecimal consumptionTotalArredondado = new BigDecimal(consumptionTotal).setScale(3, RoundingMode.HALF_EVEN);
-                            
+
                             BigDecimal solicitadoLiquido = new BigDecimal(0).setScale(3, RoundingMode.HALF_EVEN);
-                            
+
                             if (consumptionTotalArredondado.doubleValue() < optWbc.get().getNrQtd() && consumptionTotalArredondado.doubleValue() > optWbc.get().getNrQtdMin()) {
-                                
+
                                 solicitadoLiquido = new BigDecimal(consumptionTotal).setScale(3, RoundingMode.HALF_EVEN);
-                                
+
                             } else if (consumptionTotalArredondado.doubleValue() > optWbc.get().getNrQtd() && consumptionTotalArredondado.doubleValue() < optWbc.get().getNrQtdMax()) {
-                            
-                                    solicitadoLiquido = new BigDecimal(consumptionTotal).setScale(3, RoundingMode.HALF_EVEN);
-                                                
-                                   } else if (consumptionTotalArredondado.doubleValue() > optWbc.get().getNrQtd() && consumptionTotalArredondado.doubleValue() > optWbc.get().getNrQtdMax()) {
-                                       
-                                            solicitadoLiquido = new BigDecimal(optWbc.get().getNrQtdMax()).setScale(3, RoundingMode.HALF_EVEN);
-                                        
-                                          }
-                                
-                                    
+
+                                solicitadoLiquido = new BigDecimal(consumptionTotal).setScale(3, RoundingMode.HALF_EVEN);
+
+                            } else if (consumptionTotalArredondado.doubleValue() > optWbc.get().getNrQtd() && consumptionTotalArredondado.doubleValue() > optWbc.get().getNrQtdMax()) {
+
+                                solicitadoLiquido = new BigDecimal(optWbc.get().getNrQtdMax()).setScale(3, RoundingMode.HALF_EVEN);
+
+                            }
+
                             Optional<CompanyDTO> optEmp = this.empresaService.listByPoint(point);
                             result.setResult(consumptionTotalArredondado.doubleValue());
                             result.setContractId(informationDTO.getContractId());
@@ -132,8 +163,8 @@ public class CalculateTask implements Task {
                             result.setEmpresa(optEmp.get());
                             result.setInformation(optWbc.get());
                             result.setSolicitadoLiquido(solicitadoLiquido.doubleValue());
-                            
-                            Optional<ContractMeasurementPoint> optional =  pointService.findByPoint(point);
+
+                            Optional<ContractMeasurementPoint> optional = pointService.findByPoint(point);
                             MeansurementFileResult fileResult = new MeansurementFileResult();
                             fileResult.setMeansurementFileId(id);
                             fileResult.setPercentLoss(percentLoss);
@@ -142,10 +173,8 @@ public class CalculateTask implements Task {
                             fileResult.setMeansurementPointId(optional.get().getId());
                             fileResult.setResult(consumptionTotalArredondado.doubleValue());
                             fileResult.setMontanteLiquido(solicitadoLiquido.doubleValue());
-                            
+
                             resultService.save(fileResult);
-                            
-                            
 
                         } else {
                             result.setError("Não existe cadastro do contrato associado ao ponto!");
@@ -160,6 +189,6 @@ public class CalculateTask implements Task {
             Logger.getLogger(CalculateTask.class.getName()).log(Level.SEVERE, "[execute]", e);
         }
 
-    }
-    
+    }  
+
 }

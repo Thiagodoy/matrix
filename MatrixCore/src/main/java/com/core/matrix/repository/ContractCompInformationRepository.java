@@ -25,4 +25,5 @@ public interface ContractCompInformationRepository extends JpaRepository<Contrac
     Optional<ContractInformationDTO> listByPoint(@Param("point") String point);
     
     Optional<ContractCompInformation> findByWbcContract(Long contract);
+    Optional<ContractCompInformation> findByWbcContractAndMeansurementPoint(Long contract, String point);
 }

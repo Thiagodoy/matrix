@@ -5,7 +5,9 @@
  */
 package com.core.matrix.resource;
 
+import com.core.matrix.model.MeansurementFile;
 import com.core.matrix.service.MeansurementFileService;
+import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -14,6 +16,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 /**
@@ -34,7 +37,19 @@ public class MeansurementFileResource {
             this.service.delete(id);
             return ResponseEntity.ok().build();
         } catch (Exception e) {
-            Logger.getLogger(MeansurementFileResource.class.getName()).log(Level.SEVERE, "[delete]", e.getMessage());
+            Logger.getLogger(MeansurementFileResource.class.getName()).log(Level.SEVERE, "[ delete ]", e.getMessage());
+            return ResponseEntity.status(HttpStatus.resolve(500)).body(e);
+        }
+    }
+    
+    
+    @RequestMapping(value = "/errors", method = RequestMethod.GET)
+    public ResponseEntity getFilesWithErrors(@RequestParam(name = "processInstanceId",required = true) String processInstanceId){
+        try {
+            List<MeansurementFile> response = this.service.findAllFilesWithErrors(processInstanceId);
+            return ResponseEntity.ok(response);
+        } catch (Exception e) {
+            Logger.getLogger(MeansurementFileResource.class.getName()).log(Level.SEVERE, "[ getByProcessInstanceId ]", e.getMessage());
             return ResponseEntity.status(HttpStatus.resolve(500)).body(e);
         }
     }

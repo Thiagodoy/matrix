@@ -30,6 +30,12 @@ public class MeansurementFileService {
         return this.repository.save(file);
     }
     
+    
+    @Transactional 
+    public List<MeansurementFile> findByProcessInstanceId(String id){
+        return this.repository.findByProcessInstanceId(id);
+    }
+    
     @Transactional 
     public void delete(Long id){
          this.repository.deleteById(id);
@@ -45,6 +51,7 @@ public class MeansurementFileService {
         return this.repository.findById(id).orElseThrow(()-> new Exception("Arquivo não encontrado"));
     }
     
+    @Transactional(readOnly = true)
     public List<MeansurementFileStatusDTO> getStatus(Long year, Long month){        
         
 //        LocalDate referenceMonth = LocalDate.of(year, Month.of(month), 1);
@@ -53,6 +60,11 @@ public class MeansurementFileService {
 //        LocalDateTime end = referenceMonth.atStartOfDay();
         
         return this.repository.getStatus(year, month);
+    }
+    
+    @Transactional(readOnly = true)
+    public List<MeansurementFile>findAllFilesWithErrors(String processInstanceId){
+        return this.repository.findAllFilesWithErrors(processInstanceId);
     }
 
     

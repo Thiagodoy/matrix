@@ -28,5 +28,11 @@ public interface MeansurementFileRepository extends JpaRepository<MeansurementFi
 
     @Query(nativeQuery = true)
     List<MeansurementFileStatusDTO> getStatus(@Param("year") Long year, @Param("month") Long month);
+    
+    List<MeansurementFile>findByProcessInstanceId(String id);
+    
+    @Query(value = "select * from mtx_arquivo_de_medicao f where f.act_id_processo = :processo and f.status <> 'SUCCESS' ",nativeQuery = true)
+    List<MeansurementFile>findAllFilesWithErrors(@Param("process")String processInstanceId);
+    
 
 }

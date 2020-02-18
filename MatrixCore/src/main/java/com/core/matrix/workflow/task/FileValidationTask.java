@@ -14,6 +14,7 @@ import com.core.matrix.model.MeansurementFile;
 import com.core.matrix.model.MeansurementFileDetail;
 import com.core.matrix.service.MeansurementFileDetailService;
 import com.core.matrix.service.MeansurementFileService;
+import com.core.matrix.utils.MeansurementFileDetailStatus;
 import com.core.matrix.utils.MeansurementFileStatus;
 import com.core.matrix.utils.MeansurementFileType;
 import java.io.BufferedReader;
@@ -25,15 +26,12 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.nio.charset.Charset;
-import java.time.LocalDate;
-import java.time.format.DateTimeFormatter;
+import java.text.MessageFormat;
 
 import java.util.List;
 import java.util.Optional;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 import lombok.Data;
 import org.activiti.engine.TaskService;
@@ -57,6 +55,9 @@ public class FileValidationTask implements JavaDelegate {
     private MeansurementFileService service;
     private MeansurementFileDetailService detailService;
     private DelegateExecution delegateExecution;
+    private List<String> meansurementPoints;
+    private List<MeansurementFile> files;
+    private List<String> messageErrors;
 
     public FileValidationTask() {
 
@@ -76,39 +77,53 @@ public class FileValidationTask implements JavaDelegate {
     public void execute(DelegateExecution de) throws Exception {
 
         delegateExecution = de;
+        final List<String> attachmentIds = (List<String>) de.getVariable(LIST_ATTACHMENT_ID, Object.class);
+        final String user = de.getVariable(USER_UPLOAD, String.class);
+        files = this.service.findByProcessInstanceId(delegateExecution.getProcessInstanceId());
 
-        final String attachmentId = de.getVariable(ATTACHMENT_ID, String.class);
-        final String userId = de.getVariable(CREATED_BY, String.class);
+        attachmentIds.parallelStream().forEach(attachmentId -> {
 
-        try {
+            try {
 
-            InputStream stream = taskService.getAttachmentContent(attachmentId);
+                InputStream stream = null;
+                String fileName = null;
 
-            stream = removeLinesEmpty(stream);
+                synchronized (taskService) {
+                    stream = taskService.getAttachmentContent(attachmentId);
+                    stream = removeLinesEmpty(stream);
+                    fileName = taskService.getAttachment(attachmentId).getName();
+                }
 
-            String fileName = taskService.getAttachment(attachmentId).getName();
+                BeanIoReader reader = new BeanIoReader();
+                Optional<FileParsedDTO> fileParsed = reader.<FileParsedDTO>parse(stream);
 
-            delegateExecution.setVariable(VAR_FILE_NAME, fileName);
+                if (!reader.getErrors().isEmpty()) {
+                    writeFile(fileName, reader.getErrors(), de);
+                } else if (fileParsed.isPresent()) {
+                    mountFile(fileParsed.get(), attachmentId, user, files);
+                }
 
-            BeanIoReader reader = new BeanIoReader();
-            Optional<FileParsedDTO> fileParsed = reader.<FileParsedDTO>parse(stream);
-
-            if (!reader.getErrors().isEmpty()) {
-                writeFile(reader.getErrors(), de);
-                delegateExecution.setVariable(RESPONSE_RESULT_MESSAGE, "Layout/registros estão inválidos!");
-                delegateExecution.setVariable(CONTROLE, RESPONSE_LAYOUT_INVALID);
-            } else if (fileParsed.isPresent()) {
-                mountFile(fileParsed.get(), attachmentId, userId);
+            } catch (Exception e) {
+                Logger.getLogger(FileValidationTask.class.getName()).log(Level.SEVERE, "[ forEach ]", e);
             }
 
-        } catch (Exception e) {
-            Logger.getLogger(MeansurementFileService.class.getName()).log(Level.SEVERE, "[execute]", e);
-            delegateExecution.setVariable(RESPONSE_RESULT_MESSAGE, new String[]{e.getMessage()});
-            de.setVariable(CONTROLE, RESPONSE_LAYOUT_INVALID);
+        });
+
+        files.stream().filter(f -> f.getFile() == null).forEach(f -> {
+            String message = MessageFormat.format("Não foi encontrado nenhuma corespondência do ponto de medição, dentro dos arquivos postados.\nInformação:\nContrato: {0}\nPonto de Medição: {1}\n", f.getWbcContract(), f.getMeansurementPoint());
+            this.messageErrors.add(message);
+        });
+
+        if (!this.messageErrors.isEmpty()) {
+            delegateExecution.setVariable(RESPONSE_RESULT, messageErrors);
+            delegateExecution.setVariable(CONTROLE, RESPONSE_LAYOUT_INVALID);
+        } else {
+            delegateExecution.setVariable(CONTROLE, RESPONSE_LAYOUT_VALID);
         }
+
     }
 
-    private void writeFile(List<String> errors, DelegateExecution de) {
+    private void writeFile(String fileName, List<String> errors, DelegateExecution de) {
 
         FileWriter writer = null;
         File file = null;
@@ -123,8 +138,13 @@ public class FileValidationTask implements JavaDelegate {
             writer.flush();
             writer.close();
 
-            Attachment attachment = taskService.createAttachment("text/plain", null, de.getProcessInstanceId(), "Erros.txt", "attachmentDescription", new FileInputStream(file));
-            delegateExecution.setVariable(ATTACHMENT_ERROR_ID, attachment.getId());
+            taskService.createAttachment("text/plain",
+                    null,
+                    de.getProcessInstanceId(),
+                    fileName + "erros.txt",
+                    "attachmentDescription",
+                    new FileInputStream(file));
+
         } catch (IOException ex) {
             Logger.getLogger(FileValidationTask.class.getName()).log(Level.SEVERE, "[ writeFile ]", ex);
         } finally {
@@ -140,43 +160,50 @@ public class FileValidationTask implements JavaDelegate {
 
     }
 
-    private void mountFile(FileParsedDTO fileParsedDTO, String idFile, String userId) throws Exception {
+    public void mountFile(FileParsedDTO fileParsedDTO, String attachmentId, String userId, List<MeansurementFile> files) {
 
-        final String period = fileParsedDTO.informations.get(2).getValue();
-
-        MeansurementFile meansurementFile = new MeansurementFile();
-        meansurementFile.setFile(idFile);
-        LocalDate date = extractMonthAndYear(period);
-        meansurementFile.setMonth((long) date.getMonthValue());
-        meansurementFile.setYear((long) date.getYear());
-
-        meansurementFile.setStatus(MeansurementFileStatus.SUCCESS);
-        meansurementFile.setUser(userId);
-
-        meansurementFile.setType(MeansurementFileType.valueOf(fileParsedDTO.getType()));
-
-        meansurementFile = service.saveFile(meansurementFile);
-        final Long id = meansurementFile.getId();
-
-        List<MeansurementFileDetail> details = null;
         try {
 
-            details = this.mountDetail(fileParsedDTO.getDetails(), meansurementFile.getType());
-            details.parallelStream().forEach(d -> {
-                d.setIdMeansurementFile(id);
+            MeansurementFileType type = MeansurementFileType.valueOf(fileParsedDTO.getType());
+            final List<MeansurementFileDetail> details = this.mountDetail(fileParsedDTO.getDetails(), type);
+
+            //set a user for files and type
+            files.forEach(file -> {
+                file.setUser(userId);
+                file.setType(type);
+            });
+            //List all point that are into the file    
+            List<String> meansuremPoint = details.parallelStream().map(d -> d.getMeansurementPoint()).distinct().collect(Collectors.toList());
+
+            //Verify if point match some files made. And set the attachment id on file             
+            meansuremPoint.forEach(point -> {
+                Optional<MeansurementFile> opt = files.stream().filter(file -> file.getMeansurementPoint().equals(point)).findFirst();
+                if (opt.isPresent()) {
+
+                    MeansurementFile file = opt.get();
+                    file.setFile(attachmentId);
+                    file.setUser(userId);
+                    file.setType(type);
+
+                    List<MeansurementFileDetail> fileDetaisl = details
+                            .stream()
+                            .filter(d -> d.getMeansurementPoint().equals(point))
+                            .collect(Collectors.toList());
+
+                    fileDetaisl.forEach(d -> {
+                        d.setIdMeansurementFile(file.getId());                        
+                    });
+
+                    opt.get().setStatus(MeansurementFileStatus.SUCCESS);
+                    service.saveFile(opt.get());
+                    detailService.save(fileDetaisl);
+                }
             });
 
         } catch (Exception e) {
-            Logger.getLogger(FileValidationTask.class.getName()).log(Level.SEVERE, "[ mountDetail ]", e);
-            meansurementFile.setStatus(MeansurementFileStatus.FILE_ERROR);
-            service.saveFile(meansurementFile);
+            Logger.getLogger(FileValidationTask.class.getName()).log(Level.SEVERE, "[ mountFile ]", e);
             throw e;
         }
-
-        detailService.save(details);
-        delegateExecution.setVariable(TYPE_LAYOUT_FILE, meansurementFile.getType().toString());
-        delegateExecution.setVariable(FILE_MEANSUREMENT_ID, meansurementFile.getId());
-        delegateExecution.setVariable(CONTROLE, RESPONSE_LAYOUT_VALID);
 
     }
 
@@ -187,29 +214,7 @@ public class FileValidationTask implements JavaDelegate {
                 .collect(Collectors.toList());
     }
 
-    private LocalDate extractMonthAndYear(String value) throws Exception {
-
-        Pattern p = Pattern.compile("([0-3]?[0-9]/[0-3]?[0-9]/(?:[0-9]{2})?[0-9]{2})|([0-3]?[0-9]/(?:[0-9]{2})?[0-9]{2})", Pattern.MULTILINE);
-        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd/MM/yyyy");
-
-        Matcher m = p.matcher(value);
-
-        if (m.find()) {
-
-            String stringDate = m.group(0);
-
-            if (stringDate.length() == 7) {
-                stringDate = "01/" + stringDate;
-            }
-            LocalDate localDate = LocalDate.parse(stringDate, formatter);
-            return localDate;
-        } else {
-            throw new Exception("Não foi possivel extrair o periodo");
-        }
-
-    }
-
-    private InputStream removeLinesEmpty(InputStream stream) throws IOException {
+    private synchronized InputStream removeLinesEmpty(InputStream stream) throws IOException {
 
         StringBuilder sb = new StringBuilder();
 

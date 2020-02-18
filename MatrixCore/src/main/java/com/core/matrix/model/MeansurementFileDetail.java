@@ -134,6 +134,8 @@ public class MeansurementFileDetail implements Serializable {
     public MeansurementFileDetail(FileDetailDTO detail, MeansurementFileType type) {
 
         DateTimeFormatter formater = DateTimeFormatter.ofPattern("dd/MM/yyyy");
+        
+        this.status = MeansurementFileDetailStatus.SUCCESS;
 
         switch (type) {
             case LAYOUT_A:

@@ -35,4 +35,10 @@ public class MeansurementFileDetailService {
     }
     
     
+    @Transactional
+    public void deleteAll(List<MeansurementFileDetail> details){
+        this.repository.deleteAll(details);
+    }
+    
+    
 }
