@@ -21,6 +21,7 @@ import org.activiti.image.ProcessDiagramGenerator;
 import org.activiti.image.impl.DefaultProcessDiagramGenerator;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 /**
  *
@@ -33,8 +34,9 @@ public class RepositoryActivitiService {
     private RepositoryService repositoryService;
 
     @Autowired
-    private RuntimeService runtimeService;
-
+    private RuntimeService runtimeService;   
+    
+    
     public Deployment getDeployment(String deploymentId) {
         return this.repositoryService.createDeploymentQuery().deploymentId(deploymentId).singleResult();
     }

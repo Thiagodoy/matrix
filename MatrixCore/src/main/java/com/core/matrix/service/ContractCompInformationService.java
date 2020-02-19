@@ -82,10 +82,10 @@ public class ContractCompInformationService {
         if (opt.isPresent()) {
             ContractCompInformation contractCompInformation = opt.get();
 
-            Optional<Long> isSon = Optional.ofNullable(contractCompInformation.getCodeContractApportionment());
+            Optional<Long> hasParent = Optional.ofNullable(contractCompInformation.getCodeContractApportionment());
 
-            if (isSon.isPresent()) {
-                return this.repository.findByCodeContractApportionment(contractId);
+            if (hasParent.isPresent()) {
+                return this.repository.findByCodeContractApportionment(hasParent.get());
             } else {
                 return Arrays.asList(opt.get());
             }

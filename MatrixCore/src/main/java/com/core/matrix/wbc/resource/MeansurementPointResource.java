@@ -5,7 +5,10 @@
  */
 package com.core.matrix.wbc.resource;
 
+import com.core.matrix.request.MeansurementPointRequest;
+import com.core.matrix.wbc.model.MeansurementPoint;
 import com.core.matrix.wbc.service.MeansurementPointService;
+import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -13,6 +16,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
@@ -39,6 +43,18 @@ public class MeansurementPointResource {
             return ResponseEntity.ok(response);
         } catch (Exception e) {
             Logger.getLogger(MeansurementPointResource.class.getName()).log(Level.SEVERE, "[getPoint]", e);
+            return ResponseEntity.status(HttpStatus.resolve(500)).body(e.getMessage());
+        }
+    }
+    
+    
+    @RequestMapping(value = "/listByCompanies", method = RequestMethod.POST)
+    public ResponseEntity listByCompanies(@RequestBody MeansurementPointRequest request) {
+        try {
+            List<MeansurementPoint> response = service.listByCompanys(request.getCompanies());
+            return ResponseEntity.ok(response);
+        } catch (Exception e) {
+            Logger.getLogger(MeansurementPointResource.class.getName()).log(Level.SEVERE, "[listByCompanies]", e);
             return ResponseEntity.status(HttpStatus.resolve(500)).body(e.getMessage());
         }
     }

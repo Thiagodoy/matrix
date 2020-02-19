@@ -25,5 +25,10 @@ public class ContractWbcInformationDTO implements Serializable{
     private Double nrQtdMax;
     private Double percentMin;
     private Double percentMax;
+    private Double qtdHired;
+    private Double qtdHiredMin;
+    private Double qtdHiredMax;
+    private Double limitMin;
+    private Double limitMax;
 
 }

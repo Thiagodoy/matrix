@@ -30,9 +30,6 @@ public class MeansurementFileResult {
     @Column(name = "id_arquivo_de_medicao")
     private Long meansurementFileId;
 
-    @Column(name = "id_ponto_de_medicao")
-    private Long meansurementPointId;
-
     @Column(name = "percentual_de_perda")
     private Double percentLoss;
 
@@ -42,9 +39,30 @@ public class MeansurementFileResult {
     @Column(name = "proinfa")
     private Double proinfa;
 
-    @Column(name = "montante")
-    private Double result;
+    @Column(name = "montante_scde")
+    private Double amountScde;
+
+    @Column(name = "montante_bruto")
+    private Double amountBruto;
 
     @Column(name = "montante_liquido")
-    private Double montanteLiquido;
+    private Double amountLiquido;
+
+    @Column(name = "limite_minimo")
+    private Double limitMin;
+
+    @Column(name = "limite_maximo")
+    private Double limitMax;
+
+    @Column(name = "quantidade_contratada")
+    private Double qtdHired;
+
+    @Column(name = "quantidade_contratada_minima")
+    private Double qtdHiredMin;
+
+    @Column(name = "quantidade_contratada_maxima")
+    private Double qtdHiredMax;
+
+    @Column(name = "act_id_process")
+    private String idProcess;
 }

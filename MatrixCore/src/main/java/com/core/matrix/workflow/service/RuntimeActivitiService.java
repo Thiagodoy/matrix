@@ -88,10 +88,9 @@ public class RuntimeActivitiService {
     public void startProcessoByMessage(String message, Map<String, Object> variables) {
         this.runtimeService.startProcessInstanceByMessage(message, variables);
     }
-    
-    
+
     @Transactional
-    public  String startProcessByMessage(String message){
+    public String startProcessByMessage(String message) {
         return runtimeService.startProcessInstanceByMessage(message).getProcessInstanceId();
     }
 
@@ -245,14 +244,14 @@ public class RuntimeActivitiService {
 
     public PageResponse<TaskResponse> getCandidateTasks(UserActiviti user, int page, int size) {
 
-        List<String> groups = user.getGroups().stream().map(g-> g.getGroupId()).filter(Objects::nonNull).collect(Collectors.toList());
-        
+        List<String> groups = user.getGroups().stream().map(g -> g.getGroupId()).filter(Objects::nonNull).collect(Collectors.toList());
+
         Long sizeTotalElements = taskService.createTaskQuery().taskCandidateGroupIn(groups).count();
         // grou
 
         int min = page * size;
         //int max = min + size;
-        
+
         List<TaskResponse> response = taskService
                 .createTaskQuery()
                 .taskCandidateGroupIn(groups)
@@ -281,7 +280,7 @@ public class RuntimeActivitiService {
         Long sizeTotalElements = taskService.createTaskQuery().taskAssignee(user).count();
 
         int min = page * size;
-        
+
         List<TaskResponse> response = taskService
                 .createTaskQuery()
                 .taskAssignee(user)
@@ -519,8 +518,10 @@ public class RuntimeActivitiService {
     }
 
     @Transactional
-    public void deleteProcess(String id) {
-        runtimeService.deleteProcessInstance(id, null);
+    public void deleteProcess(String[] values) {
+        for (String id : values) {
+            runtimeService.deleteProcessInstance(id, null);
+        }
     }
 
 }

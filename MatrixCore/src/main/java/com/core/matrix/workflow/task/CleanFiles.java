@@ -15,6 +15,8 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 import org.activiti.engine.delegate.DelegateExecution;
 import org.activiti.engine.delegate.JavaDelegate;
+import org.activiti.engine.task.Attachment;
+import org.activiti.engine.task.Comment;
 import org.springframework.context.ApplicationContext;
 
 /**
@@ -23,38 +25,42 @@ import org.springframework.context.ApplicationContext;
  */
 public class CleanFiles implements JavaDelegate {
 
-    
     private static ApplicationContext context;
     private MeansurementFileService fileService;
     private MeansurementFileDetailService fileDetailService;
-    
-    public CleanFiles(ApplicationContext context){
+
+    public CleanFiles(ApplicationContext context) {
         CleanFiles.context = context;
     }
-    
-    public CleanFiles(){
-        synchronized(CleanFiles.context){
+
+    public CleanFiles() {
+        synchronized (CleanFiles.context) {
             this.fileService = CleanFiles.context.getBean(MeansurementFileService.class);
             this.fileDetailService = CleanFiles.context.getBean(MeansurementFileDetailService.class);
         }
-    } 
-    
-    
+    }
+
     @Override
     public void execute(DelegateExecution execution) throws Exception {
 
         try {
-            List<String> files = (List<String>) execution.getVariable(Constants.LIST_DELETE_FILES);
 
-            for (String file : files) {
-                execution.getEngineServices().getTaskService().deleteAttachment(file);
+            List<Attachment> attachments = execution.getEngineServices().getTaskService().getProcessInstanceAttachments(execution.getProcessInstanceId());
+            List<Comment> comments = execution.getEngineServices().getTaskService().getProcessInstanceComments(execution.getProcessInstanceId());
+
+            for (Attachment attachment : attachments) {
+                execution.getEngineServices().getTaskService().deleteAttachment(attachment.getId());
             }
-            
-            this.fileService.findByProcessInstanceId(execution.getProcessInstanceId()).forEach(file->{            
-                this.fileDetailService.deleteAll(file.getDetails());            
+
+            for (Comment comment : comments) {
+                execution.getEngineServices().getTaskService().deleteComment(comment.getId());
+            }
+
+            this.fileService.findByProcessInstanceId(execution.getProcessInstanceId()).forEach(file -> {
+                this.fileDetailService.deleteAll(file.getDetails());
                 this.fileService.updateStatus(MeansurementFileStatus.FILE_PENDING, file.getId());
             });
-            
+
         } catch (Exception e) {
             Logger.getLogger(CleanFiles.class.getName()).log(Level.SEVERE, "[ execute ]", e);
         }

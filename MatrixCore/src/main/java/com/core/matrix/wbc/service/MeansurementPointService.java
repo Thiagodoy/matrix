@@ -5,7 +5,9 @@
  */
 package com.core.matrix.wbc.service;
 
+import com.core.matrix.wbc.model.MeansurementPoint;
 import com.core.matrix.wbc.repository.MeansurementPointRepository;
+import java.util.List;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
@@ -25,6 +27,10 @@ public class MeansurementPointService {
     @Transactional(readOnly = true)
     public boolean existsPoint(String point) {
         return this.repository.findByCode(point).isPresent();
+    }
+    
+    public List<MeansurementPoint> listByCompanys(List<Long>companys){
+        return this.repository.listByCompanys(companys);
     }
     
     @Transactional(readOnly = true)

@@ -48,7 +48,7 @@ import lombok.Data;
                     ,
                         @ColumnResult(name = "nCdSituacaoContrato", type = Long.class)
                     ,
-                        @ColumnResult(name = "sDsSituacaoContrato", type = String.class)                  
+                        @ColumnResult(name = "sDsSituacaoContrato", type = String.class)
                     ,
                         @ColumnResult(name = "bFlRateio", type = Long.class)
                     ,
@@ -175,6 +175,16 @@ import lombok.Data;
                         @ColumnResult(name = "nLimPercentualMin", type = Double.class)
                     ,
                         @ColumnResult(name = "nLimPercentualMax", type = Double.class)
+                    ,    
+                        @ColumnResult(name = "quantidade_contratada", type = Double.class)
+                    ,
+                        @ColumnResult(name = "nQtContratadaMin", type = Double.class)
+                    ,
+                        @ColumnResult(name = "nQtContratadaMax", type = Double.class)
+                    ,
+                        @ColumnResult(name = "quantidade_contratada_minima", type = Double.class)
+                    ,
+                        @ColumnResult(name = "quantidade_contratada_maxima", type = Double.class)
 
                 }))
 
@@ -187,6 +197,11 @@ import lombok.Data;
         + "	 ,case when SZ.[nQtInformadaTotal] is not null then Round((SZ.[nQtInformadaTotal]+(SZ.[nQtInformadaTotal]*RO.[sPcLimMesMax])/100),3) else Round((SZ.[nQtContratadaTotal]+(SZ.[nQtContratadaTotal]*RO.[sPcLimMesMax])/100),3) end as 'nQtContratadaMax'\n"
         + "	 ,RO.[sPcLimMesMin] as 'nLimPercentualMin'\n"
         + "      ,RO.[sPcLimMesMax] as 'nLimPercentualMax'\n"
+        + "      ,case when SZ.[nQtInformadaTotal] is not null then SZ.[nQtInformadaTotal] else SZ.[nQtContratadaTotal] end as 'quantidade_contratada'\n"
+        + "      ,case when SZ.nQtInformadaTotal is not null then Round((SZ.[nQtInformadaTotal]-(SZ.[nQtInformadaTotal]*RO.[sPcLimMesMin])/100),3) else Round((SZ.[nQtContratadaTotal]-(SZ.[nQtContratadaTotal]*RO.[sPcLimMesMin])/100),3) end as 'quantidade_contratada_minima'\n"
+        + "      ,case when SZ.nQtInformadaTotal is not null then Round((SZ.[nQtInformadaTotal]+(SZ.[nQtInformadaTotal]*RO.[sPcLimMesMax])/100),3) else Round((SZ.[nQtContratadaTotal]+(SZ.[nQtContratadaTotal]*RO.[sPcLimMesMax])/100),3) end as 'quantidade_contratada_maxima'\n"
+        + "      ,RO.[sPcLimMesMin] as 'limite_minimo'\n"
+        + "      ,RO.[sPcLimMesMax] as 'limite_maximo'"
         + "  FROM [CE_CONTRATO] CT,\n"
         + "       [CE_SAZONALIZACAO] SZ,\n"
         + "       [CE_REGRA_OPCIONALIDADE] RO\n"
