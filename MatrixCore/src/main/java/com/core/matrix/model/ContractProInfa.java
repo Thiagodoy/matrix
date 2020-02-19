@@ -31,9 +31,11 @@ public class ContractProInfa {
     @Column(name = "wbc_ponto_de_medicao")
     private String meansurementPoint;
 
+    @Id
     @Column(name = "ano")
     private Long year;
 
+    @Id
     @Column(name = "mes")
     private Long month;
 
@@ -45,6 +47,8 @@ public class ContractProInfa {
 
         private Long wbcContract;
         private String meansurementPoint;
+        private Long year;
+        private Long month;
     }
 
 }

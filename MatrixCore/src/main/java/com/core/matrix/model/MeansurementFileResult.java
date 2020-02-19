@@ -5,6 +5,7 @@
  */
 package com.core.matrix.model;
 
+import com.core.matrix.wbc.dto.ContractWbcInformationDTO;
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
@@ -12,6 +13,7 @@ import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.Table;
 import lombok.Data;
+import lombok.NoArgsConstructor;
 
 /**
  *
@@ -20,6 +22,7 @@ import lombok.Data;
 @Entity
 @Table(name = "mtx_arquivo_de_medicao_resultado")
 @Data
+@NoArgsConstructor
 public class MeansurementFileResult {
 
     @Id
@@ -65,4 +68,22 @@ public class MeansurementFileResult {
 
     @Column(name = "act_id_process")
     private String idProcess;
+    
+    @Column(name = "ponto_de_medicao")
+    private String meansurementPoint;
+    
+    @Column(name = "wbc_contrato")
+    private String wbcContract;
+    
+    public MeansurementFileResult(ContractWbcInformationDTO informationDTO, String idProcess){        
+        
+        this.qtdHiredMin = informationDTO.getQtdHiredMin();
+        this.qtdHiredMax = informationDTO.getQtdHiredMax();
+        this.qtdHired = informationDTO.getQtdHired();
+        this.idProcess = idProcess;
+        this.limitMin =  informationDTO.getLimitMin();
+        this.limitMax = informationDTO.getLimitMax();
+        
+    }
+    
 }
