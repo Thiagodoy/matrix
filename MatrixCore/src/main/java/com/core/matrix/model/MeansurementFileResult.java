@@ -73,7 +73,13 @@ public class MeansurementFileResult {
     private String meansurementPoint;
     
     @Column(name = "wbc_contrato")
-    private String wbcContract;
+    private Long wbcContract;
+    
+//    @Column(name = "nome_empresa")    
+//    private String nameCompany;
+//    
+//    @Column(name = "nome_fantasia")
+//    private String nickNameCompany;
     
     public MeansurementFileResult(ContractWbcInformationDTO informationDTO, String idProcess){        
         

@@ -27,5 +27,10 @@ public interface ContractCompInformationRepository extends JpaRepository<Contrac
     
     Optional<ContractCompInformation> findByWbcContract(Long contract);
     List<ContractCompInformation> findByCodeContractApportionment(Long contract);
+    
+    
+    Optional<ContractCompInformation> findByCodeWbcContract(Long contract);
+    
+    
     Optional<ContractCompInformation> findByWbcContractAndMeansurementPoint(Long contract, String point);
 }

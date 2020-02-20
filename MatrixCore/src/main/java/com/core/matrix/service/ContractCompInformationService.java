@@ -75,7 +75,7 @@ public class ContractCompInformationService {
     }
 
     @Transactional
-    public List<ContractCompInformation> listByContract(Long contractId) {
+    public List<ContractCompInformation> listByContract(Long contractId) throws Exception {
 
         Optional<ContractCompInformation> opt = this.repository.findByWbcContract(contractId);
 
@@ -84,9 +84,18 @@ public class ContractCompInformationService {
 
             Optional<Long> hasParent = Optional.ofNullable(contractCompInformation.getCodeContractApportionment());
 
-            if (hasParent.isPresent()) {
-                return this.repository.findByCodeContractApportionment(hasParent.get());
-            } else {
+            if (hasParent.isPresent() && contractCompInformation.getIsApportionment().equals(1L)) {
+                
+                List<ContractCompInformation> rateioSon = this.repository.findByCodeContractApportionment(hasParent.get());
+                ContractCompInformation rateioParent = this.repository.findByCodeWbcContract(hasParent.get()).orElseThrow(()-> new Exception("Não foi possivel localizar o contrato pai!"));
+                rateioSon.add(rateioParent);
+                return rateioSon;
+            } else if(!hasParent.isPresent() && contractCompInformation.getIsApportionment().equals(1L)){
+            
+                List<ContractCompInformation> rateioSon = this.repository.findByCodeContractApportionment(contractCompInformation.getCodeWbcContract());
+                rateioSon.add(contractCompInformation);
+                return rateioSon;
+            }else {
                 return Arrays.asList(opt.get());
             }
 

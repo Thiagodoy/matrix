@@ -188,12 +188,18 @@ public class CalculateTask implements Task {
 
                     double consumptionTotal = (((sum / 1000) + (sum / 1000) * percentLoss) - proinfa);
 
+                    Optional<CompanyDTO> optEmp = this.empresaService.listByPoint(point);
+                    
+                    
+                    
+                    
                     MeansurementFileResult fileResult = new MeansurementFileResult(contractWbcInformation, de.getProcessInstanceId());
                     fileResult.setAmountScde(sum);
                     fileResult.setMeansurementFileId(file.getId());
                     Double consumptionLiquid = solicitadoLiquido(consumptionTotal, contractWbcInformation);
                     fileResult.setAmountLiquido(consumptionLiquid);
-
+                    fileResult.setWbcContract(Long.valueOf(contractWbcInformation.getNrContract()));
+                    fileResult.setMeansurementPoint(point);
                     results.add(fileResult);
                     resultService.save(fileResult);
 
@@ -213,10 +219,12 @@ public class CalculateTask implements Task {
 
             MeansurementFileResult fileResult = new MeansurementFileResult();
             fileResult.setIdProcess(de.getProcessInstanceId());
+            fileResult.setAmountBruto(consumptionTotal);
 
             resultService.save(fileResult);
             
         } catch (Exception e) {
+             Logger.getLogger(CalculateTask.class.getName()).log(Level.SEVERE, "[ calculateWithRateio ]", e);
         }
 
     }

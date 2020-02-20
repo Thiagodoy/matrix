@@ -6,6 +6,7 @@
 package com.core.matrix.model;
 
 import com.core.matrix.dto.ContractInformationDTO;
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import java.io.Serializable;
 import java.time.LocalDateTime;
 import java.util.List;
@@ -63,6 +64,7 @@ import lombok.Data;
 @Table(name = "mtx_contrato_informacao_complementar")
 @Data
 @IdClass(ContractCompInformation.IdClass.class)
+@JsonIgnoreProperties(value = {"lastUpdate","createAt"})
 public class ContractCompInformation {
 
     @Id
