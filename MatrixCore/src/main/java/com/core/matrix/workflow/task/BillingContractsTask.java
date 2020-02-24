@@ -18,7 +18,6 @@ import java.text.MessageFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
-import java.util.Comparator;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -168,7 +167,7 @@ public class BillingContractsTask implements JavaDelegate {
                                 Log log = new Log();
                                 log.setMessage(e.getMessage());
                                 log.setNameProcesso(execution.getProcessDefinitionId());
-                                 logs.add(log);
+                                logs.add(log);
 
                             }
 
@@ -180,7 +179,7 @@ public class BillingContractsTask implements JavaDelegate {
                                 .filter(c -> c.getNCdContrato().equals(contractParent))
                                 .findFirst();
 
-                        if (opt.isPresent()) {
+                        if (opt.isPresent() && logs.isEmpty()) {
 
                             List<ContractDTO> sons = contractsSon.stream().filter(t -> t.getMeansurementPoint() != null).collect(Collectors.toList());
 
@@ -189,16 +188,12 @@ public class BillingContractsTask implements JavaDelegate {
 
                             String processInstanceId = this.createAProcessForBilling(execution, sons).getProcessInstanceId();
                             this.createMeansurementFile(processInstanceId, sons);
+                        }else{
+                            this.logService.save(logs);
+                            logs.clear();
                         }
 
                     });
-            
-            
-            if (!logs.isEmpty()) {
-                this.logService.save(logs);
-            }
-            
-            
             
 
         } catch (Exception e) {

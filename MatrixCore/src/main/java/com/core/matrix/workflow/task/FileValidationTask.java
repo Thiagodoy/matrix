@@ -129,6 +129,8 @@ public class FileValidationTask implements JavaDelegate {
             }
         } catch (Exception e) {
             Logger.getLogger(FileValidationTask.class.getName()).log(Level.SEVERE, "[execute]", e);
+            delegateExecution.setVariable(CONTROLE, RESPONSE_LAYOUT_INVALID);
+            this.generateLog(de, e, "Erro ao processar o arquivo");
         }
 
     }
