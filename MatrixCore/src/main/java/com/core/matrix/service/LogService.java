@@ -44,7 +44,7 @@ public class LogService {
         this.repository.deleteByFileId(id);
     }
     
-    @Transactional
+    @Transactional(transactionManager = "matrixTransactionManager")
     public void deleteLogsByProcessInstance(String id) {
         this.repository.deleteByActIdProcesso(id);
     }

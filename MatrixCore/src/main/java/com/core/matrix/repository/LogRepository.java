@@ -8,6 +8,9 @@ package com.core.matrix.repository;
 import com.core.matrix.model.Log;
 import java.util.List;
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Modifying;
+import org.springframework.data.jpa.repository.Query;
+import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
 /**
@@ -19,6 +22,13 @@ public interface LogRepository extends JpaRepository<Log, Long>{
     
     
     void deleteByFileId(Long id);
-    void deleteByActIdProcesso(String process);
+
+    @Modifying
+    @Query(value = "delete from Log l where l.actIdProcesso = :idPro")
+    void deleteBulk(@Param("idPro")String process);
+    
+    long deleteByActIdProcesso(String id);
+    
+    
     List<Log> findByActIdProcesso(String process);
 }

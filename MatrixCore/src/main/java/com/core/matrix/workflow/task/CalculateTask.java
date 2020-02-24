@@ -168,10 +168,14 @@ public class CalculateTask implements Task {
             final List<ContractCompInformation> contractsInformations = contractService.listByContract(files.get(0).getWbcContract());
 
             final List<MeansurementFileResult> results = new ArrayList<>();
-
+            
+            Long fileId = files.stream().findFirst().orElseThrow(()-> new Exception("Não existe nenhum arquivo para ser processado")).getId();
             //Contracts sons
             files.stream().forEach(file -> {
 
+                
+                
+                
                 try {
                     List<MeansurementFileDetail> filteredByPoint = details
                             .stream()
@@ -238,8 +242,10 @@ public class CalculateTask implements Task {
 
             MeansurementFileResult fileResult = new MeansurementFileResult();
             fileResult.setIdProcess(de.getProcessInstanceId());
+            
             fileResult.setAmountBruto(consumptionTotal);
-
+            fileResult.setMeansurementFileId(fileId);
+            
             resultService.save(fileResult);
 
         } catch (Exception e) {

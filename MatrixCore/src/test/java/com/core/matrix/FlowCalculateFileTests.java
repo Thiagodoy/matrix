@@ -34,19 +34,40 @@ class FlowCalculateFileTests {
         
      //Get task
      
-        Task task = taskService.createTaskQuery().taskId("215087").singleResult();
+        Task task = taskService.createTaskQuery().taskId("302503").singleResult();
         
-        File file = new File("Layout A - Caminho feliz.csv");
+        File file1 = new File("Layout A - Caminho feliz - 1.csv");
         
-        InputStream ip = new FileInputStream(file);
+        InputStream ip = new FileInputStream(file1);
         
-         Attachment attachment = taskService
-                .createAttachment("application/vnd.ms-excel", null, task.getProcessInstanceId(), file.getName(), "attachmentDescription", ip);
+         Attachment attachment1 = taskService
+                .createAttachment("application/vnd.ms-excel", null, task.getProcessInstanceId(), file1.getName(), "attachmentDescription", ip);
+         
+         
+         
+         File file2 = new File("Layout A - Caminho feliz - 2.csv");
+        
+        InputStream ip2 = new FileInputStream(file2);
+        
+         Attachment attachment2 = taskService
+                .createAttachment("application/vnd.ms-excel", null, task.getProcessInstanceId(), file2.getName(), "attachmentDescription", ip2);
+         
+         
+         
+         
+         File file3 = new File("Layout A - Caminho feliz - 3.csv");
+        
+        InputStream ip3 = new FileInputStream(file3);
+        
+         Attachment attachment3 = taskService
+                .createAttachment("application/vnd.ms-excel", null, task.getProcessInstanceId(), file3.getName(), "attachmentDescription", ip3);
+         
+         
         
          
          Map<String,Object>parameters = new HashMap<>();
          
-         parameters.put(LIST_ATTACHMENT_ID, Arrays.asList(attachment.getId()));
+         parameters.put(LIST_ATTACHMENT_ID, Arrays.asList(attachment1.getId(),attachment2.getId(),attachment3.getId()));
          
          taskService.complete(task.getId(), parameters);
          
