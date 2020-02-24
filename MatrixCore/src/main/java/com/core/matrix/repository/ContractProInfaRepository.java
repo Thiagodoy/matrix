@@ -14,6 +14,6 @@ import org.springframework.stereotype.Repository;
  * @author thiag
  */
 @Repository
-public interface ContractProInfaRepository extends JpaRepository<ContractProInfa, ContractProInfa.IdClass>{
+public interface ContractProInfaRepository extends JpaRepository<ContractProInfa, Long>{
     
 }

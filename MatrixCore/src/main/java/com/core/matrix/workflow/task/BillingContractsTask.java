@@ -29,6 +29,7 @@ import java.util.stream.Collectors;
 import org.activiti.engine.delegate.DelegateExecution;
 import org.activiti.engine.delegate.JavaDelegate;
 import org.activiti.engine.runtime.ProcessInstance;
+import org.joda.time.LocalDate;
 import org.springframework.context.ApplicationContext;
 
 /**
@@ -71,7 +72,14 @@ public class BillingContractsTask implements JavaDelegate {
 
     private void createMeansurementFile(String processInstanceId, ContractDTO contract) {
 
+        LocalDate monthBilling  = LocalDate.now().minusMonths(1);
+        
+        Long month = Integer.valueOf(monthBilling.getMonthOfYear()).longValue();
+        Long year = Integer.valueOf(monthBilling.getYear()).longValue();
+        
         MeansurementFile meansurementFile = new MeansurementFile(contract, processInstanceId, contract.getMeansurementPoint());
+        meansurementFile.setMonth(month);
+        meansurementFile.setYear(year);
         this.meansurementFileService.saveFile(meansurementFile);
 
     }
@@ -149,7 +157,7 @@ public class BillingContractsTask implements JavaDelegate {
                                     ContractCompInformation compInformation = opt.get();
                                     cc.setMeansurementPoint(compInformation.getMeansurementPoint());
                                 } else {
-                                    String message = MessageFormat.format("Não foi possivel criar processo de medição para o contrato abaixo:\n{0}", cc.toString());
+                                    String message = MessageFormat.format("Não foi possivel criar processo de medição para o contrato [rateio] abaixo:\n{0}", cc.toString());
                                     Log log = new Log();
                                     log.setMessage(message);
                                     log.setNameProcesso(execution.getProcessDefinitionId());
@@ -177,10 +185,10 @@ public class BillingContractsTask implements JavaDelegate {
                             List<ContractDTO> sons = contractsSon.stream().filter(t -> t.getMeansurementPoint() != null).collect(Collectors.toList());
 
                             sons.add(opt.get());
-                            List<ContractDTO> con = sons.stream().sorted(Comparator.comparing(ContractDTO::getNCdContratoRateioControlador).reversed()).collect(Collectors.toList());
+//                            List<ContractDTO> con = sons.stream().sorted(Comparator.comparing(ContractDTO::getNCdContratoRateioControlador).reversed()).collect(Collectors.toList());
 
-                            String processInstanceId = this.createAProcessForBilling(execution, con).getProcessInstanceId();
-                            this.createMeansurementFile(processInstanceId, con);
+                            String processInstanceId = this.createAProcessForBilling(execution, sons).getProcessInstanceId();
+                            this.createMeansurementFile(processInstanceId, sons);
                         }
 
                     });

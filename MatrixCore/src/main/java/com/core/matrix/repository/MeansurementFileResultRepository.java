@@ -6,6 +6,7 @@
 package com.core.matrix.repository;
 
 import com.core.matrix.model.MeansurementFileResult;
+import java.util.List;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 
@@ -15,5 +16,8 @@ import org.springframework.stereotype.Repository;
  */
 @Repository
 public interface MeansurementFileResultRepository extends JpaRepository<MeansurementFileResult, Long> {
+    
+    
+    List<MeansurementFileResult>findByIdProcess(String id);
     
 }

@@ -6,8 +6,8 @@
 package com.core.matrix.model;
 
 import com.core.matrix.dto.ContractInformationDTO;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
-import java.io.Serializable;
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
@@ -18,9 +18,7 @@ import javax.persistence.ConstructorResult;
 import javax.persistence.Entity;
 import javax.persistence.FetchType;
 import javax.persistence.Id;
-import javax.persistence.IdClass;
 import javax.persistence.JoinColumn;
-import javax.persistence.JoinColumns;
 import javax.persistence.NamedNativeQuery;
 import javax.persistence.OneToMany;
 import javax.persistence.PrePersist;
@@ -63,15 +61,14 @@ import lombok.Data;
 @Entity
 @Table(name = "mtx_contrato_informacao_complementar")
 @Data
-@IdClass(ContractCompInformation.IdClass.class)
-@JsonIgnoreProperties(value = {"lastUpdate","createAt"})
+//@IdClass(ContractCompInformation.IdClass.class)
+@JsonIgnoreProperties(value = {"lastUpdate", "createAt"})
 public class ContractCompInformation {
 
     @Id
     @Column(name = "wbc_contrato")
     private Long wbcContract;
 
-    @Id
     @Column(name = "wbc_ponto_de_medicao")
     private String meansurementPoint;
 
@@ -90,18 +87,16 @@ public class ContractCompInformation {
     @Column(name = "fator_atendimento_carga")
     private Double factorAttendanceCharge;
 
+    @JsonIgnore
     @Column(name = "data_criacao")
     private LocalDateTime createdAt;
 
+    @JsonIgnore
     @Column(name = "data_ultima_alteracao")
     private LocalDateTime lastUpdate;
 
     @OneToMany(fetch = FetchType.EAGER, orphanRemoval = true, cascade = CascadeType.ALL)
-    @JoinColumns({
-        @JoinColumn(name = "wbc_ponto_de_medicao", columnDefinition = "wbc_ponto_de_medicao")
-        ,
-        @JoinColumn(name = "wbc_contrato", columnDefinition = "wbc_contrato")
-    })
+    @JoinColumn(name = "wbc_contrato")
     private List<ContractProInfa> proinfas;
 
     @PrePersist
@@ -114,13 +109,12 @@ public class ContractCompInformation {
         this.lastUpdate = LocalDateTime.now();
     }
 
-    @Data
-    public static class IdClass implements Serializable {
-
-        private Long wbcContract;
-        private String meansurementPoint;
-    }
-
+//    @Data
+//    public static class IdClass implements Serializable {
+//
+//        private Long wbcContract;
+//        private String meansurementPoint;
+//    }
     public void update(ContractCompInformation entity) {
 
         if (Optional.ofNullable(entity.getWbcContract()).isPresent() && !entity.getWbcContract().equals(this.wbcContract)) {

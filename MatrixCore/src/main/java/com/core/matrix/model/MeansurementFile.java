@@ -111,7 +111,7 @@ public class MeansurementFile {
     
     public MeansurementFile(ContractDTO dTO, String processInstance, String meansurementPoint){        
         this.status  = MeansurementFileStatus.FILE_PENDING;
-        this.wbcContract = dTO.getNCdContrato();
+        this.wbcContract = Long.parseLong(dTO.getSNrContrato());
         this.meansurementPoint = meansurementPoint;
         this.processInstanceId = processInstance;
     }

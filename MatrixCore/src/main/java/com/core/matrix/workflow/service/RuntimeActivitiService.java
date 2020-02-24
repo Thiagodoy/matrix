@@ -7,6 +7,7 @@ package com.core.matrix.workflow.service;
 
 import com.core.matrix.request.AddComment;
 import com.core.matrix.request.CompleteTaskRequest;
+import com.core.matrix.request.DeleteProcessRequest;
 import com.core.matrix.request.StartProcessRequest;
 import com.core.matrix.response.AttachmentResponse;
 import com.core.matrix.response.PageResponse;
@@ -518,8 +519,9 @@ public class RuntimeActivitiService {
     }
 
     @Transactional
-    public void deleteProcess(String[] values) {
-        for (String id : values) {
+    public void deleteProcess(DeleteProcessRequest request) {
+        
+        for (String id : request.getIds()) {
             runtimeService.deleteProcessInstance(id, null);
         }
     }

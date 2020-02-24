@@ -19,7 +19,7 @@ import org.springframework.stereotype.Repository;
  * @author thiag
  */
 @Repository
-public interface ContractCompInformationRepository extends JpaRepository<ContractCompInformation, ContractCompInformation.IdClass> {
+public interface ContractCompInformationRepository extends JpaRepository<ContractCompInformation, Long> {
     
     
     @Query(nativeQuery = true)
@@ -33,4 +33,5 @@ public interface ContractCompInformationRepository extends JpaRepository<Contrac
     
     
     Optional<ContractCompInformation> findByWbcContractAndMeansurementPoint(Long contract, String point);
+    Optional<ContractCompInformation> findByMeansurementPoint(String point);
 }

@@ -6,7 +6,6 @@
 package com.core.matrix.wbc.dto;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
-import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import java.io.Serializable;
 import java.text.MessageFormat;
@@ -28,14 +27,11 @@ public class ContractDTO implements Serializable{
 
     private String sNmContrato;
 
-    @JsonIgnore
-    //@JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss", shape = JsonFormat.Shape.STRING)
+    
+    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss", shape = JsonFormat.Shape.STRING)
     private LocalDateTime tDdInicio;
     
-    
-
-    @JsonIgnore
-    //@JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss", shape = JsonFormat.Shape.STRING)
+    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss", shape = JsonFormat.Shape.STRING)
     private LocalDateTime tDdTermino;
 
     private Long nCdSubmercado;

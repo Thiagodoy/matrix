@@ -22,11 +22,17 @@ public class LogService {
     @Autowired
     private LogRepository repository;
 
+    
+    @Transactional(readOnly = true)
+    public List<Log>listByProcessInstance(String id){
+        return this.repository.findByActIdProcesso(id);
+    }
+    
+    
     @Transactional
     public void save(Log log) {
         this.repository.save(log);
-    }
-    
+    }    
     
     @Transactional
     public void save(List<Log> log) {
@@ -36,6 +42,11 @@ public class LogService {
     @Transactional
     public void deleteLogsByFile(Long id) {
         this.repository.deleteByFileId(id);
+    }
+    
+    @Transactional
+    public void deleteLogsByProcessInstance(String id) {
+        this.repository.deleteByActIdProcesso(id);
     }
 
 }

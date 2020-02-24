@@ -51,6 +51,8 @@ public class DataValidationTask implements Task {
     @Override
     public void execute(DelegateExecution de) throws Exception {
 
+        delegateExecution = de;
+
         List<MeansurementFile> files = this.fileService.findByProcessInstanceId(delegateExecution.getProcessInstanceId());
 
         files.forEach(file -> {
@@ -60,8 +62,8 @@ public class DataValidationTask implements Task {
         files.stream().forEach(file -> {
 
             try {
-                this.checkDays(file);
                 this.checkCalendar(file);
+                this.checkDays(file);
                 this.checkHour(file);
 
             } catch (Exception e) {
@@ -116,7 +118,7 @@ public class DataValidationTask implements Task {
         if (!details.isEmpty()) {
             file.setStatus(MeansurementFileStatus.DATA_CALENDAR_ERROR);
             fileService.updateStatus(MeansurementFileStatus.DATA_CALENDAR_ERROR, file.getId());
-            
+
             throw new Exception("Calendário inválido! arquivo -> " + file.getId());
         }
 
@@ -153,7 +155,13 @@ public class DataValidationTask implements Task {
                 });
 
                 if (!hoursOut.isEmpty()) {
+
+                    hoursOut.parallelStream().forEach(d -> {
+                        d.setStatus(MeansurementFileDetailStatus.HOUR_ERROR);
+                    });
+
                     details.addAll(hoursOut);
+                    this.fileDetailService.save(details);
                 }
             }
 

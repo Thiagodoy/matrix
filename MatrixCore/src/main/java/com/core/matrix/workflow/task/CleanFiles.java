@@ -5,10 +5,9 @@
  */
 package com.core.matrix.workflow.task;
 
-import com.core.matrix.model.MeansurementFile;
+import com.core.matrix.service.LogService;
 import com.core.matrix.service.MeansurementFileDetailService;
 import com.core.matrix.service.MeansurementFileService;
-import com.core.matrix.utils.Constants;
 import com.core.matrix.utils.MeansurementFileStatus;
 import java.util.List;
 import java.util.logging.Level;
@@ -28,6 +27,7 @@ public class CleanFiles implements JavaDelegate {
     private static ApplicationContext context;
     private MeansurementFileService fileService;
     private MeansurementFileDetailService fileDetailService;
+    private LogService logService;
 
     public CleanFiles(ApplicationContext context) {
         CleanFiles.context = context;
@@ -37,6 +37,7 @@ public class CleanFiles implements JavaDelegate {
         synchronized (CleanFiles.context) {
             this.fileService = CleanFiles.context.getBean(MeansurementFileService.class);
             this.fileDetailService = CleanFiles.context.getBean(MeansurementFileDetailService.class);
+            this.logService = CleanFiles.context.getBean(LogService.class);
         }
     }
 
@@ -60,6 +61,12 @@ public class CleanFiles implements JavaDelegate {
                 this.fileDetailService.deleteAll(file.getDetails());
                 this.fileService.updateStatus(MeansurementFileStatus.FILE_PENDING, file.getId());
             });
+            
+            
+            
+            logService.deleteLogsByProcessInstance(execution.getProcessInstanceId());
+            
+            
 
         } catch (Exception e) {
             Logger.getLogger(CleanFiles.class.getName()).log(Level.SEVERE, "[ execute ]", e);

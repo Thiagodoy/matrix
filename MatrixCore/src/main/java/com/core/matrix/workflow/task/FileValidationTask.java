@@ -10,8 +10,10 @@ import static com.core.matrix.utils.Constants.*;
 import com.core.matrix.dto.FileDetailDTO;
 import com.core.matrix.dto.FileParsedDTO;
 import com.core.matrix.io.BeanIoReader;
+import com.core.matrix.model.Log;
 import com.core.matrix.model.MeansurementFile;
 import com.core.matrix.model.MeansurementFileDetail;
+import com.core.matrix.service.LogService;
 import com.core.matrix.service.MeansurementFileDetailService;
 import com.core.matrix.service.MeansurementFileService;
 import com.core.matrix.utils.MeansurementFileStatus;
@@ -26,6 +28,7 @@ import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.nio.charset.Charset;
 import java.text.MessageFormat;
+import java.util.ArrayList;
 
 import java.util.List;
 import java.util.Optional;
@@ -53,9 +56,12 @@ public class FileValidationTask implements JavaDelegate {
     private MeansurementFileService service;
     private MeansurementFileDetailService detailService;
     private DelegateExecution delegateExecution;
+    private LogService logService;
+
     private List<String> meansurementPoints;
     private List<MeansurementFile> files;
-    private List<String> messageErrors;
+
+    private List<Log> logs;
 
     public FileValidationTask() {
 
@@ -63,6 +69,7 @@ public class FileValidationTask implements JavaDelegate {
             this.taskService = FileValidationTask.context.getBean(TaskService.class);
             this.service = FileValidationTask.context.getBean(MeansurementFileService.class);
             this.detailService = FileValidationTask.context.getBean(MeansurementFileDetailService.class);
+            this.logService = FileValidationTask.context.getBean(LogService.class);
         }
 
     }
@@ -74,51 +81,68 @@ public class FileValidationTask implements JavaDelegate {
     @Override
     public void execute(DelegateExecution de) throws Exception {
 
-        delegateExecution = de;
-        final List<String> attachmentIds = (List<String>) de.getVariable(LIST_ATTACHMENT_ID, Object.class);
-        final String user = de.getVariable(USER_UPLOAD, String.class);
-        files = this.service.findByProcessInstanceId(delegateExecution.getProcessInstanceId());
+        try {
+            delegateExecution = de;
+            logs = new ArrayList<>();
+            final List<String> attachmentIds = (List<String>) de.getVariable(LIST_ATTACHMENT_ID, Object.class);
+            final String user = de.getVariable(USER_UPLOAD, String.class);
+            files = this.service.findByProcessInstanceId(delegateExecution.getProcessInstanceId());
 
-        attachmentIds.parallelStream().forEach(attachmentId -> {
-
-            try {
+            attachmentIds.parallelStream().forEach(attachmentId -> {
 
                 InputStream stream = null;
                 String fileName = null;
+                try {
 
-                synchronized (taskService) {
-                    stream = taskService.getAttachmentContent(attachmentId);
-                    stream = removeLinesEmpty(stream);
-                    fileName = taskService.getAttachment(attachmentId).getName();
+                    synchronized (taskService) {
+                        stream = taskService.getAttachmentContent(attachmentId);
+                        stream = removeLinesEmpty(stream);
+                        fileName = taskService.getAttachment(attachmentId).getName();
+                    }
+
+                    BeanIoReader reader = new BeanIoReader();
+                    Optional<FileParsedDTO> fileParsed = reader.<FileParsedDTO>parse(stream);
+
+                    if (!reader.getErrors().isEmpty()) {
+                        writeFile(fileName, reader.getErrors(), de);
+                    } else if (fileParsed.isPresent()) {
+                        mountFile(fileParsed.get(), attachmentId, user, files);
+                    }
+
+                } catch (Exception e) {
+                    Logger.getLogger(FileValidationTask.class.getName()).log(Level.SEVERE, "[ forEach ]", e);
+                    this.generateLog(de, e, "Erro ao processar o arquivo : " + fileName);
                 }
 
-                BeanIoReader reader = new BeanIoReader();
-                Optional<FileParsedDTO> fileParsed = reader.<FileParsedDTO>parse(stream);
+            });
 
-                if (!reader.getErrors().isEmpty()) {
-                    writeFile(fileName, reader.getErrors(), de);
-                } else if (fileParsed.isPresent()) {
-                    mountFile(fileParsed.get(), attachmentId, user, files);
-                }
+            files.stream().filter(f -> f.getFile() == null).forEach(f -> {
+                String message = MessageFormat.format("Não foi encontrado nenhuma correspondência do ponto de medição, dentro dos arquivos postados.\nInformação:\nContrato: {0}\nPonto de Medição: {1}\n", f.getWbcContract().toString().replace(".", ""), f.getMeansurementPoint());
+                this.generateLog(de, null, message);
+            });
 
-            } catch (Exception e) {
-                Logger.getLogger(FileValidationTask.class.getName()).log(Level.SEVERE, "[ forEach ]", e);
+            if (!this.logs.isEmpty()) {
+                this.logService.save(logs);
+                delegateExecution.setVariable(CONTROLE, RESPONSE_LAYOUT_INVALID);
+            } else {
+                delegateExecution.setVariable(CONTROLE, RESPONSE_LAYOUT_VALID);
             }
-
-        });
-
-        files.stream().filter(f -> f.getFile() == null).forEach(f -> {
-            String message = MessageFormat.format("Não foi encontrado nenhuma corespondência do ponto de medição, dentro dos arquivos postados.\nInformação:\nContrato: {0}\nPonto de Medição: {1}\n", f.getWbcContract(), f.getMeansurementPoint());
-            this.messageErrors.add(message);
-        });
-
-        if (!this.messageErrors.isEmpty()) {
-            delegateExecution.setVariable(RESPONSE_RESULT, messageErrors);
-            delegateExecution.setVariable(CONTROLE, RESPONSE_LAYOUT_INVALID);
-        } else {
-            delegateExecution.setVariable(CONTROLE, RESPONSE_LAYOUT_VALID);
+        } catch (Exception e) {
+            Logger.getLogger(FileValidationTask.class.getName()).log(Level.SEVERE, "[execute]", e);
         }
 
+    }
+
+    private void generateLog(DelegateExecution de, Exception e, String message) {
+        Log log = new Log();
+        log.setMessage(message);
+        String messageError = Optional.ofNullable(e).isPresent() ? e.getMessage() : "";
+
+        log.setMessageErrorApplication(messageError);
+        log.setActIdProcesso(de.getProcessInstanceId());
+        log.setNameProcesso(de.getProcessBusinessKey());
+        log.setActivitiName(de.getCurrentActivityName());
+        this.logs.add(log);
     }
 
     private void writeFile(String fileName, List<String> errors, DelegateExecution de) {
@@ -131,6 +155,14 @@ public class FileValidationTask implements JavaDelegate {
             file = File.createTempFile("erros", ".txt");
             writer = new FileWriter(file);
 
+            errors.stream().distinct().forEach(msg -> {
+                Log log = new Log();
+                log.setMessage(msg);
+                log.setActivitiName(de.getCurrentActivityName());
+                log.setActIdProcesso(de.getProcessInstanceId());
+                logs.add(log);
+            });
+
             String content = errors.stream().distinct().collect(Collectors.joining("\n"));
             writer.write(content);
             writer.flush();
@@ -139,12 +171,14 @@ public class FileValidationTask implements JavaDelegate {
             taskService.createAttachment("text/plain",
                     null,
                     de.getProcessInstanceId(),
-                    fileName + "erros.txt",
+                    fileName + "_erros.txt",
                     "attachmentDescription",
                     new FileInputStream(file));
 
         } catch (IOException ex) {
             Logger.getLogger(FileValidationTask.class.getName()).log(Level.SEVERE, "[ writeFile ]", ex);
+            this.generateLog(de, ex, "Não foi possivel gravar o arquivo de erro.");
+
         } finally {
 
             if (file != null) {
@@ -170,6 +204,7 @@ public class FileValidationTask implements JavaDelegate {
                 file.setUser(userId);
                 file.setType(type);
             });
+
             //List all point that are into the file    
             List<String> meansuremPoint = details.parallelStream().map(d -> d.getMeansurementPoint()).distinct().collect(Collectors.toList());
 
@@ -189,7 +224,7 @@ public class FileValidationTask implements JavaDelegate {
                             .collect(Collectors.toList());
 
                     fileDetaisl.forEach(d -> {
-                        d.setIdMeansurementFile(file.getId());                        
+                        d.setIdMeansurementFile(file.getId());
                     });
 
                     opt.get().setStatus(MeansurementFileStatus.SUCCESS);
@@ -200,7 +235,8 @@ public class FileValidationTask implements JavaDelegate {
 
         } catch (Exception e) {
             Logger.getLogger(FileValidationTask.class.getName()).log(Level.SEVERE, "[ mountFile ]", e);
-            throw e;
+            String fileName = taskService.getAttachment(attachmentId).getName();
+            this.generateLog(delegateExecution, e, "Erro ao montar os detalhes do arquivo : " + fileName);
         }
 
     }

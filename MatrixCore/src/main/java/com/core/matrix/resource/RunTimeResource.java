@@ -7,6 +7,7 @@ package com.core.matrix.resource;
 
 import com.core.matrix.request.AddComment;
 import com.core.matrix.request.CompleteTaskRequest;
+import com.core.matrix.request.DeleteProcessRequest;
 import com.core.matrix.request.StartProcessRequest;
 import com.core.matrix.response.AttachmentResponse;
 import com.core.matrix.response.PageResponse;
@@ -255,10 +256,10 @@ public class RunTimeResource {
         }
     }
 
-    @RequestMapping(value = "/process/{id}", method = RequestMethod.DELETE)
-    public ResponseEntity deleteProcess(@RequestParam(name = "[]id") String[] id) {
+    @RequestMapping(value = "/process", method = RequestMethod.DELETE)
+    public ResponseEntity deleteProcess(@RequestBody DeleteProcessRequest request) {
         try {
-            service.deleteProcess(id);
+            service.deleteProcess(request);
             return ResponseEntity.ok().build();
         } catch (Exception e) {
             Logger.getLogger(RepositoryResource.class.getName()).log(Level.SEVERE, "[post]", e);

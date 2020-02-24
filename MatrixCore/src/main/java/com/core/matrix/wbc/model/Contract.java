@@ -178,13 +178,13 @@ import lombok.Data;
                     ,    
                         @ColumnResult(name = "quantidade_contratada", type = Double.class)
                     ,
-                        @ColumnResult(name = "nQtContratadaMin", type = Double.class)
-                    ,
-                        @ColumnResult(name = "nQtContratadaMax", type = Double.class)
-                    ,
                         @ColumnResult(name = "quantidade_contratada_minima", type = Double.class)
                     ,
                         @ColumnResult(name = "quantidade_contratada_maxima", type = Double.class)
+                    ,
+                        @ColumnResult(name = "limite_minimo", type = Double.class)
+                    ,
+                        @ColumnResult(name = "limite_maximo", type = Double.class)
 
                 }))
 

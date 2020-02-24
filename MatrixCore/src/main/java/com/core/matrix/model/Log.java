@@ -5,6 +5,7 @@
  */
 package com.core.matrix.model;
 
+import com.fasterxml.jackson.annotation.JsonFormat;
 import java.time.LocalDateTime;
 import javax.persistence.Column;
 import javax.persistence.Entity;
@@ -23,33 +24,40 @@ import lombok.Data;
 @Table(name = "mtx_log")
 @Data
 public class Log {
-    
+
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "id_log")
     private Long id;
-    
+
     @Column(name = "anexo")
-    private String attachment;    
-    
+    private String attachment;
+
     @Column(name = "id_arquivo")
-    private Long fileId;  
-    
+    private Long fileId;
+
     @Column(name = "nome_processo")
-    private String nameProcesso;  
-    
+    private String nameProcesso;
+
+    @Column(name = "act_id_processo")
+    private String actIdProcesso;
+
     @Column(name = "mensagem")
     private String message;
+
+    @Column(name = "mensagem_erro_aplicacao")
+    private String messageErrorApplication;
     
+    @Column(name = "nome_atividade")
+    private String activitiName;
+
+    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss", shape = JsonFormat.Shape.STRING)
     @Column(name = "data_criacao")
     private LocalDateTime createAt;
-    
-    
+
     @PrePersist
-    public void generateDate(){
+    public void generateDate() {
         this.createAt = LocalDateTime.now();
     }
-    
-    
-    
+
 }

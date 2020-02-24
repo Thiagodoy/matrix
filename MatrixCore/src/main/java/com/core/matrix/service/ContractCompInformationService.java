@@ -7,7 +7,6 @@ package com.core.matrix.service;
 
 import com.core.matrix.dto.ContractInformationDTO;
 import com.core.matrix.model.ContractCompInformation;
-import com.core.matrix.model.ContractProInfa;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -46,32 +45,13 @@ public class ContractCompInformationService {
     @Transactional
     public void update(ContractCompInformation information) throws Exception {
 
-        ContractCompInformation.IdClass idClass = new ContractCompInformation.IdClass();
-        idClass.setMeansurementPoint(information.getMeansurementPoint());
-        idClass.setWbcContract(information.getWbcContract());
-
         ContractCompInformation entity = this.repository
-                .findById(idClass)
+                .findById(information.getWbcContract())
                 .orElseThrow(() -> new Exception("Não foi encontrado nenhuma informação adicional para o contrato"));
 
-        entity.update(information);
-
-        this.repository.save(entity);
-
-        ContractProInfa.IdClass id = new ContractProInfa.IdClass();
-        id.setMeansurementPoint(information.getMeansurementPoint());
-        id.setWbcContract(information.getWbcContract());
-        proInfaService.delete(id);
-
-        information.getProinfas().forEach(c -> {
-
-            c.setMeansurementPoint(id.getMeansurementPoint());
-            c.setWbcContract(c.getWbcContract());
-
-        });
+        this.repository.delete(entity);        
+        this.save(information);
         
-        proInfaService.saveAll(information.getProinfas());
-
     }
 
     @Transactional
@@ -79,27 +59,32 @@ public class ContractCompInformationService {
 
         Optional<ContractCompInformation> opt = this.repository.findByWbcContract(contractId);
 
-        if (opt.isPresent()) {
+        if (opt.isPresent() && opt.get().getIsApportionment() == 0L) {
+            return Arrays.asList(opt.get());
+        } else if (opt.isPresent() && opt.get().getIsApportionment() == 1L) {
+
             ContractCompInformation contractCompInformation = opt.get();
+            Optional<Long> isSon = Optional.ofNullable(contractCompInformation.getCodeContractApportionment());
 
-            Optional<Long> hasParent = Optional.ofNullable(contractCompInformation.getCodeContractApportionment());
+            if (isSon.isPresent()) {
+                //load all sons
+                List<ContractCompInformation> rateioSon = this.repository.findByCodeContractApportionment(isSon.get());
+                ContractCompInformation rateioFather = this.repository.findByCodeWbcContract(isSon.get())
+                        .orElseThrow(() -> new Exception("Não foi possivel localizar o contrato pai!"));
 
-            if (hasParent.isPresent() && contractCompInformation.getIsApportionment().equals(1L)) {
-                
-                List<ContractCompInformation> rateioSon = this.repository.findByCodeContractApportionment(hasParent.get());
-                ContractCompInformation rateioParent = this.repository.findByCodeWbcContract(hasParent.get()).orElseThrow(()-> new Exception("Não foi possivel localizar o contrato pai!"));
-                rateioSon.add(rateioParent);
+                rateioSon.add(rateioFather);
                 return rateioSon;
-            } else if(!hasParent.isPresent() && contractCompInformation.getIsApportionment().equals(1L)){
-            
+            } else {
+
                 List<ContractCompInformation> rateioSon = this.repository.findByCodeContractApportionment(contractCompInformation.getCodeWbcContract());
+               
+
                 rateioSon.add(contractCompInformation);
                 return rateioSon;
-            }else {
-                return Arrays.asList(opt.get());
+
             }
 
-        } else {
+        }else{
             return new ArrayList<>();
         }
 
@@ -116,7 +101,11 @@ public class ContractCompInformationService {
     }
 
     public Optional<ContractCompInformation> findByWbcContractAndMeansurementPoint(Long contract, String point) {
-        return this.findByWbcContractAndMeansurementPoint(contract, point);
+        return this.repository.findByWbcContractAndMeansurementPoint(contract, point);
+    }
+    
+    public Optional<ContractCompInformation> findByMeansurementPoint(String point) {
+        return this.repository.findByMeansurementPoint(point);
     }
 
 }

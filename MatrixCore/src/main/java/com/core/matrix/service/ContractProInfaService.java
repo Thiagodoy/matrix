@@ -23,7 +23,7 @@ public class ContractProInfaService {
     private ContractProInfaRepository repository;
 
     @Transactional
-    public void delete(ContractProInfa.IdClass id) {
+    public void delete(Long id) {
         this.repository.deleteById(id);
     }
 

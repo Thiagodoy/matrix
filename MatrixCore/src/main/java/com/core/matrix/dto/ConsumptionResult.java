@@ -16,10 +16,6 @@ import lombok.Data;
  */
 @Data
 public class ConsumptionResult implements Serializable{
-    
-    
-    
-    
     private String meansurementPoint;
     private Double result = 0D;
     private String error;
