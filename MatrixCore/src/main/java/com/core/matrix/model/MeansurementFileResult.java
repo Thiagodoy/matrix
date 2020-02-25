@@ -27,7 +27,7 @@ public class MeansurementFileResult {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = "mtx_aquivo_de_medicao_resultado")
+    @Column(name = "id_aquivo_de_medicao_resultado")
     private Long id;
 
     @Column(name = "id_arquivo_de_medicao")
@@ -80,6 +80,9 @@ public class MeansurementFileResult {
     
     @Column(name = "nome_fantasia")
     private String nickNameCompany;
+    
+    @Column(name = "contrato_pai")
+    private Long contractParent;
     
     public MeansurementFileResult(ContractWbcInformationDTO informationDTO, String idProcess){        
         

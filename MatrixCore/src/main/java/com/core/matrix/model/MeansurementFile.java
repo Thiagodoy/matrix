@@ -9,6 +9,7 @@ import com.core.matrix.dto.MeansurementFileStatusDTO;
 import com.core.matrix.utils.MeansurementFileStatus;
 import com.core.matrix.utils.MeansurementFileType;
 import com.core.matrix.wbc.dto.ContractDTO;
+import java.io.Serializable;
 import java.time.LocalDateTime;
 import java.util.List;
 import javax.persistence.CascadeType;
@@ -35,28 +36,25 @@ import lombok.NoArgsConstructor;
  *
  * @author thiag
  */
-
-
-@SqlResultSetMapping(name = "statusDTO", 
+@SqlResultSetMapping(name = "statusDTO",
         classes = @ConstructorResult(
                 targetClass = MeansurementFileStatusDTO.class,
                 columns = {
-                        @ColumnResult(name = "Status", type = String.class),
-                        @ColumnResult(name = "qtd", type = Long.class),                                                       
-                    
-                }))
+                    @ColumnResult(name = "Status", type = String.class)
+                    ,
+                        @ColumnResult(name = "qtd", type = Long.class),}))
 
 @NamedNativeQuery(name = "MeansurementFile.getStatus",
-        query = "select 'RECEIVED' as status, count(1) as qtd from matrix.mtx_arquivo_de_medicao a where a.mes = :month and a.ano = :year\n" +
-                "union all\n" +
-                "select status , count(1) from matrix.mtx_arquivo_de_medicao a where a.mes = :month and a.ano = :year group by status ",
+        query = "select 'RECEIVED' as status, count(1) as qtd from matrix.mtx_arquivo_de_medicao a where a.mes = :month and a.ano = :year\n"
+        + "union all\n"
+        + "select status , count(1) from matrix.mtx_arquivo_de_medicao a where a.mes = :month and a.ano = :year group by status ",
         resultSetMapping = "statusDTO")
 
 @Entity
 @Table(name = "mtx_arquivo_de_medicao")
 @Data
 @NoArgsConstructor
-public class MeansurementFile {
+public class MeansurementFile implements Serializable{
 
     @Id
     @Column(name = "id_arquivo_de_medicao")
@@ -65,13 +63,13 @@ public class MeansurementFile {
 
     @Column(name = "wbc_contrato")
     private Long wbcContract;
-    
+
     @Column(name = "wbc_ponto_de_medicao")
     private String meansurementPoint;
-    
+
     @Column(name = "act_id_processo")
     private String processInstanceId;
-    
+
     @Column(name = "mes")
     private Long month;
 
@@ -97,26 +95,21 @@ public class MeansurementFile {
     @Column(name = "tipo_arquivo")
     @Enumerated(EnumType.STRING)
     private MeansurementFileType type;
-    
-    @OneToMany(cascade = {CascadeType.PERSIST, CascadeType.REMOVE }, orphanRemoval = true, fetch = FetchType.EAGER)
+
+    @OneToMany(cascade = {CascadeType.PERSIST, CascadeType.REMOVE}, orphanRemoval = true, fetch = FetchType.EAGER)
     @JoinColumn(name = "id_arquivo_de_medicao")
-    private List<MeansurementFileDetail>details;    
-    
-    
+    private List<MeansurementFileDetail> details;
+
     @PrePersist
-    public void generateCreatedAt(){
+    public void generateCreatedAt() {
         this.createdAt = LocalDateTime.now();
     }
-    
-    
-    public MeansurementFile(ContractDTO dTO, String processInstance, String meansurementPoint){        
-        this.status  = MeansurementFileStatus.FILE_PENDING;
+
+    public MeansurementFile(ContractDTO dTO, String processInstance, String meansurementPoint) {
+        this.status = MeansurementFileStatus.FILE_PENDING;
         this.wbcContract = Long.parseLong(dTO.getSNrContrato());
         this.meansurementPoint = meansurementPoint;
         this.processInstanceId = processInstance;
     }
-    
-   
-    
 
 }

@@ -88,7 +88,7 @@ public class FileValidationTask implements JavaDelegate {
             final String user = de.getVariable(USER_UPLOAD, String.class);
             files = this.service.findByProcessInstanceId(delegateExecution.getProcessInstanceId());
 
-            attachmentIds.parallelStream().forEach(attachmentId -> {
+            attachmentIds.stream().forEach(attachmentId -> {
 
                 InputStream stream = null;
                 String fileName = null;
@@ -198,7 +198,14 @@ public class FileValidationTask implements JavaDelegate {
 
         try {
 
+            Logger.getLogger(FileValidationTask.class.getName()).log(Level.SEVERE, "mount File layout :->" + fileParsedDTO.getType() );
+            
             MeansurementFileType type = MeansurementFileType.valueOf(fileParsedDTO.getType());
+            
+            Logger.getLogger(FileValidationTask.class.getName()).log(Level.SEVERE, "mount File  escolhido :->" + type.toString() );
+            
+            
+            
             final List<MeansurementFileDetail> details = this.mountDetail(fileParsedDTO.getDetails(), type);
 
             //set a user for files and type
@@ -208,7 +215,11 @@ public class FileValidationTask implements JavaDelegate {
             });
 
             //List all point that are into the file    
-            List<String> meansuremPoint = details.parallelStream().map(d -> d.getMeansurementPoint()).distinct().collect(Collectors.toList());
+            List<String> meansuremPoint = details
+                    .parallelStream()
+                    .map(d -> d.getMeansurementPoint().replaceAll("\\((L|B)\\)", "").trim())
+                    .distinct()
+                    .collect(Collectors.toList());
 
             //Verify if point match some files made. And set the attachment id on file             
             meansuremPoint.forEach(point -> {
@@ -222,7 +233,7 @@ public class FileValidationTask implements JavaDelegate {
 
                     List<MeansurementFileDetail> fileDetaisl = details
                             .stream()
-                            .filter(d -> d.getMeansurementPoint().equals(point))
+                            .filter(d -> d.getMeansurementPoint().replaceAll("\\((L|B)\\)", "").trim().equals(point))
                             .collect(Collectors.toList());
 
                     fileDetaisl.forEach(d -> {
@@ -247,6 +258,7 @@ public class FileValidationTask implements JavaDelegate {
         return details
                 .parallelStream()
                 .map(d -> new MeansurementFileDetail(d, type))
+                .filter(mpd-> !mpd.getMeansurementPoint().contains("(B)"))
                 .collect(Collectors.toList());
     }
 

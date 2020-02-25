@@ -31,7 +31,7 @@ public class MeansurementFileService {
     }
     
     
-    @Transactional 
+    @Transactional(transactionManager = "matrixTransactionManager")
     public List<MeansurementFile> findByProcessInstanceId(String id){
         return this.repository.findByProcessInstanceId(id);
     }

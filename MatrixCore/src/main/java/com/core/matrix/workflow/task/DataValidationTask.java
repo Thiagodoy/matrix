@@ -5,6 +5,7 @@
  */
 package com.core.matrix.workflow.task;
 
+import com.core.matrix.io.BeanIoReader;
 import com.core.matrix.model.MeansurementFile;
 import com.core.matrix.model.MeansurementFileDetail;
 import com.core.matrix.service.MeansurementFileDetailService;
@@ -56,7 +57,8 @@ public class DataValidationTask implements Task {
         List<MeansurementFile> files = this.fileService.findByProcessInstanceId(delegateExecution.getProcessInstanceId());
 
         files.forEach(file -> {
-            file.setStatus(MeansurementFileStatus.SUCCESS);
+            Logger.getLogger(BeanIoReader.class.getName()).log(Level.SEVERE, "File id -> " + file.getId());
+            file.setStatus(MeansurementFileStatus.SUCCESS);           
         });
 
         files.stream().forEach(file -> {
@@ -68,6 +70,7 @@ public class DataValidationTask implements Task {
 
             } catch (Exception e) {
                 Logger.getLogger(DataValidationTask.class.getName()).log(Level.SEVERE, "[execute]", e);
+                de.setVariable(CONTROLE, RESPONSE_INVALID_DATA);
             }
 
         });
@@ -90,6 +93,10 @@ public class DataValidationTask implements Task {
         int daysOnMonth = YearMonth.of(file.getYear().intValue(), Month.of(file.getMonth().intValue())).lengthOfMonth();
         LocalDate init = LocalDate.of(file.getYear().intValue(), file.getMonth().intValue(), 1);
         LocalDate end = LocalDate.of(file.getYear().intValue(), file.getMonth().intValue(), daysOnMonth);
+        
+        
+        
+        
 
         Map<String, List<MeansurementFileDetail>> lotes = this.getDetails(file, delegateExecution)
                 .stream()

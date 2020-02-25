@@ -18,20 +18,25 @@ import org.springframework.transaction.annotation.Transactional;
  */
 @Service
 public class MeansurementFileResultService {
-    
+
     @Autowired
     private MeansurementFileResultRepository repository;
-    
-    
-    @Transactional 
-    public void save(MeansurementFileResult result){
+
+    @Transactional
+    public void save(MeansurementFileResult result) {
         this.repository.save(result);
     }
-    
+
     @Transactional(readOnly = true)
-    public List<MeansurementFileResult>getResult(String id){
+    public List<MeansurementFileResult> getResult(String id) {
         return this.repository.findByIdProcess(id);
+    }
+
+    @Transactional(transactionManager = "matrixTransactionManager")
+    public void deleteByProcess(String id){
+        this.repository.deleteByIdProcess(id);
     }
     
     
+
 }

@@ -91,11 +91,24 @@ public class BeanIoReader {
             String content = record.getInformations().get(0).getValue();
             JaroWinklerDistance n = new JaroWinklerDistance();
 
-            if (n.apply(CONTENT_ID_LAYOUT_A, content) >= 0.8) {
+            Logger.getLogger(BeanIoReader.class.getName()).log(Level.SEVERE, "CONTENT_ID_LAYOUT_A=" + CONTENT_ID_LAYOUT_A + " | " + "content=" + content  );
+            
+            Logger.getLogger(BeanIoReader.class.getName()).log(Level.SEVERE, "Regra CONTENT_ID_LAYOUT_A = " + n.apply(CONTENT_ID_LAYOUT_A, content)  );
+            Logger.getLogger(BeanIoReader.class.getName()).log(Level.SEVERE, "Regra CONTENT_ID_LAYOUT_B = " + n.apply(CONTENT_ID_LAYOUT_B, content)  );
+            Logger.getLogger(BeanIoReader.class.getName()).log(Level.SEVERE, "Regra CONTENT_ID_LAYOUT_C = " + n.apply(CONTENT_ID_LAYOUT_C, content)  );
+            
+            
+            
+            
+            
+            
+            
+            
+            if (n.apply(CONTENT_ID_LAYOUT_A, content) >= 0.95) {
                 return MeansurementFileType.LAYOUT_A;
-            } else if (n.apply(CONTENT_ID_LAYOUT_B, content) >= 0.8) {
+            } else if (n.apply(CONTENT_ID_LAYOUT_B, content) >= 0.95) {
                 return MeansurementFileType.LAYOUT_B;
-            } else if (n.apply(CONTENT_ID_LAYOUT_C, content) >= 0.8) {
+            } else if (n.apply(CONTENT_ID_LAYOUT_C, content) >= 0.95) {
                 return MeansurementFileType.LAYOUT_C;
             } else {
                 throw new Exception("Não foi possivel determinar o layout do arquivo!");

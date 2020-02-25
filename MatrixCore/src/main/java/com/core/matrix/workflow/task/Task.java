@@ -33,13 +33,11 @@ import org.activiti.engine.delegate.JavaDelegate;
  *
  * @author thiag
  */
+public interface Task extends JavaDelegate {
 
-public interface Task extends JavaDelegate{ 
-    
-   
-    default List<MeansurementFileDetail> getDetails(MeansurementFile file,DelegateExecution delegateExecution) throws Exception {
+    default List<MeansurementFileDetail> getDetails(MeansurementFile file, DelegateExecution delegateExecution) throws Exception {
 
-        List<MeansurementFileDetail> result = new ArrayList<>();
+        List<MeansurementFileDetail> result = new ArrayList<>();        
 
         switch (file.getType()) {
             case LAYOUT_A:
@@ -48,10 +46,10 @@ public interface Task extends JavaDelegate{
                         .filter(d -> d.getEnergyType().equalsIgnoreCase(TYPE_ENERGY_LIQUID))
                         .filter(d -> {
                             if ((d.getReasonOfSituation() != null && d.getReasonOfSituation().length() > 0)
-                                    && (Utils.checkDistance(CONST_SITUATION_1, d.getReasonOfSituation()) > 0.95
-                                    || (Utils.checkDistance(CONST_SITUATION_2, d.getReasonOfSituation()) > 0.95)
-                                    || (Utils.checkDistance(CONST_SITUATION_3, d.getReasonOfSituation()) > 0.95)
-                                    || (Utils.checkDistance(CONST_SITUATION_4, d.getReasonOfSituation()) > 0.95))) {
+                                    && (Utils.checkDistance(CONST_SITUATION_1, d.getReasonOfSituation()) > 0.90
+                                    || (Utils.checkDistance(CONST_SITUATION_2, d.getReasonOfSituation()) > 0.90)
+                                    || (Utils.checkDistance(CONST_SITUATION_3, d.getReasonOfSituation()) > 0.90)
+                                    || (Utils.checkDistance(CONST_SITUATION_4, d.getReasonOfSituation()) > 0.90))) {
                                 return true;
                             } else {
                                 return false;
@@ -60,14 +58,16 @@ public interface Task extends JavaDelegate{
                         .collect(Collectors.toList());
                 break;
             case LAYOUT_B:
+
                 result = file.getDetails()
                         .parallelStream()
                         .filter(d -> d.getEnergyType().equalsIgnoreCase(TYPE_ENERGY_LIQUID))
                         .filter(d -> {
+
                             if ((d.getSourceCollection() != null && d.getSourceCollection().length() > 0)
-                                    && (Utils.checkDistance(CONST_SOURCE_COLLECTION_1, d.getSourceCollection()) > 0.95
-                                    || (Utils.checkDistance(CONST_SOURCE_COLLECTION_2, d.getSourceCollection()) > 0.95)
-                                    || (Utils.checkDistance(CONST_SOURCE_COLLECTION_3, d.getSourceCollection()) > 0.95))) {
+                                    && (Utils.checkDistance(CONST_SOURCE_COLLECTION_1, d.getSourceCollection()) > 0.90
+                                    || (Utils.checkDistance(CONST_SOURCE_COLLECTION_2, d.getSourceCollection()) > 0.90)
+                                    || (Utils.checkDistance(CONST_SOURCE_COLLECTION_3, d.getSourceCollection()) > 0.90))) {
                                 return true;
                             } else {
                                 return false;
@@ -81,7 +81,7 @@ public interface Task extends JavaDelegate{
                         .filter(detail -> detail.getMeansurementPoint().contains("(L)"))
                         .filter(d -> {
                             if ((d.getQuality() != null && d.getQuality().length() > 0)
-                                    && Utils.checkDistance(CONST_QUALITY_COMPLETE, d.getQuality()) > 0.95) {
+                                    && Utils.checkDistance(CONST_QUALITY_COMPLETE, d.getQuality()) > 0.90) {
                                 return true;
                             } else {
                                 return false;
@@ -89,9 +89,9 @@ public interface Task extends JavaDelegate{
                         })
                         .filter(d -> {
                             if ((d.getOrigem() != null && d.getOrigem().length() > 0)
-                                    && ((Utils.checkDistance(CONST_SITUATION_2, d.getOrigem()) > 0.95)
-                                    || (Utils.checkDistance(CONST_SITUATION_3, d.getOrigem()) > 0.95)
-                                    || (Utils.checkDistance(CONST_SITUATION_4, d.getOrigem()) > 0.95))) {
+                                    && ((Utils.checkDistance(CONST_SITUATION_2, d.getOrigem()) > 0.90)
+                                    || (Utils.checkDistance(CONST_SITUATION_3, d.getOrigem()) > 0.90)
+                                    || (Utils.checkDistance(CONST_SITUATION_4, d.getOrigem()) > 0.90))) {
                                 return true;
                             } else {
                                 return false;
@@ -105,14 +105,14 @@ public interface Task extends JavaDelegate{
                 break;
         }
 
-        if (result.isEmpty()) {            
-            delegateExecution.setVariable(RESPONSE_RESULT_MESSAGE, "Não existe nenhum registro para realizar as validações!");            
-            delegateExecution.setVariable(CONTROLE, RESPONSE_CALENDAR_INVALID, true);            
+        if (result.isEmpty()) {
+            delegateExecution.setVariable(RESPONSE_RESULT_MESSAGE, "Não existe nenhum registro para realizar as validações!");
+            delegateExecution.setVariable(CONTROLE, RESPONSE_CALENDAR_INVALID, true);
             throw new Exception("Não existe dados Suficiente");
         } else {
             return result;
         }
 
     }
-   
+
 }

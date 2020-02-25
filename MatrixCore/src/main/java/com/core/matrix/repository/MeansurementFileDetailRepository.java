@@ -6,6 +6,7 @@
 package com.core.matrix.repository;
 
 import com.core.matrix.model.MeansurementFileDetail;
+import java.util.List;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 
@@ -14,6 +15,8 @@ import org.springframework.stereotype.Repository;
  * @author thiag
  */
 @Repository
-public interface MeansurementFileDetailRepository extends JpaRepository<MeansurementFileDetail, Long> {    
+public interface MeansurementFileDetailRepository extends JpaRepository<MeansurementFileDetail, Long> {
+
+    List<MeansurementFileDetail> findByIdMeansurementFile(Long id);
 
 }

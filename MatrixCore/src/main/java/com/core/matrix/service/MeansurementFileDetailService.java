@@ -29,9 +29,14 @@ public class MeansurementFileDetailService {
         this.repository.save(detail);
     }
     
-    @Transactional
+    @Transactional(transactionManager = "matrixTransactionManager")
     public void save(List<MeansurementFileDetail> detail){
         this.repository.saveAll(detail);
+    }
+    
+    @Transactional(readOnly = true)
+    public List<MeansurementFileDetail> listByFileId(Long fileId){
+        return this.repository.findByIdMeansurementFile(fileId);
     }
     
     

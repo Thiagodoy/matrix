@@ -7,6 +7,7 @@ package com.core.matrix.workflow.task;
 
 import com.core.matrix.service.LogService;
 import com.core.matrix.service.MeansurementFileDetailService;
+import com.core.matrix.service.MeansurementFileResultService;
 import com.core.matrix.service.MeansurementFileService;
 import com.core.matrix.utils.MeansurementFileStatus;
 import java.util.List;
@@ -27,6 +28,7 @@ public class CleanFiles implements JavaDelegate {
     private static ApplicationContext context;
     private MeansurementFileService fileService;
     private MeansurementFileDetailService fileDetailService;
+    private MeansurementFileResultService  fileResultService;
     private LogService logService;
 
     public CleanFiles(ApplicationContext context) {
@@ -65,6 +67,10 @@ public class CleanFiles implements JavaDelegate {
             
             
             logService.deleteLogsByProcessInstance(execution.getProcessInstanceId());
+            fileResultService.deleteByProcess(execution.getProcessInstanceId());
+            
+            
+            
             
             
 

@@ -1,3 +1,8 @@
+/*
+ * To change this license header, choose License Headers in Project Properties.
+ * To change this template file, choose Tools | Templates
+ * and open the template in the editor.
+ */
 package com.core.matrix;
 
 import com.core.matrix.model.MeansurementFile;
@@ -12,43 +17,31 @@ import static com.core.matrix.utils.Constants.CONST_SOURCE_COLLECTION_1;
 import static com.core.matrix.utils.Constants.CONST_SOURCE_COLLECTION_2;
 import static com.core.matrix.utils.Constants.CONST_SOURCE_COLLECTION_3;
 import static com.core.matrix.utils.Constants.TYPE_ENERGY_LIQUID;
+import static com.core.matrix.utils.MeansurementFileType.LAYOUT_A;
+import static com.core.matrix.utils.MeansurementFileType.LAYOUT_B;
+import static com.core.matrix.utils.MeansurementFileType.LAYOUT_C;
 import com.core.matrix.utils.Utils;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
-import org.activiti.engine.RuntimeService;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 
+/**
+ *
+ * @author thiag
+ */
 @SpringBootTest
-class MatrixApplicationTests {
+public class TesteTasks {
 
-    
-    
     @Autowired
-    private RuntimeService runtimeService;
-    
-     @Autowired
     private MeansurementFileService service;
 
-    
-
-    //@Test
-    void contextLoads() throws Exception {
-        
-        
-        runtimeService.startProcessInstanceByMessage("p131");
-        
-     
-        //System.out.println("password-> " + new BCryptPasswordEncoder().encode("123456"));
-    }
-    
-    
     @Test
     public void teste() throws Exception {
 
-        MeansurementFile file = service.findById(318L);
+        MeansurementFile file = service.findById(1176L);
         List<MeansurementFileDetail> result = new ArrayList<>();
 
         switch (file.getType()) {
