@@ -26,6 +26,13 @@ public class MeansurementFileResultService {
     public void save(MeansurementFileResult result) {
         this.repository.save(result);
     }
+    
+    
+    @Transactional
+    public void update(MeansurementFileResult result) {
+        this.repository.save(result);
+    }
+    
 
     @Transactional(readOnly = true)
     public List<MeansurementFileResult> getResult(String id) {

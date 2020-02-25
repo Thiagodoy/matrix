@@ -123,7 +123,7 @@ public class CalculateTask implements Task {
             String name = optEmp.isPresent() ? optEmp.get().getSNmEmpresa() : "";
 
             MeansurementFileResult fileResult = new MeansurementFileResult(contractWbcInformationDTO, de.getProcessInstanceId());
-            fileResult.setAmountScde(this.roundValue((sum/1000), 3));
+            fileResult.setAmountScde(this.roundValue((sum / 1000), 3));
             fileResult.setMeansurementFileId(file.getId());
             Double consumptionLiquid = solicitadoLiquido(consumptionTotal, contractWbcInformationDTO);
             fileResult.setAmountLiquido(this.roundValue(consumptionLiquid, 3));
@@ -178,13 +178,21 @@ public class CalculateTask implements Task {
                     .findFirst()
                     .orElseThrow(() -> new Exception("Não existe nenhum arquivo para ser processado"))
                     .getId();
-            
+
+            ContractCompInformation contractInformationParent = contractsInformations
+                    .stream()
+                    .filter(c -> c.getCodeContractApportionment() == null)
+                    .findFirst()
+                    .orElseThrow(() -> new Exception("[Matrix] Informação do contrato não encontrada!"));
+
+            final Double factorAtt = contractInformationParent.getFactorAttendanceCharge();
+
             //Contracts sons
             files.stream().forEach(file -> {
 
                 try {
                     List<MeansurementFileDetail> filteredByPoint = details
-                            .stream()                            
+                            .stream()
                             .filter(mpd -> mpd.getMeansurementPoint().replaceAll("\\((L|B)\\)", "").trim().equals(file.getMeansurementPoint()))
                             .collect(Collectors.toList());
 
@@ -202,22 +210,27 @@ public class CalculateTask implements Task {
 
                     final double percentLoss = contractInformation.getPercentOfLoss() / 100;
                     final double proinfa = this.getProinfa(file, contractInformation.getProinfas());
-                    final double sum = this.getSumConsumptionActive(filteredByPoint);
+                    final Double sum = this.getSumConsumptionActive(filteredByPoint);
+
+                    Logger.getLogger(CalculateTask.class.getName()).log(Level.SEVERE, "[ getSumConsumptionActive ] -> " + sum.toString());
+                    Logger.getLogger(CalculateTask.class.getName()).log(Level.SEVERE, "[ getSumConsumptionActive (sum / 1000d) ] -> " + (sum / 1000d));
 
                     final ConsumptionResult result = new ConsumptionResult();
                     result.setMeansurementPoint(file.getMeansurementPoint());
 
-                    double consumptionTotal = (((sum / 1000) + (sum / 1000) * percentLoss) - proinfa);
+                    double consumptionTotal = ((sum / 1000) + ((sum / 1000) * percentLoss) - proinfa) * factorAtt;
+                    // double consumptionTotal = (((sum / 1000) + (sum / 1000) * percentLoss) - proinfa);
 
                     Optional<CompanyDTO> optEmp = this.empresaService.listByPoint(point);
                     String nickname = optEmp.isPresent() ? optEmp.get().getSNmApelido() : "";
                     String name = optEmp.isPresent() ? optEmp.get().getSNmEmpresa() : "";
 
                     MeansurementFileResult fileResult = new MeansurementFileResult(contractWbcInformation, de.getProcessInstanceId());
-                    fileResult.setAmountScde(sum / 1000);
+
+                    fileResult.setAmountScde((sum / 1000d));
                     fileResult.setMeansurementFileId(file.getId());
-                    Double consumptionLiquid = solicitadoLiquido(consumptionTotal, contractWbcInformation);
-                    fileResult.setAmountLiquido(consumptionLiquid);
+                    //Double consumptionLiquid = solicitadoLiquido(consumptionTotal, contractWbcInformation);
+                    fileResult.setAmountBruto(consumptionTotal / 100);
                     fileResult.setWbcContract(Long.valueOf(contractWbcInformation.getNrContract()));
                     fileResult.setMeansurementPoint(point);
                     fileResult.setNickNameCompany(nickname);
@@ -238,25 +251,25 @@ public class CalculateTask implements Task {
                     logService.save(log);
                 }
             });
+           
 
-            //Contract father 
-            ContractCompInformation contractInformation = contractsInformations
-                    .stream()
-                    .filter(c -> c.getCodeContractApportionment() == null)
-                    .findFirst()
-                    .orElseThrow(() -> new Exception("[Matrix] Informação do contrato não encontrada!"));
+            MeansurementFile file = files.stream().findFirst().orElseThrow(() -> new Exception("Nenhum Arquivo!"));
 
-            Double sum = results.stream().mapToDouble(MeansurementFileResult::getAmountLiquido).reduce(0d, Double::sum);
-            Double consumptionTotal = sum * contractInformation.getFactorAttendanceCharge();            
-            
+            ContractWbcInformationDTO contractWbcInformation = this.contractWbcService
+                    .getInformation(file.getYear(), file.getMonth(), contractInformationParent.getWbcContract())
+                    .orElseThrow(() -> new Exception("[WBC] -> Não foi possivel carregar as informações complementares!\n Referente as informações de [CE_SAZONALIZACAO] e [CE_REGRA_OPCIONALIDADE] "));
+
+            Double sum = results.stream().mapToDouble(MeansurementFileResult::getAmountBruto).reduce(0d, Double::sum);
+            Double sumScde = results.stream().mapToDouble(MeansurementFileResult::getAmountScde).reduce(0d, Double::sum);
+
             String name = results.stream().findFirst().get().getNameCompany();
 
-            MeansurementFileResult fileResult = new MeansurementFileResult();
-            fileResult.setIdProcess(de.getProcessInstanceId());
-            fileResult.setFactorAtt(contractInformation.getFactorAttendanceCharge());
-            fileResult.setAmountBruto(consumptionTotal);
+            MeansurementFileResult fileResult = new MeansurementFileResult(contractWbcInformation, de.getProcessInstanceId());
+            fileResult.setFactorAtt(contractInformationParent.getFactorAttendanceCharge());
+            fileResult.setAmountBruto(sum);
+            fileResult.setAmountScde(sumScde);
             fileResult.setMeansurementFileId(fileId);
-            fileResult.setWbcContract(contractInformation.getCodeWbcContract());
+            fileResult.setWbcContract(contractInformationParent.getCodeWbcContract());
             fileResult.setContractParent(1L);
             fileResult.setNameCompany(name);
 
@@ -303,7 +316,7 @@ public class CalculateTask implements Task {
     private Double getSumConsumptionActive(List<MeansurementFileDetail> details) {
         return details.stream()
                 .mapToDouble(MeansurementFileDetail::getConsumptionActive)
-                .reduce(0, Double::sum);
+                .reduce(0D, Double::sum);
     }
 
     private Double getProinfa(MeansurementFile file, List<ContractProInfa> proInfas) throws Exception {
@@ -318,10 +331,6 @@ public class CalculateTask implements Task {
                 .orElseThrow(() -> new Exception("Não foi encontrado nenhum proinfa cadastrada para esse contrato!\n Mês/Ano refência: " + monthRef + "/" + yearRef));
 
         return contractProInfa.getProinfa();
-
-    }
-
-    public void calculate() {
 
     }
 

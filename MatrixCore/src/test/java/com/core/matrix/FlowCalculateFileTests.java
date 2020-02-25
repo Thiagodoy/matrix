@@ -34,7 +34,7 @@ class FlowCalculateFileTests {
         
      //Get task
      
-        Task task = taskService.createTaskQuery().taskId("322614").singleResult();
+        Task task = taskService.createTaskQuery().taskId("355114").singleResult();
         
         File file1 = new File("exportacao_mantovani_226591_EMBALATEC MOGI_1.csv");
         
