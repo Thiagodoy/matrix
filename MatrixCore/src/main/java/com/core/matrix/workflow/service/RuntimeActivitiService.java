@@ -285,7 +285,7 @@ public class RuntimeActivitiService {
         List<TaskResponse> response = taskService
                 .createTaskQuery()
                 .taskAssignee(user)
-                .includeProcessVariables()
+                .includeProcessVariables()               
                 .orderByTaskCreateTime()
                 .desc()
                 .listPage(min, size)

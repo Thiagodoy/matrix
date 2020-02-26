@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <actions>
+<<<<<<< HEAD
     <action>
         <actionName>run</actionName>
         <packagings>
@@ -77,6 +78,9 @@
         </action>
     <action>
 
+=======
+        <action>
+>>>>>>> cd01e5aaedf61d217326e8c48d2daf4b927e590b
             <actionName>build-with-dependencies</actionName>
             <reactor>also-make</reactor>
             <packagings>
@@ -89,6 +93,7 @@
                 <skipTests>true</skipTests>
             </properties>
         </action>
+<<<<<<< HEAD
 
 
     <action>
@@ -120,3 +125,6 @@
         </action>
 
 </actions>
+=======
+    </actions>
+>>>>>>> cd01e5aaedf61d217326e8c48d2daf4b927e590b

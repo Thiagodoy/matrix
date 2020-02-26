@@ -6,7 +6,6 @@
 package com.core.matrix.workflow.task;
 
 import com.core.matrix.dto.ConsumptionResult;
-import com.core.matrix.dto.ContractInformationDTO;
 import com.core.matrix.model.ContractCompInformation;
 import com.core.matrix.model.ContractProInfa;
 import com.core.matrix.model.Log;
@@ -18,9 +17,6 @@ import com.core.matrix.service.LogService;
 
 import com.core.matrix.service.MeansurementFileResultService;
 import com.core.matrix.service.MeansurementFileService;
-import static com.core.matrix.utils.Constants.FILE_MEANSUREMENT_ID;
-import static com.core.matrix.utils.Constants.RESPONSE_RESULT;
-import static com.core.matrix.utils.Constants.RESPONSE_RESULT_MESSAGE;
 import com.core.matrix.wbc.dto.ContractWbcInformationDTO;
 import com.core.matrix.wbc.dto.CompanyDTO;
 import com.core.matrix.wbc.service.ContractService;
@@ -29,9 +25,7 @@ import java.math.BigDecimal;
 import java.math.RoundingMode;
 import java.text.MessageFormat;
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
-import java.util.Map;
 import java.util.Optional;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -114,8 +108,7 @@ public class CalculateTask implements Task {
 
             double consumptionTotal = ((sum / 1000) + ((sum / 1000) * percentLoss) - proinfa) * factorAtt;
 
-            // BigDecimal consumptionTotalArredondado = new BigDecimal(consumptionTotal).setScale(3, RoundingMode.HALF_EVEN);
-            //Double solicitadoLiquido = solicitadoLiquido(consumptionTotal, contractWbcInformationDTO);
+            
             String point = file.getMeansurementPoint().replaceAll("\\((L|B)\\)", "").trim();
 
             Optional<CompanyDTO> optEmp = this.empresaService.listByPoint(point);
@@ -127,8 +120,8 @@ public class CalculateTask implements Task {
             
             fileResult.setMeansurementFileId(file.getId());
             Double consumptionLiquid = solicitadoLiquido(consumptionTotal, contractWbcInformationDTO);
-            fileResult.setAmountLiquido(this.roundValue(consumptionLiquid, 6));
-            fileResult.setAmountBruto(this.roundValue(consumptionTotal, 6));
+            fileResult.setAmountLiquido(this.roundValue(consumptionLiquid, 3));
+            fileResult.setAmountBruto(this.roundValue(consumptionTotal, 3));
             fileResult.setWbcContract(Long.valueOf(contractWbcInformationDTO.getNrContract()));
             fileResult.setMeansurementPoint(file.getMeansurementPoint());
             fileResult.setNickNameCompany(nickname);
@@ -152,9 +145,7 @@ public class CalculateTask implements Task {
     }
 
     private Double roundValue(Double value, int qtd) {
-
         return new BigDecimal(value).setScale(qtd, RoundingMode.HALF_EVEN).doubleValue();
-
     }
 
     public void calculateWithRateio(DelegateExecution de, List<MeansurementFile> files) {
@@ -214,14 +205,10 @@ public class CalculateTask implements Task {
                     final double proinfa = this.getProinfa(file, contractInformation.getProinfas());
                     final Double sum = this.getSumConsumptionActive(filteredByPoint);
 
-                    Logger.getLogger(CalculateTask.class.getName()).log(Level.SEVERE, "[ getSumConsumptionActive ] -> " + sum.toString());
-                    Logger.getLogger(CalculateTask.class.getName()).log(Level.SEVERE, "[ getSumConsumptionActive (sum / 1000d) ] -> " + (sum / 1000d));
-
                     final ConsumptionResult result = new ConsumptionResult();
                     result.setMeansurementPoint(file.getMeansurementPoint());
 
-                    double consumptionTotal = ((sum / 1000) + ((sum / 1000) * percentLoss) - proinfa) * factorAtt;
-                    // double consumptionTotal = (((sum / 1000) + (sum / 1000) * percentLoss) - proinfa);
+                    double consumptionTotal = ((sum / 1000) + ((sum / 1000) * percentLoss) - proinfa) * factorAtt;                    
 
                     Optional<CompanyDTO> optEmp = this.empresaService.listByPoint(point);
                     String nickname = optEmp.isPresent() ? optEmp.get().getSNmApelido() : "";
@@ -231,9 +218,9 @@ public class CalculateTask implements Task {
 
                     fileResult.setAmountScde((sum / 1000d));
                     fileResult.setMeansurementFileId(file.getId());
-                    //Double consumptionLiquid = solicitadoLiquido(consumptionTotal, contractWbcInformation);
-                    fileResult.setAmountBruto(consumptionTotal / 100);
-                    fileResult.setAmountLiquido(consumptionTotal / 100);
+                    
+                    fileResult.setAmountBruto(this.roundValue((consumptionTotal / 100),3));
+                    fileResult.setAmountLiquido(this.roundValue((consumptionTotal / 100),3));
                     fileResult.setWbcContract(Long.valueOf(contractWbcInformation.getNrContract()));
                     fileResult.setMeansurementPoint(point);
                     fileResult.setNickNameCompany(nickname);
@@ -268,8 +255,9 @@ public class CalculateTask implements Task {
 
             MeansurementFileResult fileResult = new MeansurementFileResult(contractWbcInformation, de.getProcessInstanceId());
             fileResult.setFactorAtt(contractInformationParent.getFactorAttendanceCharge());
-            fileResult.setAmountBruto(sum);
+            fileResult.setAmountBruto(this.roundValue(sum,3));
             fileResult.setAmountScde(sumScde);
+            fileResult.setAmountLiquido(this.roundValue(sum,3));
             fileResult.setMeansurementFileId(fileId);
             fileResult.setWbcContract(contractInformationParent.getCodeWbcContract());
             fileResult.setContractParent(1L);
@@ -317,8 +305,7 @@ public class CalculateTask implements Task {
 
     private Double getSumConsumptionActive(List<MeansurementFileDetail> details) {
         return details.stream()
-                .map(d -> new BigDecimal(d.getConsumptionActive()).setScale(6,RoundingMode.HALF_EVEN))
-                //.mapToDouble(MeansurementFileDetail::getConsumptionActive)
+                .map(d -> new BigDecimal(d.getConsumptionActive()).setScale(6,RoundingMode.HALF_EVEN))                
                 .reduce(new BigDecimal(0D), BigDecimal::add).doubleValue();
     }
 
@@ -336,95 +323,5 @@ public class CalculateTask implements Task {
         return contractProInfa.getProinfa();
 
     }
-
-    public void executeOld(DelegateExecution de) throws Exception {
-
-        try {
-            Long id = de.getVariable(FILE_MEANSUREMENT_ID, Long.class);
-            MeansurementFile file = fileService.findById(id);
-            List<MeansurementFileDetail> details = this.getDetails(file, de);
-
-            Map<String, List<MeansurementFileDetail>> lotes = details
-                    .parallelStream()
-                    .collect(Collectors.groupingBy(MeansurementFileDetail::getMeansurementPoint));
-
-            List<ConsumptionResult> results = Collections.synchronizedList(new ArrayList<>());
-
-            lotes
-                    .values()
-                    .parallelStream()
-                    .forEach((List<MeansurementFileDetail> lote) -> {
-
-                        String point = lote.stream().findFirst().get().getMeansurementPoint().replaceAll("\\((L|B)\\)", "").trim();
-                        Optional<ContractInformationDTO> opt = this.contractService.listByPoint(point);
-                        Optional<ContractWbcInformationDTO> optWbc = this.contractWbcService.getInformation(file.getYear(), file.getMonth(), opt.get().getContractId());
-                        final ConsumptionResult result = new ConsumptionResult();
-                        result.setMeansurementPoint(point);
-
-                        if (opt.isPresent()) {
-                            ContractInformationDTO informationDTO = opt.get();
-                            final double factorAtt = informationDTO.getFactorAttendanceCharge() / 100;
-                            final double percentLoss = informationDTO.getPercentOfLoss() / 100;
-                            final double proinfa = informationDTO.getProinfa();
-                            final double sum = lote.stream()
-                                    .mapToDouble(MeansurementFileDetail::getConsumptionActive)
-                                    .reduce(0, Double::sum);
-
-                            double consumptionTotal = ((sum / 1000) + ((sum / 1000) * percentLoss) - proinfa) * factorAtt;
-
-                            BigDecimal consumptionTotalArredondado = new BigDecimal(consumptionTotal).setScale(3, RoundingMode.HALF_EVEN);
-
-                            BigDecimal solicitadoLiquido = new BigDecimal(0).setScale(3, RoundingMode.HALF_EVEN);
-
-                            if (consumptionTotalArredondado.doubleValue() < optWbc.get().getNrQtd() && consumptionTotalArredondado.doubleValue() > optWbc.get().getNrQtdMin()) {
-
-                                solicitadoLiquido = new BigDecimal(consumptionTotal).setScale(3, RoundingMode.HALF_EVEN);
-
-                            } else if (consumptionTotalArredondado.doubleValue() > optWbc.get().getNrQtd() && consumptionTotalArredondado.doubleValue() < optWbc.get().getNrQtdMax()) {
-
-                                solicitadoLiquido = new BigDecimal(consumptionTotal).setScale(3, RoundingMode.HALF_EVEN);
-
-                            } else if (consumptionTotalArredondado.doubleValue() > optWbc.get().getNrQtd() && consumptionTotalArredondado.doubleValue() > optWbc.get().getNrQtdMax()) {
-
-                                solicitadoLiquido = new BigDecimal(optWbc.get().getNrQtdMax()).setScale(3, RoundingMode.HALF_EVEN);
-
-                            }
-
-                            Optional<CompanyDTO> optEmp = this.empresaService.listByPoint(point);
-                            result.setResult(consumptionTotalArredondado.doubleValue());
-                            result.setContractId(informationDTO.getContractId());
-                            result.setPercentLoss(percentLoss);
-                            result.setFactorAtt(factorAtt);
-                            result.setProinfa(proinfa);
-                            result.setEmpresa(optEmp.get());
-                            result.setInformation(optWbc.get());
-                            result.setSolicitadoLiquido(solicitadoLiquido.doubleValue());
-
-                            // Optional<ContractMeasurementPoint> optional = pointService.findByPoint(point);
-                            MeansurementFileResult fileResult = new MeansurementFileResult();
-                            fileResult.setMeansurementFileId(id);
-                            fileResult.setPercentLoss(percentLoss);
-                            fileResult.setFactorAtt(factorAtt);
-                            fileResult.setProinfa(proinfa);
-                            // fileResult.setMeansurementPointId(optional.get().getId());
-                            //fileResult.setResult(consumptionTotalArredondado.doubleValue());
-                            //fileResult.setMontanteLiquido(solicitadoLiquido.doubleValue());
-
-                            resultService.save(fileResult);
-
-                        } else {
-                            result.setError("Não existe cadastro do contrato associado ao ponto!");
-                        }
-                        results.add(result);
-                    });
-
-            de.setVariable(RESPONSE_RESULT, results);
-
-        } catch (Exception e) {
-            de.setVariable(RESPONSE_RESULT_MESSAGE, "Erro ao realizar o calculo!");
-            Logger.getLogger(CalculateTask.class.getName()).log(Level.SEVERE, "[execute]", e);
-        }
-
-    }
-
+  
 }
