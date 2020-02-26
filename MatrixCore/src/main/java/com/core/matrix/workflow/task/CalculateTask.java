@@ -128,7 +128,7 @@ public class CalculateTask implements Task {
             fileResult.setMeansurementFileId(file.getId());
             Double consumptionLiquid = solicitadoLiquido(consumptionTotal, contractWbcInformationDTO);
             fileResult.setAmountLiquido(this.roundValue(consumptionLiquid, 6));
-            fileResult.setAmountBruto(this.roundValue(consumptionTotal, 6)/1000d);
+            fileResult.setAmountBruto(this.roundValue(consumptionTotal, 6));
             fileResult.setWbcContract(Long.valueOf(contractWbcInformationDTO.getNrContract()));
             fileResult.setMeansurementPoint(file.getMeansurementPoint());
             fileResult.setNickNameCompany(nickname);
