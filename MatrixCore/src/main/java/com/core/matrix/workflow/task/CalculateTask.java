@@ -123,10 +123,12 @@ public class CalculateTask implements Task {
             String name = optEmp.isPresent() ? optEmp.get().getSNmEmpresa() : "";
 
             MeansurementFileResult fileResult = new MeansurementFileResult(contractWbcInformationDTO, de.getProcessInstanceId());
-            fileResult.setAmountScde(this.roundValue((sum / 1000), 6));
+            fileResult.setAmountScde(this.roundValue((sum / 1000), 6));            
+            
             fileResult.setMeansurementFileId(file.getId());
             Double consumptionLiquid = solicitadoLiquido(consumptionTotal, contractWbcInformationDTO);
             fileResult.setAmountLiquido(this.roundValue(consumptionLiquid, 6));
+            fileResult.setAmountBruto(this.roundValue(consumptionTotal, 6)/1000d);
             fileResult.setWbcContract(Long.valueOf(contractWbcInformationDTO.getNrContract()));
             fileResult.setMeansurementPoint(file.getMeansurementPoint());
             fileResult.setNickNameCompany(nickname);
