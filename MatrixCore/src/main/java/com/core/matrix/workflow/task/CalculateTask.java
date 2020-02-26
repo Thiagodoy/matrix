@@ -127,8 +127,8 @@ public class CalculateTask implements Task {
             
             fileResult.setMeansurementFileId(file.getId());
             Double consumptionLiquid = solicitadoLiquido(consumptionTotal, contractWbcInformationDTO);
-            fileResult.setAmountLiquido(this.roundValue(consumptionLiquid, 6));
-            fileResult.setAmountBruto(this.roundValue(consumptionTotal, 6)/1000d);
+            fileResult.setAmountLiquido(this.roundValue(consumptionLiquid, 3));
+            fileResult.setAmountBruto(this.roundValue(consumptionTotal, 3));
             fileResult.setWbcContract(Long.valueOf(contractWbcInformationDTO.getNrContract()));
             fileResult.setMeansurementPoint(file.getMeansurementPoint());
             fileResult.setNickNameCompany(nickname);
@@ -232,8 +232,8 @@ public class CalculateTask implements Task {
                     fileResult.setAmountScde((sum / 1000d));
                     fileResult.setMeansurementFileId(file.getId());
                     //Double consumptionLiquid = solicitadoLiquido(consumptionTotal, contractWbcInformation);
-                    fileResult.setAmountBruto(consumptionTotal / 100);
-                    fileResult.setAmountLiquido(consumptionTotal / 100);
+                    fileResult.setAmountBruto(this.roundValue((consumptionTotal / 100),3));
+                    fileResult.setAmountLiquido(this.roundValue((consumptionTotal / 100),3));
                     fileResult.setWbcContract(Long.valueOf(contractWbcInformation.getNrContract()));
                     fileResult.setMeansurementPoint(point);
                     fileResult.setNickNameCompany(nickname);
@@ -268,8 +268,9 @@ public class CalculateTask implements Task {
 
             MeansurementFileResult fileResult = new MeansurementFileResult(contractWbcInformation, de.getProcessInstanceId());
             fileResult.setFactorAtt(contractInformationParent.getFactorAttendanceCharge());
-            fileResult.setAmountBruto(sum);
+            fileResult.setAmountBruto(this.roundValue(sum,3));
             fileResult.setAmountScde(sumScde);
+            fileResult.setAmountLiquido(this.roundValue(sum,3));
             fileResult.setMeansurementFileId(fileId);
             fileResult.setWbcContract(contractInformationParent.getCodeWbcContract());
             fileResult.setContractParent(1L);
