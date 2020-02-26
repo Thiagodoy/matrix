@@ -123,10 +123,10 @@ public class CalculateTask implements Task {
             String name = optEmp.isPresent() ? optEmp.get().getSNmEmpresa() : "";
 
             MeansurementFileResult fileResult = new MeansurementFileResult(contractWbcInformationDTO, de.getProcessInstanceId());
-            fileResult.setAmountScde(this.roundValue((sum / 1000), 3));
+            fileResult.setAmountScde(this.roundValue((sum / 1000), 6));
             fileResult.setMeansurementFileId(file.getId());
             Double consumptionLiquid = solicitadoLiquido(consumptionTotal, contractWbcInformationDTO);
-            fileResult.setAmountLiquido(this.roundValue(consumptionLiquid, 3));
+            fileResult.setAmountLiquido(this.roundValue(consumptionLiquid, 6));
             fileResult.setWbcContract(Long.valueOf(contractWbcInformationDTO.getNrContract()));
             fileResult.setMeansurementPoint(file.getMeansurementPoint());
             fileResult.setNickNameCompany(nickname);
@@ -231,6 +231,7 @@ public class CalculateTask implements Task {
                     fileResult.setMeansurementFileId(file.getId());
                     //Double consumptionLiquid = solicitadoLiquido(consumptionTotal, contractWbcInformation);
                     fileResult.setAmountBruto(consumptionTotal / 100);
+                    fileResult.setAmountLiquido(consumptionTotal / 100);
                     fileResult.setWbcContract(Long.valueOf(contractWbcInformation.getNrContract()));
                     fileResult.setMeansurementPoint(point);
                     fileResult.setNickNameCompany(nickname);
@@ -251,7 +252,6 @@ public class CalculateTask implements Task {
                     logService.save(log);
                 }
             });
-           
 
             MeansurementFile file = files.stream().findFirst().orElseThrow(() -> new Exception("Nenhum Arquivo!"));
 
@@ -315,8 +315,9 @@ public class CalculateTask implements Task {
 
     private Double getSumConsumptionActive(List<MeansurementFileDetail> details) {
         return details.stream()
-                .mapToDouble(MeansurementFileDetail::getConsumptionActive)
-                .reduce(0D, Double::sum);
+                .map(d -> new BigDecimal(d.getConsumptionActive()).setScale(6,RoundingMode.HALF_EVEN))
+                //.mapToDouble(MeansurementFileDetail::getConsumptionActive)
+                .reduce(new BigDecimal(0D), BigDecimal::add).doubleValue();
     }
 
     private Double getProinfa(MeansurementFile file, List<ContractProInfa> proInfas) throws Exception {

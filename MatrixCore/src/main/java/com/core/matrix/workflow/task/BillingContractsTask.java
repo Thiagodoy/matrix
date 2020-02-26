@@ -58,12 +58,15 @@ public class BillingContractsTask implements JavaDelegate {
     }
 
     private ProcessInstance createAProcessForBilling(DelegateExecution execution, ContractDTO contract) {
-        return this.createAProcessForBilling(execution, Arrays.asList(contract));
+
+        Map<String, Object> variables = new HashMap<>();
+        variables.put("@Cliente", contract.getSNmEmpresaEpce());
+
+        return this.createAProcessForBilling(execution, Arrays.asList(contract), variables);
     }
 
-    private synchronized ProcessInstance createAProcessForBilling(DelegateExecution execution, List<ContractDTO> contracts) {
+    private synchronized ProcessInstance createAProcessForBilling(DelegateExecution execution, List<ContractDTO> contracts, Map<String, Object> variables) {
 
-        Map<String, Object> variables = new HashMap<String, Object>();
         variables.put(Constants.LIST_CONTRACTS_FOR_BILLING, contracts);
 
         return execution.getEngineServices().getRuntimeService().startProcessInstanceByMessage(Constants.PROCESS_MEANSUREMENT_FILE_MESSAGE_EVENT, variables);
@@ -71,11 +74,11 @@ public class BillingContractsTask implements JavaDelegate {
 
     private void createMeansurementFile(String processInstanceId, ContractDTO contract) {
 
-        LocalDate monthBilling  = LocalDate.now().minusMonths(1);
-        
+        LocalDate monthBilling = LocalDate.now().minusMonths(1);
+
         Long month = Integer.valueOf(monthBilling.getMonthOfYear()).longValue();
         Long year = Integer.valueOf(monthBilling.getYear()).longValue();
-        
+
         MeansurementFile meansurementFile = new MeansurementFile(contract, processInstanceId, contract.getMeansurementPoint());
         meansurementFile.setMonth(month);
         meansurementFile.setYear(year);
@@ -186,15 +189,17 @@ public class BillingContractsTask implements JavaDelegate {
                             sons.add(opt.get());
 //                            List<ContractDTO> con = sons.stream().sorted(Comparator.comparing(ContractDTO::getNCdContratoRateioControlador).reversed()).collect(Collectors.toList());
 
-                            String processInstanceId = this.createAProcessForBilling(execution, sons).getProcessInstanceId();
+                            Map<String, Object> variables = new HashMap<>();
+                            variables.put("@Cliente", sons.stream().findFirst().get().getSNmEmpresaEpce());
+
+                            String processInstanceId = this.createAProcessForBilling(execution, sons,variables).getProcessInstanceId();
                             this.createMeansurementFile(processInstanceId, sons);
-                        }else{
+                        } else {
                             this.logService.save(logs);
                             logs.clear();
                         }
 
                     });
-            
 
         } catch (Exception e) {
             Logger.getLogger(BillingContractsTask.class.getName()).log(Level.SEVERE, "[ execute ]", e);

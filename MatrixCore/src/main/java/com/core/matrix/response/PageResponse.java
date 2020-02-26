@@ -24,14 +24,20 @@ public class PageResponse<T>  {
     private Long totalElements;
     private Long size;
     private Long page;
+    private boolean  first;
+    private boolean  last;
+    private Long number;
     
     
     public PageResponse(List<T> content, Long totalElements, Long size, Long page ){
         this.content = content;
-        this.totalPages = (totalElements == 0) || Math.ceil((size / totalElements.doubleValue())) < 1 ? 1 : (long)Math.ceil((size / totalElements.doubleValue()));
+        this.totalPages = (totalElements == 0) || Math.ceil((size / totalElements.doubleValue())) < 1 ? 0 : (long)Math.ceil((size / totalElements));
         this.totalElements = totalElements;
         this.size = size;  
-        this.page = page;   
+        this.page = page; 
+        this.first = page == 0;
+        this.last = (this.totalPages - 1) == page;
+        this.number = page;
     }
     
 
