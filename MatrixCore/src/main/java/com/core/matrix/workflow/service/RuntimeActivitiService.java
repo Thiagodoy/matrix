@@ -269,6 +269,10 @@ public class RuntimeActivitiService {
                             + "WHERE\n"
                             + "    v.TEXT_ LIKE '%" + variableValue.toUpperCase() + "%'\n"
                             + "        AND k.group_id_ in(" + gro + ") ").list().stream().map(t -> t.getProcessInstanceId()).distinct().collect(Collectors.toList());
+            
+            if(processInstances.isEmpty()){
+                return new PageResponse<TaskResponse>(new ArrayList(), (long) 0, (long) processInstances.size(), (long) page);
+            }
 
             List<TaskResponse> response = taskService
                     .createTaskQuery()
@@ -392,7 +396,7 @@ public class RuntimeActivitiService {
     }
 
     @Transactional(readOnly = true)
-    public PageResponse<TaskResponse> getMyTasks(String user, String variableValue, String processInstance, int page, int size) {        
+    public PageResponse<TaskResponse> getMyTasks(String user, String variableValue, String processInstance, int page, int size) {
 
         int min = page * size;
 
@@ -409,8 +413,17 @@ public class RuntimeActivitiService {
                             + "    activiti.ACT_RU_IDENTITYLINK k ON t.PROC_INST_ID_ = k.PROC_INST_ID_\n"
                             + "WHERE\n"
                             + "    v.TEXT_ LIKE '%" + variableValue.toUpperCase() + "%'\n"
-                            + "        AND k.user_id_ = '" + user + "'; ").list().stream().map(t -> t.getProcessInstanceId()).distinct().collect(Collectors.toList());
+                            + "        AND k.user_id_ = '" + user + "'; ").list()
+                    .stream()
+                    .map(t -> t.getProcessInstanceId())
+                    .distinct()
+                    .collect(Collectors.toList());
 
+            
+            if(processInstances.isEmpty()){
+                return new PageResponse<TaskResponse>(new ArrayList(), (long) 0, (long) processInstances.size(), (long) page);
+            }
+            
             List<TaskResponse> response = taskService
                     .createTaskQuery()
                     .includeProcessVariables()
@@ -462,11 +475,10 @@ public class RuntimeActivitiService {
 
         } else {
 
-            
             Long sizeTotalElements = taskService.createTaskQuery().taskAssignee(user).count();
 
             List<TaskResponse> response = taskService
-                    .createTaskQuery()  
+                    .createTaskQuery()
                     .taskAssignee(user)
                     .includeProcessVariables()
                     .includeTaskLocalVariables()
@@ -511,7 +523,6 @@ public class RuntimeActivitiService {
 //                .collect(Collectors.toList());
 //
 //        return new PageResponse<TaskResponse>(response, (long) response.size(), sizeTotalElements, (long) page);
-
     }
 
     @Transactional(readOnly = true)

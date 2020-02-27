@@ -61,7 +61,7 @@ public class FileValidation {
         try {
 
              
-            InputStream stream = new FileInputStream(new File("exportacao_clacos0g0_235079.csv"));;
+            InputStream stream = new FileInputStream(new File("Tipo C.csv"));;
             BeanIoReader reader = new BeanIoReader();
             Optional<FileParsedDTO> fileParsed = reader.<FileParsedDTO>parse(stream);
             
