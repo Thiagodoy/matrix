@@ -29,7 +29,7 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 import org.activiti.engine.delegate.DelegateExecution;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 
@@ -61,7 +61,7 @@ public class FileValidation {
         try {
 
              
-            InputStream stream = new FileInputStream(new File("TIPO C.csv"));;
+            InputStream stream = new FileInputStream(new File("exportacao_clacos0g0_235079.csv"));;
             BeanIoReader reader = new BeanIoReader();
             Optional<FileParsedDTO> fileParsed = reader.<FileParsedDTO>parse(stream);
             
@@ -70,7 +70,7 @@ public class FileValidation {
                // delegateExecution.setVariable(RESPONSE_RESULT_MESSAGE, "Layout/registros estão inválidos!");
               //  delegateExecution.setVariable(CONTROLE, RESPONSE_LAYOUT_INVALID);
             }else if (fileParsed.isPresent()) {
-                mountFile(fileParsed.get(), "111-teste", "thiagodoy@hotmail.com");
+              //  mountFile(fileParsed.get(), "111-teste", "thiagodoy@hotmail.com");
             }
 
         } catch (Exception e) {
