@@ -20,52 +20,53 @@ import org.springframework.transaction.annotation.Transactional;
  */
 @Service
 public class MeansurementFileService {
-    
-    
+
     @Autowired
     private MeansurementFileRepository repository;
-    
-    @Transactional 
-    public MeansurementFile saveFile(MeansurementFile file){
+
+    @Transactional
+    public MeansurementFile saveFile(MeansurementFile file) {
         return this.repository.save(file);
     }
-    
-    
+
     @Transactional(transactionManager = "matrixTransactionManager")
-    public List<MeansurementFile> findByProcessInstanceId(String id){
+    public List<MeansurementFile> findByProcessInstanceId(String id) {
         return this.repository.findByProcessInstanceId(id);
     }
-    
-    @Transactional 
-    public void delete(Long id){
-         this.repository.deleteById(id);
+
+    @Transactional
+    public void delete(Long id) {
+        this.repository.deleteById(id);
     }
-    
+
     @Transactional(transactionManager = "matrixTransactionManager")
-    public void updateStatus(MeansurementFileStatus status, Long id){
+    public void updateStatus(MeansurementFileStatus status, Long id) {
         this.repository.updateStatus(status, id);
     }
-    
+
     @Transactional(readOnly = true)
-    public MeansurementFile findById(Long id) throws Exception{
-        return this.repository.findById(id).orElseThrow(()-> new Exception("Arquivo não encontrado"));
+    public MeansurementFile findById(Long id) throws Exception {
+        return this.repository.findById(id).orElseThrow(() -> new Exception("Arquivo não encontrado"));
     }
-    
+
     @Transactional(readOnly = true)
-    public List<MeansurementFileStatusDTO> getStatus(Long year, Long month){        
-        
+    public List<MeansurementFileStatusDTO> getStatus(Long year, Long month) {
+
 //        LocalDate referenceMonth = LocalDate.of(year, Month.of(month), 1);
 //        LocalDateTime start = referenceMonth.atStartOfDay();
 //        referenceMonth = referenceMonth.plusDays(Utils.getDaysOfMonth(referenceMonth));        
 //        LocalDateTime end = referenceMonth.atStartOfDay();
-        
         return this.repository.getStatus(year, month);
     }
-    
+
     @Transactional(readOnly = true)
-    public List<MeansurementFile>findAllFilesWithErrors(String processInstanceId){
+    public List<MeansurementFile> findAllFilesWithErrors(String processInstanceId) {
         return this.repository.findAllFilesWithErrors(processInstanceId);
     }
 
-    
+    @Transactional(readOnly = true)
+    public boolean exists(Long contract, String meansurementPoint, Long month, Long year) {
+        return this.repository.exists(contract, meansurementPoint, month, year).isPresent();
+    }
+
 }

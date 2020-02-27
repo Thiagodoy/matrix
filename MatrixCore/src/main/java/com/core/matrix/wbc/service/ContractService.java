@@ -47,7 +47,7 @@ public class ContractService {
     }
     
     @Transactional(readOnly = true)
-    public List<ContractDTO>listForBilling(){
+    public List<ContractDTO>listForBilling(){        
         return this.repository.listForBilling();
     }
 }

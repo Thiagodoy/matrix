@@ -254,7 +254,7 @@ public class CalculateTask implements Task {
             String name = results.stream().findFirst().get().getNameCompany();
 
             MeansurementFileResult fileResult = new MeansurementFileResult(contractWbcInformation, de.getProcessInstanceId());
-            fileResult.setFactorAtt(contractInformationParent.getFactorAttendanceCharge());
+            fileResult.setFactorAtt(contractInformationParent.getFactorAttendanceCharge()/100);
             fileResult.setAmountBruto(this.roundValue(sum,3));
             fileResult.setAmountScde(sumScde);
             fileResult.setAmountLiquido(this.roundValue(sum,3));

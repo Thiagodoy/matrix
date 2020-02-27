@@ -9,6 +9,7 @@ import com.core.matrix.dto.MeansurementFileStatusDTO;
 import com.core.matrix.model.MeansurementFile;
 import com.core.matrix.utils.MeansurementFileStatus;
 import java.util.List;
+import java.util.Optional;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
@@ -33,6 +34,9 @@ public interface MeansurementFileRepository extends JpaRepository<MeansurementFi
     
     @Query(value = "select * from mtx_arquivo_de_medicao f where f.act_id_processo = :processo and f.status <> 'SUCCESS' ",nativeQuery = true)
     List<MeansurementFile>findAllFilesWithErrors(@Param("process")String processInstanceId);
+    
+    @Query(value = "select c from MeansurementFile c where c.wbcContract = :contract and c.meansurementPoint = :point and c.year = :year and c.month = :month")
+    Optional<MeansurementFile> exists(@Param("contract")Long contract, @Param("point")String meansurementPoint, @Param("month")Long month, @Param("year") Long year);
     
 
 }

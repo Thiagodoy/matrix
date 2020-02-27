@@ -97,6 +97,17 @@ public class BillingContractsTask implements JavaDelegate {
                 });
     }
 
+    private boolean hasMeansurementFile(ContractCompInformation contractCompInformation) {
+
+        LocalDate monthBilling = LocalDate.now().minusMonths(1);
+
+        Long month = Integer.valueOf(monthBilling.getMonthOfYear()).longValue();
+        Long year = Integer.valueOf(monthBilling.getYear()).longValue();
+
+        return this.meansurementFileService.exists(contractCompInformation.getWbcContract(), contractCompInformation.getMeansurementPoint(), month, year);
+
+    }
+
     @Override
     public void execute(DelegateExecution execution) throws Exception {
 
@@ -117,8 +128,16 @@ public class BillingContractsTask implements JavaDelegate {
                                 ContractCompInformation compInformation = opt.get();
                                 contract.setMeansurementPoint(compInformation.getMeansurementPoint());
 
-                                String processInstanceId = this.createAProcessForBilling(execution, contract).getProcessInstanceId();
-                                this.createMeansurementFile(processInstanceId, contract);
+//                                if (!this.hasMeansurementFile(compInformation)) {
+                                    String processInstanceId = this.createAProcessForBilling(execution, contract).getProcessInstanceId();
+                                    this.createMeansurementFile(processInstanceId, contract);
+//                                } else {
+//                                    String message = MessageFormat.format("Já existe um processo criado para o contrato abaixo:\n{0}", contract.toString());
+//                                    Log log = new Log();
+//                                    log.setMessage(message);
+//                                    log.setNameProcesso(execution.getProcessDefinitionId());
+//                                    logs.add(log);
+//                                }
 
                             } else {
                                 String message = MessageFormat.format("Não foi possivel criar processo de medição para o contrato abaixo:\n{0}", contract.toString());
@@ -187,13 +206,24 @@ public class BillingContractsTask implements JavaDelegate {
                             List<ContractDTO> sons = contractsSon.stream().filter(t -> t.getMeansurementPoint() != null).collect(Collectors.toList());
 
                             sons.add(opt.get());
-//                            List<ContractDTO> con = sons.stream().sorted(Comparator.comparing(ContractDTO::getNCdContratoRateioControlador).reversed()).collect(Collectors.toList());
 
                             Map<String, Object> variables = new HashMap<>();
                             variables.put("@Cliente", sons.stream().findFirst().get().getSNmEmpresaEpce());
 
-                            String processInstanceId = this.createAProcessForBilling(execution, sons,variables).getProcessInstanceId();
-                            this.createMeansurementFile(processInstanceId, sons);
+                            ContractDTO c = sons.stream().findFirst().get();
+
+                            try {
+//                                Optional<ContractCompInformation> ccc = this.contractCompInformationService.listByContract(Long.parseLong(c.getSNrContrato())).stream().findFirst();
+//
+//                                if (!this.hasMeansurementFile(ccc.get())) {
+                                    String processInstanceId = this.createAProcessForBilling(execution, sons, variables).getProcessInstanceId();
+                                    this.createMeansurementFile(processInstanceId, sons);
+//                                }
+
+                            } catch (Exception ex) {
+                                Logger.getLogger(BillingContractsTask.class.getName()).log(Level.SEVERE, "[Search contracts]", ex);
+                            }
+
                         } else {
                             this.logService.save(logs);
                             logs.clear();

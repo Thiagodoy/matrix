@@ -35,6 +35,18 @@ public class GroupActivitiService {
     @Transactional(readOnly = true)
     public List<GroupActiviti>listAll(){
         return this.repository.findAll();
-    }   
+    }
+    
+    @Transactional(readOnly = true)
+    public List<GroupActiviti>listAllCache(){
+        return this.repository.findAll();
+    }
+    
+    @Transactional(readOnly = true, transactionManager = "transactionManager")
+    public List<GroupActiviti>listByTask(String id){
+        return this.repository.findByTaskId(id);
+    }
+    
+    
     
 }

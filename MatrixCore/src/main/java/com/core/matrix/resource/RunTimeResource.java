@@ -60,8 +60,8 @@ public class RunTimeResource {
             return ResponseEntity.status(HttpStatus.resolve(500)).body(e.getMessage());
         }
     }
-    
-     @RequestMapping(value = "/startProcessByMessage", method = RequestMethod.POST)
+
+    @RequestMapping(value = "/startProcessByMessage", method = RequestMethod.POST)
     public ResponseEntity startProcessByMessage(@RequestParam("message") String message) {
         try {
             String response = this.service.startProcessByMessage(message);
@@ -102,10 +102,15 @@ public class RunTimeResource {
 
     //TODO Create a pagination
     @RequestMapping(value = "/getCandidateTask", method = RequestMethod.GET)
-    public ResponseEntity getCandidateTask(@RequestParam(name = "page", required = true, defaultValue = "0") int page,
+    public ResponseEntity getCandidateTask(
+            @RequestParam(name = "valueVariable", required = false) String valueVariable,
+            @RequestParam(name = "processInstanceId", required = false) String processInstanceId,
+            @RequestParam(name = "page", required = true, defaultValue = "0") int page,
             @RequestParam(name = "size", required = true, defaultValue = "10") int size, UsernamePasswordAuthenticationToken principal) {
         try {
-            PageResponse<TaskResponse> response = this.service.getCandidateTasks((UserActiviti)principal.getPrincipal(), page, size);
+
+            PageResponse<TaskResponse> response = this.service.getCandidateTasks((UserActiviti) principal.getPrincipal(), valueVariable, processInstanceId, page, size);
+
             return ResponseEntity.ok(response);
         } catch (Exception e) {
             Logger.getLogger(RunTimeResource.class.getName()).log(Level.SEVERE, "[getCandidateTask]", e);
@@ -114,20 +119,23 @@ public class RunTimeResource {
     }
 
     @RequestMapping(value = "/getMyTask", method = RequestMethod.GET)
-    public ResponseEntity getMyTask(@RequestParam(name = "page", required = true, defaultValue = "0") int page,
+    public ResponseEntity getMyTask(
+            @RequestParam(name = "valueVariable", required = false) String valueVariable,
+            @RequestParam(name = "processInstanceId", required = false) String processInstanceId,
+            @RequestParam(name = "page", required = true, defaultValue = "0") int page,
             @RequestParam(name = "size", required = true, defaultValue = "10") int size,
             Principal principal) {
         try {
-            PageResponse<TaskResponse> response = this.service.getMyTasks(principal.getName(), page, size);
+            PageResponse<TaskResponse> response = this.service.getMyTasks(principal.getName(), valueVariable, processInstanceId, page, size);
             return ResponseEntity.ok(response);
         } catch (Exception e) {
             Logger.getLogger(RunTimeResource.class.getName()).log(Level.SEVERE, "[getMyTask]", e);
             return ResponseEntity.status(HttpStatus.resolve(500)).body(e.getMessage());
         }
     }
-    
+
     @RequestMapping(value = "/assigneeTask", method = RequestMethod.POST)
-    public ResponseEntity assigneeTask(@RequestParam(name = "taskId")String taskId, Principal principal){
+    public ResponseEntity assigneeTask(@RequestParam(name = "taskId") String taskId, Principal principal) {
         try {
             this.service.assigneeTask(taskId, principal.getName());
             return ResponseEntity.ok().build();
@@ -135,7 +143,7 @@ public class RunTimeResource {
             Logger.getLogger(RunTimeResource.class.getName()).log(Level.SEVERE, "[assigneeTask]", e);
             return ResponseEntity.status(HttpStatus.resolve(500)).body(e.getMessage());
         }
-        
+
     }
 
     @RequestMapping(value = "/getInvolvedTasks", method = RequestMethod.GET)

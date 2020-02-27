@@ -20,8 +20,8 @@ import org.activiti.engine.repository.ProcessDefinition;
 import org.activiti.image.ProcessDiagramGenerator;
 import org.activiti.image.impl.DefaultProcessDiagramGenerator;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
 
 /**
  *
@@ -60,6 +60,18 @@ public class RepositoryActivitiService {
 
     //@Cacheable("processDefinition")
     public List<ProcessDefinitionResponse> listAll() {
+        return this.repositoryService
+                .createProcessDefinitionQuery()
+                .latestVersion()
+                .list()
+                .parallelStream()
+                .map(p -> new ProcessDefinitionResponse(p))
+                .collect(Collectors.toList());
+
+    }
+    
+    @Cacheable("processDefinition")
+    public List<ProcessDefinitionResponse> listAllFromCache() {
         return this.repositoryService
                 .createProcessDefinitionQuery()
                 .latestVersion()

@@ -37,6 +37,7 @@ public class TaskResponse {
     private String delegate;
     private String finalized;
     private List<String> breadCrump;
+    private List<String>profileCanditates;
     private String key;
 
     public TaskResponse(TaskInfo task) {
@@ -51,6 +52,10 @@ public class TaskResponse {
         this.globalVariables = task.getProcessVariables();
         this.localVariables = task.getTaskLocalVariables();
         this.key = task.getProcessDefinitionId().split(":")[0];
+        
+        
+        
+        
         
         
         
