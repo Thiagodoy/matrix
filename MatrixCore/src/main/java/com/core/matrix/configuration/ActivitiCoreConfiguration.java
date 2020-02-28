@@ -8,10 +8,11 @@ package com.core.matrix.configuration;
 import com.core.matrix.properties.ActivitiProperties;
 import com.core.matrix.workflow.task.BillingContractsTask;
 import com.core.matrix.workflow.task.CalculateTask;
+import com.core.matrix.workflow.task.ChangeStatusFileTask;
+import com.core.matrix.workflow.task.CheckStatusFileResultTask;
 import com.core.matrix.workflow.task.CleanFiles;
 import com.core.matrix.workflow.task.DataValidationTask;
 import com.core.matrix.workflow.task.FileValidationTask;
-import com.core.matrix.workflow.task.PointMeansurementValidationTask;
 import com.zaxxer.hikari.HikariConfig;
 import com.zaxxer.hikari.HikariDataSource;
 import java.util.HashMap;
@@ -178,10 +179,10 @@ public class ActivitiCoreConfiguration implements EnvironmentAware {
         return new FileValidationTask(context);
     }
     
-    @Bean 
-    public PointMeansurementValidationTask pointMeansurementValidationTask(ApplicationContext context){
-        return new PointMeansurementValidationTask(context);
-    }
+//    @Bean 
+//    public PointMeansurementValidationTask pointMeansurementValidationTask(ApplicationContext context){
+//        return new PointMeansurementValidationTask(context);
+//    }
     
     @Bean
     public DataValidationTask dataValidationTask(ApplicationContext context){
@@ -201,6 +202,16 @@ public class ActivitiCoreConfiguration implements EnvironmentAware {
     @Bean
     public BillingContractsTask billingContractsTask(ApplicationContext context){
         return new BillingContractsTask(context);
+    }
+    
+    @Bean
+    public ChangeStatusFileTask changeStatusFileTask(ApplicationContext context){
+        return new ChangeStatusFileTask(context);
+    }
+    
+    @Bean
+    public CheckStatusFileResultTask checkStatusFileResultTask(ApplicationContext context){
+        return new CheckStatusFileResultTask(context);
     }
     
 }

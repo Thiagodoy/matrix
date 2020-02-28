@@ -128,16 +128,10 @@ public class BillingContractsTask implements JavaDelegate {
                                 ContractCompInformation compInformation = opt.get();
                                 contract.setMeansurementPoint(compInformation.getMeansurementPoint());
 
-//                                if (!this.hasMeansurementFile(compInformation)) {
+                                if (!this.hasMeansurementFile(compInformation)) {
                                     String processInstanceId = this.createAProcessForBilling(execution, contract).getProcessInstanceId();
                                     this.createMeansurementFile(processInstanceId, contract);
-//                                } else {
-//                                    String message = MessageFormat.format("Já existe um processo criado para o contrato abaixo:\n{0}", contract.toString());
-//                                    Log log = new Log();
-//                                    log.setMessage(message);
-//                                    log.setNameProcesso(execution.getProcessDefinitionId());
-//                                    logs.add(log);
-//                                }
+                                }
 
                             } else {
                                 String message = MessageFormat.format("Não foi possivel criar processo de medição para o contrato abaixo:\n{0}", contract.toString());
@@ -213,12 +207,12 @@ public class BillingContractsTask implements JavaDelegate {
                             ContractDTO c = sons.stream().findFirst().get();
 
                             try {
-//                                Optional<ContractCompInformation> ccc = this.contractCompInformationService.listByContract(Long.parseLong(c.getSNrContrato())).stream().findFirst();
-//
-//                                if (!this.hasMeansurementFile(ccc.get())) {
+                                Optional<ContractCompInformation> ccc = this.contractCompInformationService.listByContract(Long.parseLong(c.getSNrContrato())).stream().findFirst();
+
+                                if (!this.hasMeansurementFile(ccc.get())) {
                                     String processInstanceId = this.createAProcessForBilling(execution, sons, variables).getProcessInstanceId();
                                     this.createMeansurementFile(processInstanceId, sons);
-//                                }
+                                }
 
                             } catch (Exception ex) {
                                 Logger.getLogger(BillingContractsTask.class.getName()).log(Level.SEVERE, "[Search contracts]", ex);

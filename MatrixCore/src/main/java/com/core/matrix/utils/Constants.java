@@ -67,7 +67,15 @@ public class Constants {
     public static final String LIST_DELETE_FILES = "list_delete_files";
     public static final String LIST_CONTRACTS_FOR_BILLING = "list_contracts_for_biling";
     
+    public static final String PROCESS_BILLING_CONTRACT_MESSAGE_EVENT = "p131";
     public static final String PROCESS_MEANSUREMENT_FILE_MESSAGE_EVENT = "p132";
+    public static final String PROCESS_STATUS_PROCESS_FILE_MESSAGE_EVENT = "p133";
+    
+    public static final String PROCESS_MONTH_REFERENCE = "month_reference";
+    public static final String PROCESS_YEAR_REFERENCE = "year_reference";
+    
+    public static final String RESPONSE_STATUS_FILE_OK = "Não existe arquivos pendentes";
+    public static final String RESPONSE_STATUS_FILE_NOK = "Existem Arquivos Pendentes";
     
     
     

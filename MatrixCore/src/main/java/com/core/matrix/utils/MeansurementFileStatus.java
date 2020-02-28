@@ -17,5 +17,6 @@ public enum MeansurementFileStatus {
     DATA_DAY_ERROR,
     DATA_CALENDAR_ERROR,
     LAYOUT_ERROR,
+    APPROVED,
     SUCCESS;    
 }

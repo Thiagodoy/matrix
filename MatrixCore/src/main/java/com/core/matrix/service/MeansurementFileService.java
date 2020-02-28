@@ -63,6 +63,12 @@ public class MeansurementFileService {
     public List<MeansurementFile> findAllFilesWithErrors(String processInstanceId) {
         return this.repository.findAllFilesWithErrors(processInstanceId);
     }
+    
+    
+    @Transactional(readOnly = true)
+    public boolean hasFilePending(Long year, Long month){
+        return !this.repository.hasFilePending(year, month).isEmpty();
+    }
 
     @Transactional(readOnly = true)
     public boolean exists(Long contract, String meansurementPoint, Long month, Long year) {

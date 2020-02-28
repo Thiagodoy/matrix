@@ -90,7 +90,7 @@ public class RuntimeActivitiService {
     private GroupActivitiService groupActivitiService;
 
     @Transactional
-    public void startProcessoByMessage(String message, Map<String, Object> variables) {
+    public void startProcessByMessage(String message, Map<String, Object> variables) {
         this.runtimeService.startProcessInstanceByMessage(message, variables);
     }
 
