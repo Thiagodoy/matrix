@@ -5,6 +5,7 @@
  */
 package com.core.matrix.service;
 
+import com.core.matrix.dto.MeansurementFileResultStatusDTO;
 import com.core.matrix.model.MeansurementFileResult;
 import com.core.matrix.repository.MeansurementFileResultRepository;
 import java.util.List;
@@ -42,6 +43,11 @@ public class MeansurementFileResultService {
     @Transactional(transactionManager = "matrixTransactionManager")
     public void deleteByProcess(String id){
         this.repository.deleteByIdProcess(id);
+    }
+    
+    @Transactional(readOnly = true)
+    public List<MeansurementFileResultStatusDTO>getStatusBilling(Long year, Long month){
+        return this.repository.getStatusBilling(year, month);
     }
     
     

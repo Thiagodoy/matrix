@@ -13,6 +13,7 @@ import java.io.Serializable;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 import java.util.List;
+import java.util.Optional;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.persistence.Column;
@@ -90,10 +91,10 @@ public class MeansurementFileDetail implements Serializable {
 
     @Column(name = "qualidade")
     private String quality;
-    
+
     @Column(name = "origem")
     private String origem;
-    
+
     @Enumerated(EnumType.STRING)
     @Column(name = "status")
     private MeansurementFileDetailStatus status;
@@ -113,28 +114,30 @@ public class MeansurementFileDetail implements Serializable {
         this.idMeansurementFile = fileId;
         this.meansurementPoint = meansurementPoint;
     }
-    
-    private Double parseToDouble(String value){
-        
+
+    private Double parseToDouble(String value) {
+
+        if (!Optional.ofNullable(value).isPresent()) {
+            value = "0,0";
+        }
+
         String v = value
                 .replaceAll("[.]", "")
                 .replaceAll("[,]", ".");
-        
+
         try {
             return Double.parseDouble(v);
         } catch (NumberFormatException e) {
             Logger.getLogger(MeansurementFileDetail.class.getName()).log(Level.SEVERE, "Não foi possivel formatar -> " + v);
             throw e;
         }
-        
-        
-        
+
     }
 
     public MeansurementFileDetail(FileDetailDTO detail, MeansurementFileType type) {
 
         DateTimeFormatter formater = DateTimeFormatter.ofPattern("dd/MM/yyyy");
-        
+
         this.status = MeansurementFileDetailStatus.SUCCESS;
 
         switch (type) {

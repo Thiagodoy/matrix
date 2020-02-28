@@ -5,6 +5,7 @@
  */
 package com.core.matrix.resource;
 
+import com.core.matrix.dto.MeansurementFileResultStatusDTO;
 import com.core.matrix.model.MeansurementFileResult;
 import com.core.matrix.service.MeansurementFileResultService;
 import java.util.List;
@@ -52,6 +53,20 @@ public class MeansurementFileResultResource {
 
         } catch (Exception e) {
             Logger.getLogger(MeansurementFileResultResource.class.getName()).log(Level.SEVERE, "[getResult]", e.getMessage());
+            return ResponseEntity.status(HttpStatus.resolve(500)).body(e.getMessage());
+        }
+    }
+
+    @RequestMapping(value = "/status-billing", method = RequestMethod.GET)
+    public ResponseEntity getStatusBilling(@RequestParam("year") Long year, @RequestParam("month") Long month) {
+
+        try {
+
+            List<MeansurementFileResultStatusDTO> response = this.service.getStatusBilling(year, month);
+            return ResponseEntity.ok(response);
+
+        } catch (Exception e) {
+            Logger.getLogger(MeansurementFileResultResource.class.getName()).log(Level.SEVERE, "[getStatusBilling]", e.getMessage());
             return ResponseEntity.status(HttpStatus.resolve(500)).body(e.getMessage());
         }
     }
