@@ -108,7 +108,6 @@ public class CalculateTask implements Task {
 
             double consumptionTotal = ((sum / 1000) + ((sum / 1000) * percentLoss) - proinfa) * factorAtt;
 
-            
             String point = file.getMeansurementPoint().replaceAll("\\((L|B)\\)", "").trim();
 
             Optional<CompanyDTO> optEmp = this.empresaService.listByPoint(point);
@@ -116,8 +115,8 @@ public class CalculateTask implements Task {
             String name = optEmp.isPresent() ? optEmp.get().getSNmEmpresa() : "";
 
             MeansurementFileResult fileResult = new MeansurementFileResult(contractWbcInformationDTO, de.getProcessInstanceId());
-            fileResult.setAmountScde(this.roundValue((sum / 1000), 6));            
-            
+            fileResult.setAmountScde(this.roundValue((sum / 1000), 6));
+
             fileResult.setMeansurementFileId(file.getId());
             Double consumptionLiquid = solicitadoLiquido(consumptionTotal, contractWbcInformationDTO);
             fileResult.setAmountLiquido(this.roundValue(consumptionLiquid, 3));
@@ -208,7 +207,7 @@ public class CalculateTask implements Task {
                     final ConsumptionResult result = new ConsumptionResult();
                     result.setMeansurementPoint(file.getMeansurementPoint());
 
-                    double consumptionTotal = ((sum / 1000) + ((sum / 1000) * percentLoss) - proinfa) * factorAtt;                    
+                    double consumptionTotal = ((sum / 1000) + ((sum / 1000) * percentLoss) - proinfa) * factorAtt;
 
                     Optional<CompanyDTO> optEmp = this.empresaService.listByPoint(point);
                     String nickname = optEmp.isPresent() ? optEmp.get().getSNmApelido() : "";
@@ -218,9 +217,9 @@ public class CalculateTask implements Task {
 
                     fileResult.setAmountScde((sum / 1000d));
                     fileResult.setMeansurementFileId(file.getId());
-                    
-                    fileResult.setAmountBruto(this.roundValue((consumptionTotal / 100),3));
-                    fileResult.setAmountLiquido(this.roundValue((consumptionTotal / 100),3));
+
+                    fileResult.setAmountBruto(this.roundValue((consumptionTotal / 100), 3));
+                    fileResult.setAmountLiquido(this.roundValue((consumptionTotal / 100), 3));
                     fileResult.setWbcContract(Long.valueOf(contractWbcInformation.getNrContract()));
                     fileResult.setMeansurementPoint(point);
                     fileResult.setNickNameCompany(nickname);
@@ -254,10 +253,10 @@ public class CalculateTask implements Task {
             String name = results.stream().findFirst().get().getNameCompany();
 
             MeansurementFileResult fileResult = new MeansurementFileResult(contractWbcInformation, de.getProcessInstanceId());
-            fileResult.setFactorAtt(contractInformationParent.getFactorAttendanceCharge()/100);
-            fileResult.setAmountBruto(this.roundValue(sum,3));
+            fileResult.setFactorAtt(contractInformationParent.getFactorAttendanceCharge() / 100);
+            fileResult.setAmountBruto(this.roundValue(sum, 3));
             fileResult.setAmountScde(sumScde);
-            fileResult.setAmountLiquido(this.roundValue(sum,3));
+            fileResult.setAmountLiquido(this.roundValue(sum, 3));
             fileResult.setMeansurementFileId(fileId);
             fileResult.setWbcContract(contractInformationParent.getCodeWbcContract());
             fileResult.setContractParent(1L);
@@ -305,7 +304,7 @@ public class CalculateTask implements Task {
 
     private Double getSumConsumptionActive(List<MeansurementFileDetail> details) {
         return details.stream()
-                .map(d -> new BigDecimal(d.getConsumptionActive()).setScale(6,RoundingMode.HALF_EVEN))                
+                .map(d -> new BigDecimal(d.getConsumptionActive()).setScale(6, RoundingMode.HALF_EVEN))
                 .reduce(new BigDecimal(0D), BigDecimal::add).doubleValue();
     }
 
@@ -323,5 +322,5 @@ public class CalculateTask implements Task {
         return contractProInfa.getProinfa();
 
     }
-  
+
 }

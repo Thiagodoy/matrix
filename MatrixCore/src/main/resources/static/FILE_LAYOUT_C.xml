@@ -9,7 +9,7 @@
         </parser>
         
         <!-- TIPO 2-->
-        <group name="file" class="com.core.matrix.dto.FileParsedDTO" minOccurs="0" maxOccurs="1">            
+<!--        <group name="file" class="com.core.matrix.dto.FileParsedDTO" minOccurs="0" maxOccurs="1">            
             <record  name="informations" class="com.core.matrix.dto.InformationDTO"  minOccurs="1" maxOccurs="3" collection="list" order="1" >
                 <field name="value" trim="true" type="string"/>                              
             </record>    
@@ -20,7 +20,7 @@
                 <field name="headerdate" trim="true" type="string"  />
                 <field name="headerhour" trim="true" type="string"  />
                 <field name="headerconsumptionActive" trim="true" type="string"  />               
-                <field name="headerquality" trim="true" type="string"  />
+                <field name="headerquality" trim="true" type="string"  /> 
                 <field name="headerorigem" trim="true" type="string"  />                             
             </record> 
             
@@ -34,7 +34,7 @@
                 <field type="string" name="quality" trim="true"/>
                 <field type="string" name="origem" trim="true"/> 
             </record>
-        </group>
+        </group>-->
         
         
         
