@@ -72,6 +72,18 @@ public class RunTimeResource {
         }
     }
 
+     @RequestMapping(value = "/startProcessByMessageWithParams", method = RequestMethod.POST)
+    public ResponseEntity startProcessByMessage(@RequestBody StartProcessRequest request) {
+        try {
+            this.service.startProcessByMessage(request.getKey(),request.getVariables());
+            return ResponseEntity.ok().build();
+        } catch (Exception e) {
+            Logger.getLogger(RunTimeResource.class.getName()).log(Level.SEVERE, "[startProcessByMessage]", e);
+            return ResponseEntity.status(HttpStatus.resolve(500)).body(e.getMessage());
+        }
+    }
+    
+    
     @RequestMapping(value = "/getTask", method = RequestMethod.GET)
     public ResponseEntity getTask(@RequestParam(value = "taskId", required = true) String taskId) {
         try {
