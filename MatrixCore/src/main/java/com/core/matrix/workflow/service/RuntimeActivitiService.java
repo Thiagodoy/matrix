@@ -271,7 +271,7 @@ public class RuntimeActivitiService {
                             + "        AND k.group_id_ in(" + gro + ") ").list().stream().map(t -> t.getProcessInstanceId()).distinct().collect(Collectors.toList());
             
             if(processInstances.isEmpty()){
-                return new PageResponse<TaskResponse>(new ArrayList(), (long) 0, (long) processInstances.size(), (long) page);
+                return new PageResponse<TaskResponse>(new ArrayList(), 1L, 1L, (long) page);
             }
 
             List<TaskResponse> response = taskService
@@ -292,7 +292,7 @@ public class RuntimeActivitiService {
                     })
                     .collect(Collectors.toList());
 
-            return new PageResponse<TaskResponse>(response, (long) response.size(), (long) processInstances.size(), (long) page);
+            return new PageResponse<TaskResponse>(response, (long) processInstances.size(),(long) size , (long) page);
 
         } else if (Optional.ofNullable(processInstance).isPresent()) {
 
@@ -321,7 +321,7 @@ public class RuntimeActivitiService {
 //            task.setProfileCanditates(gr);
             });
 
-            return new PageResponse<TaskResponse>(response, (long) response.size(), 1L, (long) page);
+            return new PageResponse<TaskResponse>(response, 1L, 1L, (long) page);
 
         } else {
 
@@ -352,7 +352,7 @@ public class RuntimeActivitiService {
 //            task.setProfileCanditates(gr);
             });
 
-            return new PageResponse<TaskResponse>(response, (long) response.size(), sizeTotalElements, (long) page);
+            return new PageResponse<TaskResponse>(response, sizeTotalElements, (long)size, (long) page);
         }
 
     }
@@ -391,7 +391,7 @@ public class RuntimeActivitiService {
 //            task.setProfileCanditates(gr);
         });
 
-        return new PageResponse<TaskResponse>(response, (long) response.size(), sizeTotalElements, (long) page);
+        return new PageResponse<TaskResponse>(response,  sizeTotalElements, (long)size , (long) page);
 
     }
 
@@ -421,7 +421,7 @@ public class RuntimeActivitiService {
 
             
             if(processInstances.isEmpty()){
-                return new PageResponse<TaskResponse>(new ArrayList(), (long) 0, (long) processInstances.size(), (long) page);
+                return new PageResponse<TaskResponse>(new ArrayList(), 1L, 1L, (long) page);
             }
             
             List<TaskResponse> response = taskService
@@ -442,7 +442,9 @@ public class RuntimeActivitiService {
                     })
                     .collect(Collectors.toList());
 
-            return new PageResponse<TaskResponse>(response, (long) response.size(), (long) processInstances.size(), (long) page);
+            return new PageResponse<TaskResponse>(response,  (long) processInstances.size(), (long)size , (long) page);
+            
+           // return new PageResponse<TaskResponse>(response, (long) response.size(), (long) processInstances.size(), (long) page);
 
         } else if (Optional.ofNullable(processInstance).isPresent()) {
 
@@ -471,7 +473,7 @@ public class RuntimeActivitiService {
 //            task.setProfileCanditates(gr);
             });
 
-            return new PageResponse<TaskResponse>(response, (long) response.size(), 1L, (long) page);
+            return new PageResponse<TaskResponse>(response, 1L, 1L, (long) page);
 
         } else {
 
@@ -501,7 +503,7 @@ public class RuntimeActivitiService {
 //            task.setProfileCanditates(gr);
             });
 
-            return new PageResponse<TaskResponse>(response, (long) response.size(), sizeTotalElements, (long) page);
+            return new PageResponse<TaskResponse>(response, (long) sizeTotalElements, (long)size, (long) page);
         }
 
 //        List<TaskResponse> response = taskService
@@ -547,7 +549,7 @@ public class RuntimeActivitiService {
                 })
                 .collect(Collectors.toList());
 
-        return new PageResponse<TaskResponse>(response, (long) response.size(), sizeTotalElements, (long) page);
+        return new PageResponse<TaskResponse>(response, (long) sizeTotalElements, (long)size, (long) page);
 
     }
 

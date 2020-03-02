@@ -29,11 +29,15 @@ public class PageResponse<T>  {
     private Long number;
     
     
-    public PageResponse(List<T> content, Long totalElements, Long size, Long page ){
+    public PageResponse(List<T> content, Long totalElements, Long sizePerPage, Long page ){
         this.content = content;
-        this.totalPages = (totalElements == 0) || Math.ceil((size / totalElements.doubleValue())) < 1 ? 0 : (long)Math.ceil((size / totalElements));
+        this.totalPages =  (long) Math.ceil((totalElements / sizePerPage.doubleValue()));
+        
+        
+        
+        
         this.totalElements = totalElements;
-        this.size = size;  
+        this.size = sizePerPage;  
         this.page = page; 
         this.first = page == 0;
         this.last = (this.totalPages - 1) == page;
