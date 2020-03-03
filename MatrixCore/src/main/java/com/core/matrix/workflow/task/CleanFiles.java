@@ -40,6 +40,7 @@ public class CleanFiles implements JavaDelegate {
             this.fileService = CleanFiles.context.getBean(MeansurementFileService.class);
             this.fileDetailService = CleanFiles.context.getBean(MeansurementFileDetailService.class);
             this.logService = CleanFiles.context.getBean(LogService.class);
+            this.fileResultService = CleanFiles.context.getBean(MeansurementFileResultService.class);
         }
     }
 

@@ -10,6 +10,7 @@ import com.core.matrix.workflow.task.BillingContractsTask;
 import com.core.matrix.workflow.task.CalculateTask;
 import com.core.matrix.workflow.task.ChangeStatusFileTask;
 import com.core.matrix.workflow.task.CheckStatusFileResultTask;
+import com.core.matrix.workflow.task.CleanFileResult;
 import com.core.matrix.workflow.task.CleanFiles;
 import com.core.matrix.workflow.task.DataValidationTask;
 import com.core.matrix.workflow.task.FileValidationTask;
@@ -212,6 +213,11 @@ public class ActivitiCoreConfiguration implements EnvironmentAware {
     @Bean
     public CheckStatusFileResultTask checkStatusFileResultTask(ApplicationContext context){
         return new CheckStatusFileResultTask(context);
+    }
+    
+    @Bean
+    public CleanFileResult cleanFileResult(ApplicationContext context){
+        return new CleanFileResult(context);
     }
     
 }
