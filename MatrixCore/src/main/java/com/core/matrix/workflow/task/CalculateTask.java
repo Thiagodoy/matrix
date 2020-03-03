@@ -91,7 +91,7 @@ public class CalculateTask implements Task {
                     .collect(Collectors.toList());
 
             ContractCompInformation compInformation = contractService
-                    .findByMeansurementPoint(file.getMeansurementPoint())
+                    .findByWbcContractAndMeansurementPoint(file.getWbcContract(),file.getMeansurementPoint())                    
                     .orElseThrow(() -> new Exception("[Matrix] -> Não foi possivel encontrar as informações complementares do contrato!"));
 
             ContractWbcInformationDTO contractWbcInformationDTO = this.contractWbcService

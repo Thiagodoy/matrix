@@ -76,6 +76,7 @@ public interface Task extends JavaDelegate {
                         .collect(Collectors.toList());
                 break;
             case LAYOUT_C:
+            case LAYOUT_C_1:
                 result = file.getDetails()
                         .parallelStream()
                         .filter(detail -> detail.getMeansurementPoint().contains("(L)"))

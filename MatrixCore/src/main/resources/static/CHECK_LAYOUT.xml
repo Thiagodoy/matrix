@@ -11,7 +11,7 @@
         <group name="file" class="com.core.matrix.dto.FileParsedDTO">            
             <record  name="informations" class="com.core.matrix.dto.InformationDTO"  minOccurs="1" maxOccurs="3" collection="list" order="1" >
                 <field name="value" trim="true" type="string"/>               
-            </record>                
+            </record> 
         </group>
     </stream>  
 </beanio>

@@ -13,6 +13,7 @@ public enum MeansurementFileType {
 
     LAYOUT_A,
     LAYOUT_B,
-    LAYOUT_C
+    LAYOUT_C,
+    LAYOUT_C_1
 
 }

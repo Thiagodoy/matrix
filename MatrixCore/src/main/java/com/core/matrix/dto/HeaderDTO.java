@@ -5,6 +5,8 @@
  */
 package com.core.matrix.dto;
 
+import java.util.Arrays;
+import java.util.Objects;
 import lombok.Data;
 
 /**
@@ -30,5 +32,22 @@ public class HeaderDTO {
     public String headernotificationCollection;
     public String headerquality;
     public String headerorigem;
+    
+    
+    
+    
+    
+    public long countValuesNonNull(){
+        
+        return Arrays.asList(HeaderDTO.class.getDeclaredFields()).stream().map(field->{
+            
+            try {
+                return (String) field.get(this);
+            } catch (Exception ex) {
+                return null;
+            } 
+        
+        }).filter(Objects::nonNull).count();
+    }
 
 }

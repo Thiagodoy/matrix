@@ -1,0 +1,47 @@
+<beanio xmlns="http://www.beanio.org/2012/03" 
+        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xsi:schemaLocation="http://www.beanio.org/2012/03 http://www.beanio.org/2012/03/mapping.xsd">
+  
+    <stream name="file-matrix" format="csv" resourceBundle="beanio/messages" >  
+        
+        <parser>
+           <property name="delimiter" value=";" />
+        </parser>
+        
+        <!-- TIPO 2-->
+        <group name="file" class="com.core.matrix.dto.FileParsedDTO" minOccurs="0" maxOccurs="1">            
+            <record  name="informations" class="com.core.matrix.dto.InformationDTO"  minOccurs="1" maxOccurs="3" collection="list" order="1" >
+                <field name="value" trim="true" type="string"/>                              
+            </record>    
+            
+            <record  name="header" class="com.core.matrix.dto.HeaderDTO"  minOccurs="1" maxOccurs="1" order="2" >
+                <field name="headeragent" trim="true" type="string" />
+                <field name="headermeansurementPoint" trim="true" type="string"  />
+                <field name="headerdate" trim="true" type="string"  />
+                <field name="headerhour" trim="true" type="string"  />
+                <field name="headerconsumptionActive" trim="true" type="string"  />               
+                <field name="headerquality" trim="true" type="string"  /> 
+                <field name="headerorigem" trim="true" type="string"  />                             
+            </record> 
+            
+            
+           <record name="details" class="com.core.matrix.dto.FileDetailDTO" minOccurs="1" maxOccurs="unbounded" collection="list" order="3" >               
+                <field type="string" name="agent"  trim="true" />
+                <field type="string" name="meansurementPoint" required="true"  trim="true"  />
+                <field type="string" name="date" trim="true" required="true"  />
+                <field type="string" name="hour" trim="true" required="true"  />                          
+                <field type="string" name="consumptionActive" trim="true" required="true"   />                
+                <field type="string" name="quality" trim="true"/>
+                <field type="string" name="origem" trim="true"/> 
+            </record>
+        </group>
+        
+        
+        
+       
+        
+        
+        
+        
+    </stream>  
+</beanio>
