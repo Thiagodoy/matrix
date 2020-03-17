@@ -139,7 +139,8 @@ public class ActivitiCoreConfiguration implements EnvironmentAware {
                 
                 .setDataSource(this.dataSource())
                 .setAsyncFailedJobWaitTime(2147483647)
-                .setDefaultFailedJobWaitTime(2147483647);
+                .setDefaultFailedJobWaitTime(2147483647)
+                .setJobExecutorActivate(true);
 
         return s.buildProcessEngine();
 

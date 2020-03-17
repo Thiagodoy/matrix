@@ -16,6 +16,7 @@ import com.core.matrix.model.MeansurementFileDetail;
 import com.core.matrix.service.LogService;
 import com.core.matrix.service.MeansurementFileDetailService;
 import com.core.matrix.service.MeansurementFileService;
+import com.core.matrix.utils.MeansurementFileDetailStatus;
 import com.core.matrix.utils.MeansurementFileStatus;
 import com.core.matrix.utils.MeansurementFileType;
 import java.io.BufferedReader;
@@ -28,9 +29,14 @@ import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.nio.charset.Charset;
 import java.text.MessageFormat;
+import java.time.LocalDate;
+import java.time.Month;
+import java.time.YearMonth;
 import java.util.ArrayList;
+import java.util.Arrays;
 
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -57,9 +63,10 @@ public class FileValidationTask implements JavaDelegate {
     private MeansurementFileDetailService detailService;
     private DelegateExecution delegateExecution;
     private LogService logService;
-
-    private List<String> meansurementPoints;
+ 
     private List<MeansurementFile> files;
+    
+    private List<String> meansuremPointFiles;
 
     private List<Log> logs;
 
@@ -87,7 +94,11 @@ public class FileValidationTask implements JavaDelegate {
             final List<String> attachmentIds = (List<String>) de.getVariable(LIST_ATTACHMENT_ID, Object.class);
             final String user = de.getVariable(USER_UPLOAD, String.class);
             files = this.service.findByProcessInstanceId(delegateExecution.getProcessInstanceId());
-
+                     
+            meansuremPointFiles = new ArrayList<String>();
+            
+            List<String> listaDePontos = Arrays.asList(de.getVariable("pontos", String.class).replace("[", "").replace("]","").split(","));
+            
             attachmentIds.stream().forEach(attachmentId -> {
 
                 InputStream stream = null;
@@ -99,27 +110,59 @@ public class FileValidationTask implements JavaDelegate {
                         stream = removeLinesEmpty(stream);
                         fileName = taskService.getAttachment(attachmentId).getName();
                     }
+                                                          
+                    String extension = fileName.substring(fileName.indexOf('.'), fileName.length());
 
-                    BeanIoReader reader = new BeanIoReader();
-                    Optional<FileParsedDTO> fileParsed = reader.<FileParsedDTO>parse(stream);
+                    if (!".csv".equals(extension)) {
+                    
+                        this.generateLog (de, null, "As extensões de arquivos de medição devem ser .csv : " + fileName);          
+                    
+                    } else {
+                    
+                        BeanIoReader reader = new BeanIoReader();
+                        Optional<FileParsedDTO> fileParsed = reader.<FileParsedDTO>parse(stream);
 
-                    if (!reader.getErrors().isEmpty()) {
-                        writeFile(fileName, reader.getErrors(), de);
-                    } else if (fileParsed.isPresent()) {
-                        mountFile(fileParsed.get(), attachmentId, user, files);
+                        if (!reader.getErrors().isEmpty()) {
+                            writeFile(fileName, reader.getErrors(), de);
+                        } else if (fileParsed.isPresent()) {
+                            mountFile(fileParsed.get(), attachmentId, user, files);
+                        }
+                                                                     
                     }
-
+                    
                 } catch (Exception e) {
                     Logger.getLogger(FileValidationTask.class.getName()).log(Level.SEVERE, "[ forEach ]", e);
                     this.generateLog(de, e, "Erro ao processar o arquivo : " + fileName);
                 }
 
             });
-
-            files.stream().filter(f -> f.getFile() == null).forEach(f -> {
-                String message = MessageFormat.format("Não foi encontrado nenhuma correspondência do ponto de medição, dentro dos arquivos postados.\nInformação:\nContrato: {0}\nPonto de Medição: {1}\n", f.getWbcContract().toString().replace(".", ""), f.getMeansurementPoint());
-                this.generateLog(de, null, message);
-            });
+            
+            for(int i = 0; i < listaDePontos.size(); i++){
+                               
+                int achou = 0;
+                
+                for(int z = 0; z < meansuremPointFiles.size(); z++){
+                                      
+                        if (!meansuremPointFiles.get(z).trim().equals(listaDePontos.get(i).trim())) {
+                
+                           achou = 0;                            
+                    
+                        }  else {
+                            
+                            achou = 1;
+                            z = meansuremPointFiles.size()+1;
+                            
+                        }   
+                                              
+                }
+                
+                if (achou == 0 && meansuremPointFiles.size()>0) {
+                    
+                    String message = MessageFormat.format("Não foi encontrado nenhuma correspondência do ponto de medição, dentro dos arquivos postados.\nPonto de medição não encontrado: {0}\n", listaDePontos.get(i).toString());
+                    this.generateLog(delegateExecution, null, message);
+                    
+                }
+            }  
 
             if (!this.logs.isEmpty()) {
                 this.logService.save(logs);
@@ -134,7 +177,7 @@ public class FileValidationTask implements JavaDelegate {
         }
 
     }
-
+   
     private void generateLog(DelegateExecution de, Exception e, String message) {
         Log log = new Log();
         log.setMessage(message);
@@ -197,40 +240,37 @@ public class FileValidationTask implements JavaDelegate {
     public void mountFile(FileParsedDTO fileParsedDTO, String attachmentId, String userId, List<MeansurementFile> files) {
 
         try {
-
-            Logger.getLogger(FileValidationTask.class.getName()).log(Level.SEVERE, "mount File layout :->" + fileParsedDTO.getType() );
-            
+         
             MeansurementFileType type = MeansurementFileType.valueOf(fileParsedDTO.getType());
-            
-            Logger.getLogger(FileValidationTask.class.getName()).log(Level.SEVERE, "mount File  escolhido :->" + type.toString() );
-            
-            
-            
+                             
             final List<MeansurementFileDetail> details = this.mountDetail(fileParsedDTO.getDetails(), type);
-
+                             
             //set a user for files and type
             files.forEach(file -> {
                 file.setUser(userId);
                 file.setType(type);
             });
-
+                       
             //List all point that are into the file    
             List<String> meansuremPoint = details
                     .parallelStream()
                     .map(d -> d.getMeansurementPoint().replaceAll("\\((L|B)\\)", "").trim())
                     .distinct()
                     .collect(Collectors.toList());
-
+            
+            meansuremPointFiles.addAll(meansuremPoint);
+                       
             //Verify if point match some files made. And set the attachment id on file             
             meansuremPoint.forEach(point -> {
                 Optional<MeansurementFile> opt = files.stream().filter(file -> file.getMeansurementPoint().equals(point)).findFirst();
+                
                 if (opt.isPresent()) {
 
                     MeansurementFile file = opt.get();
                     file.setFile(attachmentId);
                     file.setUser(userId);
                     file.setType(type);
-
+                    
                     List<MeansurementFileDetail> fileDetaisl = details
                             .stream()
                             .filter(d -> d.getMeansurementPoint().replaceAll("\\((L|B)\\)", "").trim().equals(point))
@@ -243,7 +283,8 @@ public class FileValidationTask implements JavaDelegate {
                     opt.get().setStatus(MeansurementFileStatus.SUCCESS);
                     service.saveFile(opt.get());
                     detailService.save(fileDetaisl);
-                }
+                } 
+                    
             });
 
         } catch (Exception e) {
@@ -262,6 +303,7 @@ public class FileValidationTask implements JavaDelegate {
                 .collect(Collectors.toList());
     }
 
+  
     private synchronized InputStream removeLinesEmpty(InputStream stream) throws IOException {
 
         StringBuilder sb = new StringBuilder();

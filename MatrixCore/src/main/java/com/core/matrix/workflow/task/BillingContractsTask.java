@@ -43,7 +43,7 @@ public class BillingContractsTask implements JavaDelegate {
     private LogService logService;
 
     private static ApplicationContext context;
-
+    
     public BillingContractsTask() {
         synchronized (BillingContractsTask.context) {
             this.contractService = context.getBean(ContractService.class);
@@ -57,16 +57,15 @@ public class BillingContractsTask implements JavaDelegate {
         BillingContractsTask.context = context;
     }
 
-    private ProcessInstance createAProcessForBilling(DelegateExecution execution, ContractDTO contract) {
-
+    private ProcessInstance createAProcessForBilling(DelegateExecution execution, ContractDTO contract) {                                    
         Map<String, Object> variables = new HashMap<>();
-        variables.put("@Cliente", contract.getSNmEmpresaEpce());
-
+        variables.put("@Cliente", contract.getSNmEmpresaEpce().toString());
+        variables.put("pontos", contract.getMeansurementPoint().toString());
+        
         return this.createAProcessForBilling(execution, Arrays.asList(contract), variables);
     }
 
     private synchronized ProcessInstance createAProcessForBilling(DelegateExecution execution, List<ContractDTO> contracts, Map<String, Object> variables) {
-
         variables.put(Constants.LIST_CONTRACTS_FOR_BILLING, contracts);
 
         return execution.getEngineServices().getRuntimeService().startProcessInstanceByMessage(Constants.PROCESS_MEANSUREMENT_FILE_MESSAGE_EVENT, variables);
@@ -155,14 +154,16 @@ public class BillingContractsTask implements JavaDelegate {
                 this.logService.save(logs);
                 logs.clear();
             }
-
+            
             //Contracts with rateio
             contracts
                     .parallelStream()
                     .filter(contract -> contract.getBFlRateio().equals(1L) && contract.getNCdContratoRateioControlador() != null)
                     .collect(Collectors.groupingBy(ContractDTO::getNCdContratoRateioControlador))
                     .forEach((contractParent, contractsSon) -> {
-
+                        
+                        List<String> listaDePontos = new ArrayList<String>();
+                        
                         contractsSon.stream().forEach(cc -> {
 
                             try {
@@ -171,6 +172,8 @@ public class BillingContractsTask implements JavaDelegate {
                                 if (opt.isPresent()) {
                                     ContractCompInformation compInformation = opt.get();
                                     cc.setMeansurementPoint(compInformation.getMeansurementPoint());
+                                    listaDePontos.add(compInformation.getMeansurementPoint().toString());
+                                    Logger.getLogger(FileValidationTask.class.getName()).log(Level.SEVERE, "point :->" + compInformation.getMeansurementPoint().toString());
                                 } else {
                                     String message = MessageFormat.format("Não foi possivel criar processo de medição para o contrato [rateio] abaixo:\n{0}", cc.toString());
                                     Log log = new Log();
@@ -203,6 +206,7 @@ public class BillingContractsTask implements JavaDelegate {
 
                             Map<String, Object> variables = new HashMap<>();
                             variables.put("@Cliente", sons.stream().findFirst().get().getSNmEmpresaEpce());
+                            variables.put("pontos", listaDePontos.toString());
 
                             ContractDTO c = sons.stream().findFirst().get();
 
@@ -211,7 +215,9 @@ public class BillingContractsTask implements JavaDelegate {
 
                                 if (!this.hasMeansurementFile(ccc.get())) {
                                     String processInstanceId = this.createAProcessForBilling(execution, sons, variables).getProcessInstanceId();
+                                    //String processInstanceId = this.createAProcessForBilling(execution, variables).getProcessInstanceId();
                                     this.createMeansurementFile(processInstanceId, sons);
+                                    Logger.getLogger(BillingContractsTask.class.getName()).log(Level.SEVERE, "process :->" + processInstanceId );
                                 }
 
                             } catch (Exception ex) {

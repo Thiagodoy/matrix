@@ -60,6 +60,7 @@ public class Constants {
     public static final String CONST_SOURCE_COLLECTION_1 = "Consistido";
     public static final String CONST_SOURCE_COLLECTION_2 = "Coleta Diária";
     public static final String CONST_SOURCE_COLLECTION_3 = "Hora Ajustada";
+    public static final String CONST_SOURCE_COLLECTION_4 = "Inspeção Lógica";
     
     public static final String CONST_QUALITY_COMPLETE = "Completo";    
     public static final String TYPE_LAYOUT_FILE = "type_layout_file";
@@ -74,8 +75,8 @@ public class Constants {
     public static final String PROCESS_MONTH_REFERENCE = "month_reference";
     public static final String PROCESS_YEAR_REFERENCE = "year_reference";
     
-    public static final String RESPONSE_STATUS_FILE_OK = "Não existe arquivos pendentes";
-    public static final String RESPONSE_STATUS_FILE_NOK = "Existem Arquivos Pendentes";
+    public static final String RESPONSE_STATUS_FILE_OK = "SEM PENDÊNCIA";
+    public static final String RESPONSE_STATUS_FILE_NOK = "COM PENDÊNCIA";
     
     
     

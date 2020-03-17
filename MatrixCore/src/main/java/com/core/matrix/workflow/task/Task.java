@@ -15,6 +15,7 @@ import static com.core.matrix.utils.Constants.CONST_SITUATION_4;
 import static com.core.matrix.utils.Constants.CONST_SOURCE_COLLECTION_1;
 import static com.core.matrix.utils.Constants.CONST_SOURCE_COLLECTION_2;
 import static com.core.matrix.utils.Constants.CONST_SOURCE_COLLECTION_3;
+import static com.core.matrix.utils.Constants.CONST_SOURCE_COLLECTION_4;
 import static com.core.matrix.utils.Constants.CONTROLE;
 import static com.core.matrix.utils.Constants.RESPONSE_CALENDAR_INVALID;
 import static com.core.matrix.utils.Constants.RESPONSE_RESULT_MESSAGE;
@@ -67,7 +68,8 @@ public interface Task extends JavaDelegate {
                             if ((d.getSourceCollection() != null && d.getSourceCollection().length() > 0)
                                     && (Utils.checkDistance(CONST_SOURCE_COLLECTION_1, d.getSourceCollection()) > 0.90
                                     || (Utils.checkDistance(CONST_SOURCE_COLLECTION_2, d.getSourceCollection()) > 0.90)
-                                    || (Utils.checkDistance(CONST_SOURCE_COLLECTION_3, d.getSourceCollection()) > 0.90))) {
+                                    || (Utils.checkDistance(CONST_SOURCE_COLLECTION_3, d.getSourceCollection()) > 0.90)
+                                    || (Utils.checkDistance(CONST_SOURCE_COLLECTION_4, d.getSourceCollection()) > 0.90))) {
                                 return true;
                             } else {
                                 return false;

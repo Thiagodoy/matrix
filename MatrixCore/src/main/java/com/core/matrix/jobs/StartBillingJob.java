@@ -38,21 +38,25 @@ public class StartBillingJob {
     public void startBilling() {
 
         try {
-
+            
             final LocalDate reference = LocalDate.now().minusMonths(1);
             Map<String, Object> variables = new HashMap<>();
-            variables.put(PROCESS_MONTH_REFERENCE, reference.getMonthValue());
-            variables.put(PROCESS_YEAR_REFERENCE, reference.getYear());
-            
+            //variables.put(PROCESS_MONTH_REFERENCE, reference.getMonthValue());
+            //variables.put(PROCESS_YEAR_REFERENCE, reference.getYear());
+            variables.put(PROCESS_MONTH_REFERENCE, "2");
+            variables.put(PROCESS_YEAR_REFERENCE, "2020"); 
+
             
             Logger.getLogger(StartBillingJob.class.getName()).log(Level.INFO, "Start billing of all Contracts Matrix");
             
             //Start process for billing all contracts   
-            service.startProcessByMessage(PROCESS_BILLING_CONTRACT_MESSAGE_EVENT, variables);
+            //service.startProcessByMessage(PROCESS_BILLING_CONTRACT_MESSAGE_EVENT, variables);
 
             //Start process for cheking results of all contracts
+                    
             service.startProcessByMessage(PROCESS_STATUS_PROCESS_FILE_MESSAGE_EVENT, variables);
-
+            
+           
         } catch (Exception e) {
             Logger.getLogger(StartBillingJob.class.getName()).log(Level.SEVERE, "[startBilling]", e);
             Log log = new Log();
