@@ -46,6 +46,10 @@ import lombok.Data;
                     ,
                         @ColumnResult(name = "sNmEmpresaEpce", type = String.class)
                     ,
+                        @ColumnResult(name = "sNmFantasia", type = String.class)
+                    ,
+                        @ColumnResult(name = "sNmApelido", type = String.class)
+                    ,
                         @ColumnResult(name = "nCdSituacaoContrato", type = Long.class)
                     ,
                         @ColumnResult(name = "sDsSituacaoContrato", type = String.class)
@@ -85,6 +89,10 @@ import lombok.Data;
                         @ColumnResult(name = "nCdEmpresaContratante", type = Long.class)
                     ,
                         @ColumnResult(name = "sNmEmpresaEpce", type = String.class)
+                    ,
+                        @ColumnResult(name = "sNmFantasia", type = String.class)
+                    ,
+                        @ColumnResult(name = "sNmApelido", type = String.class)
                     ,
                         @ColumnResult(name = "bFlPublicado", type = Long.class)
                     ,
@@ -135,6 +143,10 @@ import lombok.Data;
                         @ColumnResult(name = "nCdEmpresaContratante", type = Long.class)
                     ,
                         @ColumnResult(name = "sNmEmpresaEpce", type = String.class)
+                    ,
+                        @ColumnResult(name = "sNmFantasia", type = String.class)
+                    ,
+                        @ColumnResult(name = "sNmApelido", type = String.class)
                     ,
                         @ColumnResult(name = "bFlPublicado", type = Long.class)
                     ,
@@ -226,6 +238,8 @@ import lombok.Data;
         + "      ,EPCA.[sNmEmpresa] as sNmEmpresaEpca\n"
         + "      ,CT.[nCdEmpresaContratante]\n"
         + "      ,EPCE.[sNmEmpresa] as sNmEmpresaEpce\n"
+        + "	 ,EPCE.[sNmFantasia] as sNmFantasia\n"
+	+ "      ,EPCE.[sNmApelido] as sNmApelido\n"
         + "      ,CT.[bFlPublicado]\n"
         + "      ,CT.[nCdSituacaoContrato]\n"
         + "      ,SC.[sDsSituacaoContrato]\n"
@@ -264,6 +278,8 @@ import lombok.Data;
         + "      ,EPCA.[sNmEmpresa] as sNmEmpresaEpca\n"
         + "      ,CT.[nCdEmpresaContratante]\n"
         + "      ,EPCE.[sNmEmpresa] as sNmEmpresaEpce\n"
+        + "	 ,EPCE.[sNmFantasia] as sNmFantasia\n"
+	+ "      ,EPCE.[sNmApelido] as sNmApelido\n"        
         + "      ,CT.[bFlPublicado]\n"
         + "      ,CT.[nCdSituacaoContrato]\n"
         + "      ,SC.sDsSituacaoContrato\n"
@@ -305,6 +321,8 @@ import lombok.Data;
         + "      ,EPCA.[sNmEmpresa] as sNmEmpresaEpca\n"
         + "      ,CT.[nCdEmpresaContratante]\n"
         + "      ,EPCE.[sNmEmpresa] as sNmEmpresaEpce\n"
+        + "	 ,EPCE.[sNmFantasia] as sNmFantasia\n"
+	+ "      ,EPCE.[sNmApelido] as sNmApelido\n"        
         + "      ,CT.[bFlPublicado]\n"
         + "      ,CT.[nCdSituacaoContrato]\n"
         + "      ,SC.sDsSituacaoContrato\n"
@@ -342,6 +360,8 @@ import lombok.Data;
         + "       EPCA.[snmempresa] as sNmEmpresaEpca, \n"
         + "       CT.[ncdempresacontratante], \n"
         + "       EPCE.[snmempresa] as sNmEmpresaEpce, \n"
+        + "	  EPCE.[sNmFantasia] as sNmFantasia, \n"
+	+ "       EPCE.[sNmApelido] as sNmApelido, \n"        
         + "       CT.[ncdsituacaocontrato], \n"
         + "       SC.sdssituacaocontrato, \n"
         + "       CT.bflrateio, \n"
@@ -374,6 +394,8 @@ import lombok.Data;
         + "       EPCA.[snmempresa] as sNmEmpresaEpca, \n"
         + "       CT.[ncdempresacontratante], \n"
         + "       EPCE.[snmempresa] as sNmEmpresaEpce, \n"
+        + "	  EPCE.[sNmFantasia] as sNmFantasia, \n"
+	+ "       EPCE.[sNmApelido] as sNmApelido, \n"        
         + "       CT.[ncdsituacaocontrato], \n"
         + "       SC.sdssituacaocontrato, \n"
         + "       CT.bflrateio, \n"
@@ -406,6 +428,8 @@ import lombok.Data;
         + "       EPCA.[snmempresa] as sNmEmpresaEpca, \n"
         + "       CT.[ncdempresacontratante], \n"
         + "       EPCE.[snmempresa] as sNmEmpresaEpce, \n"
+        + "	  EPCE.[sNmFantasia] as sNmFantasia, \n"
+	+ "       EPCE.[sNmApelido] as sNmApelido, \n"
         + "       CT.[ncdsituacaocontrato], \n"
         + "       SC.sdssituacaocontrato, \n"
         + "       CT.bflrateio, \n"

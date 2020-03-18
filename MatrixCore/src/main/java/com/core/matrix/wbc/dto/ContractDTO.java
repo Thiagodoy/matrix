@@ -49,6 +49,10 @@ public class ContractDTO implements Serializable{
     private Long nCdEmpresaContratante;
 
     private String sNmEmpresaEpce;
+   
+    private String sNmFantasia;
+        
+    private String sNmApelido;
 
     private Long bFlPublicado;
 
@@ -87,6 +91,8 @@ public class ContractDTO implements Serializable{
             String sNmEmpresaEpca,
             Long nCdEmpresaContratante,
             String sNmEmpresaEpce,
+            String sNmFantasia,
+            String sNmApelido,
             Long bFlPublicado,
             Long nCdSituacaoContrato,
             String sDsSituacaoContrato,
@@ -111,6 +117,8 @@ public class ContractDTO implements Serializable{
         this.sNmEmpresaEpca = sNmEmpresaEpca;
         this.nCdEmpresaContratante = nCdEmpresaContratante;
         this.sNmEmpresaEpce = sNmEmpresaEpce;
+        this.sNmFantasia = sNmFantasia;
+        this.sNmApelido = sNmApelido;
         this.bFlPublicado = bFlPublicado;
         this.nCdSituacaoContrato = nCdSituacaoContrato;
         this.sDsSituacaoContrato = sDsSituacaoContrato;
@@ -135,6 +143,8 @@ public class ContractDTO implements Serializable{
             String sNmEmpresaEpca,
             Long nCdEmpresaContratante,
             String sNmEmpresaEpce,
+            String sNmFantasia,
+            String sNmApelido,     
             Long nCdSituacaoContrato,
             String sDsSituacaoContrato,
             Long bFlRateio,
@@ -149,6 +159,8 @@ public class ContractDTO implements Serializable{
         this.nCdEmpresaContratada = nCdEmpresaContratada;
         this.sNmEmpresaEpca = sNmEmpresaEpca;
         this.nCdEmpresaContratante = nCdEmpresaContratante;
+        this.sNmEmpresaEpce = sNmEmpresaEpce;
+        this.sNmApelido = sNmApelido;
         this.sNmEmpresaEpce = sNmEmpresaEpce;
         this.nCdSituacaoContrato = nCdSituacaoContrato;
         this.sDsSituacaoContrato = sDsSituacaoContrato;
@@ -172,6 +184,8 @@ public class ContractDTO implements Serializable{
             String sNmEmpresaEpca,
             Long nCdEmpresaContratante,
             String sNmEmpresaEpce,
+            String sNmFantasia,
+            String sNmApelido,
             Long bFlPublicado,
             Long nCdSituacaoContrato,
             String sDsSituacaoContrato,
@@ -195,6 +209,8 @@ public class ContractDTO implements Serializable{
         this.sNmEmpresaEpca = sNmEmpresaEpca;
         this.nCdEmpresaContratante = nCdEmpresaContratante;
         this.sNmEmpresaEpce = sNmEmpresaEpce;
+        this.sNmFantasia = sNmFantasia;
+        this.sNmApelido = sNmApelido;
         this.bFlPublicado = bFlPublicado;
         this.nCdSituacaoContrato = nCdSituacaoContrato;
         this.sDsSituacaoContrato = sDsSituacaoContrato;

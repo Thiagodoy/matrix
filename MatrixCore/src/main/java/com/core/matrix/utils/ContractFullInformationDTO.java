@@ -45,6 +45,10 @@ public class ContractFullInformationDTO {
     
     private String sNmEmpresaEpce;
     
+    private String sNmFantasia;
+    
+    private String sNmApelido;
+    
     private Long bFlPublicado;
     
     private Long nCdSituacaoContrato;
@@ -75,6 +79,8 @@ public class ContractFullInformationDTO {
             String sNmEmpresaEpca,
             Long nCdEmpresaContratante,
             String sNmEmpresaEpce,
+            String sNmFantasia,
+            String sNmApelido,
             Long bFlPublicado,
             Long nCdSituacaoContrato,
             String sDsSituacaoContrato,
@@ -98,6 +104,8 @@ public class ContractFullInformationDTO {
         this.sNmEmpresaEpca = sNmEmpresaEpca;
         this.nCdEmpresaContratante = nCdEmpresaContratante;
         this.sNmEmpresaEpce = sNmEmpresaEpce;
+        this.sNmFantasia = sNmFantasia;
+        this.sNmApelido = sNmApelido;     
         this.bFlPublicado = bFlPublicado;
         this.nCdSituacaoContrato = nCdSituacaoContrato;
         this.sDsSituacaoContrato = sDsSituacaoContrato;
