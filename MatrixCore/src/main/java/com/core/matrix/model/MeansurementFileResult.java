@@ -126,6 +126,9 @@ public class MeansurementFileResult {
 
     @Column(name = "contrato_pai")
     private Long contractParent;
+    
+    @Column(name = "montante_liquido_ajustado")
+    private Double amountLiquidoAdjusted;
 
     public MeansurementFileResult(ContractWbcInformationDTO informationDTO, String idProcess) {
 

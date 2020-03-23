@@ -76,11 +76,13 @@ public class Constants {
     public static final String PROCESS_YEAR_REFERENCE = "year_reference";
     
     public static final String RESPONSE_STATUS_FILE_OK = "SEM PENDÊNCIA";
-    public static final String RESPONSE_STATUS_FILE_NOK = "COM PENDÊNCIA";
-    
+    public static final String RESPONSE_STATUS_FILE_NOK = "COM PENDÊNCIA";    
+
     public static final String PROCESS_INFORMATION_CLIENT = "@Cliente";
-    
-    
+    public static final String RESPONSE_NIVEL = "AVANÇAR";
+    public static final String RESPONSE_NIVEL_1 = "SEM ALÇADA DE APROVAÇÃO";
+    public static final String RESPONSE_NIVEL_2 = "ENCAMINHAR PARA APROVAÇÃO";  
+
     
     
 }

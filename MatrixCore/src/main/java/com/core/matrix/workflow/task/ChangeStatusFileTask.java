@@ -21,7 +21,7 @@ import org.springframework.context.ApplicationContext;
  */
 public class ChangeStatusFileTask implements JavaDelegate {
 
-    private static ApplicationContext context;
+    static ApplicationContext context;
 
     private MeansurementFileService meansurementFileService;
     private LogService logService;
