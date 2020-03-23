@@ -102,9 +102,6 @@ public interface Task extends JavaDelegate {
                         })
                         .collect(Collectors.toList());
 
-//                result.parallelStream().forEach(d -> {
-//                    d.setMeansurementPoint(d.getMeansurementPoint().replaceAll("\\((L|B)\\)", "").trim());
-//                });
                 break;
         }
 

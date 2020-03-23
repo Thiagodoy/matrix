@@ -78,6 +78,8 @@ public class Constants {
     public static final String RESPONSE_STATUS_FILE_OK = "SEM PENDÊNCIA";
     public static final String RESPONSE_STATUS_FILE_NOK = "COM PENDÊNCIA";
     
+    public static final String PROCESS_INFORMATION_CLIENT = "@Cliente";
+    
     
     
     

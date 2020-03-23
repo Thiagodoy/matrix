@@ -16,7 +16,6 @@ import com.core.matrix.model.MeansurementFileDetail;
 import com.core.matrix.service.LogService;
 import com.core.matrix.service.MeansurementFileDetailService;
 import com.core.matrix.service.MeansurementFileService;
-import com.core.matrix.utils.MeansurementFileDetailStatus;
 import com.core.matrix.utils.MeansurementFileStatus;
 import com.core.matrix.utils.MeansurementFileType;
 import java.io.BufferedReader;
@@ -29,14 +28,10 @@ import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.nio.charset.Charset;
 import java.text.MessageFormat;
-import java.time.LocalDate;
-import java.time.Month;
-import java.time.YearMonth;
 import java.util.ArrayList;
 import java.util.Arrays;
 
 import java.util.List;
-import java.util.Map;
 import java.util.Optional;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -97,8 +92,6 @@ public class FileValidationTask implements JavaDelegate {
                      
             meansuremPointFiles = new ArrayList<String>();
             
-            List<String> listaDePontos = Arrays.asList(de.getVariable("pontos", String.class).replace("[", "").replace("]","").split(","));
-            
             attachmentIds.stream().forEach(attachmentId -> {
 
                 InputStream stream = null;
@@ -137,32 +130,10 @@ public class FileValidationTask implements JavaDelegate {
 
             });
             
-            for(int i = 0; i < listaDePontos.size(); i++){
-                               
-                int achou = 0;
-                
-                for(int z = 0; z < meansuremPointFiles.size(); z++){
-                                      
-                        if (!meansuremPointFiles.get(z).trim().equals(listaDePontos.get(i).trim())) {
-                
-                           achou = 0;                            
-                    
-                        }  else {
-                            
-                            achou = 1;
-                            z = meansuremPointFiles.size()+1;
-                            
-                        }   
-                                              
-                }
-                
-                if (achou == 0 && meansuremPointFiles.size()>0) {
-                    
-                    String message = MessageFormat.format("Não foi encontrado nenhuma correspondência do ponto de medição, dentro dos arquivos postados.\nPonto de medição não encontrado: {0}\n", listaDePontos.get(i).toString());
-                    this.generateLog(delegateExecution, null, message);
-                    
-                }
-            }  
+            files.stream().filter(f -> f.getFile() == null).forEach(f -> {
+                String message = MessageFormat.format("Não foi encontrado nenhuma correspondência do ponto de medição, dentro dos arquivos postados.\nInformação:\nContrato: {0}\nPonto de Medição: {1}\n", f.getWbcContract().toString().replace(".", ""), f.getMeansurementPoint());
+                this.generateLog(de, null, message);
+            });
 
             if (!this.logs.isEmpty()) {
                 this.logService.save(logs);

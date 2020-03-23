@@ -70,5 +70,18 @@ public class MeansurementFileResultResource {
             return ResponseEntity.status(HttpStatus.resolve(500)).body(e.getMessage());
         }
     }
+    
+    @RequestMapping(value = "/export")
+    public ResponseEntity export(){
+        try {
+            
+            
+            return ResponseEntity.ok().build();
+
+        } catch (Exception e) {
+            Logger.getLogger(MeansurementFileResultResource.class.getName()).log(Level.SEVERE, "[export]", e.getMessage());
+            return ResponseEntity.status(HttpStatus.resolve(500)).body(e.getMessage());
+        }
+    }
 
 }

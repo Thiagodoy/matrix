@@ -12,6 +12,7 @@ import com.core.matrix.service.ContractCompInformationService;
 import com.core.matrix.service.LogService;
 import com.core.matrix.service.MeansurementFileService;
 import com.core.matrix.utils.Constants;
+import static com.core.matrix.utils.Constants.PROCESS_INFORMATION_CLIENT;
 import com.core.matrix.wbc.dto.ContractDTO;
 import com.core.matrix.wbc.service.ContractService;
 import java.text.MessageFormat;
@@ -59,8 +60,7 @@ public class BillingContractsTask implements JavaDelegate {
 
     private ProcessInstance createAProcessForBilling(DelegateExecution execution, ContractDTO contract) {                                    
         Map<String, Object> variables = new HashMap<>();
-        variables.put("@Cliente", contract.getSNmEmpresaEpce().toString());
-        variables.put("pontos", contract.getMeansurementPoint().toString());
+        variables.put(PROCESS_INFORMATION_CLIENT, contract.getSNmEmpresaEpce().toString());       
         
         return this.createAProcessForBilling(execution, Arrays.asList(contract), variables);
     }
@@ -162,7 +162,7 @@ public class BillingContractsTask implements JavaDelegate {
                     .collect(Collectors.groupingBy(ContractDTO::getNCdContratoRateioControlador))
                     .forEach((contractParent, contractsSon) -> {
                         
-                        List<String> listaDePontos = new ArrayList<String>();
+                        
                         
                         contractsSon.stream().forEach(cc -> {
 
@@ -172,8 +172,6 @@ public class BillingContractsTask implements JavaDelegate {
                                 if (opt.isPresent()) {
                                     ContractCompInformation compInformation = opt.get();
                                     cc.setMeansurementPoint(compInformation.getMeansurementPoint());
-                                    listaDePontos.add(compInformation.getMeansurementPoint().toString());
-                                    Logger.getLogger(FileValidationTask.class.getName()).log(Level.SEVERE, "point :->" + compInformation.getMeansurementPoint().toString());
                                 } else {
                                     String message = MessageFormat.format("Não foi possivel criar processo de medição para o contrato [rateio] abaixo:\n{0}", cc.toString());
                                     Log log = new Log();
@@ -205,19 +203,15 @@ public class BillingContractsTask implements JavaDelegate {
                             sons.add(opt.get());
 
                             Map<String, Object> variables = new HashMap<>();
-                            variables.put("@Cliente", sons.stream().findFirst().get().getSNmEmpresaEpce());
-                            variables.put("pontos", listaDePontos.toString());
-
+                            variables.put(PROCESS_INFORMATION_CLIENT, sons.stream().findFirst().get().getSNmEmpresaEpce());
                             ContractDTO c = sons.stream().findFirst().get();
 
                             try {
                                 Optional<ContractCompInformation> ccc = this.contractCompInformationService.listByContract(Long.parseLong(c.getSNrContrato())).stream().findFirst();
 
                                 if (!this.hasMeansurementFile(ccc.get())) {
-                                    String processInstanceId = this.createAProcessForBilling(execution, sons, variables).getProcessInstanceId();
-                                    //String processInstanceId = this.createAProcessForBilling(execution, variables).getProcessInstanceId();
-                                    this.createMeansurementFile(processInstanceId, sons);
-                                    Logger.getLogger(BillingContractsTask.class.getName()).log(Level.SEVERE, "process :->" + processInstanceId );
+                                    String processInstanceId = this.createAProcessForBilling(execution, sons, variables).getProcessInstanceId();                                    
+                                    this.createMeansurementFile(processInstanceId, sons);                                    
                                 }
 
                             } catch (Exception ex) {

@@ -12,6 +12,7 @@ import com.fasterxml.jackson.annotation.JsonFormat;
 import java.io.Serializable;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
+import java.time.format.DateTimeParseException;
 import java.util.List;
 import java.util.Optional;
 import java.util.logging.Level;
@@ -133,17 +134,27 @@ public class MeansurementFileDetail implements Serializable {
         }
 
     }
+    
+    private LocalDate parseToLocaDate(String value){
+    
+        try {
+            DateTimeFormatter formater = DateTimeFormatter.ofPattern("dd/MM/yyyy");
+            return LocalDate.parse(value, formater);
+        } catch (DateTimeParseException e) {
+            DateTimeFormatter formater = DateTimeFormatter.ofPattern("yyyy-MM-dd");
+            return LocalDate.parse(value, formater);
+        }
+    }
 
-    public MeansurementFileDetail(FileDetailDTO detail, MeansurementFileType type) {
 
-        DateTimeFormatter formater = DateTimeFormatter.ofPattern("dd/MM/yyyy");
+    public MeansurementFileDetail(FileDetailDTO detail, MeansurementFileType type) {        
 
         this.status = MeansurementFileDetailStatus.SUCCESS;
 
         switch (type) {
             case LAYOUT_A:
                 this.meansurementPoint = detail.getMeansurementPoint();
-                this.date = LocalDate.parse(detail.getDate(), formater);
+                this.date = this.parseToLocaDate(detail.getDate());
                 this.hour = Long.valueOf(detail.getHour());
                 this.energyType = detail.getEnergyType();
                 this.generationActive = this.parseToDouble(detail.getGenerationActive());
@@ -157,7 +168,7 @@ public class MeansurementFileDetail implements Serializable {
 
             case LAYOUT_B:
                 this.meansurementPoint = detail.getMeansurementPoint();
-                this.date = LocalDate.parse(detail.getDate(), formater);
+                this.date = this.parseToLocaDate(detail.getDate());
                 this.hour = Long.valueOf(detail.getHour());
                 this.energyType = detail.getEnergyType();
                 this.generationActive = this.parseToDouble(detail.getGenerationActive());
@@ -170,7 +181,7 @@ public class MeansurementFileDetail implements Serializable {
             case LAYOUT_C:
                 this.agent = detail.getAgent();
                 this.meansurementPoint = detail.getMeansurementPoint();
-                this.date = LocalDate.parse(detail.getDate(), formater);
+                this.date = this.parseToLocaDate(detail.getDate());
                 this.hour = Long.valueOf(detail.getHour());
                 this.consumptionActive = this.parseToDouble(detail.getConsumptionActive());
                 this.generationActive = this.parseToDouble(detail.getGenerationActive());

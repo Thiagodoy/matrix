@@ -16,7 +16,7 @@ import lombok.Data;
 public class FileParsedDTO {
 
     public List<InformationDTO> informations;
-    public HeaderDTO header;     
+    public HeaderDTO header;         
     public List<FileDetailDTO> details;
     public String type;
 }

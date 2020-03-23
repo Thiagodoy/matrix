@@ -14,10 +14,12 @@ import com.core.matrix.utils.MeansurementFileType;
 public enum Stream {
 
     FILE_LAYOUT_A_PARSER("file-matrix", "static/FILE_LAYOUT_A.xml"),
+    FILE_LAYOUT("file-matrix", "static/FILE_LAYOUT.xml"),
     FILE_LAYOUT_B_PARSER("file", "static/FILE_LAYOUT_B.xml"),
     FILE_LAYOUT_C_PARSER("file-matrix", "static/FILE_LAYOUT_C.xml"),
     FILE_LAYOUT_C_1_PARSER("file-matrix", "static/FILE_LAYOUT_C_1.xml"),
     CHECK_LAYOUT_PARSER("file", "static/CHECK_LAYOUT.xml");
+    
 
     private String streamId;
     private String streamFile;

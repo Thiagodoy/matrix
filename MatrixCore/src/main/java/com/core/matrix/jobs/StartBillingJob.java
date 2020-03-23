@@ -7,7 +7,6 @@ package com.core.matrix.jobs;
 
 import com.core.matrix.model.Log;
 import com.core.matrix.service.LogService;
-import static com.core.matrix.utils.Constants.PROCESS_BILLING_CONTRACT_MESSAGE_EVENT;
 import static com.core.matrix.utils.Constants.PROCESS_MONTH_REFERENCE;
 import static com.core.matrix.utils.Constants.PROCESS_STATUS_PROCESS_FILE_MESSAGE_EVENT;
 import static com.core.matrix.utils.Constants.PROCESS_YEAR_REFERENCE;
@@ -33,18 +32,16 @@ public class StartBillingJob {
 
     @Autowired
     private LogService logService;
-
-    @Scheduled(cron = "0 0 6 1 1/1 ?")
+    
     public void startBilling() {
 
         try {
             
             final LocalDate reference = LocalDate.now().minusMonths(1);
             Map<String, Object> variables = new HashMap<>();
-            //variables.put(PROCESS_MONTH_REFERENCE, reference.getMonthValue());
-            //variables.put(PROCESS_YEAR_REFERENCE, reference.getYear());
-            variables.put(PROCESS_MONTH_REFERENCE, "2");
-            variables.put(PROCESS_YEAR_REFERENCE, "2020"); 
+            variables.put(PROCESS_MONTH_REFERENCE, reference.getMonthValue());
+            variables.put(PROCESS_YEAR_REFERENCE, reference.getYear());
+          
 
             
             Logger.getLogger(StartBillingJob.class.getName()).log(Level.INFO, "Start billing of all Contracts Matrix");

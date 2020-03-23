@@ -1,0 +1,31 @@
+/*
+ * To change this license header, choose License Headers in Project Properties.
+ * To change this template file, choose Tools | Templates
+ * and open the template in the editor.
+ */
+package com.core.matrix.utils;
+
+/**
+ *
+ * @author thiag
+ */
+public class ReportConstants {
+
+    public enum ReportType {
+        EXPORT_RESULT_WBC,
+        EXPORT_RESULT_FULL_WBC
+    }
+
+    public static String[] getHeaders(ReportType type){
+
+        switch (type) {
+            case EXPORT_RESULT_FULL_WBC:
+                return new String[]{"Ano", "Mês", "Cód. CCEE", "Número do Contrato", "Ponto de Medição", "Status", "Montantes (MWh)"};
+            case EXPORT_RESULT_WBC:
+                return new String[]{"Ano", "Mês", "Numero do Contrato", "Ponto", "Montantes (MWh)"};
+            default:
+                return new String[]{};
+        }
+    }
+
+}

@@ -51,5 +51,10 @@ public class MeansurementFileResultService {
     }
     
     
+    @Transactional(readOnly = true)
+    public List<MeansurementFileResult>findByIds(List<Long>ids){
+        return this.repository.findAllById(ids);
+    }
+    
 
 }

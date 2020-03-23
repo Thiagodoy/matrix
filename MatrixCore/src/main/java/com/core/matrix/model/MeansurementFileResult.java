@@ -28,6 +28,8 @@ import lombok.NoArgsConstructor;
         classes = @ConstructorResult(
                 targetClass = MeansurementFileResultStatusDTO.class,
                 columns = {
+                    @ColumnResult(name = "id_arquivo_de_medicao", type = Long.class)
+                    ,
                     @ColumnResult(name = "ano", type = Long.class)
                     ,
                     @ColumnResult(name = "mes", type = Long.class)
@@ -43,6 +45,7 @@ import lombok.NoArgsConstructor;
 
 @NamedNativeQuery(name = "MeansurementFileResult.getStatusBilling",
         query = "SELECT \n"
+        + "    a.id_arquivo_de_medicao,\n"
         + "    a.ano,\n"
         + "    a.mes,\n"
         + "    a.wbc_contrato,\n"
