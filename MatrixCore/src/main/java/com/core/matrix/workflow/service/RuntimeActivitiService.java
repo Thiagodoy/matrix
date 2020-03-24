@@ -16,9 +16,9 @@ import com.core.matrix.response.ProcessDetailResponse;
 import com.core.matrix.response.TaskResponse;
 import com.core.matrix.utils.Constants;
 import com.core.matrix.utils.Utils;
-import com.core.matrix.workflow.model.GroupActiviti;
 import com.core.matrix.workflow.model.GroupMemberActiviti;
 import com.core.matrix.workflow.model.UserActiviti;
+import com.sun.javafx.scene.control.skin.VirtualFlow;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.ArrayList;
@@ -269,8 +269,8 @@ public class RuntimeActivitiService {
                             + "WHERE\n"
                             + "    v.TEXT_ LIKE '%" + variableValue.toUpperCase() + "%'\n"
                             + "        AND k.group_id_ in(" + gro + ") ").list().stream().map(t -> t.getProcessInstanceId()).distinct().collect(Collectors.toList());
-            
-            if(processInstances.isEmpty()){
+
+            if (processInstances.isEmpty()) {
                 return new PageResponse<TaskResponse>(new ArrayList(), 1L, 1L, (long) page);
             }
 
@@ -292,7 +292,7 @@ public class RuntimeActivitiService {
                     })
                     .collect(Collectors.toList());
 
-            return new PageResponse<TaskResponse>(response, (long) processInstances.size(),(long) size , (long) page);
+            return new PageResponse<TaskResponse>(response, (long) processInstances.size(), (long) size, (long) page);
 
         } else if (Optional.ofNullable(processInstance).isPresent()) {
 
@@ -352,7 +352,7 @@ public class RuntimeActivitiService {
 //            task.setProfileCanditates(gr);
             });
 
-            return new PageResponse<TaskResponse>(response, sizeTotalElements, (long)size, (long) page);
+            return new PageResponse<TaskResponse>(response, sizeTotalElements, (long) size, (long) page);
         }
 
     }
@@ -391,7 +391,7 @@ public class RuntimeActivitiService {
 //            task.setProfileCanditates(gr);
         });
 
-        return new PageResponse<TaskResponse>(response,  sizeTotalElements, (long)size , (long) page);
+        return new PageResponse<TaskResponse>(response, sizeTotalElements, (long) size, (long) page);
 
     }
 
@@ -419,11 +419,10 @@ public class RuntimeActivitiService {
                     .distinct()
                     .collect(Collectors.toList());
 
-            
-            if(processInstances.isEmpty()){
+            if (processInstances.isEmpty()) {
                 return new PageResponse<TaskResponse>(new ArrayList(), 1L, 1L, (long) page);
             }
-            
+
             List<TaskResponse> response = taskService
                     .createTaskQuery()
                     .includeProcessVariables()
@@ -442,10 +441,9 @@ public class RuntimeActivitiService {
                     })
                     .collect(Collectors.toList());
 
-            return new PageResponse<TaskResponse>(response,  (long) processInstances.size(), (long)size , (long) page);
-            
-           // return new PageResponse<TaskResponse>(response, (long) response.size(), (long) processInstances.size(), (long) page);
+            return new PageResponse<TaskResponse>(response, (long) processInstances.size(), (long) size, (long) page);
 
+            // return new PageResponse<TaskResponse>(response, (long) response.size(), (long) processInstances.size(), (long) page);
         } else if (Optional.ofNullable(processInstance).isPresent()) {
 
             List<TaskResponse> response = taskService
@@ -503,7 +501,7 @@ public class RuntimeActivitiService {
 //            task.setProfileCanditates(gr);
             });
 
-            return new PageResponse<TaskResponse>(response, (long) sizeTotalElements, (long)size, (long) page);
+            return new PageResponse<TaskResponse>(response, (long) sizeTotalElements, (long) size, (long) page);
         }
 
 //        List<TaskResponse> response = taskService
@@ -549,7 +547,7 @@ public class RuntimeActivitiService {
                 })
                 .collect(Collectors.toList());
 
-        return new PageResponse<TaskResponse>(response, (long) sizeTotalElements, (long)size, (long) page);
+        return new PageResponse<TaskResponse>(response, (long) sizeTotalElements, (long) size, (long) page);
 
     }
 
@@ -718,12 +716,16 @@ public class RuntimeActivitiService {
     }
 
     @Transactional
-    public AttachmentResponse createAttachament(String processInstance, MultipartFile file) throws IOException {
+    public List<AttachmentResponse> createAttachament(String processInstance, MultipartFile[] files) throws IOException {
 
-        Attachment attachment = taskService
-                .createAttachment(file.getContentType(), null, processInstance, file.getOriginalFilename(), "attachmentDescription", file.getInputStream());
+        List<AttachmentResponse> responses = new ArrayList<>();
 
-        return new AttachmentResponse(attachment);
+        for (MultipartFile file : files) {
+            Attachment attachment = taskService
+                    .createAttachment(file.getContentType(), null, processInstance, file.getOriginalFilename(), "attachmentDescription", file.getInputStream());
+            responses.add(new AttachmentResponse(attachment));        }
+
+        return responses;
     }
 
     @Transactional(readOnly = true)

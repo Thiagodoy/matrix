@@ -233,10 +233,10 @@ public class RunTimeResource {
     }
 
     @RequestMapping(value = "/attachment", method = RequestMethod.POST)
-    public ResponseEntity createAttachment(@RequestPart(value = "file") MultipartFile file,
+    public ResponseEntity createAttachment(@RequestPart(value = "file") MultipartFile [] file,
             @RequestPart(value = "processInstance") String processInstance) {
         try {
-            AttachmentResponse response = this.service.createAttachament(processInstance, file);
+            List<AttachmentResponse> response = this.service.createAttachament(processInstance, file);
             return ResponseEntity.ok(response);
         } catch (Exception e) {
             Logger.getLogger(RepositoryResource.class.getName()).log(Level.SEVERE, "[post]", e);

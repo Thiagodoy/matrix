@@ -33,11 +33,10 @@ public class MeansurementFileResultStatusDTO {
 
         String year = nf.format(this.year).replaceAll("\\.", "");
         String contracto = nf.format(this.wbcContract).replaceAll("\\.", "");
-        
 
         switch (type) {
             case EXPORT_RESULT_FULL_WBC:
-                return new Object[]{year, this.month, "",contracto, this.wbcMeansurementPoint, this.status, this.mount};
+                return new Object[]{year, this.month, "", contracto, this.wbcMeansurementPoint, this.status, this.mount};
             case EXPORT_RESULT_WBC:
                 return new Object[]{year, this.month, contracto, this.wbcMeansurementPoint, this.mount};
             default:
