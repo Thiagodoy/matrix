@@ -12,6 +12,7 @@ import org.jboss.logging.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
@@ -24,10 +25,12 @@ import org.springframework.web.bind.annotation.RestController;
 @RestController
 @RequestMapping(value = "/api/report")
 public class ReportResource {
+    
 
     @Autowired
     private ReportService reportService;
 
+    
     @RequestMapping(value = "/meansurement-result", method = RequestMethod.POST)
     public ResponseEntity generate(@RequestBody MeansurementResultRequest request, HttpServletResponse response) {
         try {

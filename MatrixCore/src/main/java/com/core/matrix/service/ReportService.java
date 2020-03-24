@@ -61,7 +61,7 @@ public class ReportService {
 
         OutputStream out = response.getOutputStream();
 
-        response.setContentType("application/vnd.openxmlformats-officedocument.spreadsheetml.sheet");
+        response.setContentType("application/vnd.ms-excel");
         response.setHeader("Content-disposition", "attachment; filename=exportação.xlsx");
 
         this.wb.write(out);
