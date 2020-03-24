@@ -28,7 +28,7 @@ public interface ContractRepository extends JpaRepository<Contract, Long> {
     Page<ContractDTO> shortInfomation(@Param("contractId") Long contractId, Pageable page);
     
     @Query(nativeQuery = true)
-    Page<ContractDTO> fullInformation(@Param("numeroDoContrato") Long contractId, Pageable page);
+     List<ContractDTO> fullInformation(@Param("numeroDoContrato") Long contractId);
 
     @Query(nativeQuery = true, value = "SELECT COUNT(1) \n"
             + "  FROM [CE_CONTRATO] CT\n"

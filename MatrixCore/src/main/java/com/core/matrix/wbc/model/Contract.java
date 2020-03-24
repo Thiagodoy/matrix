@@ -264,91 +264,93 @@ import lombok.Data;
         + "   AND CT.[nCdSituacaoContrato] = 8\n"
         + "   AND CT.[sNrContrato] = :contractId", name = "Contract.shortInfomation", resultSetMapping = "contractDTO")
 
-@NamedNativeQuery(query = "SELECT CT.[nCdContrato]\n"
-        + "      ,CT.[sNrContrato]\n"
-        + "      ,CT.[sNmContrato]\n"
-        + "      ,CT.[sNrReferencia]\n"
-        + "      ,CT.[tDdInicio]\n"
-        + "      ,CT.[tDdTermino]\n"
-        + "      ,CT.[nCdSubmercado]\n"
-        + "      ,SM.[sDsSubmercado]\n"
-        + "      ,CT.[nCdTipo]\n"
-        + "      ,TP.[sDsTipo]\n"
-        + "      ,CT.[nCdEmpresaContratada]\n"
-        + "      ,EPCA.[sNmEmpresa] as sNmEmpresaEpca\n"
-        + "      ,CT.[nCdEmpresaContratante]\n"
-        + "      ,EPCE.[sNmEmpresa] as sNmEmpresaEpce\n"
-        + "	 ,EPCE.[sNmFantasia] as sNmFantasia\n"
-	+ "      ,EPCE.[sNmApelido] as sNmApelido\n"        
-        + "      ,CT.[bFlPublicado]\n"
-        + "      ,CT.[nCdSituacaoContrato]\n"
-        + "      ,SC.sDsSituacaoContrato\n"
-        + "      ,CT.[sDsObservacao]\n"
-        + "      ,CT.[nCdContratoPai]\n"
-        + "      ,CT.[nCdAgrupador]\n"
-        + "      ,CA.sDsAgrupador\n"
-        + "      ,CT.bFlRateio\n"
-        + "      ,CT.nCdContratoRateioControlador\n"
-        + "  FROM [CE_CONTRATO] CT\n"
-        + "      ,[CE_SUBMERCADO] SM\n"
-        + "      ,[CE_TIPO_CONTRATO] TP\n"
-        + "      ,[EMPRESA] EPCA\n"
-        + "      ,[EMPRESA] EPCE\n"
-        + "      ,[CE_SITUACAO_CONTRATO] SC\n"
-        + "      ,[CE_CONTRATO_AGRUPADOR] CA\n"
-        + " WHERE CT.nCdSubmercado = SM.nCdSubmercado\n"
-        + "   AND CT.nCdTipo = TP.nCdTipo\n"
-        + "   AND CT.nCdEmpresaContratada = EPCA.[nCdEmpresa]\n"
-        + "   AND CT.nCdEmpresaContratante = EPCE.[nCdEmpresa]\n"
-        + "   AND CT.[nCdSituacaoContrato] = SC.nCdSituacaoContrato\n"
-        + "   AND CT.[nCdAgrupador] = CA.nCdAgrupador\n"
-        + "   AND CT.[nCdSituacaoContrato] in (8)\n"
-        + "   AND CT.bFlRateio = 1\n"
-        + "   AND CT.[sNrReferencia] IN (SELECT CTC.[sNrReferencia] FROM [CE_CONTRATO] CTC\n"
-        + "WHERE CTC.[sNrContrato] = :numeroDoContrato)\n"
-        + "UNION ALL\n"
-        + "SELECT CT.[nCdContrato]\n"
-        + "      ,CT.[sNrContrato]\n"
-        + "      ,CT.[sNmContrato]\n"
-        + "      ,CT.[sNrReferencia]\n"
-        + "      ,CT.[tDdInicio]\n"
-        + "      ,CT.[tDdTermino]\n"
-        + "      ,CT.[nCdSubmercado]\n"
-        + "      ,SM.[sDsSubmercado]\n"
-        + "      ,CT.[nCdTipo]\n"
-        + "      ,TP.[sDsTipo]\n"
-        + "      ,CT.[nCdEmpresaContratada]\n"
-        + "      ,EPCA.[sNmEmpresa] as sNmEmpresaEpca\n"
-        + "      ,CT.[nCdEmpresaContratante]\n"
-        + "      ,EPCE.[sNmEmpresa] as sNmEmpresaEpce\n"
-        + "	 ,EPCE.[sNmFantasia] as sNmFantasia\n"
-	+ "      ,EPCE.[sNmApelido] as sNmApelido\n"        
-        + "      ,CT.[bFlPublicado]\n"
-        + "      ,CT.[nCdSituacaoContrato]\n"
-        + "      ,SC.sDsSituacaoContrato\n"
-        + "      ,CT.[sDsObservacao]\n"
-        + "      ,CT.[nCdContratoPai]\n"
-        + "      ,CT.[nCdAgrupador]\n"
-        + "      ,CA.sDsAgrupador\n"
-        + "      ,CT.bFlRateio\n"
-        + "      ,CT.nCdContratoRateioControlador\n"
-        + "  FROM [CE_CONTRATO] CT\n"
-        + "      ,[CE_SUBMERCADO] SM\n"
-        + "      ,[CE_TIPO_CONTRATO] TP\n"
-        + "      ,[EMPRESA] EPCA\n"
-        + "      ,[EMPRESA] EPCE\n"
-        + "      ,[CE_SITUACAO_CONTRATO] SC\n"
-        + "      ,[CE_CONTRATO_AGRUPADOR] CA\n"
-        + " WHERE CT.nCdSubmercado = SM.nCdSubmercado\n"
-        + "   AND CT.nCdTipo = TP.nCdTipo\n"
-        + "   AND CT.nCdEmpresaContratada = EPCA.[nCdEmpresa]\n"
-        + "   AND CT.nCdEmpresaContratante = EPCE.[nCdEmpresa]\n"
-        + "   AND CT.[nCdSituacaoContrato] = SC.nCdSituacaoContrato\n"
-        + "   AND CT.[nCdAgrupador] = CA.nCdAgrupador\n"
-        + "   AND CT.[nCdSituacaoContrato] in (8)\n"
-        + "   AND CT.bFlRateio = 0\n"
-        + "   AND CT.[sNrContrato] = :numeroDoContrato\n"
-        + "ORDER BY CT.[sNrContrato]", name = "Contract.fullInformation", resultSetMapping = "contractFullInformationDTO")
+@NamedNativeQuery(query = "SELECT CT.nCdContrato ,\n" +
+"       CT.sNrContrato ,\n" +
+"       CT.sNmContrato ,\n" +
+"       CT.sNrReferencia ,\n" +
+"       CT.tDdInicio ,\n" +
+"       CT.tDdTermino ,\n" +
+"       CT.nCdSubmercado ,\n" +
+"       SM.sDsSubmercado ,\n" +
+"       CT.nCdTipo ,\n" +
+"       TP.sDsTipo ,\n" +
+"       CT.nCdEmpresaContratada ,\n" +
+"       EPCA.sNmEmpresa AS sNmEmpresaEpca ,\n" +
+"       CT.nCdEmpresaContratante ,\n" +
+"       EPCE.sNmEmpresa AS sNmEmpresaEpce ,\n" +
+"       EPCE.sNmFantasia AS sNmFantasia ,\n" +
+"       EPCE.sNmApelido AS sNmApelido ,\n" +
+"       CT.bFlPublicado ,\n" +
+"       CT.nCdSituacaoContrato ,\n" +
+"       SC.sDsSituacaoContrato ,\n" +
+"       CT.sDsObservacao ,\n" +
+"       CT.nCdContratoPai ,\n" +
+"       CT.nCdAgrupador ,\n" +
+"       CA.sDsAgrupador ,\n" +
+"       CT.bFlRateio ,\n" +
+"       CT.nCdContratoRateioControlador\n" +
+"FROM CE_CONTRATO CT ,\n" +
+"     CE_SUBMERCADO SM ,\n" +
+"     CE_TIPO_CONTRATO TP ,\n" +
+"     EMPRESA EPCA ,\n" +
+"     EMPRESA EPCE ,\n" +
+"     CE_SITUACAO_CONTRATO SC ,\n" +
+"     CE_CONTRATO_AGRUPADOR CA\n" +
+"WHERE CT.nCdSubmercado = SM.nCdSubmercado\n" +
+"  AND CT.nCdTipo = TP.nCdTipo\n" +
+"  AND CT.nCdEmpresaContratada = EPCA.nCdEmpresa\n" +
+"  AND CT.nCdEmpresaContratante = EPCE.nCdEmpresa\n" +
+"  AND CT.nCdSituacaoContrato = SC.nCdSituacaoContrato\n" +
+"  AND CT.nCdAgrupador = CA.nCdAgrupador\n" +
+"  AND CT.nCdSituacaoContrato IN (8)\n" +
+"  AND CT.bFlRateio = 1\n" +
+"  AND CT.sNrReferencia IN\n" +
+"    (SELECT CTC.sNrReferencia\n" +
+"     FROM CE_CONTRATO CTC\n" +
+"     WHERE CTC.sNrContrato = :numeroDoContrato )\n" +
+"UNION ALL\n" +
+"SELECT CT.nCdContrato ,\n" +
+"       CT.sNrContrato ,\n" +
+"       CT.sNmContrato ,\n" +
+"       CT.sNrReferencia ,\n" +
+"       CT.tDdInicio ,\n" +
+"       CT.tDdTermino ,\n" +
+"       CT.nCdSubmercado ,\n" +
+"       SM.sDsSubmercado ,\n" +
+"       CT.nCdTipo ,\n" +
+"       TP.sDsTipo ,\n" +
+"       CT.nCdEmpresaContratada ,\n" +
+"       EPCA.sNmEmpresa AS sNmEmpresaEpca ,\n" +
+"       CT.nCdEmpresaContratante ,\n" +
+"       EPCE.sNmEmpresa AS sNmEmpresaEpce ,\n" +
+"       EPCE.sNmFantasia AS sNmFantasia ,\n" +
+"       EPCE.sNmApelido AS sNmApelido ,\n" +
+"       CT.bFlPublicado ,\n" +
+"       CT.nCdSituacaoContrato ,\n" +
+"       SC.sDsSituacaoContrato ,\n" +
+"       CT.sDsObservacao ,\n" +
+"       CT.nCdContratoPai ,\n" +
+"       CT.nCdAgrupador ,\n" +
+"       CA.sDsAgrupador ,\n" +
+"       CT.bFlRateio ,\n" +
+"       CT.nCdContratoRateioControlador\n" +
+"FROM CE_CONTRATO CT ,\n" +
+"     CE_SUBMERCADO SM ,\n" +
+"     CE_TIPO_CONTRATO TP ,\n" +
+"     EMPRESA EPCA ,\n" +
+"     EMPRESA EPCE ,\n" +
+"     CE_SITUACAO_CONTRATO SC ,\n" +
+"     CE_CONTRATO_AGRUPADOR CA\n" +
+"WHERE CT.nCdSubmercado = SM.nCdSubmercado\n" +
+"  AND CT.nCdTipo = TP.nCdTipo\n" +
+"  AND CT.nCdEmpresaContratada = EPCA.nCdEmpresa\n" +
+"  AND CT.nCdEmpresaContratante = EPCE.nCdEmpresa\n" +
+"  AND CT.nCdSituacaoContrato = SC.nCdSituacaoContrato\n" +
+"  AND CT.nCdAgrupador = CA.nCdAgrupador\n" +
+"  AND CT.nCdSituacaoContrato IN (8)\n" +
+"  AND CT.bFlRateio = 0\n" +
+"  AND CT.sNrContrato = :numeroDoContrato\n" +
+"ORDER BY CT.sNrContrato", name = "Contract.fullInformation", resultSetMapping = "contractFullInformationDTO")
 
 @NamedNativeQuery(query = "SELECT CT.[ncdcontrato], \n"
         + "       CT.[snrcontrato], \n"

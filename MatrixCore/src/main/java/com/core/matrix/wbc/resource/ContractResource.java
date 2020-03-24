@@ -5,11 +5,12 @@
  */
 package com.core.matrix.wbc.resource;
 
+import com.core.matrix.wbc.dto.ContractDTO;
 import com.core.matrix.wbc.service.ContractService;
+import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -32,9 +33,9 @@ public class ContractResource {
     @RequestMapping(method = RequestMethod.GET)
     public ResponseEntity get(@RequestParam(name = "contractId") Long contractId,
             @RequestParam(name = "page", required = true, defaultValue = "0") int page,
-            @RequestParam(name = "page", required = true, defaultValue = "10") int size) {
+            @RequestParam(name = "size", required = true, defaultValue = "10") int size) {
         try {
-            Page contracts = service.findAll(contractId, PageRequest.of(page, size));
+            List<ContractDTO> contracts = service.findAll(contractId, PageRequest.of(page, size));
             return ResponseEntity.ok(contracts);
         } catch (Exception e) {
             Logger.getLogger(ContractResource.class.getName()).log(Level.SEVERE, "[get]", e);

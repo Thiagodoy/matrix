@@ -32,8 +32,8 @@ public class ContractService {
     }
     
     @Transactional(readOnly = true)
-    public Page findAll(Long contractId, PageRequest page) {
-        return this.repository.fullInformation(contractId, page);
+    public List<ContractDTO> findAll(Long contractId, PageRequest page) {
+        return this.repository.fullInformation(contractId);
     }
     
     @Transactional(readOnly = true)
