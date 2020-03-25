@@ -5,13 +5,14 @@
  */
 package com.core.matrix.resource;
 
-import com.core.matrix.model.MeansurementFileAuthority;
-import com.core.matrix.model.MeansurementFileDetail;
-import com.core.matrix.service.MeansurementFileAuthorityService;
-import java.util.List;
+import com.core.matrix.model.Product;
+import com.core.matrix.service.ProductService;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Sort;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -26,30 +27,31 @@ import org.springframework.web.bind.annotation.RestController;
  * @author thiag
  */
 @RestController
-@RequestMapping(value = "/api/authority")
-public class MeansurementFileAuthorityResource {
-
-    @Autowired
-    private MeansurementFileAuthorityService service;
+@RequestMapping(value = "/api/product")
+public class ProductResource {
+    
+    
+     @Autowired
+    private ProductService service;
 
     @RequestMapping(method = RequestMethod.POST)
-    public ResponseEntity post(@RequestBody MeansurementFileAuthority request) {
+    public ResponseEntity post(@RequestBody Product request) {
         try {
             this.service.save(request);
             return ResponseEntity.ok().build();
         } catch (Exception e) {
-            Logger.getLogger(MeansurementFileDetailResource.class.getName()).log(Level.SEVERE, "[post]", e);
+            Logger.getLogger(ProductResource.class.getName()).log(Level.SEVERE, "[post]", e);
             return ResponseEntity.status(HttpStatus.resolve(500)).body(e.getMessage());
         }
     }
 
     @RequestMapping(method = RequestMethod.PUT)
-    public ResponseEntity put(@RequestBody MeansurementFileAuthority request) {
+    public ResponseEntity put(@RequestBody Product request) {
         try {
             this.service.update(request);
             return ResponseEntity.ok().build();
         } catch (Exception e) {
-            Logger.getLogger(MeansurementFileDetailResource.class.getName()).log(Level.SEVERE, "[put]", e);
+            Logger.getLogger(ProductResource.class.getName()).log(Level.SEVERE, "[put]", e);
             return ResponseEntity.status(HttpStatus.resolve(500)).body(e.getMessage());
         }
     }
@@ -61,24 +63,25 @@ public class MeansurementFileAuthorityResource {
             return ResponseEntity.ok().build();
 
         } catch (Exception e) {
-            Logger.getLogger(MeansurementFileDetailResource.class.getName()).log(Level.SEVERE, "[delete]", e);
+            Logger.getLogger(ProductResource.class.getName()).log(Level.SEVERE, "[delete]", e);
             return ResponseEntity.status(HttpStatus.resolve(500)).body(e.getMessage());
         }
     }
 
     @RequestMapping(method = RequestMethod.GET)
     public ResponseEntity get(
-            @RequestParam(name = "idMeansurementFile", required = false) Long idMeansurementFile,
-            @RequestParam(name = "authority", required = false) String authority,
-            @RequestParam(name = "user", required = false) String user,
-            @RequestParam(name = "userName", required = false) String userName) {
+            @RequestParam(name = "subMarket", required = false) Long subMarket,
+            @RequestParam(name = "name", required = false) String name,
+            @RequestParam(name = "page", required = false, defaultValue = "0") int page,
+            @RequestParam(name = "size", required = false, defaultValue = "10") int size) {
         try {
-            List<MeansurementFileAuthority> response = this.service.find(idMeansurementFile, authority, user, userName);
+            Page response = this.service.find(subMarket, name, PageRequest.of(page, size, Sort.by("name")));
             return ResponseEntity.ok(response);
         } catch (Exception e) {
-            Logger.getLogger(MeansurementFileDetailResource.class.getName()).log(Level.SEVERE, "[get]", e);
+            Logger.getLogger(ProductResource.class.getName()).log(Level.SEVERE, "[get]", e);
             return ResponseEntity.status(HttpStatus.resolve(500)).body(e.getMessage());
         }
     }
-
+    
+    
 }

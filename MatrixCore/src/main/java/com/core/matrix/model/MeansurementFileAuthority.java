@@ -5,6 +5,7 @@
  */
 package com.core.matrix.model;
 
+import com.fasterxml.jackson.annotation.JsonFormat;
 import java.io.Serializable;
 import java.time.LocalDateTime;
 import java.util.Optional;
@@ -13,6 +14,7 @@ import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
+import javax.persistence.PrePersist;
 import javax.persistence.Table;
 import lombok.Data;
 
@@ -48,8 +50,14 @@ public class MeansurementFileAuthority implements Serializable {
     @Column(name = "act_nome_usuario_aprovador")
     private String userName;
 
+    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss", shape = JsonFormat.Shape.STRING)
     @Column(name = "data")
     private LocalDateTime createdAt;
+    
+    @PrePersist
+    public void generateCreateAt(){
+        this.createdAt = LocalDateTime.now();
+    }
 
     public void update(MeansurementFileAuthority entiAuthority) {
 

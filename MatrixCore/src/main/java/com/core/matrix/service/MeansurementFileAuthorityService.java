@@ -10,6 +10,8 @@ import com.core.matrix.repository.MeansurementFileAuthorityRepository;
 import com.core.matrix.specifications.MeansurementFileAuthoritySpecification;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collection;
+import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -49,7 +51,12 @@ public class MeansurementFileAuthorityService {
 
         if (Optional.ofNullable(idMeansurementFile).isPresent()) {
             MeansurementFileAuthority mfa = this.repository.findByIdMeansurementFile(idMeansurementFile);
-            return Arrays.asList(mfa);
+            if(Optional.ofNullable(mfa).isPresent()){
+                return Arrays.asList(mfa);
+            }else{
+                return Collections.emptyList();
+            }
+            
         }
 
         List<Specification> specifications = new ArrayList();

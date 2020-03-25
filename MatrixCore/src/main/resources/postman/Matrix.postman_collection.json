@@ -103,7 +103,7 @@
 							}
 						],
 						"url": {
-							"raw": "http://localhost:8004/api/manager?",
+							"raw": "http://localhost:8004/api/manager",
 							"protocol": "http",
 							"host": [
 								"localhost"
@@ -519,12 +519,12 @@
 						"header": [
 							{
 								"key": "Authorization",
-								"value": "Bearer eyJhbGciOiJIUzUxMiJ9.eyJzdWIiOiJhZG1pbkBhZG1pbi5jb20iLCJleHAiOjE1Nzk2MjY1MTksImlhdCI6MTU3OTYwODUxOX0.5DeZtBnJPococZApDZmPIavhlPeD3oOCObY8zttyP4YGIwKFYInhi8jjOSbhrnfE2vX8zgfWAhYmHKGiYLL7ug",
+								"value": "Bearer eyJhbGciOiJIUzUxMiJ9.eyJzdWIiOiJhZG1pbkBhZG1pbi5jb20iLCJleHAiOjE1ODUwOTU5NDEsImlhdCI6MTU4NTA3Nzk0MX0.zZLeirsS0N2TeZVYBOBj6bHKGpkRR9yLcRjX2xVTh687N2czpaysfjLSJQh1Faar7sER8mhHXhvI8g_UBgRsMA",
 								"type": "text"
 							}
 						],
 						"url": {
-							"raw": "http://localhost:8004/api/wbc/contract?contractId=67929",
+							"raw": "http://localhost:8004/api/wbc/contract?contractId=65744",
 							"protocol": "http",
 							"host": [
 								"localhost"
@@ -538,7 +538,7 @@
 							"query": [
 								{
 									"key": "contractId",
-									"value": "67929"
+									"value": "65744"
 								}
 							]
 						}
@@ -607,6 +607,49 @@
 									"key": "company",
 									"value": "447"
 								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "List point by companies",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer eyJhbGciOiJIUzUxMiJ9.eyJzdWIiOiJhZG1pbkBhZG1pbi5jb20iLCJleHAiOjE1ODIxNDUzNDMsImlhdCI6MTU4MjEyNzM0M30.WuW73D3Zm6hkAalof60GyYh4oToSO5fQEzuuLmWGVANh4EJ1XtsDx_JNERVv0MHLZ-SvQxjiJINqGyXgxIySlA",
+								"type": "text"
+							},
+							{
+								"key": "Content-Type",
+								"name": "Content-Type",
+								"value": "application/json",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n\t\"companies\":[228]\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "http://localhost:8004/api/wbc/point-meansurement/listByCompanies",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "8004",
+							"path": [
+								"api",
+								"wbc",
+								"point-meansurement",
+								"listByCompanies"
 							]
 						}
 					},
@@ -980,12 +1023,12 @@
 						"header": [
 							{
 								"key": "Authorization",
-								"value": "Bearer eyJhbGciOiJIUzUxMiJ9.eyJzdWIiOiJhZG1pbkBhZG1pbi5jb20iLCJleHAiOjE1Nzk1NzQ3MjEsImlhdCI6MTU3OTU1NjcyMX0.f3-78nLa3PnPa6gMcwd_bzNA_s1ygyjCXDXg8fR7WXlocwvzUYaSZmGVWeLyubGWZiPAKWNFK3iVnZKapl-u5Q",
+								"value": "Bearer eyJhbGciOiJIUzUxMiJ9.eyJzdWIiOiJhZG1pbkBhZG1pbi5jb20iLCJleHAiOjE1ODE3MjEzOTgsImlhdCI6MTU4MTcwMzM5OH0.YNjFqsfrasSk195b-YdXUcltVvju4CiM6_GxgrJRtMdrGeEMQEdPP8-zv0k0Lk-lho-KF6XY6ZMhjyqoZc5wdg",
 								"type": "text"
 							}
 						],
 						"url": {
-							"raw": "http://localhost:8004/api/workflow/runtime/getTask?taskId=90008",
+							"raw": "http://localhost:8004/api/workflow/runtime/getTask?taskId=255006",
 							"protocol": "http",
 							"host": [
 								"localhost"
@@ -1000,7 +1043,7 @@
 							"query": [
 								{
 									"key": "taskId",
-									"value": "90008"
+									"value": "255006"
 								}
 							]
 						}
@@ -1014,7 +1057,7 @@
 						"header": [
 							{
 								"key": "Authorization",
-								"value": "Bearer eyJhbGciOiJIUzUxMiJ9.eyJzdWIiOiJhZG1pbkBhZG1pbi5jb20iLCJleHAiOjE1Nzk1NzQ3MjEsImlhdCI6MTU3OTU1NjcyMX0.f3-78nLa3PnPa6gMcwd_bzNA_s1ygyjCXDXg8fR7WXlocwvzUYaSZmGVWeLyubGWZiPAKWNFK3iVnZKapl-u5Q",
+								"value": "Bearer eyJhbGciOiJIUzUxMiJ9.eyJzdWIiOiJhZG1pbkBhZG1pbi5jb20iLCJleHAiOjE1ODI1ODkwNDQsImlhdCI6MTU4MjU3MTA0NH0.eUVeTfKXGBaYmpXcwo40q2Xri1Mixxnix15yK8l1mmgg4Kt9xTP_0jYb9SmN9HHPPpDlBeTqpYku1d-OQjqxPQ",
 								"type": "text"
 							},
 							{
@@ -1026,7 +1069,7 @@
 						],
 						"body": {
 							"mode": "raw",
-							"raw": "{\t\n\t\"processInstanceId\":\"90001\",\n\t\"taskId\":\"90008\",\n\t\"variables\":{\n\t\t\"_controle\":\"Cancelar\"\n\t}\n}",
+							"raw": "{\t\n\t\"processInstanceId\":\"344016\",\n\t\"taskId\":\"345018\",\n\t\"variables\":{\n\t\t\"_controle\":\"Realizar Novo Upload\"\n\t}\n\t\n}",
 							"options": {
 								"raw": {
 									"language": "json"
@@ -1034,12 +1077,14 @@
 							}
 						},
 						"url": {
-							"raw": "http://localhost:8004/api/workflow/runtime/completeTask",
+							"raw": "http://52.225.134.57/api/workflow/runtime/completeTask",
 							"protocol": "http",
 							"host": [
-								"localhost"
+								"52",
+								"225",
+								"134",
+								"57"
 							],
-							"port": "8004",
 							"path": [
 								"api",
 								"workflow",
@@ -1051,23 +1096,25 @@
 					"response": []
 				},
 				{
-					"name": "http://localhost:8004/workflow/runtime/getMyTask?size=2",
+					"name": "getMyTask",
 					"request": {
 						"method": "GET",
 						"header": [
 							{
 								"key": "Authorization",
-								"value": "Bearer eyJhbGciOiJIUzUxMiJ9.eyJzdWIiOiJhZG1pbkBhZG1pbi5jb20iLCJleHAiOjE1Nzg3NjYxMzEsImlhdCI6MTU3ODc0ODEzMX0.TmHn3UA5l-tcge1OpVJ1T7vgeLtoOzOY987FlyzG4IxnfEyDvnORKbNqUxAlQiD9jLgrwayvKyTtpQOUQo8zrQ",
+								"value": "Bearer eyJhbGciOiJIUzUxMiJ9.eyJzdWIiOiJhZG1pbkBhZG1pbi5jb20iLCJleHAiOjE1ODI4NDkxNjgsImlhdCI6MTU4MjgzMTE2OH0.ngGs-rOR5x332yDtkq8x2mMJT0fMnwEJh523bkB3kUItQEadC4o7Thxq7Xe6RQg6J9oDNH3IbTeR8AsMxX3MuQ",
 								"type": "text"
 							}
 						],
 						"url": {
-							"raw": "http://localhost:8004/api/workflow/runtime/getMyTask?size=2",
+							"raw": "http://52.225.134.57/api/workflow/runtime/getMyTask?processInstanceId=448213",
 							"protocol": "http",
 							"host": [
-								"localhost"
+								"52",
+								"225",
+								"134",
+								"57"
 							],
-							"port": "8004",
 							"path": [
 								"api",
 								"workflow",
@@ -1077,7 +1124,17 @@
 							"query": [
 								{
 									"key": "size",
-									"value": "2"
+									"value": "10",
+									"disabled": true
+								},
+								{
+									"key": "processInstanceId",
+									"value": "448213"
+								},
+								{
+									"key": "valueVariable",
+									"value": "CRUZEIRO",
+									"disabled": true
 								}
 							]
 						}
@@ -1140,7 +1197,7 @@
 							},
 							{
 								"key": "Authorization",
-								"value": "Bearer eyJhbGciOiJIUzUxMiJ9.eyJzdWIiOiJhZG1pbkBhZG1pbi5jb20iLCJleHAiOjE1Nzk2NTQ3MTQsImlhdCI6MTU3OTYzNjcxNH0.9jfAHBebsbWW76jnfl1qsXRi4NdI2hN8s9rAhsmldkynmcUfhsmkr5fobVPPLKJLtUGkd4yPrvYCRxp-JNsNIg",
+								"value": "Bearer eyJhbGciOiJIUzUxMiJ9.eyJzdWIiOiJhZG1pbkBhZG1pbi5jb20iLCJleHAiOjE1ODUwNzM2NzcsImlhdCI6MTU4NTA1NTY3N30.HYJWcQWlw5x0gdIk4UAA-SRon7y_oggX5nSnEK_Ulzj69IJqT90pUBHK_ctPtDlaVq5-WDbDUqjuM-OE7dFRmQ",
 								"type": "text"
 							}
 						],
@@ -1150,12 +1207,22 @@
 								{
 									"key": "file",
 									"type": "file",
-									"src": "/C:/Users/thiag/Desktop/teste imagem clicktop/WhatsApp Image 2020-01-18 at 16.34.44(1).jpeg"
+									"src": [
+										"/C:/Users/thiag/Desktop/tour/WhatsApp Image 2020-03-16 at 10.16.06 (1).jpeg",
+										"/C:/Users/thiag/Desktop/tour/WhatsApp Image 2020-03-16 at 10.16.06 (2).jpeg",
+										"/C:/Users/thiag/Desktop/tour/WhatsApp Image 2020-03-16 at 10.16.06.jpeg"
+									]
 								},
 								{
 									"key": "processInstance",
 									"value": "132501",
 									"type": "text"
+								},
+								{
+									"key": "file[1]",
+									"type": "file",
+									"src": "/C:/Users/thiag/Desktop/tour/WhatsApp Image 2020-03-16 at 10.16.06.jpeg",
+									"disabled": true
 								}
 							]
 						},
@@ -1296,6 +1363,242 @@
 						}
 					},
 					"response": []
+				},
+				{
+					"name": "getGroupTasks",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer eyJhbGciOiJIUzUxMiJ9.eyJzdWIiOiJhZG1pbkBhZG1pbi5jb20iLCJleHAiOjE1ODI4MjExMjIsImlhdCI6MTU4MjgwMzEyMn0.0kCq9N_8hCtHzOIo1NgPCYVDMQndH8siebIqAKMmvAaBR-FvdZXYFLA5I12y2mIWb5xHgnOtB6JdyOCnuNtKSg",
+								"type": "text"
+							}
+						],
+						"url": {
+							"raw": "http://52.225.134.57/api/workflow/runtime/getGroupTasks",
+							"protocol": "http",
+							"host": [
+								"52",
+								"225",
+								"134",
+								"57"
+							],
+							"path": [
+								"api",
+								"workflow",
+								"runtime",
+								"getGroupTasks"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Delete a process",
+					"request": {
+						"method": "DELETE",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer eyJhbGciOiJIUzUxMiJ9.eyJzdWIiOiJhZG1pbkBhZG1pbi5jb20iLCJleHAiOjE1ODMxMzA5OTksImlhdCI6MTU4MzExMjk5OX0.LV4I1F6uvcN9jncD6mUxEYblUYAgOo12l2eJ8S2799lk_fKrfUvTdi0UK3K-QyrGLusbSs2LTPKfRT7lwQuYyQ",
+								"type": "text"
+							},
+							{
+								"key": "Content-Type",
+								"name": "Content-Type",
+								"value": "application/json",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n\t\"ids\":[\"460518\",\"460508\",\"460499\",\"460490\",\"460481\",\"460472\",\"460463\",\"460454\",\"460445\",\"460436\",\"460427\",\"460418\",\"460409\",\"460400\",\"460391\",\"460382\",\"460373\",\"460364\",\"460355\",\"460346\",\"460337\",\n\"460328\",\"460319\",\"460310\",\"460301\",\"460292\",\"460283\",\"460274\",\"460265\",\"460256\",\"460247\",\"460238\",\"460229\",\"460220\",\"460211\",\"460202\",\"460193\",\"460184\",\"460175\",\"460166\",\"460157\",\"460148\",\n\"460139\",\"460130\",\"460121\",\"460112\",\"460103\",\"460094\",\"460059\",\"457952\",\"457943\",\"457934\",\"457916\",\"457907\",\"457898\",\"457889\",\"457880\",\"457871\",\"457862\",\"457853\",\"457844\",\"457835\",\"457826\",\n\"457817\",\"457808\",\"457799\",\"457790\",\"457781\",\"457772\",\"457763\",\"457754\",\"457745\",\"457736\",\"457727\",\"457718\",\"457709\",\"457700\",\"457691\",\"457682\",\"457673\",\"457664\",\"457655\",\"457646\",\"457637\",\n\"457628\",\"457619\",\"457610\",\"457601\",\"457592\",\"457583\",\"457574\",\"457565\",\"457556\",\"457547\",\"457538\",\"455432\"]\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "http://52.225.134.57/api/workflow/runtime/process",
+							"protocol": "http",
+							"host": [
+								"52",
+								"225",
+								"134",
+								"57"
+							],
+							"path": [
+								"api",
+								"workflow",
+								"runtime",
+								"process"
+							],
+							"query": [
+								{
+									"key": "id%5B%5D%3D165004%26id%5B%5D%3D165012%26id%5B%5D%3D165020%26id%5B%5D%3D165036%26id%5B%5D%3D165044%26id%5B%5D%3D165052%26id%5B%5D%3D165060%26id%5B%5D%3D165068%26id%5B%5D%3D165076%26id%5B%5D%3D165084%26id%5B%5D%3D165092%26id%5B%5D%3D165100%26id%5B%5D%3D165108%26id%5B%5D%3D165116%26id%5B%5D%3D165124%26id%5B%5D%3D165132%26id%5B%5D%3D165140%26id%5B%5D%3D165148",
+									"value": null,
+									"disabled": true
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "getCandidateTask",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer eyJhbGciOiJIUzUxMiJ9.eyJzdWIiOiJhZG1pbkBhZG1pbi5jb20iLCJleHAiOjE1ODI4MjExMjIsImlhdCI6MTU4MjgwMzEyMn0.0kCq9N_8hCtHzOIo1NgPCYVDMQndH8siebIqAKMmvAaBR-FvdZXYFLA5I12y2mIWb5xHgnOtB6JdyOCnuNtKSg",
+								"type": "text"
+							}
+						],
+						"url": {
+							"raw": "http://localhost:8004/api/workflow/runtime/getCandidateTask?processInstanceId=446335",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "8004",
+							"path": [
+								"api",
+								"workflow",
+								"runtime",
+								"getCandidateTask"
+							],
+							"query": [
+								{
+									"key": "valueVariable",
+									"value": "LTDA",
+									"disabled": true
+								},
+								{
+									"key": "processInstanceId",
+									"value": "446335"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "assigneeTask",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Authorization",
+								"type": "text",
+								"value": "Bearer eyJhbGciOiJIUzUxMiJ9.eyJzdWIiOiJhZG1pbkBhZG1pbi5jb20iLCJleHAiOjE1ODE3MjMwNjUsImlhdCI6MTU4MTcwNTA2NX0.ikwRIA_IYKENZJMRV8UiRht-6yqI343HWESJudGEQKE2aMkSOvXkBUK4Wd_ciYbzOwg_IAxpvy15jSaxGIENxA"
+							}
+						],
+						"url": {
+							"raw": "http://localhost:8004/api/workflow/runtime/assigneeTask?taskId=166314",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "8004",
+							"path": [
+								"api",
+								"workflow",
+								"runtime",
+								"assigneeTask"
+							],
+							"query": [
+								{
+									"key": "taskId",
+									"value": "166314"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Start process by message",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer eyJhbGciOiJIUzUxMiJ9.eyJzdWIiOiJhZG1pbkBhZG1pbi5jb20iLCJleHAiOjE1ODMxMzA5OTksImlhdCI6MTU4MzExMjk5OX0.LV4I1F6uvcN9jncD6mUxEYblUYAgOo12l2eJ8S2799lk_fKrfUvTdi0UK3K-QyrGLusbSs2LTPKfRT7lwQuYyQ",
+								"type": "text"
+							}
+						],
+						"url": {
+							"raw": "http://52.225.134.57/api/workflow/runtime/startProcessByMessage?message=p131",
+							"protocol": "http",
+							"host": [
+								"52",
+								"225",
+								"134",
+								"57"
+							],
+							"path": [
+								"api",
+								"workflow",
+								"runtime",
+								"startProcessByMessage"
+							],
+							"query": [
+								{
+									"key": "message",
+									"value": "p131"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "startProcessByMessageWithParams",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"name": "Content-Type",
+								"value": "application/json",
+								"type": "text"
+							},
+							{
+								"key": "Authorization",
+								"value": "Bearer eyJhbGciOiJIUzUxMiJ9.eyJzdWIiOiJhZG1pbkBhZG1pbi5jb20iLCJleHAiOjE1ODMxODk0NzUsImlhdCI6MTU4MzE3MTQ3NX0.-CHs38EiGpWLfLYBoLbGkO7S0ZnOFLFlfeO7dd89Gf1ZyXghMqQhRSwKm8oSZD0oxoOfWaj0ccUBsVGM57vwLg",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n\t\"key\":\"p133\",\n\t\"variables\":{\n\t\t\"month_reference\": 1,\n\t\t\"year_reference\": 2020\n\t}\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "http://52.225.134.57/api/workflow/runtime/startProcessByMessageWithParams",
+							"protocol": "http",
+							"host": [
+								"52",
+								"225",
+								"134",
+								"57"
+							],
+							"path": [
+								"api",
+								"workflow",
+								"runtime",
+								"startProcessByMessageWithParams"
+							]
+						}
+					},
+					"response": []
 				}
 			],
 			"protocolProfileBehavior": {}
@@ -1310,7 +1613,7 @@
 						"header": [
 							{
 								"key": "Authorization",
-								"value": "Bearer eyJhbGciOiJIUzUxMiJ9.eyJzdWIiOiJhZG1pbkBhZG1pbi5jb20iLCJleHAiOjE1Nzk2NTQ3MTQsImlhdCI6MTU3OTYzNjcxNH0.9jfAHBebsbWW76jnfl1qsXRi4NdI2hN8s9rAhsmldkynmcUfhsmkr5fobVPPLKJLtUGkd4yPrvYCRxp-JNsNIg",
+								"value": "Bearer eyJhbGciOiJIUzUxMiJ9.eyJzdWIiOiJhZG1pbkBhZG1pbi5jb20iLCJleHAiOjE1ODMyOTYxNDAsImlhdCI6MTU4MzI3ODE0MH0.yPudSjWnIeb8rFCoVz2X-vB_Ze_fgxGm0sOc2IR_kz_NbF_w9xR7tNZlduAXXHyffOyBrApdtOBfxCmVwPq1JQ",
 								"type": "text"
 							},
 							{
@@ -1338,7 +1641,7 @@
 								{
 									"key": "file",
 									"type": "file",
-									"src": "/E:/Documentos/Projeto - Matrix/processos-matrix/src/main/resources/diagrams/Associar Gestor.bpmn"
+									"src": "/E:/Documentos/Projeto - Matrix/processos-matrix/src/main/resources/diagrams/Análise de Cálculo de Medição v2.bpmn"
 								}
 							]
 						},
@@ -1400,17 +1703,18 @@
 						"header": [
 							{
 								"key": "Authorization",
-								"value": "Bearer eyJhbGciOiJIUzUxMiJ9.eyJzdWIiOiJhZG1pbkBhZG1pbi5jb20iLCJleHAiOjE1Nzk2NTQ3MTQsImlhdCI6MTU3OTYzNjcxNH0.9jfAHBebsbWW76jnfl1qsXRi4NdI2hN8s9rAhsmldkynmcUfhsmkr5fobVPPLKJLtUGkd4yPrvYCRxp-JNsNIg",
+								"value": "Bearer eyJhbGciOiJIUzUxMiJ9.eyJzdWIiOiJhZG1pbkBhZG1pbi5jb20iLCJleHAiOjE1ODMxODU4NDIsImlhdCI6MTU4MzE2Nzg0Mn0.jw3Ires_H_NXLhHGv_rpSBAym4V6b6kOIy9pIK77fGp4pL717yxZVezraHdK35hcwFU52FP8Qa2KXDTp4hQIDw",
 								"type": "text"
 							}
 						],
 						"url": {
-							"raw": "http://localhost:8004/api/workflow/repository",
-							"protocol": "http",
+							"raw": "https://api.matrixenergia.com/api/workflow/repository",
+							"protocol": "https",
 							"host": [
-								"localhost"
+								"api",
+								"matrixenergia",
+								"com"
 							],
-							"port": "8004",
 							"path": [
 								"api",
 								"workflow",
@@ -1427,22 +1731,24 @@
 						"header": [
 							{
 								"key": "Authorization",
-								"value": "Bearer eyJhbGciOiJIUzUxMiJ9.eyJzdWIiOiJhZG1pbkBhZG1pbi5jb20iLCJleHAiOjE1Nzg0MzgyNzksImlhdCI6MTU3ODQyMDI3OX0.2IzDczX62yt7XYgQK93cYzjJSmL_0fsyFc_SyPVlBCWYwG9Hye9ElzjAfX5BaCUgoew7CfY9ljuqfkCOsMd5Aw",
+								"value": "Bearer eyJhbGciOiJIUzUxMiJ9.eyJzdWIiOiJhZG1pbkBhZG1pbi5jb20iLCJleHAiOjE1ODMxODU4NDIsImlhdCI6MTU4MzE2Nzg0Mn0.jw3Ires_H_NXLhHGv_rpSBAym4V6b6kOIy9pIK77fGp4pL717yxZVezraHdK35hcwFU52FP8Qa2KXDTp4hQIDw",
 								"type": "text"
 							}
 						],
 						"url": {
-							"raw": "http://localhost:8004/api/workflow/repository/1",
+							"raw": "http://52.225.134.57/api/workflow/repository/446326",
 							"protocol": "http",
 							"host": [
-								"localhost"
+								"52",
+								"225",
+								"134",
+								"57"
 							],
-							"port": "8004",
 							"path": [
 								"api",
 								"workflow",
 								"repository",
-								"1"
+								"446326"
 							]
 						}
 					},
@@ -1467,13 +1773,13 @@
 							},
 							{
 								"key": "Authorization",
-								"value": "Bearer eyJhbGciOiJIUzUxMiJ9.eyJzdWIiOiJhZG1pbkBhZG1pbi5jb20iLCJleHAiOjE1Nzk2MjY1MTksImlhdCI6MTU3OTYwODUxOX0.5DeZtBnJPococZApDZmPIavhlPeD3oOCObY8zttyP4YGIwKFYInhi8jjOSbhrnfE2vX8zgfWAhYmHKGiYLL7ug",
+								"value": "Bearer eyJhbGciOiJIUzUxMiJ9.eyJzdWIiOiJhZG1pbkBhZG1pbi5jb20iLCJleHAiOjE1ODIyMTg2NjMsImlhdCI6MTU4MjIwMDY2M30.85boHJ2ehHxriiqra48O2eee8DiLSi4jX4OSCc2zlGSPXwn6XXwX2aeOzDyKgdpoEBE1SorERUndw7qLlJ_1rw",
 								"type": "text"
 							}
 						],
 						"body": {
 							"mode": "raw",
-							"raw": "{\n\t\"percentOfLoss\": 100.000001,\n\t\"factorAttendanceCharge\": 100.000001,\n\t\"proinfa\": 100.000001,\n\t\"wbcContract\":\"67928\"\n\t\n}",
+							"raw": "{\r\n   \"codeContractApportionment\":null,\r\n   \"codeWbcContract\":46493,\r\n   \"factorAttendanceCharge\":10,\r\n   \"isApportionment\":0,\r\n   \"meansurementPoint\":\"TOJSDDENTR101\",\r\n   \"percentOfLoss\":8,\r\n   \"proinfas\":[\r\n      {\r\n         \"meansurementPoint\":\"TOJSDDENTR101\",\r\n         \"month\":1,\r\n         \"proinfa\":0,\r\n         \"wbcContract\":\"46492\",\r\n         \"year\":2020\r\n      },\r\n      {\r\n         \"meansurementPoint\":\"TOJSDDENTR101\",\r\n         \"month\":2,\r\n         \"proinfa\":0,\r\n         \"wbcContract\":\"46492\",\r\n         \"year\":2020\r\n      },\r\n      {\r\n         \"meansurementPoint\":\"TOJSDDENTR101\",\r\n         \"month\":3,\r\n         \"proinfa\":0,\r\n         \"wbcContract\":\"46492\",\r\n         \"year\":2020\r\n      },\r\n      {\r\n         \"meansurementPoint\":\"TOJSDDENTR101\",\r\n         \"month\":4,\r\n         \"proinfa\":0,\r\n         \"wbcContract\":\"46492\",\r\n         \"year\":2020\r\n      },\r\n      {\r\n         \"meansurementPoint\":\"TOJSDDENTR101\",\r\n         \"month\":5,\r\n         \"proinfa\":0,\r\n         \"wbcContract\":\"46492\",\r\n         \"year\":2020\r\n      },\r\n      {\r\n         \"meansurementPoint\":\"TOJSDDENTR101\",\r\n         \"month\":6,\r\n         \"proinfa\":0,\r\n         \"wbcContract\":\"46492\",\r\n         \"year\":2020\r\n      },\r\n      {\r\n         \"meansurementPoint\":\"TOJSDDENTR101\",\r\n         \"month\":7,\r\n         \"proinfa\":0,\r\n         \"wbcContract\":\"46492\",\r\n         \"year\":2020\r\n      },\r\n      {\r\n         \"meansurementPoint\":\"TOJSDDENTR101\",\r\n         \"month\":8,\r\n         \"proinfa\":0,\r\n         \"wbcContract\":\"46492\",\r\n         \"year\":2020\r\n      },\r\n      {\r\n         \"meansurementPoint\":\"TOJSDDENTR101\",\r\n         \"month\":9,\r\n         \"proinfa\":0,\r\n         \"wbcContract\":\"46492\",\r\n         \"year\":2020\r\n      },\r\n      {\r\n         \"meansurementPoint\":\"TOJSDDENTR101\",\r\n         \"month\":10,\r\n         \"proinfa\":0,\r\n         \"wbcContract\":\"46492\",\r\n         \"year\":2020\r\n      },\r\n      {\r\n         \"meansurementPoint\":\"TOJSDDENTR101\",\r\n         \"month\":11,\r\n         \"proinfa\":0,\r\n         \"wbcContract\":\"46492\",\r\n         \"year\":2020\r\n      },\r\n      {\r\n         \"meansurementPoint\":\"TOJSDDENTR101\",\r\n         \"month\":12,\r\n         \"proinfa\":0,\r\n         \"wbcContract\":\"46492\",\r\n         \"year\":2020\r\n      }\r\n   ],\r\n   \"wbcContract\":\"46492\"\r\n}",
 							"options": {
 								"raw": {
 									"language": "json"
@@ -1491,6 +1797,39 @@
 								"api",
 								"complement",
 								"information"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Get Contract ",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer eyJhbGciOiJIUzUxMiJ9.eyJzdWIiOiJhZG1pbkBhZG1pbi5jb20iLCJleHAiOjE1ODI0NDM5NDcsImlhdCI6MTU4MjQyNTk0N30.qyD_YiZ4pCgv5tWNDmZV2m85B2grw4WzXPLUJEefH2NDaO9dWFWLV0cc_IFEsurMEW7unAnymgwKBqAAXeZmww",
+								"type": "text"
+							}
+						],
+						"url": {
+							"raw": "http://localhost:8004/api/complement/information?contractId=16674",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "8004",
+							"path": [
+								"api",
+								"complement",
+								"information"
+							],
+							"query": [
+								{
+									"key": "contractId",
+									"value": "16674"
+								}
 							]
 						}
 					},
@@ -1546,6 +1885,553 @@
 				}
 			],
 			"protocolProfileBehavior": {}
+		},
+		{
+			"name": "monitor",
+			"item": [
+				{
+					"name": "Monitor status of process file",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer eyJhbGciOiJIUzUxMiJ9.eyJzdWIiOiJhZG1pbkBhZG1pbi5jb20iLCJleHAiOjE1ODA4MzM5NjksImlhdCI6MTU4MDgxNTk2OX0.sjmSWQg13n4WrFO_WoxZaPN0UPusWccAtIjFcxFYtjWrzuNG7k1D5Yr-95-zi9qA1O_zlYcwaT8lyaM08m-7HQ",
+								"type": "text"
+							}
+						],
+						"url": {
+							"raw": "http://localhost:8004/api/monitor?year=2020&month=1",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "8004",
+							"path": [
+								"api",
+								"monitor"
+							],
+							"query": [
+								{
+									"key": "year",
+									"value": "2020"
+								},
+								{
+									"key": "month",
+									"value": "1"
+								}
+							]
+						}
+					},
+					"response": []
+				}
+			],
+			"protocolProfileBehavior": {}
+		},
+		{
+			"name": "log",
+			"item": [
+				{
+					"name": "List errors by process instance",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer eyJhbGciOiJIUzUxMiJ9.eyJzdWIiOiJhZG1pbkBhZG1pbi5jb20iLCJleHAiOjE1ODIzMDg4OTksImlhdCI6MTU4MjI5MDg5OX0.-qtkgVL5s1dNW-_SOQlsIENossGMMVsBE1w-2pGQ6lusV4vb2NpfAV9vzf4xt86svQNGzKaQb4zvLOD0tWqgAA",
+								"type": "text"
+							}
+						],
+						"url": {
+							"raw": "http://localhost:8004/api/log?processInstanceId=187512",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "8004",
+							"path": [
+								"api",
+								"log"
+							],
+							"query": [
+								{
+									"key": "processInstanceId",
+									"value": "187512"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Delete logs by ProcessIntanceId",
+					"request": {
+						"method": "DELETE",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer eyJhbGciOiJIUzUxMiJ9.eyJzdWIiOiJhZG1pbkBhZG1pbi5jb20iLCJleHAiOjE1ODI1NjQ2MDgsImlhdCI6MTU4MjU0NjYwOH0.lc4iv8CZzFyK9OAG2qxbYxqGhq15LYfbtYmivzLsbSZgPbEZfER7eHEzXOJdtNuDkkqkz6dgxx3jtF11KqXgcw",
+								"type": "text"
+							}
+						],
+						"url": {
+							"raw": "http://localhost:8004/api/log/278808",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "8004",
+							"path": [
+								"api",
+								"log",
+								"278808"
+							]
+						}
+					},
+					"response": []
+				}
+			],
+			"protocolProfileBehavior": {}
+		},
+		{
+			"name": "report",
+			"item": [
+				{
+					"name": "ResultFile",
+					"request": {
+						"method": "OPTIONS",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer eyJhbGciOiJIUzUxMiJ9.eyJzdWIiOiJ0ZXN0ZTJtYXRyaXhAbWFpbGluYXRvci5jb20iLCJleHAiOjE1ODUwNzczOTYsImlhdCI6MTU4NTA1OTM5Nn0.t7-WaogrFjiesDEv0XX_66VeoBoV7GLp3lMKgBdcDUojCcxzWHyipDI5TRe-hQUQ-F6GM1kZ5qOhysDgaaEDpw",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\"ids\":[3300,3247],\"type\":\"EXPORT_RESULT_WBC\",\"month\":2,\"year\":2020}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "http://localhost:8004/api/report/meansurement-result",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "8004",
+							"path": [
+								"api",
+								"report",
+								"meansurement-result"
+							]
+						}
+					},
+					"response": []
+				}
+			],
+			"protocolProfileBehavior": {}
+		},
+		{
+			"name": "authority",
+			"item": [
+				{
+					"name": "List",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer eyJhbGciOiJIUzUxMiJ9.eyJzdWIiOiJhZG1pbkBhZG1pbi5jb20iLCJleHAiOjE1ODUxNTg5OTksImlhdCI6MTU4NTE0MDk5OX0.V4sV4LGSUKfMbWL-kfYLw8NmICYecs8Bhkj5xgKDEdDBcDZqDIxo8VrhYp8vNvB9NzD8jbKh8elVJJfzOpsbcA",
+								"type": "text"
+							}
+						],
+						"url": {
+							"raw": "http://localhost:8004/api/authority",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "8004",
+							"path": [
+								"api",
+								"authority"
+							],
+							"query": [
+								{
+									"key": "idMeansurementFile",
+									"value": "182",
+									"disabled": true
+								},
+								{
+									"key": "authority",
+									"value": "profile-pós-venda",
+									"disabled": true
+								},
+								{
+									"key": "user",
+									"value": "aprovador1@bandtec.com.br",
+									"disabled": true
+								},
+								{
+									"key": "userName",
+									"value": "aprovador 1",
+									"disabled": true
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Save",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer eyJhbGciOiJIUzUxMiJ9.eyJzdWIiOiJhZG1pbkBhZG1pbi5jb20iLCJleHAiOjE1ODUxNTg5OTksImlhdCI6MTU4NTE0MDk5OX0.V4sV4LGSUKfMbWL-kfYLw8NmICYecs8Bhkj5xgKDEdDBcDZqDIxo8VrhYp8vNvB9NzD8jbKh8elVJJfzOpsbcA",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": " {\r\n        \r\n        \"idMeansurementFile\": 185,\r\n        \"authority\": \"profile-aprovador-nivel2\",\r\n        \"result\": \"APROVADO\",\r\n        \"justify\": \"aceito a solicitação\",\r\n        \"user\": \"aprovador1@bandtec.com.br\",\r\n        \"userName\": \"APROVADOR 1\"\r\n        \r\n  }",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "http://localhost:8004/api/authority",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "8004",
+							"path": [
+								"api",
+								"authority"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Delete",
+					"request": {
+						"method": "DELETE",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer eyJhbGciOiJIUzUxMiJ9.eyJzdWIiOiJhZG1pbkBhZG1pbi5jb20iLCJleHAiOjE1ODUxNTg5OTksImlhdCI6MTU4NTE0MDk5OX0.V4sV4LGSUKfMbWL-kfYLw8NmICYecs8Bhkj5xgKDEdDBcDZqDIxo8VrhYp8vNvB9NzD8jbKh8elVJJfzOpsbcA",
+								"type": "text"
+							}
+						],
+						"url": {
+							"raw": "http://localhost:8004/api/authority/4",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "8004",
+							"path": [
+								"api",
+								"authority",
+								"4"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Update",
+					"request": {
+						"method": "PUT",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer eyJhbGciOiJIUzUxMiJ9.eyJzdWIiOiJhZG1pbkBhZG1pbi5jb20iLCJleHAiOjE1ODUxNTg5OTksImlhdCI6MTU4NTE0MDk5OX0.V4sV4LGSUKfMbWL-kfYLw8NmICYecs8Bhkj5xgKDEdDBcDZqDIxo8VrhYp8vNvB9NzD8jbKh8elVJJfzOpsbcA",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": " {\r\n        \r\n        \"id\":5,\r\n        \"authority\": \"thiago\",\r\n        \"result\": \"thiago\",\r\n        \"justify\": \"thiago\",\r\n        \"user\": \"thiago\",\r\n        \"userName\": \"thiago\"\r\n        \r\n  }",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "http://localhost:8004/api/authority",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "8004",
+							"path": [
+								"api",
+								"authority"
+							]
+						}
+					},
+					"response": []
+				}
+			],
+			"protocolProfileBehavior": {}
+		},
+		{
+			"name": "product",
+			"item": [
+				{
+					"name": "List",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer eyJhbGciOiJIUzUxMiJ9.eyJzdWIiOiJhZG1pbkBhZG1pbi5jb20iLCJleHAiOjE1ODUxNTg5OTksImlhdCI6MTU4NTE0MDk5OX0.V4sV4LGSUKfMbWL-kfYLw8NmICYecs8Bhkj5xgKDEdDBcDZqDIxo8VrhYp8vNvB9NzD8jbKh8elVJJfzOpsbcA",
+								"type": "text"
+							}
+						],
+						"url": {
+							"raw": "http://localhost:8004/api/product",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "8004",
+							"path": [
+								"api",
+								"product"
+							],
+							"query": [
+								{
+									"key": "name",
+									"value": "conv",
+									"disabled": true
+								},
+								{
+									"key": "subMarket",
+									"value": "1",
+									"disabled": true
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Save",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer eyJhbGciOiJIUzUxMiJ9.eyJzdWIiOiJhZG1pbkBhZG1pbi5jb20iLCJleHAiOjE1ODUxNTg5OTksImlhdCI6MTU4NTE0MDk5OX0.V4sV4LGSUKfMbWL-kfYLw8NmICYecs8Bhkj5xgKDEdDBcDZqDIxo8VrhYp8vNvB9NzD8jbKh8elVJJfzOpsbcA",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": " {\r\n            \r\n            \"subMarket\": 2,\r\n            \"name\": \"THIAGO\",\r\n            \"pld\": 154.44,\r\n            \"spreadPurchase\": -2.0,\r\n            \"spreadSale\": -1.0\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "http://localhost:8004/api/product",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "8004",
+							"path": [
+								"api",
+								"product"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Update",
+					"request": {
+						"method": "PUT",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer eyJhbGciOiJIUzUxMiJ9.eyJzdWIiOiJhZG1pbkBhZG1pbi5jb20iLCJleHAiOjE1ODUxNTg5OTksImlhdCI6MTU4NTE0MDk5OX0.V4sV4LGSUKfMbWL-kfYLw8NmICYecs8Bhkj5xgKDEdDBcDZqDIxo8VrhYp8vNvB9NzD8jbKh8elVJJfzOpsbcA",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": " {\r\n             \"id\": 1,\r\n            \"subMarket\": 2,\r\n            \"name\": \"THIAGO2\",\r\n            \"pld\": 154.44,\r\n            \"spreadPurchase\": -2.0,\r\n            \"spreadSale\": -1.0\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "http://localhost:8004/api/product",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "8004",
+							"path": [
+								"api",
+								"product"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Delete",
+					"request": {
+						"method": "DELETE",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer eyJhbGciOiJIUzUxMiJ9.eyJzdWIiOiJhZG1pbkBhZG1pbi5jb20iLCJleHAiOjE1ODUxNTg5OTksImlhdCI6MTU4NTE0MDk5OX0.V4sV4LGSUKfMbWL-kfYLw8NmICYecs8Bhkj5xgKDEdDBcDZqDIxo8VrhYp8vNvB9NzD8jbKh8elVJJfzOpsbcA",
+								"type": "text"
+							}
+						],
+						"url": {
+							"raw": "http://localhost:8004/api/product/1",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "8004",
+							"path": [
+								"api",
+								"product",
+								"1"
+							]
+						}
+					},
+					"response": []
+				}
+			],
+			"protocolProfileBehavior": {}
+		},
+		{
+			"name": "List details of file",
+			"request": {
+				"method": "GET",
+				"header": [
+					{
+						"key": "Authorization",
+						"value": "Bearer eyJhbGciOiJIUzUxMiJ9.eyJzdWIiOiJhZG1pbkBhZG1pbi5jb20iLCJleHAiOjE1ODI2MTAxNDUsImlhdCI6MTU4MjU5MjE0NX0.ncBMBmmg13-kRSM6ii6v-1E_dUTX21GYnHAhlzIZJwfsrdrnqKQxuAKuparP0hpAmV8mA_8eOy4kaZq1uw5qjg",
+						"type": "text"
+					}
+				],
+				"url": {
+					"raw": "http://52.225.134.57/api/file/detail?id=1200",
+					"protocol": "http",
+					"host": [
+						"52",
+						"225",
+						"134",
+						"57"
+					],
+					"path": [
+						"api",
+						"file",
+						"detail"
+					],
+					"query": [
+						{
+							"key": "id",
+							"value": "1200"
+						}
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "http://localhost:8004/api/meansurement-file/result?processInstanceId=355108",
+			"request": {
+				"method": "GET",
+				"header": [
+					{
+						"key": "Authorization",
+						"value": "Bearer eyJhbGciOiJIUzUxMiJ9.eyJzdWIiOiJhZG1pbkBhZG1pbi5jb20iLCJleHAiOjE1ODI2Nzg3NjYsImlhdCI6MTU4MjY2MDc2Nn0.56ID6vvo0AbRLCOfViKAn4LADEg2qeLHyE3vBPP940ur-16JDHygN8e3JGFTPpfOwYAgpdhwDok0Ujmlqe9oMA",
+						"type": "text"
+					}
+				],
+				"url": {
+					"raw": "http://localhost:8004/api/meansurement-file/result?processInstanceId=355108",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "8004",
+					"path": [
+						"api",
+						"meansurement-file",
+						"result"
+					],
+					"query": [
+						{
+							"key": "processInstanceId",
+							"value": "355108"
+						}
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "CheckStatusBilling",
+			"request": {
+				"method": "GET",
+				"header": [
+					{
+						"key": "Authorization",
+						"value": "Bearer eyJhbGciOiJIUzUxMiJ9.eyJzdWIiOiJhZG1pbkBhZG1pbi5jb20iLCJleHAiOjE1ODI5MjY1MzksImlhdCI6MTU4MjkwODUzOX0.qg6wHGH9IDLT-4UGk0KtRzfIqJdknsof_R0wvYX_xqCBLKIQQRil1alH2OC8ogRracueKkJ8yS1v9kbKQj7eXQ",
+						"type": "text"
+					}
+				],
+				"url": {
+					"raw": "http://localhost:8004/api/meansurement-file/result/status-billing?year=2020&month=1",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "8004",
+					"path": [
+						"api",
+						"meansurement-file",
+						"result",
+						"status-billing"
+					],
+					"query": [
+						{
+							"key": "year",
+							"value": "2020"
+						},
+						{
+							"key": "month",
+							"value": "1"
+						}
+					]
+				}
+			},
+			"response": []
 		}
 	],
 	"protocolProfileBehavior": {}
