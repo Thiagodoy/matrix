@@ -16,13 +16,13 @@ public class ReportConstants {
         EXPORT_RESULT_FULL_WBC
     }
 
-    public static String[] getHeaders(ReportType type){
+    public static String[] getHeaders(ReportType type) {
 
         switch (type) {
             case EXPORT_RESULT_FULL_WBC:
                 return new String[]{"Ano", "Mês", "Cód. CCEE", "Número do Contrato", "Ponto de Medição", "Status", "Montantes (MWh)"};
             case EXPORT_RESULT_WBC:
-                return new String[]{"Ano", "Mês", "Numero do Contrato", "Ponto", "Montantes (MWh)"};
+                return new String[]{"Ano", "Mês", "Cód. CCEE", "Número do Contrato", "Montantes (MWh)"};
             default:
                 return new String[]{};
         }

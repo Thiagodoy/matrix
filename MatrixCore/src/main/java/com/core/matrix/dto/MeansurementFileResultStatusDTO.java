@@ -37,8 +37,8 @@ public class MeansurementFileResultStatusDTO {
         switch (type) {
             case EXPORT_RESULT_FULL_WBC:
                 return new Object[]{year, this.month, "", contracto, this.wbcMeansurementPoint, this.status, this.mount};
-            case EXPORT_RESULT_WBC:
-                return new Object[]{year, this.month, contracto, this.wbcMeansurementPoint, this.mount};
+            case EXPORT_RESULT_WBC:                
+                return new Object[]{year, this.month, "",contracto,  this.mount};
             default:
                 return new Object[]{};
         }
