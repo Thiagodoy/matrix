@@ -197,11 +197,12 @@ import lombok.Data;
                         @ColumnResult(name = "limite_minimo", type = Double.class)
                     ,
                         @ColumnResult(name = "limite_maximo", type = Double.class)
-
+                    ,
+                        @ColumnResult(name = "preco_contratado", type = Double.class)
                 }))
 
 @NamedNativeQuery(query = "SELECT DISTINCT\n"
-        + "	   CT.[sNrContrato]\n"
+        + "	  CT.[sNrContrato]\n"
         + "      ,SZ.[nNrAno]\n"
         + "      ,SZ.[nNrMes]\n"
         + "      ,case when SZ.[nQtInformadaTotal] is not null then SZ.[nQtInformadaTotal] else SZ.[nQtContratadaTotal] end as 'nQtContratadaTotal'\n"
@@ -213,7 +214,8 @@ import lombok.Data;
         + "      ,case when SZ.nQtInformadaTotal is not null then Round((SZ.[nQtInformadaTotal]-(SZ.[nQtInformadaTotal]*RO.[sPcLimMesMin])/100),3) else Round((SZ.[nQtContratadaTotal]-(SZ.[nQtContratadaTotal]*RO.[sPcLimMesMin])/100),3) end as 'quantidade_contratada_minima'\n"
         + "      ,case when SZ.nQtInformadaTotal is not null then Round((SZ.[nQtInformadaTotal]+(SZ.[nQtInformadaTotal]*RO.[sPcLimMesMax])/100),3) else Round((SZ.[nQtContratadaTotal]+(SZ.[nQtContratadaTotal]*RO.[sPcLimMesMax])/100),3) end as 'quantidade_contratada_maxima'\n"
         + "      ,RO.[sPcLimMesMin] as 'limite_minimo'\n"
-        + "      ,RO.[sPcLimMesMax] as 'limite_maximo'"
+        + "      ,RO.[sPcLimMesMax] as 'limite_maximo'\n"
+        + "      ,SZ.[nVlPrecoEnergiaMedio] as 'preco_contratado'"
         + "  FROM [CE_CONTRATO] CT,\n"
         + "       [CE_SAZONALIZACAO] SZ,\n"
         + "       [CE_REGRA_OPCIONALIDADE] RO\n"

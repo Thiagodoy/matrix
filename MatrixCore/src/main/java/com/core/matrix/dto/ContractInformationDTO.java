@@ -21,5 +21,5 @@ public class ContractInformationDTO {
     private Double percentOfLoss;
     private Double factorAttendanceCharge;
     private Double proinfa;
-
+    private Integer wbcSubmercado;
 }

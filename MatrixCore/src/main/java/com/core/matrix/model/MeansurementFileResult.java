@@ -100,7 +100,7 @@ public class MeansurementFileResult {
 
     @Column(name = "limite_maximo")
     private Double limitMax;
-
+  
     @Column(name = "quantidade_contratada")
     private Double qtdHired;
 
