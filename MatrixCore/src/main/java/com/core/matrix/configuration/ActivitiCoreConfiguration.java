@@ -11,6 +11,7 @@ import com.core.matrix.workflow.task.CalculateTask;
 import com.core.matrix.workflow.task.ChangeStatusFileTask;
 import com.core.matrix.workflow.task.CheckLevelOfApproval;
 import com.core.matrix.workflow.task.CheckStatusFileResultTask;
+import com.core.matrix.workflow.task.CheckTake;
 import com.core.matrix.workflow.task.CleanFileResult;
 import com.core.matrix.workflow.task.CleanFiles;
 import com.core.matrix.workflow.task.DataValidationTask;
@@ -223,4 +224,11 @@ public class ActivitiCoreConfiguration implements EnvironmentAware {
     public CheckLevelOfApproval checkLevelOfApproval(ApplicationContext context) {
         return new CheckLevelOfApproval(context);
     }
+
+    @Bean
+    public CheckTake checkTake(ApplicationContext context) {
+        return new CheckTake(context);
+    }
+
+    
 }

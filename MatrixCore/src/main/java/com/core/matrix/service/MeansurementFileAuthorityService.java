@@ -46,6 +46,12 @@ public class MeansurementFileAuthorityService {
 
     }
 
+    
+    @Transactional(readOnly = true)
+    public List<MeansurementFileAuthority> findByProcess(String processInstanceId){
+        return this.repository.findByProcessInstanceId(processInstanceId);
+    }
+    
     @Transactional(readOnly = true)
     public List<MeansurementFileAuthority> find(Long idMeansurementFile, String authority, String user, String userName) {
 

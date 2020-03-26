@@ -27,7 +27,7 @@ import static com.core.matrix.utils.Constants.*;
 
 /**
  *
- * @author Aloysio
+ * @author Thiago
  */
 public class CheckLevelOfApproval implements JavaDelegate {
 
@@ -100,6 +100,7 @@ public class CheckLevelOfApproval implements JavaDelegate {
         if (results.size() == 1) {
             return results.get(0);
         } else {
+            //busca o contrato pai
             return results
                     .stream()
                     .filter(r -> Optional.ofNullable(r.getContractParent()).isPresent() && r.getContractParent().equals(1L))

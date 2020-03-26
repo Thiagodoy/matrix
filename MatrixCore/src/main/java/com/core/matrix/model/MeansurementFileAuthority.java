@@ -54,6 +54,9 @@ public class MeansurementFileAuthority implements Serializable {
     @Column(name = "data")
     private LocalDateTime createdAt;
     
+    @Column(name = "act_id_processo")
+    private String processInstanceId;
+    
     @PrePersist
     public void generateCreateAt(){
         this.createdAt = LocalDateTime.now();
