@@ -21,6 +21,7 @@ public class AssigneUserListener implements TaskListener{
         delegateTask.getCandidates();        
         String user = delegateTask.getVariable(CREATED_BY,String.class);
         delegateTask.setAssignee(user);
+        
     }
     
 }

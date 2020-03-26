@@ -9,6 +9,7 @@ import com.core.matrix.properties.ActivitiProperties;
 import com.core.matrix.workflow.task.BillingContractsTask;
 import com.core.matrix.workflow.task.CalculateTask;
 import com.core.matrix.workflow.task.ChangeStatusFileTask;
+import com.core.matrix.workflow.task.CheckLevelOfApproval;
 import com.core.matrix.workflow.task.CheckStatusFileResultTask;
 import com.core.matrix.workflow.task.CleanFileResult;
 import com.core.matrix.workflow.task.CleanFiles;
@@ -47,10 +48,9 @@ import org.springframework.transaction.PlatformTransactionManager;
  *
  * @author thiag
  */
-
 @EnableJpaRepositories(basePackages = {"com.core.matrix.workflow.repository"},
-         entityManagerFactoryRef = "entityManagerFactory", 
-        transactionManagerRef = "transactionManager") 
+        entityManagerFactoryRef = "entityManagerFactory",
+        transactionManagerRef = "transactionManager")
 
 @Configuration
 public class ActivitiCoreConfiguration implements EnvironmentAware {
@@ -82,7 +82,7 @@ public class ActivitiCoreConfiguration implements EnvironmentAware {
         HashMap<String, Object> properties = new HashMap<>();
         properties.put("hibernate.hbm2ddl.auto", "update");
         properties.put("hibernate.dialect", "org.hibernate.dialect.MySQL5InnoDBDialect");
-       // properties.put("hibernate.tool.hbm2ddl.SchemaUpdate", "true");
+        // properties.put("hibernate.tool.hbm2ddl.SchemaUpdate", "true");
         em.setJpaPropertyMap(properties);
 
         return em;
@@ -133,10 +133,9 @@ public class ActivitiCoreConfiguration implements EnvironmentAware {
         ProcessEngineConfiguration s = new StandaloneProcessEngineConfiguration()
                 .setCustomSessionFactories(null)
                 .setDatabaseSchemaUpdate(ProcessEngineConfiguration.DB_SCHEMA_UPDATE_TRUE)
-                
                 //.setPro
                 // .setAsyncExecutorEnabled(true)
-                
+
                 .setDataSource(this.dataSource())
                 .setAsyncFailedJobWaitTime(2147483647)
                 .setDefaultFailedJobWaitTime(2147483647)
@@ -150,75 +149,78 @@ public class ActivitiCoreConfiguration implements EnvironmentAware {
     public IdentityService identityService() {
         return this.processEngine().getIdentityService();
     }
-    
+
     @Bean
     public RuntimeService runtimeService() {
         return this.processEngine().getRuntimeService();
     }
-    
+
     @Bean
     public RepositoryService repositoryService() {
         return this.processEngine().getRepositoryService();
     }
-    
+
     @Bean
     public TaskService taskService() {
         return this.processEngine().getTaskService();
     }
-    
+
     @Bean
     public ManagementService managementService() {
         return this.processEngine().getManagementService();
     }
-    
+
     @Bean
-    public HistoryService historyService(){
+    public HistoryService historyService() {
         return this.processEngine().getHistoryService();
     }
-    
+
     @Bean
-    public FileValidationTask fileValidationTask(ApplicationContext context){
+    public FileValidationTask fileValidationTask(ApplicationContext context) {
         return new FileValidationTask(context);
     }
-    
+
 //    @Bean 
 //    public PointMeansurementValidationTask pointMeansurementValidationTask(ApplicationContext context){
 //        return new PointMeansurementValidationTask(context);
 //    }
-    
     @Bean
-    public DataValidationTask dataValidationTask(ApplicationContext context){
+    public DataValidationTask dataValidationTask(ApplicationContext context) {
         return new DataValidationTask(context);
     }
-    
+
     @Bean
-    public CalculateTask calculateTask(ApplicationContext context){
+    public CalculateTask calculateTask(ApplicationContext context) {
         return new CalculateTask(context);
     }
-    
+
     @Bean
-    public CleanFiles cleanFiles(ApplicationContext context){
+    public CleanFiles cleanFiles(ApplicationContext context) {
         return new CleanFiles(context);
     }
-    
+
     @Bean
-    public BillingContractsTask billingContractsTask(ApplicationContext context){
+    public BillingContractsTask billingContractsTask(ApplicationContext context) {
         return new BillingContractsTask(context);
     }
-    
+
     @Bean
-    public ChangeStatusFileTask changeStatusFileTask(ApplicationContext context){
+    public ChangeStatusFileTask changeStatusFileTask(ApplicationContext context) {
         return new ChangeStatusFileTask(context);
     }
-    
+
     @Bean
-    public CheckStatusFileResultTask checkStatusFileResultTask(ApplicationContext context){
+    public CheckStatusFileResultTask checkStatusFileResultTask(ApplicationContext context) {
         return new CheckStatusFileResultTask(context);
     }
-    
+
     @Bean
-    public CleanFileResult cleanFileResult(ApplicationContext context){
+    public CleanFileResult cleanFileResult(ApplicationContext context) {
         return new CleanFileResult(context);
     }
-    
+
+    @Bean
+    public CheckLevelOfApproval checkLevelOfApproval(ApplicationContext context) {
+        return new CheckLevelOfApproval(context);
+    }
 }

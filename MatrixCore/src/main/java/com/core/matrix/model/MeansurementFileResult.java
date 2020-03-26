@@ -7,6 +7,7 @@ package com.core.matrix.model;
 
 import com.core.matrix.dto.MeansurementFileResultStatusDTO;
 import com.core.matrix.wbc.dto.ContractWbcInformationDTO;
+import com.google.common.base.Optional;
 import javax.persistence.Column;
 import javax.persistence.ColumnResult;
 import javax.persistence.ConstructorResult;
@@ -129,6 +130,9 @@ public class MeansurementFileResult {
     
     @Column(name = "montante_liquido_ajustado")
     private Double amountLiquidoAdjusted;
+    
+    @Column(name = "justificativa")
+    private String justify;
 
     public MeansurementFileResult(ContractWbcInformationDTO informationDTO, String idProcess) {
 
@@ -139,6 +143,19 @@ public class MeansurementFileResult {
         this.limitMin = informationDTO.getLimitMin();
         this.limitMax = informationDTO.getLimitMax();
 
+    }
+    
+    
+    public void update(MeansurementFileResult result){
+        
+        if(Optional.fromNullable(result.getAmountLiquidoAdjusted()).isPresent() && !result.getAmountLiquidoAdjusted().equals(this.amountLiquidoAdjusted)){
+            this.amountLiquidoAdjusted = result.getAmountLiquidoAdjusted();
+        }
+        
+        if(Optional.fromNullable(result.getJustify()).isPresent() && !result.getJustify().equals(this.justify)){
+            this.justify = result.getJustify();
+        }
+        
     }
 
 }

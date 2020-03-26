@@ -80,8 +80,8 @@ public class Constants {
 
     public static final String PROCESS_INFORMATION_CLIENT = "@Cliente";
     public static final String RESPONSE_NIVEL = "AVANÇAR";
-    public static final String RESPONSE_NIVEL_1 = "SEM ALÇADA DE APROVAÇÃO";
-    public static final String RESPONSE_NIVEL_2 = "ENCAMINHAR PARA APROVAÇÃO";  
+    public static final String RESPONSE_SEM_ALCADA = "SEM ALÇADA DE APROVAÇÃO";
+    public static final String RESPONSE_ENCAMINHAR_APROVACAO = "ENCAMINHAR PARA APROVAÇÃO";  
 
     
     

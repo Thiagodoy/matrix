@@ -27,13 +27,18 @@ public class MeansurementFileResultService {
     public void save(MeansurementFileResult result) {
         this.repository.save(result);
     }
-    
-    
+
     @Transactional
-    public void update(MeansurementFileResult result) {
+    public void update(MeansurementFileResult result) throws Exception {
+
+        MeansurementFileResult fileResult = this.repository
+                .findById(result.getId())
+                .orElseThrow(() -> new Exception("Não foi encontrado nenhum resultado!"));
+
+        fileResult.update(result);
+
         this.repository.save(result);
     }
-    
 
     @Transactional(readOnly = true)
     public List<MeansurementFileResult> getResult(String id) {
@@ -41,20 +46,18 @@ public class MeansurementFileResultService {
     }
 
     @Transactional(transactionManager = "matrixTransactionManager")
-    public void deleteByProcess(String id){
+    public void deleteByProcess(String id) {
         this.repository.deleteByIdProcess(id);
     }
-    
+
     @Transactional(readOnly = true)
-    public List<MeansurementFileResultStatusDTO>getStatusBilling(Long year, Long month){
+    public List<MeansurementFileResultStatusDTO> getStatusBilling(Long year, Long month) {
         return this.repository.getStatusBilling(year, month);
     }
-    
-    
+
     @Transactional(readOnly = true)
-    public List<MeansurementFileResult>findByIds(List<Long>ids){
+    public List<MeansurementFileResult> findByIds(List<Long> ids) {
         return this.repository.findAllById(ids);
     }
-    
 
 }
