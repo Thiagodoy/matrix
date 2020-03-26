@@ -43,6 +43,8 @@ import lombok.Data;
                     ,
                         @ColumnResult(name = "fator_atendimento_carga", type = Double.class)
                     ,
+                        @ColumnResult(name = "wbc_submercado", type = Integer.class)
+                    ,
                         @ColumnResult(name = "proinfa", type = Double.class),}))
 
 @NamedNativeQuery(name = "ContractCompInformation.listByPoint", query = "SELECT \n"
@@ -50,7 +52,8 @@ import lombok.Data;
         + "    a.wbc_ponto_de_medicao,\n"
         + "    b.percentual_de_perda,\n"
         + "    b.proinfa,\n"
-        + "    b.fator_atendimento_carga\n"
+        + "    b.fator_atendimento_carga,\n"
+        + "    b.wbc_submercado\n"
         + "FROM\n"
         + "    matrix.mtx_ponto_de_medicao a\n"
         + "        INNER JOIN\n"
@@ -87,6 +90,9 @@ public class ContractCompInformation {
     @Column(name = "fator_atendimento_carga")
     private Double factorAttendanceCharge;
 
+    @Column(name = "wbc_submercado")
+    private Integer wbcSubmercado;        
+        
     @JsonIgnore
     @Column(name = "data_criacao")
     private LocalDateTime createdAt;
@@ -145,6 +151,9 @@ public class ContractCompInformation {
             this.factorAttendanceCharge = entity.getFactorAttendanceCharge();
         }
 
+        if (Optional.ofNullable(entity.getWbcSubmercado()).isPresent() && !entity.getWbcSubmercado().equals(this.wbcSubmercado)) {
+            this.wbcSubmercado = entity.getWbcSubmercado();
+        }
     }
 
 }

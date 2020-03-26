@@ -101,6 +101,9 @@ public class MeansurementFileResult {
     @Column(name = "limite_maximo")
     private Double limitMax;
 
+    @Column(name = "preco_contratado")
+    private Double price;
+    
     @Column(name = "quantidade_contratada")
     private Double qtdHired;
 
@@ -142,6 +145,7 @@ public class MeansurementFileResult {
         this.idProcess = idProcess;
         this.limitMin = informationDTO.getLimitMin();
         this.limitMax = informationDTO.getLimitMax();
+        this.price = informationDTO.getPrice();
 
     }
     
