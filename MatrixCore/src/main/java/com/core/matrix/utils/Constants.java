@@ -83,6 +83,8 @@ public class Constants {
     public static final String RESPONSE_NIVEL_1 = "SEM ALÇADA DE APROVAÇÃO";
     public static final String RESPONSE_NIVEL_2 = "ENCAMINHAR PARA APROVAÇÃO";  
 
-    
+    public static final String RESPONSE_RECOMPRA = "RECOMPRA";
+    public static final String RESPONSE_FATURAMENTO = "ENVIAR PARA FATURAMENTO";
+    public static final String RESPONSE_CURTOPRAZO = "CURTO PRAZO";  
     
 }
