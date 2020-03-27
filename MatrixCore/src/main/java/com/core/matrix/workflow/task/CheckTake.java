@@ -63,11 +63,11 @@ public class CheckTake implements JavaDelegate {
                 if (opt.isPresent() && opt.get().getResult().equals(CONST_APPROVED)) {
                     value = result.getAmountLiquidoAdjusted();
                 } else {
-                    value = result.getAmountLiquido();
+                    value = result.getAmountBruto();
                 }
 
             } else {
-                value = result.getAmountLiquido();
+                value = result.getAmountBruto();
             }
 
             
