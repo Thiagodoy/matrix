@@ -59,21 +59,22 @@ public class CheckLevelOfApproval implements JavaDelegate {
 
         try {
 
-            final String authority = profile.getExpressionText();            
-
-            MeansurementFileAuthority lastfileAuthority = this.fileAuthorityService
-                    .findByProcess(execution.getProcessInstanceId())
-                    .stream()
-                    .sorted(Comparator.comparing(MeansurementFileAuthority::getId).reversed())
-                    .findFirst()
-                    .orElseThrow(() -> new Exception("Nenhuma autorização foi encontrada!"));
-
-            final AuthorityApproval approval = approvalService.findByAuthority(authority);
             final MeansurementFileResult result = this.getResult(execution);
 
             if (!Optional.ofNullable(result.getAmountLiquidoAdjusted()).isPresent()) {
                 execution.setVariable(CONTROLE, RESPONSE_SEM_ALCADA);
             } else {
+
+                final String authority = profile.getExpressionText();
+
+                MeansurementFileAuthority lastfileAuthority = this.fileAuthorityService
+                        .findByProcess(execution.getProcessInstanceId())
+                        .stream()
+                        .sorted(Comparator.comparing(MeansurementFileAuthority::getId).reversed())
+                        .findFirst()
+                        .orElseThrow(() -> new Exception("Nenhuma autorização foi encontrada!"));
+
+                final AuthorityApproval approval = approvalService.findByAuthority(authority);
 
                 final Double delta = Math.abs((result.getAmountLiquidoAdjusted() - result.getAmountLiquido()));
 
@@ -85,7 +86,7 @@ public class CheckLevelOfApproval implements JavaDelegate {
                     } else {
                         execution.setVariable(CONTROLE, RESPONSE_ENCAMINHAR_APROVACAO);
                     }
-                }               
+                }
             }
         } catch (Exception e) {
             Logger.getLogger(CheckLevelOfApproval.class.getName()).log(Level.SEVERE, "[execute]", e);
