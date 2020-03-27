@@ -59,26 +59,24 @@ public class CheckTake implements JavaDelegate {
                         .stream()
                         .sorted(Comparator.comparing(MeansurementFileAuthority::getId).reversed())
                         .findFirst();
-                
-                
-                if(opt.isPresent() && opt.get().getResult().equals("APROVADO")){
-                   value = result.getAmountLiquidoAdjusted();
-                }else{
+
+                if (opt.isPresent() && opt.get().getResult().equals(CONST_APPROVED)) {
+                    value = result.getAmountLiquidoAdjusted();
+                } else {
                     value = result.getAmountLiquido();
                 }
-                
-            }else{
-                 value = result.getAmountLiquido();
+
+            } else {
+                value = result.getAmountLiquido();
             }
-            
-            if(value.compareTo(result.getLimitMin()) <= 0){
+
+            if (value.compareTo(result.getLimitMin()) < 0) {
                 execution.setVariable(CONTROLE, RESPONSE_RECOMPRA);
-            }else if(value.compareTo(result.getLimitMax()) >= 0){
+            } else if (value.compareTo(result.getLimitMax()) > 0) {
                 execution.setVariable(CONTROLE, RESPONSE_CURTOPRAZO);
-            }else if(value.compareTo(result.getLimitMin()) > 0 && value.compareTo(result.getLimitMax()) < 0 ){
+            } else if (value.compareTo(result.getLimitMin()) >= 0 && value.compareTo(result.getLimitMax()) <= 0) {
                 execution.setVariable(CONTROLE, RESPONSE_FATURAMENTO);
             }
-            
 
         } catch (Exception e) {
             Logger.getLogger(CheckTake.class.getName()).log(Level.SEVERE, "[execute]", e);

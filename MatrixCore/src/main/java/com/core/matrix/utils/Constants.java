@@ -89,4 +89,9 @@ public class Constants {
     public static final String RESPONSE_FATURAMENTO = "ENVIAR PARA FATURAMENTO";
     public static final String RESPONSE_CURTOPRAZO = "CURTO PRAZO";  
     
+    public static final String VAR_MAX_PROFILE = "max_profile";
+    
+    public static final String CONST_APPROVED = "APROVADO";    
+    
+    
 }
