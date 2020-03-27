@@ -37,6 +37,7 @@ public class CheckLevelOfApproval implements JavaDelegate {
 
     private MeansurementFileResultService resultService;
     private MeansurementFileAuthorityService fileAuthorityService;
+
     private AuthorityApprovalService approvalService;
     private LogService logService;
     public FixedValue profile;
@@ -67,21 +68,15 @@ public class CheckLevelOfApproval implements JavaDelegate {
 
                 final String authority = profile.getExpressionText();
 
-                MeansurementFileAuthority lastfileAuthority = this.fileAuthorityService
-                        .findByProcess(execution.getProcessInstanceId())
-                        .stream()
-                        .sorted(Comparator.comparing(MeansurementFileAuthority::getId).reversed())
-                        .findFirst()
-                        .orElseThrow(() -> new Exception("Nenhuma autorização foi encontrada!"));
-
-                final AuthorityApproval approval = approvalService.findByAuthority(authority);
-
                 final Double delta = Math.abs((result.getAmountLiquidoAdjusted() - result.getAmountLiquido()));
+                final AuthorityApproval approval = approvalService.findBetween(delta);
+
+                
 
                 if (delta.compareTo(approval.getMax()) <= 0) {
                     execution.setVariable(CONTROLE, RESPONSE_SEM_ALCADA);
                 } else if (delta.compareTo(approval.getMax()) > 0) {
-                    if (authority.equals(lastfileAuthority.getAuthority())) {
+                    if (authority.equals(approval.getAuthority())) {
                         execution.setVariable(CONTROLE, RESPONSE_SEM_ALCADA);
                     } else {
                         execution.setVariable(CONTROLE, RESPONSE_ENCAMINHAR_APROVACAO);

@@ -9,6 +9,7 @@ import com.core.matrix.model.AuthorityApproval;
 import com.core.matrix.repository.AuthorityApprovalRepository;
 import com.core.matrix.specifications.AuthorityApprovalSpecification;
 import java.util.ArrayList;
+import java.util.Comparator;
 import java.util.List;
 import java.util.Optional;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -52,12 +53,24 @@ public class AuthorityApprovalService {
                 .findByAuthority(value)
                 .orElseThrow(() -> new Exception("Alçada não encontrada! valor recebido -> " + value));
     }
-    
+
     @Transactional(readOnly = true)
     public AuthorityApproval findBetween(Double value) throws Exception {
-        return this.repository
-                .findValueBetween(value)
-                .orElseThrow(() -> new Exception("Alçada não encontrada! valor recebido -> " + value));
+        
+        Optional<AuthorityApproval> opt = this.repository
+                .findValueBetween(value);
+
+        if (opt.isPresent()) {
+            return opt.get();
+        } else {            
+            return this.repository
+                    .findAll()
+                    .stream()
+                    .sorted(Comparator.comparing(AuthorityApproval::getId).reversed())
+                    .findFirst()
+                    .orElseThrow(() -> new Exception("Alçada não encontrada! valor recebido -> " + value));
+        }
+
     }
 
     @Transactional(readOnly = true)
