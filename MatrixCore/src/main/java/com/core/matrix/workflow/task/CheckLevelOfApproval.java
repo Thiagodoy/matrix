@@ -24,6 +24,7 @@ import org.activiti.engine.task.TaskInfo;
 import org.springframework.context.ApplicationContext;
 
 import static com.core.matrix.utils.Constants.*;
+import org.activiti.engine.impl.el.FixedValue;
 
 /**
  *
@@ -36,8 +37,7 @@ public class CheckLevelOfApproval implements JavaDelegate {
     private MeansurementFileResultService resultService;
     private AuthorityApprovalService approvalService;
     private LogService logService;
-
-    List<MeansurementFileResult> resultList;
+    public FixedValue profile;
 
     public CheckLevelOfApproval(ApplicationContext context) {
         CheckLevelOfApproval.context = context;
@@ -55,14 +55,10 @@ public class CheckLevelOfApproval implements JavaDelegate {
     public void execute(DelegateExecution execution) throws Exception {
 
         try {
-
-            TaskInfo task = execution.getEngineServices()
-                    .getTaskService()
-                    .createTaskQuery()
-                    .executionId(execution.getId())
-                    .singleResult();
-
-            final String authority = task.getDescription();
+            
+            
+            final String authority = profile.getExpressionText();
+            
             final AuthorityApproval approval = approvalService.findByAuthority(authority);
             final MeansurementFileResult result = this.getResult(execution);
 

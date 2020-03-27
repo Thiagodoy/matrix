@@ -53,7 +53,7 @@ public class MeansurementFileAuthorityService {
     }
     
     @Transactional(readOnly = true)
-    public List<MeansurementFileAuthority> find(Long idMeansurementFile, String authority, String user, String userName) {
+    public List<MeansurementFileAuthority> find(Long idMeansurementFile, String processIntanceId, String authority, String user, String userName) {
 
         if (Optional.ofNullable(idMeansurementFile).isPresent()) {
             MeansurementFileAuthority mfa = this.repository.findByIdMeansurementFile(idMeansurementFile);
@@ -66,6 +66,10 @@ public class MeansurementFileAuthorityService {
         }
 
         List<Specification> specifications = new ArrayList();
+        
+        if (Optional.ofNullable(processIntanceId).isPresent()) {
+            specifications.add(MeansurementFileAuthoritySpecification.processIntanceId(processIntanceId));
+        }
 
         if (Optional.ofNullable(authority).isPresent()) {
             specifications.add(MeansurementFileAuthoritySpecification.authority(authority));

@@ -71,9 +71,10 @@ public class MeansurementFileAuthorityResource {
             @RequestParam(name = "idMeansurementFile", required = false) Long idMeansurementFile,
             @RequestParam(name = "authority", required = false) String authority,
             @RequestParam(name = "user", required = false) String user,
+            @RequestParam(name = "processIntanceId", required = false) String processIntanceId,
             @RequestParam(name = "userName", required = false) String userName) {
         try {
-            List<MeansurementFileAuthority> response = this.service.find(idMeansurementFile, authority, user, userName);
+            List<MeansurementFileAuthority> response = this.service.find(idMeansurementFile, processIntanceId, authority, user, userName);
             return ResponseEntity.ok(response);
         } catch (Exception e) {
             Logger.getLogger(MeansurementFileDetailResource.class.getName()).log(Level.SEVERE, "[get]", e);

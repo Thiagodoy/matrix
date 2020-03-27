@@ -26,4 +26,8 @@ public class MeansurementFileAuthoritySpecification {
     public static Specification<MeansurementFileAuthority> userName(String name) {
         return (root, criteriaQuery, criteriaBuilder) -> criteriaBuilder.like(criteriaBuilder.upper(root.get(MeansurementFileAuthority_.userName)), "%" + name.toUpperCase() + "%");
     }
+
+    public static Specification<MeansurementFileAuthority> processIntanceId(String id) {
+        return (root, criteriaQuery, criteriaBuilder) -> criteriaBuilder.equal(root.get(MeansurementFileAuthority_.processInstanceId), id);
+    }
 }

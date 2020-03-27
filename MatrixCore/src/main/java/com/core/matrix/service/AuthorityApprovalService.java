@@ -50,7 +50,14 @@ public class AuthorityApprovalService {
     public AuthorityApproval findByAuthority(String value) throws Exception {
         return this.repository
                 .findByAuthority(value)
-                .orElseThrow(() -> new Exception("Alçada não encontrada!"));
+                .orElseThrow(() -> new Exception("Alçada não encontrada! valor recebido -> " + value));
+    }
+    
+    @Transactional(readOnly = true)
+    public AuthorityApproval findBetween(Double value) throws Exception {
+        return this.repository
+                .findValueBetween(value)
+                .orElseThrow(() -> new Exception("Alçada não encontrada! valor recebido -> " + value));
     }
 
     @Transactional(readOnly = true)
