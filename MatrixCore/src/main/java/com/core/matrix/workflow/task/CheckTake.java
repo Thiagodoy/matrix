@@ -70,11 +70,11 @@ public class CheckTake implements JavaDelegate {
                 value = result.getAmountLiquido();
             }
 
-            if (value.compareTo(result.getLimitMin()) < 0) {
+            if (value.compareTo(result.getQtdHiredMin()) < 0) {
                 execution.setVariable(CONTROLE, RESPONSE_RECOMPRA);
-            } else if (value.compareTo(result.getLimitMax()) > 0) {
+            } else if (value.compareTo(result.getQtdHiredMax()) > 0) {
                 execution.setVariable(CONTROLE, RESPONSE_CURTOPRAZO);
-            } else if (value.compareTo(result.getLimitMin()) >= 0 && value.compareTo(result.getLimitMax()) <= 0) {
+            } else if (value.compareTo(result.getQtdHiredMin()) >= 0 && value.compareTo(result.getQtdHiredMax()) <= 0) {
                 execution.setVariable(CONTROLE, RESPONSE_FATURAMENTO);
             }
 
