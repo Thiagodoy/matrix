@@ -134,6 +134,12 @@ public class MeansurementFileResult {
     @Column(name = "justificativa")
     private String justify;
 
+    @Column(name = "preco_contratado")
+    private Double price;
+    
+    @Column(name = "wbc_submercado")
+    private Integer wbcSubmercado;
+    
     public MeansurementFileResult(ContractWbcInformationDTO informationDTO, String idProcess) {
 
         this.qtdHiredMin = informationDTO.getQtdHiredMin();
@@ -142,6 +148,7 @@ public class MeansurementFileResult {
         this.idProcess = idProcess;
         this.limitMin = informationDTO.getLimitMin();
         this.limitMax = informationDTO.getLimitMax();
+        this.price = informationDTO.getPrice();
 
     }
     

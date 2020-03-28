@@ -105,7 +105,7 @@ public class CalculateTask implements Task {
             final double percentLoss = compInformation.getPercentOfLoss() / 100;
             final double proinfa = this.getProinfa(file, compInformation.getProinfas());
             final double sum = this.getSumConsumptionActive(details);
-
+            
             double consumptionTotal = ((sum / 1000) + ((sum / 1000) * percentLoss) - proinfa) * factorAtt;
 
             String point = file.getMeansurementPoint().replaceAll("\\((L|B)\\)", "").trim();
@@ -128,6 +128,9 @@ public class CalculateTask implements Task {
             fileResult.setPercentLoss(percentLoss);
             fileResult.setProinfa(proinfa);
             fileResult.setFactorAtt(factorAtt);
+            fileResult.setWbcSubmercado(compInformation.getWbcSubmercado());
+            
+
 
             resultService.save(fileResult);
 
