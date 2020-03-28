@@ -13,4 +13,21 @@
                 <skipTests>true</skipTests>
             </properties>
         </action>
+        <action>
+            <actionName>run</actionName>
+            <packagings>
+                <packaging>jar</packaging>
+            </packagings>
+            <goals>
+                <goal>spring-boot:run</goal>
+                
+            </goals>
+            <properties>
+                <spring-boot.run.jvmArguments>-noverify -XX:TieredStopAtLevel=1 -Dspring.profiles.active=hml</spring-boot.run.jvmArguments>
+                <spring-boot.run.mainClass>com.core.matrix.MatrixApplication</spring-boot.run.mainClass>
+                <Env.SPRING_OUTPUT_ANSI_ENABLED>always</Env.SPRING_OUTPUT_ANSI_ENABLED>
+                
+                
+            </properties>
+        </action>
     </actions>
