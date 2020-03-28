@@ -71,8 +71,22 @@ public class CheckLevelOfApproval implements JavaDelegate {
                 final Double delta = Math.abs((result.getAmountLiquidoAdjusted() - result.getAmountLiquido()));
                 final AuthorityApproval approval = approvalService.findBetween(delta);
 
+            Logger.getLogger(CheckLevelOfApproval.class.getName()).log(Level.INFO, "delta -> " + delta);
+            Logger.getLogger(CheckLevelOfApproval.class.getName()).log(Level.INFO, "authority ->" + authority);
+            Logger.getLogger(CheckLevelOfApproval.class.getName()).log(Level.INFO, "getAuthority ->" + approval.getAuthority());
+            Logger.getLogger(CheckLevelOfApproval.class.getName()).log(Level.INFO, "getMax ->" + approval.getMax());
+                    
+                if (authority.equals(approval.getAuthority())) {
                 
-
+                    execution.setVariable(CONTROLE, RESPONSE_SEM_ALCADA);
+                    
+                } else {
+                        
+                    execution.setVariable(CONTROLE, RESPONSE_ENCAMINHAR_APROVACAO);
+                    
+                }
+            
+                /*
                 if (delta.compareTo(approval.getMax()) <= 0) {
                     execution.setVariable(CONTROLE, RESPONSE_SEM_ALCADA);
                 } else if (delta.compareTo(approval.getMax()) > 0) {
@@ -82,6 +96,7 @@ public class CheckLevelOfApproval implements JavaDelegate {
                         execution.setVariable(CONTROLE, RESPONSE_ENCAMINHAR_APROVACAO);
                     }
                 }
+                */
             }
         } catch (Exception e) {
             Logger.getLogger(CheckLevelOfApproval.class.getName()).log(Level.SEVERE, "[execute]", e);

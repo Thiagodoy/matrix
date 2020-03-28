@@ -62,7 +62,7 @@ public class MeansurementFileResultResource {
 
         try {
 
-            List<MeansurementFileResultStatusDTO> response = this.service.getStatusBilling(year, month);
+            List<MeansurementFileResultStatusDTO> response = this.service.getStatusBilling(year, month);           
             return ResponseEntity.ok(response);
 
         } catch (Exception e) {

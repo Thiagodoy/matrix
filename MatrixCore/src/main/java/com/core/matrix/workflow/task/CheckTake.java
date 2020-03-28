@@ -76,7 +76,7 @@ public class CheckTake implements JavaDelegate {
             Logger.getLogger(CheckTake.class.getName()).log(Level.INFO, "value max->" + result.getQtdHiredMax());
             
             Logger.getLogger(CheckTake.class.getName()).log(Level.INFO, "RESPONSE_RECOMPRA ->" + (value.compareTo(result.getQtdHiredMin()) < 0));
-            Logger.getLogger(CheckTake.class.getName()).log(Level.INFO, "RESPONSE_CURTOPRAZO ->" + (value.compareTo(result.getQtdHiredMin()) > 0));
+            Logger.getLogger(CheckTake.class.getName()).log(Level.INFO, "RESPONSE_CURTOPRAZO ->" + (value.compareTo(result.getQtdHiredMax()) > 0));
             Logger.getLogger(CheckTake.class.getName()).log(Level.INFO, "RESPONSE_FATURAMENTO ->" + (value.compareTo(result.getQtdHiredMin()) >= 0 && value.compareTo(result.getQtdHiredMax()) <= 0));
             
             
