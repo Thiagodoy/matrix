@@ -105,15 +105,23 @@ public class FileValidationTask implements JavaDelegate {
 
                     String extension = fileName.substring(fileName.indexOf('.'), fileName.length());
 
-                    BeanIoReader reader = new BeanIoReader();
-                    Optional<FileParsedDTO> fileParsed = reader.<FileParsedDTO>parse(stream);
+                    if (!".csv".equals(extension)) {
+                    
+                        this.generateLog (de, null, "As extensões de arquivos de medição devem ser .csv : " + fileName);          
+                    
+                    } else {
+                    
+                        BeanIoReader reader = new BeanIoReader();
+                        Optional<FileParsedDTO> fileParsed = reader.<FileParsedDTO>parse(stream);
 
-                    if (!reader.getErrors().isEmpty()) {
-                        writeFile(fileName, reader.getErrors(), de);
-                    } else if (fileParsed.isPresent()) {
-                        mountFile(fileParsed.get(), attachmentId, user, files);
+                        if (!reader.getErrors().isEmpty()) {
+                            writeFile(fileName, reader.getErrors(), de);
+                        } else if (fileParsed.isPresent()) {
+                            mountFile(fileParsed.get(), attachmentId, user, files);
+                        }
+
                     }
-
+                    
                 } catch (Exception e) {
                     Logger.getLogger(FileValidationTask.class.getName()).log(Level.SEVERE, "[ forEach ]", e);
                     this.generateLog(de, e, "Erro ao processar o arquivo : " + fileName);

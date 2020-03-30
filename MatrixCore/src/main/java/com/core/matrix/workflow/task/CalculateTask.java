@@ -17,8 +17,10 @@ import com.core.matrix.service.LogService;
 
 import com.core.matrix.service.MeansurementFileResultService;
 import com.core.matrix.service.MeansurementFileService;
+import com.core.matrix.utils.Constants;
 import com.core.matrix.wbc.dto.ContractWbcInformationDTO;
 import com.core.matrix.wbc.dto.CompanyDTO;
+import com.core.matrix.wbc.dto.ContractDTO;
 import com.core.matrix.wbc.service.ContractService;
 import com.core.matrix.wbc.service.EmpresaService;
 import java.math.BigDecimal;
@@ -71,11 +73,32 @@ public class CalculateTask implements Task {
     public void execute(DelegateExecution de) {
 
         List<MeansurementFile> files = fileService.findByProcessInstanceId(de.getProcessInstanceId());
-
+        
         if (files.size() > 1) {
             this.calculateWithRateio(de, files);
         } else {
-            this.calculateWithoutRateio(de, files.get(0));
+            
+            try {
+                
+                final List<ContractDTO> contracts = (List<ContractDTO>) de.getVariable(Constants.LIST_CONTRACTS_FOR_BILLING, Object.class);
+                
+                
+                Logger.getLogger(CalculateTask.class.getName()).log(Level.INFO, "[ tamanho ] "  + contracts.size());
+                Logger.getLogger(CalculateTask.class.getName()).log(Level.INFO, "[ rateio ]  "  + contracts.get(0).getBFlRateio());
+                Logger.getLogger(CalculateTask.class.getName()).log(Level.INFO, "[ rateio ]  "  + contracts.get(0).getNCdContrato());
+            
+                if (contracts.get(0).getBFlRateio().equals(1L)) {
+                    this.calculateWithRateio(de, files);  
+                } else {
+                    this.calculateWithoutRateio(de, files.get(0));
+                }
+
+            
+            
+            } catch (Exception e) {
+                
+            }
+
         }
 
     }
@@ -230,7 +253,8 @@ public class CalculateTask implements Task {
                     fileResult.setPercentLoss(percentLoss);
                     fileResult.setProinfa(proinfa);
                     fileResult.setContractParent(0L);
-
+                    fileResult.setWbcSubmercado(contractInformation.getWbcSubmercado());
+                    
                     results.add(fileResult);
                     resultService.save(fileResult);
 
@@ -264,7 +288,7 @@ public class CalculateTask implements Task {
             fileResult.setWbcContract(contractInformationParent.getCodeWbcContract());
             fileResult.setContractParent(1L);
             fileResult.setNameCompany(name);
-
+            fileResult.setWbcSubmercado(contractInformationParent.getWbcSubmercado());
             resultService.save(fileResult);
 
         } catch (Exception e) {

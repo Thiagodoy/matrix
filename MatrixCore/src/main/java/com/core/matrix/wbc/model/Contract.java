@@ -222,7 +222,7 @@ import lombok.Data;
         + "  WHERE CT.[nCdContrato] = SZ.[nCdContrato]\n"
         + "    AND SZ.[nCdContrato] = RO.[nCdContrato]\n"
         + "    AND SZ.[nCdRegraOpcionalidade] = RO.[nCdRegraOpcionalidade]\n"
-        + "    AND CT.[sNrContrato] = :contractId\n"
+        + "    AND (CT.[sNrContrato] = :contractId or CT.nCdContrato = :contractId) \n"
         + "    AND SZ.[nNrAno] = :year\n"
         + "    AND SZ.[nNrMes] = :month ", name = "Contract.getInformation", resultSetMapping = "contractInformation")
 
