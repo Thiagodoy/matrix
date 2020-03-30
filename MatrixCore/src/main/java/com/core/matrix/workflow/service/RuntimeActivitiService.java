@@ -18,7 +18,6 @@ import com.core.matrix.utils.Constants;
 import com.core.matrix.utils.Utils;
 import com.core.matrix.workflow.model.GroupMemberActiviti;
 import com.core.matrix.workflow.model.UserActiviti;
-import com.sun.javafx.scene.control.skin.VirtualFlow;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.ArrayList;

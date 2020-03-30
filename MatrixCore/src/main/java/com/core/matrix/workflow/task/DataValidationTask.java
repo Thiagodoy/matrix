@@ -8,15 +8,19 @@ package com.core.matrix.workflow.task;
 import com.core.matrix.io.BeanIoReader;
 import com.core.matrix.model.MeansurementFile;
 import com.core.matrix.model.MeansurementFileDetail;
+import com.core.matrix.service.LogService;
 import com.core.matrix.service.MeansurementFileDetailService;
 import com.core.matrix.service.MeansurementFileService;
 import static com.core.matrix.utils.Constants.*;
 import com.core.matrix.utils.MeansurementFileDetailStatus;
 import com.core.matrix.utils.MeansurementFileStatus;
+import java.text.Format;
+import java.text.SimpleDateFormat;
 import java.time.LocalDate;
 import java.time.Month;
 import java.time.YearMonth;
 import java.util.ArrayList;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
@@ -25,6 +29,7 @@ import java.util.logging.Logger;
 import java.util.stream.Collectors;
 import org.activiti.engine.delegate.DelegateExecution;
 import org.springframework.context.ApplicationContext;
+import com.core.matrix.model.Log;
 
 /**
  *
@@ -35,6 +40,8 @@ public class DataValidationTask implements Task {
     private MeansurementFileService fileService;
     private MeansurementFileDetailService fileDetailService;
 
+    private LogService logService;
+
     private DelegateExecution delegateExecution;
     private static ApplicationContext context;
 
@@ -42,6 +49,7 @@ public class DataValidationTask implements Task {
         synchronized (DataValidationTask.context) {
             this.fileService = DataValidationTask.context.getBean(MeansurementFileService.class);
             this.fileDetailService = DataValidationTask.context.getBean(MeansurementFileDetailService.class);
+            this.logService = context.getBean(LogService.class);
         }
     }
 
@@ -58,7 +66,7 @@ public class DataValidationTask implements Task {
 
         files.forEach(file -> {
             Logger.getLogger(BeanIoReader.class.getName()).log(Level.SEVERE, "File id -> " + file.getId());
-            file.setStatus(MeansurementFileStatus.SUCCESS);           
+            file.setStatus(MeansurementFileStatus.SUCCESS);
         });
 
         files.stream().forEach(file -> {
@@ -69,15 +77,22 @@ public class DataValidationTask implements Task {
                 this.checkHour(file);
 
             } catch (Exception e) {
+
+                Log log = new Log();
+                log.setMessage(e.getMessage());
+                log.setNameProcesso(de.getProcessInstanceId());
+                this.logService.save(log);
+
                 Logger.getLogger(DataValidationTask.class.getName()).log(Level.SEVERE, "[execute]", e);
                 de.setVariable(CONTROLE, RESPONSE_INVALID_DATA);
+
             }
 
         });
 
         boolean hasInvalidaData = files.stream().anyMatch(mdf -> mdf.getStatus().equals(MeansurementFileStatus.DATA_CALENDAR_ERROR));
         boolean hasDataForPersist = files.stream().anyMatch(mdf -> mdf.getStatus().equals(MeansurementFileStatus.DATA_DAY_ERROR) || mdf.getStatus().equals(MeansurementFileStatus.DATA_HOUR_ERROR));
-        
+
         if (hasInvalidaData) {
             de.setVariable(CONTROLE, RESPONSE_INVALID_DATA);
         } else if (hasDataForPersist) {
@@ -85,18 +100,16 @@ public class DataValidationTask implements Task {
         } else {
             de.setVariable(CONTROLE, RESPONSE_DATA_IS_VALID);
         }
-
+        
     }
 
     private void checkCalendar(MeansurementFile file) throws Exception {
 
+        long monthTeste = file.getMonth();
+
         int daysOnMonth = YearMonth.of(file.getYear().intValue(), Month.of(file.getMonth().intValue())).lengthOfMonth();
         LocalDate init = LocalDate.of(file.getYear().intValue(), file.getMonth().intValue(), 1);
         LocalDate end = LocalDate.of(file.getYear().intValue(), file.getMonth().intValue(), daysOnMonth);
-        
-        
-        
-        
 
         Map<String, List<MeansurementFileDetail>> lotes = this.getDetails(file, delegateExecution)
                 .stream()
@@ -121,7 +134,7 @@ public class DataValidationTask implements Task {
             }
 
         });
-
+        
         if (!details.isEmpty()) {
             file.setStatus(MeansurementFileStatus.DATA_CALENDAR_ERROR);
             fileService.updateStatus(MeansurementFileStatus.DATA_CALENDAR_ERROR, file.getId());
