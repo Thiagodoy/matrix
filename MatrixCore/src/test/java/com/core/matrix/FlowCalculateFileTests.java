@@ -34,9 +34,9 @@ class FlowCalculateFileTests {
         
      //Get task
      
-        Task task = taskService.createTaskQuery().taskId("355114").singleResult();
+        Task task = taskService.createTaskQuery().taskId("322510").singleResult();
         
-        File file1 = new File("exportacao_mantovani_226591_EMBALATEC MOGI_1.csv");
+        File file1 = new File("CONIMELFUNDICAO-2020-02-(A)_a3fb_(1).csv");
         
         InputStream ip = new FileInputStream(file1);
         
@@ -44,30 +44,30 @@ class FlowCalculateFileTests {
                 .createAttachment("application/vnd.ms-excel", null, task.getProcessInstanceId(), file1.getName(), "attachmentDescription", ip);
          
          
-         
-         File file2 = new File("exportacao_mantovani_226591_EMBALATEC SALTO_1.csv");
-        
-        InputStream ip2 = new FileInputStream(file2);
-        
-         Attachment attachment2 = taskService
-                .createAttachment("application/vnd.ms-excel", null, task.getProcessInstanceId(), file2.getName(), "attachmentDescription", ip2);
-         
-         
+//         
+//         File file2 = new File("exportacao_mantovani_226591_EMBALATEC SALTO_1.csv");
+//        
+//        InputStream ip2 = new FileInputStream(file2);
+//        
+//         Attachment attachment2 = taskService
+//                .createAttachment("application/vnd.ms-excel", null, task.getProcessInstanceId(), file2.getName(), "attachmentDescription", ip2);
          
          
-         File file3 = new File("exportacao_mantovani_226591_EMBALATEC_1.csv");
-        
-        InputStream ip3 = new FileInputStream(file3);
-        
-         Attachment attachment3 = taskService
-                .createAttachment("application/vnd.ms-excel", null, task.getProcessInstanceId(), file3.getName(), "attachmentDescription", ip3);
+         
+         
+//         File file3 = new File("exportacao_mantovani_226591_EMBALATEC_1.csv");
+//        
+//        InputStream ip3 = new FileInputStream(file3);
+//        
+//         Attachment attachment3 = taskService
+//                .createAttachment("application/vnd.ms-excel", null, task.getProcessInstanceId(), file3.getName(), "attachmentDescription", ip3);
          
          
         
          
          Map<String,Object>parameters = new HashMap<>();
          
-         parameters.put(LIST_ATTACHMENT_ID, Arrays.asList(attachment1.getId(),attachment2.getId(),attachment3.getId()));
+         parameters.put(LIST_ATTACHMENT_ID, Arrays.asList(attachment1.getId()));
          
          taskService.complete(task.getId(), parameters);
          
