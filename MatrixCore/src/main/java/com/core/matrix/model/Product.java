@@ -12,7 +12,6 @@ import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
-import javax.persistence.PrePersist;
 import javax.persistence.Table;
 import lombok.Data;
 import org.hibernate.annotations.Generated;
@@ -32,11 +31,17 @@ public class Product implements Serializable {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
+    @Column(name = "wbc_codigo_perfilCCEE")
+    private Long wbcCodigoPerfilCCEE;
+        
+    @Column(name = "wbc_perfilCCEE")
+    private String wbcPerfilCCEE;
+
+    @Column(name = "wbc_siglaCCEE")
+    private String wbcSiglaCCEE;
+        
     @Column(name = "wbc_submercado")
     private Long subMarket;
-
-    @Column(name = "produto")
-    private String name;
 
     @Column(name = "pld")
     private Double pld;
@@ -61,9 +66,17 @@ public class Product implements Serializable {
         if (Optional.ofNullable(product.getSubMarket()).isPresent() && !this.subMarket.equals(product.getSubMarket())) {
             this.subMarket = product.getSubMarket();
         }
-
-        if (Optional.ofNullable(product.getName()).isPresent() && !this.name.equals(product.getName())) {
-            this.name = product.getName();
+        
+        if (Optional.ofNullable(product.getWbcCodigoPerfilCCEE()).isPresent() && !this.wbcCodigoPerfilCCEE.equals(product.getWbcCodigoPerfilCCEE())) {
+            this.wbcCodigoPerfilCCEE = product.getWbcCodigoPerfilCCEE();
+        }
+        
+        if (Optional.ofNullable(product.getWbcPerfilCCEE()).isPresent() && !this.wbcPerfilCCEE.equals(product.getWbcPerfilCCEE())) {
+            this.wbcPerfilCCEE = product.getWbcPerfilCCEE();
+        }
+        
+        if (Optional.ofNullable(product.getWbcSiglaCCEE()).isPresent() && !this.wbcSiglaCCEE.equals(product.getWbcSiglaCCEE())) {
+            this.wbcSiglaCCEE = product.getWbcSiglaCCEE();
         }
 
         if (Optional.ofNullable(product.getPld()).isPresent() && !this.pld.equals(product.getPld())) {

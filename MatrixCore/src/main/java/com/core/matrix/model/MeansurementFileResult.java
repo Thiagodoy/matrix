@@ -51,7 +51,6 @@ import lombok.NoArgsConstructor;
         + "    a.mes,\n"
         + "    a.wbc_contrato,\n"
         + "    a.wbc_ponto_de_medicao,\n"
-        //+ "    b.montante_liquido,\n"
         + " case b.justificativa when 'APROVADO' then b.montante_liquido_ajustado else b.montante_liquido end as montante_liquido,\n"
         + "    a.status\n"
         + "FROM\n"
@@ -59,7 +58,6 @@ import lombok.NoArgsConstructor;
         + "        INNER JOIN\n"
         + "    mtx_arquivo_de_medicao_resultado b ON a.id_arquivo_de_medicao = b.id_arquivo_de_medicao\n"
         + "WHERE\n"
-        //+ "    a.status IN ('FILE_PENDING' , 'APPROVED', 'SUCCESS')\n"
         + "    a.status IN ('APPROVED')\n"
         + "        AND (contrato_pai = 1 or contrato_pai is null)\n"
         + "        AND a.ano = :year\n"
@@ -142,6 +140,9 @@ public class MeansurementFileResult {
     
     @Column(name = "wbc_submercado")
     private Integer wbcSubmercado;
+    
+    @Column(name = "wbc_perfilCCEE")
+    private Integer wbcPerfilCCEE;
     
     public MeansurementFileResult(ContractWbcInformationDTO informationDTO, String idProcess) {
 

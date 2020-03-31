@@ -64,6 +64,10 @@ public class ContractFullInformationDTO {
     private Long nCdAgrupador;
     
     private String sDsAgrupador;
+    
+    private Long nCdSiglaCCEEContratante;
+    
+    private Long nCdPerfilCCEE;
 
     public ContractFullInformationDTO(
             Long nCdContrato,
@@ -88,7 +92,9 @@ public class ContractFullInformationDTO {
             Long nCdContratoPai,
             String sNrReferencia,
             Long nCdAgrupador,
-            String sDsAgrupador
+            String sDsAgrupador,
+            Long nCdSiglaCCEEContratante,
+            Long nCdPerfilCCEE
     ) {
 
         this.nCdContrato = nCdContrato;
@@ -114,6 +120,8 @@ public class ContractFullInformationDTO {
         this.sNrReferencia = sNrReferencia;
         this.nCdAgrupador = nCdAgrupador;
         this.sDsAgrupador = sDsAgrupador;
+        this.nCdSiglaCCEEContratante = nCdSiglaCCEEContratante;
+        this.nCdPerfilCCEE = nCdPerfilCCEE;        
 
     }
 
