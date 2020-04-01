@@ -20,7 +20,7 @@ import org.springframework.web.bind.annotation.RestController;
 public class AssetResource {
     
     
-    private String version = "v1.0.8";
+    private String version = "v1.0.9";
     
     
     @RequestMapping(value = "/versao",method = RequestMethod.GET)
