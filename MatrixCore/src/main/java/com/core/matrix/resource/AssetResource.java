@@ -13,18 +13,16 @@ import org.springframework.web.bind.annotation.RestController;
 
 /**
  *
- * @author thiag  
+ * @author thiag
  */
-@RestController 
+@RestController
 @RequestMapping(value = "/asset")
 public class AssetResource {
-    
-    
-    private String version = "v1.0.9";
-    
-    
-    @RequestMapping(value = "/versao",method = RequestMethod.GET)
-    public ResponseEntity getVersao()throws IOException {
+
+    private String version = "v1.0.10";
+
+    @RequestMapping(value = "/versao", method = RequestMethod.GET)
+    public ResponseEntity getVersao() throws IOException {
         return ResponseEntity.ok(this.version);
     }
 

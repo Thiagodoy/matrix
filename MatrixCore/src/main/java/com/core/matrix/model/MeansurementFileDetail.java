@@ -134,9 +134,9 @@ public class MeansurementFileDetail implements Serializable {
         }
 
     }
-    
-    private LocalDate parseToLocaDate(String value){
-    
+
+    private LocalDate parseToLocaDate(String value) {
+
         try {
             DateTimeFormatter formater = DateTimeFormatter.ofPattern("dd/MM/yyyy");
             return LocalDate.parse(value, formater);
@@ -146,8 +146,7 @@ public class MeansurementFileDetail implements Serializable {
         }
     }
 
-
-    public MeansurementFileDetail(FileDetailDTO detail, MeansurementFileType type) {        
+    public MeansurementFileDetail(FileDetailDTO detail, MeansurementFileType type) {
 
         this.status = MeansurementFileDetailStatus.SUCCESS;
 
@@ -187,6 +186,15 @@ public class MeansurementFileDetail implements Serializable {
                 this.generationActive = this.parseToDouble(detail.getGenerationActive());
                 this.consumptionReactivate = this.parseToDouble(detail.getConsumptionReactivate());
                 this.generationReactivate = this.parseToDouble(detail.getGenerationReactivate());
+                this.quality = detail.getQuality();
+                this.origem = detail.getOrigem();
+                break;
+            case LAYOUT_C_1:
+                this.agent = detail.getAgent();
+                this.meansurementPoint = detail.getMeansurementPoint();
+                this.date = this.parseToLocaDate(detail.getDate());
+                this.hour = Long.valueOf(detail.getHour());
+                this.consumptionActive = this.parseToDouble(detail.getConsumptionActive());
                 this.quality = detail.getQuality();
                 this.origem = detail.getOrigem();
                 break;
