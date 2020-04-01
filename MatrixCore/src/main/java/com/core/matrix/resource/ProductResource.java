@@ -73,10 +73,11 @@ public class ProductResource {
             @RequestParam(name = "subMarket", required = false) Long subMarket,
             @RequestParam(name = "wbcCodigoPerfilCCEE", required = false) Long wbcCodigoPerfilCCEE,
             @RequestParam(name = "wbcPerfilCCEE", required = false) String wbcPerfilCCEE,
+            @RequestParam(name = "subMarketDescription", required = false) String subMarketDescription,
             @RequestParam(name = "page", required = false, defaultValue = "0") int page,
             @RequestParam(name = "size", required = false, defaultValue = "10") int size) {
         try {
-            Page response = this.service.find(subMarket, wbcCodigoPerfilCCEE, wbcPerfilCCEE, PageRequest.of(page, size, Sort.by("wbcPerfilCCEE")));
+            Page response = this.service.find(subMarket, wbcCodigoPerfilCCEE, wbcPerfilCCEE, subMarketDescription, PageRequest.of(page, size, Sort.by("wbcPerfilCCEE")));
             return ResponseEntity.ok(response);
         } catch (Exception e) {
             Logger.getLogger(ProductResource.class.getName()).log(Level.SEVERE, "[get]", e);

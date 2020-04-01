@@ -51,7 +51,7 @@ public class ProductService {
     }
 
     @Transactional(readOnly = true)
-    public Page find(Long subMarket, Long wbcCodigoPerfilCCEE, String wbcPerfilCCEE, Pageable page) {
+    public Page find(Long subMarket, Long wbcCodigoPerfilCCEE, String wbcPerfilCCEE, String subMarketDescription, Pageable page) {
 
         List<Specification> predicates = new ArrayList<>();
 
@@ -65,6 +65,10 @@ public class ProductService {
 
         if (Optional.ofNullable(wbcCodigoPerfilCCEE).isPresent()) {
             predicates.add(ProductSpecification.codigoPerfilCCEE(wbcCodigoPerfilCCEE));
+        }
+        
+        if (Optional.ofNullable(subMarketDescription).isPresent()) {
+            predicates.add(ProductSpecification.subMarketDescription(subMarketDescription));
         }
                 
         Specification<Product> spc = predicates.stream().reduce((a, b) -> a.and(b)).orElse(null);

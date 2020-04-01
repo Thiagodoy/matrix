@@ -26,4 +26,8 @@ public class ProductSpecification {
     public static Specification<Product> codigoPerfilCCEE(Long wbcCodigoPerfilCCEE) {
         return (root, criteriaQuery, criteriaBuilder) -> criteriaBuilder.equal(root.get(Product_.wbcCodigoPerfilCCEE), wbcCodigoPerfilCCEE);
     }     
+    
+    public static Specification<Product> subMarketDescription(String subMarketDescription) {
+        return (root, criteriaQuery, criteriaBuilder) -> criteriaBuilder.equal(root.get(Product_.subMarketDescription), subMarketDescription);
+    } 
 }

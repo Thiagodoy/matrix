@@ -43,6 +43,9 @@ public class Product implements Serializable {
     @Column(name = "wbc_submercado")
     private Long subMarket;
 
+    @Column(name = "wbc_descricao_submercado")
+    private String subMarketDescription;
+    
     @Column(name = "pld")
     private Double pld;
 
@@ -65,6 +68,11 @@ public class Product implements Serializable {
 
         if (Optional.ofNullable(product.getSubMarket()).isPresent() && !this.subMarket.equals(product.getSubMarket())) {
             this.subMarket = product.getSubMarket();
+        }
+        
+        if (Optional.ofNullable(product.getSubMarket()).isPresent() && !this.subMarketDescription.equals(product.getSubMarketDescription())) {
+            this.subMarketDescription = product.getSubMarketDescription();
+        
         }
         
         if (Optional.ofNullable(product.getWbcCodigoPerfilCCEE()).isPresent() && !this.wbcCodigoPerfilCCEE.equals(product.getWbcCodigoPerfilCCEE())) {
