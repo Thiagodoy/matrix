@@ -17,8 +17,11 @@ import com.core.matrix.service.LogService;
 
 import com.core.matrix.service.MeansurementFileResultService;
 import com.core.matrix.service.MeansurementFileService;
+import com.core.matrix.utils.Constants;
 import com.core.matrix.wbc.dto.ContractWbcInformationDTO;
 import com.core.matrix.wbc.dto.CompanyDTO;
+import com.core.matrix.wbc.dto.ContractDTO;
+import com.core.matrix.wbc.model.Contract;
 import com.core.matrix.wbc.service.ContractService;
 import com.core.matrix.wbc.service.EmpresaService;
 import java.math.BigDecimal;
@@ -26,6 +29,7 @@ import java.math.RoundingMode;
 import java.text.MessageFormat;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 import java.util.Optional;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -48,7 +52,8 @@ public class CalculateTask implements Task {
 
     private MeansurementFileResultService resultService;
     private ContractService contractWbcService;
-
+    
+            
     public CalculateTask() {
 
         synchronized (CalculateTask.context) {
@@ -71,16 +76,29 @@ public class CalculateTask implements Task {
     public void execute(DelegateExecution de) {
 
         List<MeansurementFile> files = fileService.findByProcessInstanceId(de.getProcessInstanceId());
+        
+        try {
+            
+            final List<ContractDTO> contracts = (List<ContractDTO>) de.getVariable(Constants.LIST_CONTRACTS_FOR_BILLING, Object.class);
 
-        if (files.size() > 1) {
-            this.calculateWithRateio(de, files);
-        } else {
-            this.calculateWithoutRateio(de, files.get(0));
+            if (contracts.get(0).getBFlRateio().equals(1L)) {               
+                this.calculateWithRateio(de, files, contracts);         
+            }               
+            else {               
+                this.calculateWithoutRateio(de, files.get(0), contracts);            
+            }
+
+        } catch (Exception e) {
+            Logger.getLogger(CalculateTask.class.getName()).log(Level.SEVERE, "[ execute ]", e);
+            Log log = new Log();
+            log.setActIdProcesso(de.getProcessInstanceId());
+            log.setMessage("Erro ao selecionar processo de rateio ou sem rateio.");
+            log.setMessageErrorApplication(e.getMessage());
+            logService.save(log); 
         }
+}
 
-    }
-
-    public void calculateWithoutRateio(DelegateExecution de, MeansurementFile file) {
+    public void calculateWithoutRateio(DelegateExecution de, MeansurementFile file, List<ContractDTO> contracts) {
 
         try {
 
@@ -129,8 +147,7 @@ public class CalculateTask implements Task {
             fileResult.setProinfa(proinfa);
             fileResult.setFactorAtt(factorAtt);
             fileResult.setWbcSubmercado(compInformation.getWbcSubmercado());
-            
-
+            fileResult.setWbcPerfilCCEE(consultaPerfilCCEE(contracts,Long.valueOf(contractWbcInformationDTO.getNrContract())));
 
             resultService.save(fileResult);
 
@@ -150,7 +167,7 @@ public class CalculateTask implements Task {
         return new BigDecimal(value).setScale(qtd, RoundingMode.HALF_EVEN).doubleValue();
     }
 
-    public void calculateWithRateio(DelegateExecution de, List<MeansurementFile> files) {
+    public void calculateWithRateio(DelegateExecution de, List<MeansurementFile> files, List<ContractDTO> contracts) {
 
         try {
             List<MeansurementFileDetail> details = new ArrayList<>();
@@ -230,7 +247,9 @@ public class CalculateTask implements Task {
                     fileResult.setPercentLoss(percentLoss);
                     fileResult.setProinfa(proinfa);
                     fileResult.setContractParent(0L);
-
+                    fileResult.setWbcSubmercado(contractInformation.getWbcSubmercado());
+                    
+                    
                     results.add(fileResult);
                     resultService.save(fileResult);
 
@@ -264,7 +283,9 @@ public class CalculateTask implements Task {
             fileResult.setWbcContract(contractInformationParent.getCodeWbcContract());
             fileResult.setContractParent(1L);
             fileResult.setNameCompany(name);
-
+            fileResult.setWbcSubmercado(contractInformationParent.getWbcSubmercado());
+            fileResult.setWbcPerfilCCEE(consultaPerfilCCEE(contracts,contractInformationParent.getWbcContract()));
+            
             resultService.save(fileResult);
 
         } catch (Exception e) {
@@ -304,7 +325,20 @@ public class CalculateTask implements Task {
         return solicitadoLiquido.doubleValue();
 
     }
+    
+    
+    public int consultaPerfilCCEE(List<ContractDTO> contracts, Long numeroContrato) {
+        int value = 0;
+        for(int i = 0; i < contracts.size(); i ++){
+            
+            if (Long.valueOf(contracts.get(i).getSNrContrato()).equals(numeroContrato)) {
+                value = contracts.get(i).getNCdPerfilCCEE().intValue();
+            }              
+        }
 
+        return value;
+    }
+    
     private Double getSumConsumptionActive(List<MeansurementFileDetail> details) {
         return details.stream()
                 .map(d -> new BigDecimal(d.getConsumptionActive()).setScale(6, RoundingMode.HALF_EVEN))

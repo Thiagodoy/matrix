@@ -68,6 +68,12 @@ public class MeansurementRepurchase implements Serializable {
     @Column(name = "act_id_processo")
     private String processInstanceId;
 
+    @Column(name = "pld")
+    private Double pld;
+        
+    @Column(name = "spread")
+    private Double spread;
+            
     public void update(MeansurementRepurchase meansurementRepurchase) {
 
         if (Optional.ofNullable(meansurementRepurchase.getMeansurementFileId()).isPresent() && !this.meansurementFileId.equals(meansurementRepurchase.getMeansurementFileId())) {
@@ -121,7 +127,14 @@ public class MeansurementRepurchase implements Serializable {
          if (Optional.ofNullable(meansurementRepurchase.getProcessInstanceId()).isPresent() && !this.processInstanceId.equals(meansurementRepurchase.getProcessInstanceId())) {
             this.processInstanceId = meansurementRepurchase.getProcessInstanceId();
         }
-
+         
+        if (Optional.ofNullable(meansurementRepurchase.getPld()).isPresent() && !this.pld.equals(meansurementRepurchase.getPld())) {
+            this.pld = meansurementRepurchase.getPld();
+        }
+                
+        if (Optional.ofNullable(meansurementRepurchase.getSpread()).isPresent() && !this.spread.equals(meansurementRepurchase.getSpread())) {
+            this.spread = meansurementRepurchase.getSpread();
+        }
     }
 
 }

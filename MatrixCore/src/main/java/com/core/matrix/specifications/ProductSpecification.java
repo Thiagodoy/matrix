@@ -19,7 +19,15 @@ public class ProductSpecification {
         return (root, criteriaQuery, criteriaBuilder) -> criteriaBuilder.equal(root.get(Product_.subMarket), code);
     }  
 
-    public static Specification<Product> product(String name) {
-        return (root, criteriaQuery, criteriaBuilder) -> criteriaBuilder.like(criteriaBuilder.upper(root.get(Product_.name)), "%" + name.toUpperCase() + "%");
+    public static Specification<Product> product(String wbcPerfilCCEE) {
+        return (root, criteriaQuery, criteriaBuilder) -> criteriaBuilder.like(criteriaBuilder.upper(root.get(Product_.wbcPerfilCCEE)), "%" + wbcPerfilCCEE.toUpperCase() + "%");
     }
+
+    public static Specification<Product> codigoPerfilCCEE(Long wbcCodigoPerfilCCEE) {
+        return (root, criteriaQuery, criteriaBuilder) -> criteriaBuilder.equal(root.get(Product_.wbcCodigoPerfilCCEE), wbcCodigoPerfilCCEE);
+    }     
+    
+    public static Specification<Product> subMarketDescription(String subMarketDescription) {
+        return (root, criteriaQuery, criteriaBuilder) -> criteriaBuilder.equal(root.get(Product_.subMarketDescription), subMarketDescription);
+    } 
 }

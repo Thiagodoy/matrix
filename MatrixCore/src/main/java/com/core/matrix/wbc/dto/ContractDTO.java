@@ -75,6 +75,10 @@ public class ContractDTO implements Serializable{
     private Long nCdContratoRateioControlador;
     
     private String meansurementPoint;
+    
+    private Long nCdSiglaCCEEContratante;
+    
+    private Long nCdPerfilCCEE;
 
     public ContractDTO(
             Long nCdContrato,
@@ -101,7 +105,9 @@ public class ContractDTO implements Serializable{
             Long nCdAgrupador,
             String sDsAgrupador,
             Long bFlRateio,
-            Long nCdContratoRateioControlador
+            Long nCdContratoRateioControlador,
+            Long nCdSiglaCCEEContratante,
+            Long nCdPerfilCCEE
     ) {
 
         this.nCdContrato = nCdContrato;
@@ -129,7 +135,8 @@ public class ContractDTO implements Serializable{
         this.sDsAgrupador = sDsAgrupador;
         this.bFlRateio = bFlRateio;
         this.nCdContratoRateioControlador = nCdContratoRateioControlador;
-
+        this.nCdSiglaCCEEContratante = nCdSiglaCCEEContratante;
+        this.nCdPerfilCCEE = nCdPerfilCCEE;
     }
 
     public ContractDTO(
@@ -148,7 +155,9 @@ public class ContractDTO implements Serializable{
             Long nCdSituacaoContrato,
             String sDsSituacaoContrato,
             Long bFlRateio,
-            Long nCdContratoRateioControlador
+            Long nCdContratoRateioControlador,
+            Long nCdSiglaCCEEContratante,
+            Long nCdPerfilCCEE        
     ) {
 
         this.nCdContrato = nCdContrato;
@@ -167,7 +176,8 @@ public class ContractDTO implements Serializable{
         this.sNrReferencia = sNrReferencia;
         this.bFlRateio = bFlRateio;
         this.nCdContratoRateioControlador = nCdContratoRateioControlador;
-
+        this.nCdSiglaCCEEContratante = nCdSiglaCCEEContratante;
+        this.nCdPerfilCCEE = nCdPerfilCCEE;      
     }
 
     public ContractDTO(
@@ -193,7 +203,9 @@ public class ContractDTO implements Serializable{
             Long nCdContratoPai,
             String sNrReferencia,
             Long nCdAgrupador,
-            String sDsAgrupador
+            String sDsAgrupador,
+            Long nCdSiglaCCEEContratante,
+            Long nCdPerfilCCEE
     ) {
 
         this.nCdContrato = nCdContrato;
@@ -219,7 +231,8 @@ public class ContractDTO implements Serializable{
         this.sNrReferencia = sNrReferencia;
         this.nCdAgrupador = nCdAgrupador;
         this.sDsAgrupador = sDsAgrupador;
-
+        this.nCdSiglaCCEEContratante = nCdSiglaCCEEContratante;
+        this.nCdPerfilCCEE = nCdPerfilCCEE;
     }
     
     @Override

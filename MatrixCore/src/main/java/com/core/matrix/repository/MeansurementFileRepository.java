@@ -25,7 +25,7 @@ public interface MeansurementFileRepository extends JpaRepository<MeansurementFi
 
     @Modifying
     @Query(value = "update MeansurementFile c set c.status = :status where c.id = :id")
-    void updateStatus(MeansurementFileStatus status, Long id);
+    void updateStatus(@Param("status") MeansurementFileStatus status, @Param("id") Long id);
 
     @Query(nativeQuery = true)
     List<MeansurementFileStatusDTO> getStatus(@Param("year") Long year, @Param("month") Long month);
