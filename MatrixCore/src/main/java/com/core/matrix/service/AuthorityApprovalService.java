@@ -57,8 +57,11 @@ public class AuthorityApprovalService {
     @Transactional(readOnly = true)
     public AuthorityApproval findBetween(Double value) throws Exception {
         
+        
+        Double v = Math.abs(value);
+        
         Optional<AuthorityApproval> opt = this.repository
-                .findValueBetween(value);
+                .findValueBetween(v);
 
         if (opt.isPresent()) {
             return opt.get();
@@ -68,7 +71,7 @@ public class AuthorityApprovalService {
                     .stream()
                     .sorted(Comparator.comparing(AuthorityApproval::getId).reversed())
                     .findFirst()
-                    .orElseThrow(() -> new Exception("Alçada não encontrada! valor recebido -> " + value));
+                    .orElseThrow(() -> new Exception("Alçada não encontrada! valor recebido -> " + v));
         }
 
     }
