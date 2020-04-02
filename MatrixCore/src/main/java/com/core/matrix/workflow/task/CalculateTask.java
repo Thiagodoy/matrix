@@ -180,10 +180,7 @@ public class CalculateTask implements Task {
             });
 
             final List<ContractCompInformation> contractsInformations = contractService
-                    .listByContract(files.get(0).getWbcContract())
-                    .stream()
-                    .filter(c -> Optional.ofNullable(c.getMeansurementPoint()).isPresent())
-                    .collect(Collectors.toList());
+                    .listByContract(files.get(0).getWbcContract());
 
             final List<MeansurementFileResult> results = new ArrayList<>();
 
@@ -214,6 +211,7 @@ public class CalculateTask implements Task {
 
                     ContractCompInformation contractInformation = contractsInformations
                             .stream()
+                            .filter(c -> Optional.ofNullable(c.getMeansurementPoint()).isPresent())
                             .filter(c -> c.getMeansurementPoint().equals(point))
                             .findFirst()
                             .orElseThrow(() -> new Exception("[Matrix] Informação do contrato não encontrada!"));
@@ -281,7 +279,7 @@ public class CalculateTask implements Task {
             fileResult.setAmountScde(sumScde);
             fileResult.setAmountLiquido(this.roundValue(sum, 3));
             fileResult.setMeansurementFileId(fileId);
-            fileResult.setWbcContract(contractInformationParent.getCodeWbcContract());
+            fileResult.setWbcContract(Long.valueOf(contractWbcInformation.getNrContract()));
             fileResult.setContractParent(1L);
             fileResult.setNameCompany(name);
             fileResult.setWbcSubmercado(contractInformationParent.getWbcSubmercado());

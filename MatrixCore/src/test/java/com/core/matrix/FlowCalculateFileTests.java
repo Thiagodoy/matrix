@@ -35,9 +35,9 @@ class FlowCalculateFileTests {
      //Get task
      
         //Task task = taskService.createTaskQuery().taskId("895026").singleResult();
-        Task task = taskService.createTaskQuery().taskId("322510").singleResult();
+        Task task = taskService.createTaskQuery().taskId("905033").singleResult();
         
-        File file1 = new File("Vidrominas 1.csv");
+        File file1 = new File("mrs.csv");
         
         InputStream ip = new FileInputStream(file1);
         
