@@ -30,12 +30,14 @@
 							}
 						},
 						"url": {
-							"raw": "http://localhost:8004/api/auth",
+							"raw": "http://52.225.134.57/api/auth",
 							"protocol": "http",
 							"host": [
-								"localhost"
+								"52",
+								"225",
+								"134",
+								"57"
 							],
-							"port": "8004",
 							"path": [
 								"api",
 								"auth"
@@ -1057,7 +1059,7 @@
 						"header": [
 							{
 								"key": "Authorization",
-								"value": "Bearer eyJhbGciOiJIUzUxMiJ9.eyJzdWIiOiJhZG1pbkBhZG1pbi5jb20iLCJleHAiOjE1ODI1ODkwNDQsImlhdCI6MTU4MjU3MTA0NH0.eUVeTfKXGBaYmpXcwo40q2Xri1Mixxnix15yK8l1mmgg4Kt9xTP_0jYb9SmN9HHPPpDlBeTqpYku1d-OQjqxPQ",
+								"value": "Bearer eyJhbGciOiJIUzUxMiJ9.eyJzdWIiOiJ0ZXN0ZTFtYXRyaXhAbWFpbGluYXRvci5jb20iLCJleHAiOjE1ODUyODcwMTEsImlhdCI6MTU4NTI2OTAxMX0.VVltWzO6PWSFNPh10H5OHGCXQ5zlKgiaj8LsCEAcQjVd8HNTNGJ-q9t_Ue4RlPAZ-j3-whqVRFsbIuNTWtbxqA",
 								"type": "text"
 							},
 							{
@@ -1069,7 +1071,7 @@
 						],
 						"body": {
 							"mode": "raw",
-							"raw": "{\t\n\t\"processInstanceId\":\"344016\",\n\t\"taskId\":\"345018\",\n\t\"variables\":{\n\t\t\"_controle\":\"Realizar Novo Upload\"\n\t}\n\t\n}",
+							"raw": "{\"processInstanceId\":\"732735\",\"taskId\":\"732848\",\"variables\":{\"_controle\":\"AVANÇAR\"}}",
 							"options": {
 								"raw": {
 									"language": "json"
@@ -1077,14 +1079,12 @@
 							}
 						},
 						"url": {
-							"raw": "http://52.225.134.57/api/workflow/runtime/completeTask",
+							"raw": "http://localhost:8004/api/workflow/runtime/completeTask",
 							"protocol": "http",
 							"host": [
-								"52",
-								"225",
-								"134",
-								"57"
+								"localhost"
 							],
+							"port": "8004",
 							"path": [
 								"api",
 								"workflow",
@@ -1401,7 +1401,7 @@
 						"header": [
 							{
 								"key": "Authorization",
-								"value": "Bearer eyJhbGciOiJIUzUxMiJ9.eyJzdWIiOiJhZG1pbkBhZG1pbi5jb20iLCJleHAiOjE1ODMxMzA5OTksImlhdCI6MTU4MzExMjk5OX0.LV4I1F6uvcN9jncD6mUxEYblUYAgOo12l2eJ8S2799lk_fKrfUvTdi0UK3K-QyrGLusbSs2LTPKfRT7lwQuYyQ",
+								"value": "Bearer eyJhbGciOiJIUzUxMiJ9.eyJzdWIiOiJ0ZXN0ZTFtYXRyaXhAbWFpbGluYXRvci5jb20iLCJleHAiOjE1ODUyODcwMTEsImlhdCI6MTU4NTI2OTAxMX0.VVltWzO6PWSFNPh10H5OHGCXQ5zlKgiaj8LsCEAcQjVd8HNTNGJ-q9t_Ue4RlPAZ-j3-whqVRFsbIuNTWtbxqA",
 								"type": "text"
 							},
 							{
@@ -1413,7 +1413,7 @@
 						],
 						"body": {
 							"mode": "raw",
-							"raw": "{\n\t\"ids\":[\"460518\",\"460508\",\"460499\",\"460490\",\"460481\",\"460472\",\"460463\",\"460454\",\"460445\",\"460436\",\"460427\",\"460418\",\"460409\",\"460400\",\"460391\",\"460382\",\"460373\",\"460364\",\"460355\",\"460346\",\"460337\",\n\"460328\",\"460319\",\"460310\",\"460301\",\"460292\",\"460283\",\"460274\",\"460265\",\"460256\",\"460247\",\"460238\",\"460229\",\"460220\",\"460211\",\"460202\",\"460193\",\"460184\",\"460175\",\"460166\",\"460157\",\"460148\",\n\"460139\",\"460130\",\"460121\",\"460112\",\"460103\",\"460094\",\"460059\",\"457952\",\"457943\",\"457934\",\"457916\",\"457907\",\"457898\",\"457889\",\"457880\",\"457871\",\"457862\",\"457853\",\"457844\",\"457835\",\"457826\",\n\"457817\",\"457808\",\"457799\",\"457790\",\"457781\",\"457772\",\"457763\",\"457754\",\"457745\",\"457736\",\"457727\",\"457718\",\"457709\",\"457700\",\"457691\",\"457682\",\"457673\",\"457664\",\"457655\",\"457646\",\"457637\",\n\"457628\",\"457619\",\"457610\",\"457601\",\"457592\",\"457583\",\"457574\",\"457565\",\"457556\",\"457547\",\"457538\",\"455432\"]\n}",
+							"raw": "{\n\t\"ids\":[\"507568\",\n\"565173\",\n\"692503\",\n\"693433\",\n\"695048\",\n\"695110\",\n\"695147\",\n\"695177\",\n\"697553\",\n\"705001\",\n\"705031\",\n\"705061\",\n\"705091\",\n\"717505\",\n\"717514\",\n\"717523\",\n\"717532\",\n\"717541\",\n\"717550\",\n\"717559\",\n\"717568\",\n\"717577\",\n\"717586\",\n\"717595\",\n\"717604\",\n\"717613\",\n\"717622\",\n\"717631\",\n\"717640\",\n\"717649\",\n\"717658\",\n\"717667\",\n\"717676\",\n\"717685\",\n\"717694\",\n\"717703\",\n\"717712\",\n\"717721\",\n\"717730\",\n\"717739\",\n\"717748\",\n\"717757\",\n\"717766\",\n\"717775\",\n\"717784\",\n\"717793\",\n\"717802\",\n\"717811\",\n\"717820\",\n\"717829\",\n\"717838\",\n\"717856\",\n\"717865\",\n\"717874\",\n\"717883\",\n\"717892\",\n\"717901\",\n\"717910\",\n\"717919\",\n\"717928\",\n\"717937\",\n\"717946\",\n\"717955\",\n\"717964\",\n\"717973\",\n\"717982\",\n\"717991\",\n\"718000\",\n\"718009\",\n\"718018\",\n\"718027\",\n\"718036\",\n\"718045\",\n\"718054\",\n\"718063\",\n\"718072\",\n\"718081\",\n\"718090\",\n\"718099\",\n\"718108\",\n\"718117\",\n\"718126\",\n\"718135\",\n\"718144\",\n\"718153\",\n\"718162\",\n\"718171\",\n\"718180\",\n\"718189\",\n\"718198\",\n\"718207\",\n\"718216\",\n\"718225\",\n\"718234\",\n\"720005\"\n]\n}",
 							"options": {
 								"raw": {
 									"language": "json"
@@ -1526,7 +1526,7 @@
 						"header": [
 							{
 								"key": "Authorization",
-								"value": "Bearer eyJhbGciOiJIUzUxMiJ9.eyJzdWIiOiJhZG1pbkBhZG1pbi5jb20iLCJleHAiOjE1ODMxMzA5OTksImlhdCI6MTU4MzExMjk5OX0.LV4I1F6uvcN9jncD6mUxEYblUYAgOo12l2eJ8S2799lk_fKrfUvTdi0UK3K-QyrGLusbSs2LTPKfRT7lwQuYyQ",
+								"value": "Bearer eyJhbGciOiJIUzUxMiJ9.eyJzdWIiOiJhZG1pbkBhZG1pbi5jb20iLCJleHAiOjE1ODUyOTA2NjgsImlhdCI6MTU4NTI3MjY2OH0.UzDqUqEqEDELAAFPN0FLYSE9x731UUqdw8m1_6TCj7ky3qOXIs3H16jhuy5QzxS2ZKfSwALS1pzxkZ98HwMmJg",
 								"type": "text"
 							}
 						],
@@ -1613,7 +1613,7 @@
 						"header": [
 							{
 								"key": "Authorization",
-								"value": "Bearer eyJhbGciOiJIUzUxMiJ9.eyJzdWIiOiJhZG1pbkBhZG1pbi5jb20iLCJleHAiOjE1ODMyOTYxNDAsImlhdCI6MTU4MzI3ODE0MH0.yPudSjWnIeb8rFCoVz2X-vB_Ze_fgxGm0sOc2IR_kz_NbF_w9xR7tNZlduAXXHyffOyBrApdtOBfxCmVwPq1JQ",
+								"value": "Bearer eyJhbGciOiJIUzUxMiJ9.eyJzdWIiOiJhZG1pbkBhZG1pbi5jb20iLCJleHAiOjE1ODUyOTA2NjgsImlhdCI6MTU4NTI3MjY2OH0.UzDqUqEqEDELAAFPN0FLYSE9x731UUqdw8m1_6TCj7ky3qOXIs3H16jhuy5QzxS2ZKfSwALS1pzxkZ98HwMmJg",
 								"type": "text"
 							},
 							{
@@ -1646,12 +1646,14 @@
 							]
 						},
 						"url": {
-							"raw": "http://localhost:8004/api/workflow/repository",
+							"raw": "http://52.225.134.57/api/workflow/repository",
 							"protocol": "http",
 							"host": [
-								"localhost"
+								"52",
+								"225",
+								"134",
+								"57"
 							],
-							"port": "8004",
 							"path": [
 								"api",
 								"workflow",
@@ -1703,17 +1705,18 @@
 						"header": [
 							{
 								"key": "Authorization",
-								"value": "Bearer eyJhbGciOiJIUzUxMiJ9.eyJzdWIiOiJhZG1pbkBhZG1pbi5jb20iLCJleHAiOjE1ODMxODU4NDIsImlhdCI6MTU4MzE2Nzg0Mn0.jw3Ires_H_NXLhHGv_rpSBAym4V6b6kOIy9pIK77fGp4pL717yxZVezraHdK35hcwFU52FP8Qa2KXDTp4hQIDw",
+								"value": "Bearer eyJhbGciOiJIUzUxMiJ9.eyJzdWIiOiJhZG1pbkBhZG1pbi5jb20iLCJleHAiOjE1ODUyOTA2NjgsImlhdCI6MTU4NTI3MjY2OH0.UzDqUqEqEDELAAFPN0FLYSE9x731UUqdw8m1_6TCj7ky3qOXIs3H16jhuy5QzxS2ZKfSwALS1pzxkZ98HwMmJg",
 								"type": "text"
 							}
 						],
 						"url": {
-							"raw": "https://api.matrixenergia.com/api/workflow/repository",
-							"protocol": "https",
+							"raw": "http://52.225.134.57/api/workflow/repository",
+							"protocol": "http",
 							"host": [
-								"api",
-								"matrixenergia",
-								"com"
+								"52",
+								"225",
+								"134",
+								"57"
 							],
 							"path": [
 								"api",
@@ -2328,6 +2331,90 @@
 			"protocolProfileBehavior": {}
 		},
 		{
+			"name": "authority",
+			"item": [
+				{
+					"name": "Check",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer eyJhbGciOiJIUzUxMiJ9.eyJzdWIiOiJhZG1pbkBhZG1pbi5jb20iLCJleHAiOjE1ODU0NDMxMzksImlhdCI6MTU4NTQyNTEzOX0.anK3f0hW0OSMa7gfqQ-MxDigi7eK8pGthxQXoZOnB96HjRuMaTq1wAJ6slUFW6BAVplKCo3XuftHfJZ1rcGK4w",
+								"type": "text"
+							}
+						],
+						"url": {
+							"raw": "http://52.225.134.57/api/authority/check?value=10.1",
+							"protocol": "http",
+							"host": [
+								"52",
+								"225",
+								"134",
+								"57"
+							],
+							"path": [
+								"api",
+								"authority",
+								"check"
+							],
+							"query": [
+								{
+									"key": "value",
+									"value": "10.1"
+								}
+							]
+						}
+					},
+					"response": []
+				}
+			],
+			"protocolProfileBehavior": {}
+		},
+		{
+			"name": "price",
+			"item": [
+				{
+					"name": "List",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer eyJhbGciOiJIUzUxMiJ9.eyJzdWIiOiJhZG1pbkBhZG1pbi5jb20iLCJleHAiOjE1ODUzMzI3MTgsImlhdCI6MTU4NTMxNDcxOH0.RTg-cg1IlAVUYhrG_FdIKpnGDSQSfyq2JchpzhJgIAJlDzp-tTBQRPbCpesJtGghvgWIGPaBJWvDxDRb9A7ezg",
+								"type": "text"
+							}
+						],
+						"url": {
+							"raw": "http://localhost:8004/api/price?description=SE/CO",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "8004",
+							"path": [
+								"api",
+								"price"
+							],
+							"query": [
+								{
+									"key": "subMarket",
+									"value": "1",
+									"disabled": true
+								},
+								{
+									"key": "description",
+									"value": "SE/CO"
+								}
+							]
+						}
+					},
+					"response": []
+				}
+			],
+			"protocolProfileBehavior": {}
+		},
+		{
 			"name": "List details of file",
 			"request": {
 				"method": "GET",
@@ -2427,6 +2514,66 @@
 						{
 							"key": "month",
 							"value": "1"
+						}
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Monitoring",
+			"request": {
+				"method": "GET",
+				"header": [
+					{
+						"key": "Authorization",
+						"value": "Bearer eyJhbGciOiJIUzUxMiJ9.eyJzdWIiOiJhZG1pbkBhZG1pbi5jb20iLCJleHAiOjE1ODc0NDA2OTQsImlhdCI6MTU4NzQyMjY5NH0.n2NOpgOvf15WmTPEL1cWqJlUktqwpi6ligJR5JbVHp5CtAdk9HnKEsiUtymJnZaTnTyDf8tcKHdehMeBUVzaJQ",
+						"type": "text"
+					}
+				],
+				"url": {
+					"raw": "http://localhost:8004/api/monitoring?empresa=CELTA&ano=2020&mes=3",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "8004",
+					"path": [
+						"api",
+						"monitoring"
+					],
+					"query": [
+						{
+							"key": "status",
+							"value": null,
+							"disabled": true
+						},
+						{
+							"key": "instanciaDoProcesso",
+							"value": null,
+							"disabled": true
+						},
+						{
+							"key": "wbcContrato",
+							"value": null,
+							"disabled": true
+						},
+						{
+							"key": "pontoMedicao",
+							"value": "PRCMGAENTR101",
+							"disabled": true
+						},
+						{
+							"key": "empresa",
+							"value": "CELTA"
+						},
+						{
+							"key": "ano",
+							"value": "2020"
+						},
+						{
+							"key": "mes",
+							"value": "3"
 						}
 					]
 				}
