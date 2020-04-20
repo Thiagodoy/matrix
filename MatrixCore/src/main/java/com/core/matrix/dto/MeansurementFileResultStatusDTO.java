@@ -7,6 +7,7 @@ package com.core.matrix.dto;
 
 import com.core.matrix.utils.ReportConstants;
 import java.text.NumberFormat;
+import java.util.Date;
 import java.util.Locale;
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -26,6 +27,7 @@ public class MeansurementFileResultStatusDTO {
     private String wbcMeansurementPoint;
     private Double mount;
     private String status;
+    private Date dataCriacao;
 
     public Object[] export(ReportConstants.ReportType type) {
 

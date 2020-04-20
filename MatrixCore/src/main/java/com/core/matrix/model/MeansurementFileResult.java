@@ -8,6 +8,7 @@ package com.core.matrix.model;
 import com.core.matrix.dto.MeansurementFileResultStatusDTO;
 import com.core.matrix.wbc.dto.ContractWbcInformationDTO;
 import com.google.common.base.Optional;
+import java.util.Date;
 import javax.persistence.Column;
 import javax.persistence.ColumnResult;
 import javax.persistence.ConstructorResult;
@@ -42,6 +43,8 @@ import lombok.NoArgsConstructor;
                     @ColumnResult(name = "montante_liquido", type = Double.class)
                     ,
                     @ColumnResult(name = "status", type = String.class)
+                    ,
+                    @ColumnResult(name = "data_criacao", type = Date.class)
                 }))
 
 @NamedNativeQuery(name = "MeansurementFileResult.getStatusBilling",
@@ -49,19 +52,24 @@ import lombok.NoArgsConstructor;
         + "    a.id_arquivo_de_medicao,\n"
         + "    a.ano,\n"
         + "    a.mes,\n"
-        + "    a.wbc_contrato,\n"
+        + "    case b.contrato_pai when 1 then c.wbc_contrato else a.wbc_contrato end as wbc_contrato,\n"
         + "    a.wbc_ponto_de_medicao,\n"
         + " case b.justificativa when 'APROVADO' then b.montante_liquido_ajustado else b.montante_liquido end as montante_liquido,\n"
-        + "    a.status\n"
+        + "    a.status,\n"
+        + "    a.data_criacao\n"
         + "FROM\n"
         + "    mtx_arquivo_de_medicao a\n"
         + "        INNER JOIN\n"
         + "    mtx_arquivo_de_medicao_resultado b ON a.id_arquivo_de_medicao = b.id_arquivo_de_medicao\n"
+        + "        LEFT JOIN\n"        
+        + "    mtx_contrato_informacao_complementar c ON  b.wbc_contrato = c.wbc_codigo_contrato or b.wbc_contrato = c.wbc_contrato\n"
+        + "\n"        
         + "WHERE\n"
         + "    a.status IN ('APPROVED')\n"
-        + "        AND (contrato_pai = 1 or contrato_pai is null)\n"
+    //    + "        AND (contrato_pai = 1 or contrato_pai is null)\n"
         + "        AND a.ano = :year\n"
-        + "        AND a.mes = :month",
+        + "        AND a.mes = :month\n"
+        + "    order by a.data_criacao",
         resultSetMapping = "statusBillingDTO")
 
 @Entity
