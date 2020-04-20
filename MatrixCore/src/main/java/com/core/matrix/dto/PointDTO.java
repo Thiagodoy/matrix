@@ -15,11 +15,11 @@ import lombok.Data;
  */
 @Data
 @AllArgsConstructor
-public class PointDTO implements Serializable{   
-    
-    
-    
+public class PointDTO implements Serializable {
+
+    private static final long serialVersionUID = 3987470481833012088L;
+
     private String point;
     private String origem;
-    private String message;       
+    private String message;
 }

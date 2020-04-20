@@ -24,6 +24,9 @@ import lombok.Data;
 @Data
 public class AuthorityApproval implements Serializable {
 
+    private static final long serialVersionUID = 3683267253342029782L;
+    
+
     @Id
     @Column(name = "id_alcada_aprovacao")
     @GeneratedValue(strategy = GenerationType.IDENTITY)

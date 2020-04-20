@@ -21,26 +21,29 @@ import lombok.Data;
 @Table(name = "mtx_empresa_gestor")
 @Data
 @IdClass(CompanyManager.IdClass.class)
-public class CompanyManager implements  Serializable{
-    
-    
-    
+public class CompanyManager implements Serializable {
+
+    private static final long serialVersionUID = -8054033511343028543L;
+
     @Id
     @Column(name = "wbc_empresa")
     private Long empresa;
     @Id
     @Column(name = "id_gestor")
     private Long manager;
-    
+
     @Id
     @Column(name = "id_contato_gestor")
     private Long contact;
-    
+
     @Data
     public static class IdClass implements Serializable {
+
+        private static final long serialVersionUID = -8391945771813341868L;
+
         private Long empresa;
         private Long manager;
         private Long contact;
     }
-    
+
 }

@@ -17,6 +17,8 @@ import lombok.Data;
 @AllArgsConstructor
 public class ContractWbcInformationDTO implements Serializable{
 
+    private static final long serialVersionUID = 2117510759083762211L;
+
     private String nrContract;
     private Long nrYear;
     private Long nrMonth;

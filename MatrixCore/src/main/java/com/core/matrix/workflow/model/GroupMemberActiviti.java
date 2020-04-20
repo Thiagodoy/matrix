@@ -24,6 +24,8 @@ import lombok.NoArgsConstructor;
 @Table(schema = "activiti", name = "act_id_membership")
 @IdClass(GroupMemberActiviti.IdClass.class)
 public class GroupMemberActiviti implements Serializable {
+
+    private static final long serialVersionUID = -2636531586488935713L;
     
     @Id
     @Column(name = "USER_ID_")
@@ -35,6 +37,8 @@ public class GroupMemberActiviti implements Serializable {
     
     @Data
     public static class IdClass implements Serializable {
+
+        private static final long serialVersionUID = 5316141980584556876L;
         private String userId;
         private String groupId;
     }

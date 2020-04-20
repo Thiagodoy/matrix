@@ -15,8 +15,7 @@ import lombok.Data;
  */
 @Data
 public class LoteDTO<T,S> implements Serializable{   
-    
-    
-    
+
+    private static final long serialVersionUID = 2703685355017098424L;
     private Map<T,S> lotes;    
 }

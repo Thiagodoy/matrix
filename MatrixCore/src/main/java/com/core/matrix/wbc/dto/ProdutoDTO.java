@@ -22,6 +22,9 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 public class ProdutoDTO implements Serializable {
 
+    private static final long serialVersionUID = -8716578903394081946L;   
+    
+
     private Integer nCdPerfilCCEE;
     private String sDsSiglaCCEE;
     private String sDsPerfilCCEE;

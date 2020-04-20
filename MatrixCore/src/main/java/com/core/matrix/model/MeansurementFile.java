@@ -56,6 +56,8 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 public class MeansurementFile implements Serializable{
 
+    private static final long serialVersionUID = 5548972239473582793L;
+    
     @Id
     @Column(name = "id_arquivo_de_medicao")
     @GeneratedValue(strategy = GenerationType.IDENTITY)

@@ -24,6 +24,8 @@ import lombok.Data;
 @Data
 public class MeansurementRepurchase implements Serializable {
 
+    private static final long serialVersionUID = -7514701442313318250L;
+
     @Id
     @Column(name = "id_aqruivo_de_medicao_recompra")
     @GeneratedValue(strategy = GenerationType.IDENTITY)

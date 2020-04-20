@@ -18,9 +18,9 @@ import lombok.Data;
 @Data
 @AllArgsConstructor
 
-public class ErrorInformationDTO<T> implements Serializable{
-    
-    
+public class ErrorInformationDTO<T> implements Serializable {
+
+    private static final long serialVersionUID = -2784297291065159927L;
     private String information;
     private List<T> errors;
     private CompanyDTO company;

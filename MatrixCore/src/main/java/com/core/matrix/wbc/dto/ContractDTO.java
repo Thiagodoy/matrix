@@ -21,6 +21,11 @@ import lombok.Data;
 @JsonIgnoreProperties(value = {"tddTermino","tddInicio"})
 public class ContractDTO implements Serializable{
 
+    private static final long serialVersionUID = 3749064926674036404L;
+    
+    
+    
+
     private Long nCdContrato;
 
     private String sNrContrato;

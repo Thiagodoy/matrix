@@ -20,6 +20,8 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 public class CompanyDTO implements Serializable {
 
+    private static final long serialVersionUID = 6831326922566865276L;
+    
     private Long nCdEmpresa;
     private String sNrCnpj;
     private String sNmEmpresa;

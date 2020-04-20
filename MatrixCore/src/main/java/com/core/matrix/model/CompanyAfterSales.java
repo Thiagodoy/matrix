@@ -38,6 +38,8 @@ public class CompanyAfterSales implements  Serializable{
     
     @Data
     public static class IdClass implements Serializable {
+
+        private static final long serialVersionUID = -5814907802612921380L;
         private Long company;
         private String user;
     }

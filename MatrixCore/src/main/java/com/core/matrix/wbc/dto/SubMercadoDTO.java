@@ -11,8 +11,6 @@ import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
-
-
 /**
  *
  * @author thiag
@@ -21,6 +19,8 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor()
 @NoArgsConstructor
 public class SubMercadoDTO implements Serializable {
+
+    private static final long serialVersionUID = 3772922880793570356L;
 
     private Integer nCdSubmercado;
     private String sDsSubmercado;

@@ -24,6 +24,8 @@ import lombok.Data;
 @Data
 public class Price implements Serializable {
 
+    private static final long serialVersionUID = 6246297181135230555L;
+
     @Id
     @Column(name = "id_preco_base")
     @GeneratedValue(strategy = GenerationType.IDENTITY)

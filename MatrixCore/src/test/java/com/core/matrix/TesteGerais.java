@@ -5,23 +5,68 @@
  */
 package com.core.matrix;
 
-import static com.core.matrix.utils.Constants.CONST_SITUATION_2;
-import com.core.matrix.utils.Utils;
-import org.junit.Test;
+import java.io.FileInputStream;
+import java.io.FileOutputStream;
+import java.io.ObjectInputStream;
+import java.io.ObjectOutputStream;
+import java.io.Serializable;
+import lombok.Data;
+import org.apache.tomcat.jni.Address;
 
 /**
  *
  * @author thiag
  */
-
 public class TesteGerais {
-    
-   
+
     public static void main(String[] args) {
-        System.out.println("teste distancia" + Utils.checkDistance(CONST_SITUATION_2, "Coleta Diaria")); 
+
+//        try {
+//
+//            TesteSerialization serialization = new TesteSerialization();
+//            serialization.setNome("Thiago");
+//            serialization.setSobreNome("Godoy");
+//
+//            FileOutputStream fout = new FileOutputStream("Teste.bean");
+//            ObjectOutputStream oos = new ObjectOutputStream(fout);
+//            oos.writeObject(serialization);
+//            oos.close();
+//            System.out.println("Done");
+//
+//        } catch (Exception ex) {
+//            ex.printStackTrace();
+//        }
+
+        TesteSerialization address;
+
+        try {
+
+            FileInputStream fin = new FileInputStream("Teste.bean");
+            ObjectInputStream ois = new ObjectInputStream(fin);
+            address = (TesteSerialization) ois.readObject();
+            ois.close();
+
+            System.out.println(address);
+
+        } catch (Exception ex) {
+            ex.printStackTrace();
+        }
+
     }
-    
-    
-    
-    
+
+}
+
+@Data
+class TesteSerialization implements Serializable {
+
+    private static final long serialVersionUID = 467311467422319673L;
+
+    private String nome;
+    private String sobreNome;
+    private Long idade;
+
+    public String toString() {
+        return nome + " - " + sobreNome + " - " + idade;
+    }
+
 }

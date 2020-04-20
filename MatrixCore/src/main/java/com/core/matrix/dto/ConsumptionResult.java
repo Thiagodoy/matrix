@@ -15,7 +15,10 @@ import lombok.Data;
  * @author thiag
  */
 @Data
-public class ConsumptionResult implements Serializable{
+public class ConsumptionResult implements Serializable {
+
+    private static final long serialVersionUID = -6502996779067937478L;
+
     private String meansurementPoint;
     private Double result = 0D;
     private String error;
@@ -26,5 +29,5 @@ public class ConsumptionResult implements Serializable{
     private CompanyDTO empresa;
     private ContractWbcInformationDTO information;
     private Double SolicitadoLiquido;
-    
+
 }

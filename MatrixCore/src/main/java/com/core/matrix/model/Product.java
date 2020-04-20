@@ -26,6 +26,8 @@ import org.hibernate.annotations.GenerationTime;
 @Data
 public class Product implements Serializable {
 
+    private static final long serialVersionUID = 1919164886573746902L;
+    
     @Id
     @Column(name = "id_produtos")
     @GeneratedValue(strategy = GenerationType.IDENTITY)

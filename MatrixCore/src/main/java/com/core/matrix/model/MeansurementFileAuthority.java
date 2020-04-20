@@ -27,6 +27,8 @@ import lombok.Data;
 @Data
 public class MeansurementFileAuthority implements Serializable {
 
+    private static final long serialVersionUID = 4364052964932105596L;
+    
     @Id
     @Column(name = "id_arquivo_de_medicao_alcada")
     @GeneratedValue(strategy = GenerationType.IDENTITY)
