@@ -277,7 +277,8 @@ public class CalculateTask implements Task {
             fileResult.setFactorAtt(contractInformationParent.getFactorAttendanceCharge() / 100);
             fileResult.setAmountBruto(this.roundValue(sum, 3));
             fileResult.setAmountScde(sumScde);
-            fileResult.setAmountLiquido(this.roundValue(sum, 3));
+            Double consumptionLiquid = solicitadoLiquido(this.roundValue(sum, 3), contractWbcInformation);
+            fileResult.setAmountLiquido(consumptionLiquid);
             fileResult.setMeansurementFileId(fileId);
             fileResult.setWbcContract(Long.valueOf(contractWbcInformation.getNrContract()));
             fileResult.setContractParent(1L);
@@ -303,6 +304,15 @@ public class CalculateTask implements Task {
 
     private Double solicitadoLiquido(Double consumptionTotal, ContractWbcInformationDTO contractWbcInformationDTO) {
 
+        
+        Logger.getLogger(CheckTake.class.getName()).log(Level.INFO, "consumptionTotal -> " + consumptionTotal);
+        Logger.getLogger(CheckTake.class.getName()).log(Level.INFO, "getNrQtd    ->" + contractWbcInformationDTO.getNrQtd());
+        Logger.getLogger(CheckTake.class.getName()).log(Level.INFO, "getNrQtdMin ->" + contractWbcInformationDTO.getNrQtdMin());
+        Logger.getLogger(CheckTake.class.getName()).log(Level.INFO, "getNrQtdMax ->" + contractWbcInformationDTO.getNrQtdMax());
+        
+            
+           
+        
         BigDecimal consumptionTotalArredondado = new BigDecimal(consumptionTotal).setScale(3, RoundingMode.HALF_EVEN);
 
         BigDecimal solicitadoLiquido = new BigDecimal(contractWbcInformationDTO.getNrQtdMin()).setScale(3, RoundingMode.HALF_EVEN);
