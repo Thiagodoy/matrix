@@ -21,7 +21,6 @@ import com.core.matrix.utils.Constants;
 import com.core.matrix.wbc.dto.ContractWbcInformationDTO;
 import com.core.matrix.wbc.dto.CompanyDTO;
 import com.core.matrix.wbc.dto.ContractDTO;
-import com.core.matrix.wbc.model.Contract;
 import com.core.matrix.wbc.service.ContractService;
 import com.core.matrix.wbc.service.EmpresaService;
 import java.math.BigDecimal;
@@ -29,7 +28,6 @@ import java.math.RoundingMode;
 import java.text.MessageFormat;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Objects;
 import java.util.Optional;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -196,11 +194,11 @@ public class CalculateTask implements Task {
                     .findFirst()
                     .orElseThrow(() -> new Exception("[Matrix] Informação do contrato não encontrada!"));
 
-            final Double factorAtt = contractInformationParent.getFactorAttendanceCharge();
+            //final Double factorAtt = contractInformationParent.getFactorAttendanceCharge();
 
             //Contracts sons
-            files.stream().forEach(file -> {
-
+            files.stream().forEach(file -> {                
+                
                 try {
                     List<MeansurementFileDetail> filteredByPoint = details
                             .stream()
@@ -220,6 +218,9 @@ public class CalculateTask implements Task {
                             .getInformation(file.getYear(), file.getMonth(), file.getWbcContract())
                             .orElseThrow(() -> new Exception("[WBC] -> Não foi possivel carregar as informações complementares!\n Referente as informações de [CE_SAZONALIZACAO] e [CE_REGRA_OPCIONALIDADE] "));
 
+                    
+                    
+                    final Double factorAtt = contractInformation.getFactorAttendanceCharge();
                     final double percentLoss = contractInformation.getPercentOfLoss() / 100;
                     final double proinfa = this.getProinfa(file, contractInformation.getProinfas());
                     final Double sum = this.getSumConsumptionActive(filteredByPoint);
@@ -246,6 +247,7 @@ public class CalculateTask implements Task {
                     fileResult.setNameCompany(name);
                     fileResult.setPercentLoss(percentLoss);
                     fileResult.setProinfa(proinfa);
+                    fileResult.setFactorAtt(factorAtt);
                     fileResult.setContractParent(0L);
                     fileResult.setWbcSubmercado(contractInformation.getWbcSubmercado());
 
