@@ -5,8 +5,11 @@
  */
 package com.core.matrix.resource;
 
+import com.core.matrix.dto.MonitoringStatusDTO;
 import com.core.matrix.repository.MonitoringRepository;
+import com.core.matrix.response.MonitoringResponse;
 import com.core.matrix.specifications.MonitoringSpecification;
+import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -46,7 +49,9 @@ public class MonitoringResource {
         try {
             
             Specification spc =  MonitoringSpecification.parameters(status, instanciaDoProcesso, wbcContrato, pontoMedicao, empresa, ano, mes);            
-            Page response = monitoringRepository.findAll(spc, PageRequest.of(page, size, Sort.by("instanciaDoProcesso").ascending()));            
+            Page data = monitoringRepository.findAll(spc, PageRequest.of(page, size, Sort.by("instanciaDoProcesso").ascending())); 
+            List<MonitoringStatusDTO> statusM = monitoringRepository.status(Long.parseLong(mes),Long.parseLong(ano));            
+            MonitoringResponse response = new MonitoringResponse(data, statusM);            
             return ResponseEntity.ok(response);
         } catch (Exception e) {
             Logger.getLogger(MonitoringResource.class.getName()).log(Level.SEVERE, "[get]", e);
@@ -54,5 +59,9 @@ public class MonitoringResource {
         }
 
     }
+    
+   
+    
+    
 
 }
