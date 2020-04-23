@@ -36,7 +36,7 @@ public class MonitoringSpecification {
         }
         
         if(Optional.ofNullable(empresa).isPresent()){
-            predicatives.add((root, criteriaQuery, criteriaBuilder) -> criteriaBuilder.like(criteriaBuilder.upper(root.get(Monitoring_.empresa)), "%" + empresa + "%"));
+            predicatives.add((root, criteriaQuery, criteriaBuilder) -> criteriaBuilder.like(criteriaBuilder.upper(root.get(Monitoring_.empresa)), "%" + empresa.toUpperCase() + "%"));
         }
         
         if(Optional.ofNullable(mes).isPresent()){
