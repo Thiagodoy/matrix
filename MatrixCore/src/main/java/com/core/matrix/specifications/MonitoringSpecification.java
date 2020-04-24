@@ -20,8 +20,12 @@ public class MonitoringSpecification {
 
     public static Specification<Monitoring> parameters(String status, String instanciaDoProcesso,String wbcContrato, String pontoMedicao, String empresa, String ano, String mes ) {
         
-        List<Specification> predicatives = new ArrayList<>();
+        List<Specification> predicatives = new ArrayList<>();        
         
+        
+        if(Optional.ofNullable(instanciaDoProcesso).isPresent()){
+            predicatives.add((root, criteriaQuery, criteriaBuilder) -> criteriaBuilder.equal(root.get(Monitoring_.instanciaDoProcesso), instanciaDoProcesso));
+        }
         
         if(Optional.ofNullable(status).isPresent()){
             predicatives.add((root, criteriaQuery, criteriaBuilder) -> criteriaBuilder.equal(root.get(Monitoring_.status), status));
