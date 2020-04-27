@@ -258,7 +258,8 @@ public class RuntimeActivitiService {
 
             List<String> processInstances = taskService
                     .createNativeTaskQuery().sql("SELECT \n"
-                            + "    t.PROC_INST_ID_\n"
+                            + " distinct   t.PROC_INST_ID_,\n"
+                            + "    t.ID_ \n"
                             + "FROM\n"
                             + "    activiti.act_ru_task t\n"
                             + "        INNER JOIN\n"
@@ -266,8 +267,13 @@ public class RuntimeActivitiService {
                             + "        INNER JOIN\n"
                             + "    activiti.ACT_RU_IDENTITYLINK k ON t.ID_ = k.TASK_ID_\n"
                             + "WHERE\n"
-                            + "    v.TEXT_ LIKE '%" + variableValue.toUpperCase() + "%'\n"
-                            + "        AND k.group_id_ in(" + gro + ") ").list().stream().map(t -> t.getProcessInstanceId()).distinct().collect(Collectors.toList());
+                            + "    upper(v.TEXT_) LIKE '%" + variableValue.toUpperCase() + "%'\n"
+                            + "        AND k.group_id_ in(" + gro + ") ")
+                    .list()
+                    .stream()
+                    .map(t -> t.getProcessInstanceId())
+                    .distinct()
+                    .collect(Collectors.toList());
 
             if (processInstances.isEmpty()) {
                 return new PageResponse<TaskResponse>(new ArrayList(), 1L, 1L, (long) page);
@@ -403,7 +409,8 @@ public class RuntimeActivitiService {
 
             List<String> processInstances = taskService
                     .createNativeTaskQuery().sql("SELECT \n"
-                            + "    distinct t.PROC_INST_ID_\n"
+                            + "    distinct t.PROC_INST_ID_,\n"
+                            + "    t.ID_ \n"
                             + "FROM\n"
                             + "    activiti.act_ru_task t\n"
                             + "        INNER JOIN\n"
@@ -411,7 +418,7 @@ public class RuntimeActivitiService {
                             + "        INNER JOIN\n"
                             + "    activiti.ACT_RU_IDENTITYLINK k ON t.PROC_INST_ID_ = k.PROC_INST_ID_\n"
                             + "WHERE\n"
-                            + "    v.TEXT_ LIKE '%" + variableValue.toUpperCase() + "%'\n"
+                            + "    upper(v.TEXT_) LIKE '%" + variableValue.toUpperCase() + "%'\n"
                             + "        AND k.user_id_ = '" + user + "'; ").list()
                     .stream()
                     .map(t -> t.getProcessInstanceId())
@@ -722,7 +729,8 @@ public class RuntimeActivitiService {
         for (MultipartFile file : files) {
             Attachment attachment = taskService
                     .createAttachment(file.getContentType(), null, processInstance, file.getOriginalFilename(), "attachmentDescription", file.getInputStream());
-            responses.add(new AttachmentResponse(attachment));        }
+            responses.add(new AttachmentResponse(attachment));
+        }
 
         return responses;
     }
