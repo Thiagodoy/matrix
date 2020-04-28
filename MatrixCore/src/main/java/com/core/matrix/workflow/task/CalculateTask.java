@@ -220,6 +220,8 @@ public class CalculateTask implements Task {
 
                     
                     
+                    
+                    
                     final Double factorAtt = contractInformation.getFactorAttendanceCharge();
                     final double percentLoss = contractInformation.getPercentOfLoss() / 100;
                     final double proinfa = this.getProinfa(file, contractInformation.getProinfas());
@@ -235,8 +237,14 @@ public class CalculateTask implements Task {
                     String name = optEmp.isPresent() ? optEmp.get().getSNmEmpresa() : "";
 
                     MeansurementFileResult fileResult = new MeansurementFileResult(contractWbcInformation, de.getProcessInstanceId());
-
-                    fileResult.setAmountScde((sum / 1000d));
+                    
+                    /**
+                     * Zerar para contratos unidade de consumo
+                     */
+                    Double amountScde = contractInformation.getIsConsumerUnit().equals("1") ? 0D : (sum / 1000d);
+                    
+                    
+                    fileResult.setAmountScde(amountScde);
                     fileResult.setMeansurementFileId(file.getId());
 
                     fileResult.setAmountBruto(this.roundValue((consumptionTotal / 100), 3));

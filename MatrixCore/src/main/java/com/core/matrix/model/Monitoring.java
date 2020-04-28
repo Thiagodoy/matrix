@@ -143,7 +143,13 @@ public class Monitoring implements Serializable {
 
     @Id
     @Column(name = "ID")
-    private Long id;
+    private Long id;    
+    
+    @Column(name = "ID_TASK")
+    private String taskId;
+    
+    @Column(name = "TEMPLATE")
+    private String template;
 
     @Column(name = "INSTANCIA_DO_PROCESSO")
     private String instanciaDoProcesso;

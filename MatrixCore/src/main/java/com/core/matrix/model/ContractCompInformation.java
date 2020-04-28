@@ -64,7 +64,6 @@ import lombok.Data;
 @Entity
 @Table(name = "mtx_contrato_informacao_complementar")
 @Data
-//@IdClass(ContractCompInformation.IdClass.class)
 @JsonIgnoreProperties(value = {"lastUpdate", "createAt"})
 public class ContractCompInformation {
 
@@ -103,7 +102,10 @@ public class ContractCompInformation {
 
     @OneToMany(fetch = FetchType.EAGER, orphanRemoval = true, cascade = CascadeType.ALL)
     @JoinColumn(name = "wbc_contrato")
-    private List<ContractProInfa> proinfas;
+    private List<ContractProInfa> proinfas;    
+    
+    @Column(name = "unidade_consumidora")
+    private String isConsumerUnit;
 
     @PrePersist
     public void generateCreatedAt() {
@@ -115,12 +117,6 @@ public class ContractCompInformation {
         this.lastUpdate = LocalDateTime.now();
     }
 
-//    @Data
-//    public static class IdClass implements Serializable {
-//
-//        private Long wbcContract;
-//        private String meansurementPoint;
-//    }
     public void update(ContractCompInformation entity) {
 
         if (Optional.ofNullable(entity.getWbcContract()).isPresent() && !entity.getWbcContract().equals(this.wbcContract)) {
@@ -153,6 +149,10 @@ public class ContractCompInformation {
 
         if (Optional.ofNullable(entity.getWbcSubmercado()).isPresent() && !entity.getWbcSubmercado().equals(this.wbcSubmercado)) {
             this.wbcSubmercado = entity.getWbcSubmercado();
+        }
+        
+        if (Optional.ofNullable(entity.getIsConsumerUnit()).isPresent() && !entity.getIsConsumerUnit().equals(this.isConsumerUnit)) {
+            this.isConsumerUnit = entity.getIsConsumerUnit();
         }
     }
 
