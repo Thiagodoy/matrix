@@ -5,13 +5,18 @@
  */
 package com.core.matrix.service;
 
+import com.core.matrix.annotation.ReportColumn;
 import com.core.matrix.dto.MeansurementFileResultStatusDTO;
 import com.core.matrix.request.MeansurementResultRequest;
+import com.core.matrix.utils.Report;
 import com.core.matrix.utils.ReportConstants;
 import java.io.IOException;
 import java.io.OutputStream;
+import java.lang.annotation.Annotation;
 import java.text.NumberFormat;
 import java.text.SimpleDateFormat;
+import java.util.Arrays;
+import java.util.Comparator;
 import java.util.Date;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -68,6 +73,103 @@ public class ReportService {
         out.flush();
         out.close();
         this.wb.dispose();
+    }
+
+    public <T> void export(List<T> data) {
+
+        if (data.size() == 0) {
+            return;
+        }
+
+        List<ReportColumn> columns = Arrays.asList(data.get(0).getClass().getAnnotationsByType(ReportColumn.class));
+        
+        String header = columns
+                .stream()
+                .sorted(Comparator.comparing(ReportColumn::position))
+                .map(a -> a.name())
+                .collect(Collectors.joining(";"));
+
+    }
+    
+    
+    public <T> String[] mountHeader(List<T> data) {
+        
+        List<ReportColumn> columns = Arrays.asList(data.get(0).getClass().getAnnotationsByType(ReportColumn.class));
+        
+        return  columns
+                .stream()
+                .sorted(Comparator.comparing(ReportColumn::position))
+                .map(a -> a.name())
+                .collect(Collectors.joining(";")).split(";");
+    }
+
+    private <T extends Report> void createAndWriteFile(List<T> regs) {
+
+        String sheetName = "WBC";
+
+        wb = new SXSSFWorkbook();
+        wb.setCompressTempFiles(true);
+
+        sheet = wb.createSheet(sheetName);
+
+        CellStyle cellBold = wb.createCellStyle();
+
+        Font font = wb.createFont();
+        font.setFontHeightInPoints((short) 10);
+        font.setFontName("Arial");
+        font.setColor(IndexedColors.BLACK.getIndex());
+        font.setBold(true);
+        font.setItalic(true);
+
+        int line = 0;
+        String[] header = this.mountHeader(regs);
+        SXSSFRow rr = sheet.createRow(0);
+        cellBold.setFont(font);
+
+        //Escreve o header do arquivo
+        for (int i = 0; i < header.length; i++) {
+            SXSSFCell cell = rr.createCell(i);
+            cell.setCellValue(header[i]);
+        }
+
+        Font fontRecord = wb.createFont();
+        fontRecord.setCharSet(XSSFFont.ANSI_CHARSET);
+
+        CellStyle style = wb.createCellStyle();
+        style.setFont(fontRecord);
+
+        for (T register : regs) {
+
+            line++;
+            SXSSFRow rrr = sheet.createRow(line);
+            Object[] values = register.export();
+
+            DataFormat format = sheet.getWorkbook().createDataFormat();
+            NumberFormat numberFormat = NumberFormat.getIntegerInstance();
+            SimpleDateFormat dateFormat = new SimpleDateFormat("dd/MM/yyyy HH:mm");
+
+            for (int i = 0; i < values.length; i++) {
+                SXSSFCell cell = rrr.createCell(i);
+
+                Object value = values[i];
+                if (value instanceof Double) {
+                    CellStyle cellStyle = cell.getCellStyle();
+                    ((XSSFCellStyle) cellStyle).setDataFormat(format.getFormat("#,##0.00000"));
+                    cell.setCellValue((Double) value);
+                } else if (value instanceof Integer) {
+                    cell.setCellValue(numberFormat.format(value));
+                } else if (value instanceof Long) {
+                    cell.setCellValue(numberFormat.format(value));
+                } else if (value instanceof Date) {
+                    Date date = (Date) value;
+                    cell.setCellValue(dateFormat.format(date));
+                } else {
+                    cell.setCellValue(String.valueOf(value));
+                }
+
+            }
+
+        }
     }
 
     private void createAndWriteFile(List<MeansurementFileResultStatusDTO> regs, ReportConstants.ReportType type) {

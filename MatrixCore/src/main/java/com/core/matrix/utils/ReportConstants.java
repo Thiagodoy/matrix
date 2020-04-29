@@ -5,16 +5,24 @@
  */
 package com.core.matrix.utils;
 
+import java.lang.reflect.Field;
+import java.util.List;
+
 /**
  *
  * @author thiag
  */
+
 public class ReportConstants {
 
     public enum ReportType {
         EXPORT_RESULT_WBC,
         EXPORT_RESULT_FULL_WBC
     }
+    
+    public List<Field> fields;
+    
+    
 
     public static String[] getHeaders(ReportType type) {
 

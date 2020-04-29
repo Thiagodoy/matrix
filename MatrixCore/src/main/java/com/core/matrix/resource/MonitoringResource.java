@@ -36,7 +36,8 @@ public class MonitoringResource {
     private MonitoringRepository monitoringRepository;
 
     @RequestMapping(method = RequestMethod.GET)
-    public ResponseEntity get(@RequestParam(required = false, name = "status") String status,
+    public ResponseEntity get(
+            @RequestParam(required = false, name = "status") String status,
             @RequestParam(required = false, name = "instanciaDoProcesso") String instanciaDoProcesso,
             @RequestParam(required = false, name = "wbcContrato") String wbcContrato, 
             @RequestParam(required = false, name = "pontoMedicao") String pontoMedicao,

@@ -104,7 +104,7 @@ public class ContractCompInformationService {
 
         Optional<ContractCompInformation> opt = this.repository.findByWbcContract(contractWbc);
 
-        return (opt.isPresent() && opt.get().getIsConsumerUnit().equals("1"));
+        return (opt.isPresent() && opt.get().getIsConsumerUnit() != null && opt.get().getIsConsumerUnit().equals("1"));
     }
 
     public Optional<ContractCompInformation> findByWbcContractAndMeansurementPoint(Long contract, String point) {

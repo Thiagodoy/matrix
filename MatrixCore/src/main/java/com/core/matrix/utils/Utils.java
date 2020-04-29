@@ -5,7 +5,6 @@
  */
 package com.core.matrix.utils;
 
-import static com.core.matrix.utils.Constants.CONTENT_ID_LAYOUT_A;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
