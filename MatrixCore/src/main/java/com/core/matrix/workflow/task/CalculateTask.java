@@ -239,7 +239,7 @@ public class CalculateTask implements Task {
                     MeansurementFileResult fileResult = new MeansurementFileResult(contractWbcInformation, de.getProcessInstanceId());
                     
                     /**
-                     * Zerar para contratos unidade de consumo
+                     * Set result to zero when the contract is consumer unit
                      */
                     Double amountScde = contractInformation.getIsConsumerUnit().equals("1") ? 0D : (sum / 1000d);
                     

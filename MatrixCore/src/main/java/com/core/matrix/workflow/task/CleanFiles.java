@@ -62,7 +62,15 @@ public class CleanFiles implements JavaDelegate {
 
             this.fileService.findByProcessInstanceId(execution.getProcessInstanceId()).forEach(file -> {
                 this.fileDetailService.deleteAll(file.getDetails());
-                this.fileService.updateStatus(MeansurementFileStatus.FILE_PENDING, file.getId());
+                
+                file.setStatus(MeansurementFileStatus.FILE_PENDING);
+                file.setFile(null);
+                file.setType(null);
+                file.setUser(null);
+                
+                this.fileService.saveFile(file);               
+                
+                //this.fileService.updateStatus(MeansurementFileStatus.FILE_PENDING, file.getId());
             });
             
             

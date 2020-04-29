@@ -14,13 +14,10 @@ import com.core.matrix.service.MeansurementFileService;
 import static com.core.matrix.utils.Constants.*;
 import com.core.matrix.utils.MeansurementFileDetailStatus;
 import com.core.matrix.utils.MeansurementFileStatus;
-import java.text.Format;
-import java.text.SimpleDateFormat;
 import java.time.LocalDate;
 import java.time.Month;
 import java.time.YearMonth;
 import java.util.ArrayList;
-import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
@@ -30,6 +27,7 @@ import java.util.stream.Collectors;
 import org.activiti.engine.delegate.DelegateExecution;
 import org.springframework.context.ApplicationContext;
 import com.core.matrix.model.Log;
+import com.core.matrix.service.ContractCompInformationService;
 
 /**
  *
@@ -39,6 +37,7 @@ public class DataValidationTask implements Task {
 
     private MeansurementFileService fileService;
     private MeansurementFileDetailService fileDetailService;
+    private ContractCompInformationService contractInformationService;
 
     private LogService logService;
 
@@ -49,7 +48,8 @@ public class DataValidationTask implements Task {
         synchronized (DataValidationTask.context) {
             this.fileService = DataValidationTask.context.getBean(MeansurementFileService.class);
             this.fileDetailService = DataValidationTask.context.getBean(MeansurementFileDetailService.class);
-            this.logService = context.getBean(LogService.class);
+            this.logService = DataValidationTask.context.getBean(LogService.class);
+            this.contractInformationService = DataValidationTask.context.getBean(ContractCompInformationService.class);
         }
     }
 
@@ -62,7 +62,11 @@ public class DataValidationTask implements Task {
 
         delegateExecution = de;
 
-        List<MeansurementFile> files = this.fileService.findByProcessInstanceId(delegateExecution.getProcessInstanceId());
+        List<MeansurementFile> files = this.fileService
+                .findByProcessInstanceId(delegateExecution.getProcessInstanceId())
+                .stream() //Remove files that is a consumer unit
+                .filter( f-> !this.contractInformationService.isConsumerUnit(f.getWbcContract()))
+                .collect(Collectors.toList());
 
         files.forEach(file -> {
             Logger.getLogger(BeanIoReader.class.getName()).log(Level.SEVERE, "File id -> " + file.getId());
@@ -100,7 +104,7 @@ public class DataValidationTask implements Task {
         } else {
             de.setVariable(CONTROLE, RESPONSE_DATA_IS_VALID);
         }
-        
+
     }
 
     private void checkCalendar(MeansurementFile file) throws Exception {
@@ -134,7 +138,7 @@ public class DataValidationTask implements Task {
             }
 
         });
-        
+
         if (!details.isEmpty()) {
             file.setStatus(MeansurementFileStatus.DATA_CALENDAR_ERROR);
             fileService.updateStatus(MeansurementFileStatus.DATA_CALENDAR_ERROR, file.getId());

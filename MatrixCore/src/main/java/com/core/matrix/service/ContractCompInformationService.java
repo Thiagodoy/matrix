@@ -49,9 +49,9 @@ public class ContractCompInformationService {
                 .findById(information.getWbcContract())
                 .orElseThrow(() -> new Exception("Não foi encontrado nenhuma informação adicional para o contrato"));
 
-        this.repository.delete(entity);        
+        this.repository.delete(entity);
         this.save(information);
-        
+
     }
 
     @Transactional
@@ -77,14 +77,13 @@ public class ContractCompInformationService {
             } else {
 
                 List<ContractCompInformation> rateioSon = this.repository.findByCodeContractApportionment(contractCompInformation.getCodeWbcContract());
-               
 
                 rateioSon.add(contractCompInformation);
                 return rateioSon;
 
             }
 
-        }else{
+        } else {
             return new ArrayList<>();
         }
 
@@ -100,10 +99,18 @@ public class ContractCompInformationService {
         return this.repository.findByWbcContract(contract);
     }
 
+    @Transactional(readOnly = true)
+    public boolean isConsumerUnit(Long contractWbc) {
+
+        Optional<ContractCompInformation> opt = this.repository.findByWbcContract(contractWbc);
+
+        return (opt.isPresent() && opt.get().getIsConsumerUnit().equals("1"));
+    }
+
     public Optional<ContractCompInformation> findByWbcContractAndMeansurementPoint(Long contract, String point) {
         return this.repository.findByWbcContractAndMeansurementPoint(contract, point);
     }
-    
+
     public Optional<ContractCompInformation> findByMeansurementPoint(String point) {
         return this.repository.findByMeansurementPoint(point);
     }

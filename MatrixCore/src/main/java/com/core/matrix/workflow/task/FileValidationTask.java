@@ -13,6 +13,7 @@ import com.core.matrix.io.BeanIoReader;
 import com.core.matrix.model.Log;
 import com.core.matrix.model.MeansurementFile;
 import com.core.matrix.model.MeansurementFileDetail;
+import com.core.matrix.service.ContractCompInformationService;
 import com.core.matrix.service.LogService;
 import com.core.matrix.service.MeansurementFileDetailService;
 import com.core.matrix.service.MeansurementFileService;
@@ -57,10 +58,9 @@ public class FileValidationTask implements JavaDelegate {
     private MeansurementFileDetailService detailService;
     private DelegateExecution delegateExecution;
     private LogService logService;
+    private ContractCompInformationService contractInformationService;
 
     private List<MeansurementFile> files;
-
-    private List<String> meansuremPointFiles;
 
     private List<Log> logs;
 
@@ -71,6 +71,7 @@ public class FileValidationTask implements JavaDelegate {
             this.service = FileValidationTask.context.getBean(MeansurementFileService.class);
             this.detailService = FileValidationTask.context.getBean(MeansurementFileDetailService.class);
             this.logService = FileValidationTask.context.getBean(LogService.class);
+            this.contractInformationService = FileValidationTask.context.getBean(ContractCompInformationService.class);
         }
 
     }
@@ -89,8 +90,6 @@ public class FileValidationTask implements JavaDelegate {
             final String user = de.getVariable(USER_UPLOAD, String.class);
             files = this.service.findByProcessInstanceId(delegateExecution.getProcessInstanceId());
 
-            meansuremPointFiles = new ArrayList<String>();
-
             attachmentIds.stream().forEach(attachmentId -> {
 
                 InputStream stream = null;
@@ -103,16 +102,15 @@ public class FileValidationTask implements JavaDelegate {
                         fileName = taskService.getAttachment(attachmentId).getName();
                     }
 
-                                     
-                        BeanIoReader reader = new BeanIoReader();
-                        Optional<FileParsedDTO> fileParsed = reader.<FileParsedDTO>parse(stream);
+                    BeanIoReader reader = new BeanIoReader();
+                    Optional<FileParsedDTO> fileParsed = reader.<FileParsedDTO>parse(stream);
 
-                        if (!reader.getErrors().isEmpty()) {
-                            writeFile(fileName, reader.getErrors(), de);
-                        } else if (fileParsed.isPresent()) {
-                            mountFile(fileParsed.get(), attachmentId, user, files);
-                        }
-                    
+                    if (!reader.getErrors().isEmpty()) {
+                        writeFile(fileName, reader.getErrors(), de);
+                    } else if (fileParsed.isPresent()) {
+                        mountFile(fileParsed.get(), attachmentId, user, files);
+                    }
+
                 } catch (Exception e) {
                     Logger.getLogger(FileValidationTask.class.getName()).log(Level.SEVERE, "[ forEach ]", e);
                     this.generateLog(de, e, "Erro ao processar o arquivo : " + fileName);
@@ -120,10 +118,22 @@ public class FileValidationTask implements JavaDelegate {
 
             });
 
-            files.stream().filter(f -> f.getFile() == null).forEach(f -> {
-                String message = MessageFormat.format("Não foi encontrado nenhuma correspondência do ponto de medição, dentro dos arquivos postados.\nInformação:\nContrato: {0}\nPonto de Medição: {1}\n", f.getWbcContract().toString().replace(".", ""), f.getMeansurementPoint());
-                this.generateLog(de, null, message);
-            });
+            //Verify if one file not associate with a attachment and not is a consumer unit , so write a log.
+            files.stream()
+                    .filter(f -> !this.contractInformationService.isConsumerUnit(f.getWbcContract()))
+                    .filter(f -> f.getFile() == null)
+                    .forEach(f -> {
+                        String message = MessageFormat.format("Não foi encontrado nenhuma correspondência do ponto de medição, dentro dos arquivos postados.\nInformação:\nContrato: {0}\nPonto de Medição: {1}\n", f.getWbcContract().toString().replace(".", ""), f.getMeansurementPoint());
+                        this.generateLog(de, null, message);
+                    });
+            
+            //Change status of file that is consumer unit to success      
+            files.stream()
+                    .filter(f -> this.contractInformationService.isConsumerUnit(f.getWbcContract()))
+                    .forEach(f -> {
+                        f.setStatus(MeansurementFileStatus.SUCCESS);
+                        service.saveFile(f);
+                    });
 
             if (!this.logs.isEmpty()) {
                 this.logService.save(logs);
@@ -209,7 +219,6 @@ public class FileValidationTask implements JavaDelegate {
             //set a user for files and type
             files.forEach(file -> {
                 file.setUser(userId);
-                file.setType(type);
             });
 
             //List all point that are into the file    
@@ -219,9 +228,7 @@ public class FileValidationTask implements JavaDelegate {
                     .distinct()
                     .collect(Collectors.toList());
 
-            meansuremPointFiles.addAll(meansuremPoint);
-
-            //Verify if point match some files made. And set the attachment id on file             
+            //Verify if point match some files uploaded. And set the attachment id on file             
             meansuremPoint.forEach(point -> {
                 Optional<MeansurementFile> opt = files.stream().filter(file -> file.getMeansurementPoint().equals(point)).findFirst();
 
