@@ -28,7 +28,7 @@ public class CleanFiles implements JavaDelegate {
     private static ApplicationContext context;
     private MeansurementFileService fileService;
     private MeansurementFileDetailService fileDetailService;
-    private MeansurementFileResultService  fileResultService;
+    private MeansurementFileResultService fileResultService;
     private LogService logService;
 
     public CleanFiles(ApplicationContext context) {
@@ -61,27 +61,23 @@ public class CleanFiles implements JavaDelegate {
             }
 
             this.fileService.findByProcessInstanceId(execution.getProcessInstanceId()).forEach(file -> {
-                this.fileDetailService.deleteAll(file.getDetails());
-                
+
+                if (!file.getDetails().isEmpty()) {
+                    this.fileDetailService.deleteAll(file.getDetails());
+                }
+
                 file.setStatus(MeansurementFileStatus.FILE_PENDING);
                 file.setFile(null);
                 file.setType(null);
                 file.setUser(null);
-                
-                this.fileService.saveFile(file);               
-                
+
+                this.fileService.saveFile(file);
+
                 //this.fileService.updateStatus(MeansurementFileStatus.FILE_PENDING, file.getId());
             });
-            
-            
-            
+
             logService.deleteLogsByProcessInstance(execution.getProcessInstanceId());
             fileResultService.deleteByProcess(execution.getProcessInstanceId());
-            
-            
-            
-            
-            
 
         } catch (Exception e) {
             Logger.getLogger(CleanFiles.class.getName()).log(Level.SEVERE, "[ execute ]", e);

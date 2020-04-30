@@ -22,7 +22,7 @@ class FlowAllTests {
 
     
     
-    private final String TASK_ID = "936633";
+    private final String TASK_ID = "965148";
     
     @Autowired
     private TaskService taskService;
@@ -40,8 +40,8 @@ class FlowAllTests {
                 "exportacao_mantovani_243169_EXPK_1.csv",
                 "exportacao_mantovani_243169_ROMAFILM_1.csv",
                 "exportacao_mantovani_243169_ROMAPACK_1.csv",
-                "exportacao_mantovani_243169_ROMAVIDA_1.csv");
-               //"exportacao_mantovani_243169_VILAPACK_1.csv");
+                "exportacao_mantovani_243169_ROMAVIDA_1.csv",
+                "exportacao_mantovani_243169_VILAPACK_1.csv");
         
         List<String> attachmentsIDs = new ArrayList<>();
         

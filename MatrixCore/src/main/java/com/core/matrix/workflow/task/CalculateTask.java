@@ -204,7 +204,14 @@ public class CalculateTask implements Task {
                             .filter(mpd -> mpd.getMeansurementPoint().replaceAll("\\((L|B)\\)", "").trim().equals(file.getMeansurementPoint()))
                             .collect(Collectors.toList());
 
-                    String point = filteredByPoint.stream().findFirst().get().getMeansurementPoint().replaceAll("\\((L|B)\\)", "").trim();
+                    String pointTemp = filteredByPoint
+                            .stream()
+                            .map(MeansurementFileDetail::getMeansurementPoint)
+                            .findFirst()
+                            .orElse(file.getMeansurementPoint());
+                    
+                    String point = pointTemp.replaceAll("\\((L|B)\\)", "").trim();
+                    
 
                     ContractCompInformation contractInformation = contractsInformations
                             .stream()
@@ -263,7 +270,7 @@ public class CalculateTask implements Task {
                     Log log = new Log();
                     log.setActIdProcesso(de.getProcessInstanceId());
                     log.setMessage(MessageFormat.format("Erro ao calcular a medição referente ao ponto : {0} - \n Contrato : {1}", file.getMeansurementPoint(), file.getWbcContract()));
-                    log.setMessageErrorApplication(e.getLocalizedMessage());
+                    log.setMessageErrorApplication(e.getMessage());
                     logService.save(log);
                 }
             });

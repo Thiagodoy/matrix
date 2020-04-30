@@ -100,11 +100,8 @@ public class BeanIoReader {
             record = (FileParsedDTO) reader.read();
 
             String content = record.getInformations().get(0).getValue();
-            JaroWinklerDistance n = new JaroWinklerDistance();            
-            
-            Logger.getLogger(BeanIoReader.class.getName()).log(Level.INFO, "Regra CONTENT_ID_LAYOUT_A = " + n.apply(CONTENT_ID_LAYOUT_A, content)  );
-            Logger.getLogger(BeanIoReader.class.getName()).log(Level.INFO, "Regra CONTENT_ID_LAYOUT_B = " + n.apply(CONTENT_ID_LAYOUT_B, content)  );
-            Logger.getLogger(BeanIoReader.class.getName()).log(Level.INFO, "Regra CONTENT_ID_LAYOUT_C = " + n.apply(CONTENT_ID_LAYOUT_C, content)  );
+            JaroWinklerDistance n = new JaroWinklerDistance();                        
+
             
             if (n.apply(CONTENT_ID_LAYOUT_A, content) >= 0.95) {
                 return MeansurementFileType.LAYOUT_A;
