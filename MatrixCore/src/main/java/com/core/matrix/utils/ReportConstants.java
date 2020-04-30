@@ -17,7 +17,9 @@ public class ReportConstants {
 
     public enum ReportType {
         EXPORT_RESULT_WBC,
-        EXPORT_RESULT_FULL_WBC
+        EXPORT_RESULT_FULL_WBC,
+        FULL,
+        SHORT
     }
     
     public List<Field> fields;

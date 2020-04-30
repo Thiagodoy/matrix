@@ -2527,12 +2527,12 @@
 				"header": [
 					{
 						"key": "Authorization",
-						"value": "Bearer eyJhbGciOiJIUzUxMiJ9.eyJzdWIiOiJhZG1pbkBhZG1pbi5jb20iLCJleHAiOjE1ODc0NDA2OTQsImlhdCI6MTU4NzQyMjY5NH0.n2NOpgOvf15WmTPEL1cWqJlUktqwpi6ligJR5JbVHp5CtAdk9HnKEsiUtymJnZaTnTyDf8tcKHdehMeBUVzaJQ",
+						"value": "Bearer eyJhbGciOiJIUzUxMiJ9.eyJzdWIiOiJhZG1pbkBhZG1pbi5jb20iLCJleHAiOjE1ODc2ODE4NDAsImlhdCI6MTU4NzY2Mzg0MH0.D8yeIkaB6TBofgj3CmeBj4DhmnMq9XjFwZ1Ozquuw01rZwQUR7tOGaf5QOPfr40cfQlLC8fVnDCz8U426SASCw",
 						"type": "text"
 					}
 				],
 				"url": {
-					"raw": "http://localhost:8004/api/monitoring?empresa=CELTA&ano=2020&mes=3",
+					"raw": "http://localhost:8004/api/monitoring?ano=2020&mes=3",
 					"protocol": "http",
 					"host": [
 						"localhost"
@@ -2565,7 +2565,69 @@
 						},
 						{
 							"key": "empresa",
-							"value": "CELTA"
+							"value": "CELTA",
+							"disabled": true
+						},
+						{
+							"key": "ano",
+							"value": "2020"
+						},
+						{
+							"key": "mes",
+							"value": "3"
+						}
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Export Monitoring",
+			"request": {
+				"method": "GET",
+				"header": [
+					{
+						"key": "Authorization",
+						"value": "Bearer eyJhbGciOiJIUzUxMiJ9.eyJzdWIiOiJhZG1pbkBhZG1pbi5jb20iLCJleHAiOjE1ODc2ODE4NDAsImlhdCI6MTU4NzY2Mzg0MH0.D8yeIkaB6TBofgj3CmeBj4DhmnMq9XjFwZ1Ozquuw01rZwQUR7tOGaf5QOPfr40cfQlLC8fVnDCz8U426SASCw",
+						"type": "text"
+					}
+				],
+				"url": {
+					"raw": "http://localhost:8004/api/monitoring?ano=2020&mes=3",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "8004",
+					"path": [
+						"api",
+						"monitoring"
+					],
+					"query": [
+						{
+							"key": "status",
+							"value": null,
+							"disabled": true
+						},
+						{
+							"key": "instanciaDoProcesso",
+							"value": null,
+							"disabled": true
+						},
+						{
+							"key": "wbcContrato",
+							"value": null,
+							"disabled": true
+						},
+						{
+							"key": "pontoMedicao",
+							"value": "PRCMGAENTR101",
+							"disabled": true
+						},
+						{
+							"key": "empresa",
+							"value": "CELTA",
+							"disabled": true
 						},
 						{
 							"key": "ano",

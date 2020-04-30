@@ -12,13 +12,16 @@ import com.core.matrix.utils.Report;
 import com.core.matrix.utils.ReportConstants;
 import java.io.IOException;
 import java.io.OutputStream;
-import java.lang.annotation.Annotation;
+import java.lang.reflect.Field;
 import java.text.NumberFormat;
 import java.text.SimpleDateFormat;
 import java.util.Arrays;
 import java.util.Comparator;
 import java.util.Date;
 import java.util.List;
+import java.util.Optional;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import java.util.stream.Collectors;
 import javax.servlet.http.HttpServletResponse;
 import org.apache.poi.ss.usermodel.CellStyle;
@@ -47,6 +50,7 @@ public class ReportService {
     @Autowired
     private MeansurementFileResultService fileResultService;
 
+    @Deprecated
     public void export(HttpServletResponse response, MeansurementResultRequest request) throws IOException {
 
         List<MeansurementFileResultStatusDTO> results = fileResultService.getStatusBilling(request.getYear(), request.getMonth());
@@ -75,37 +79,82 @@ public class ReportService {
         this.wb.dispose();
     }
 
-    public <T> void export(List<T> data) {
+    public <T> void export(HttpServletResponse response, List<T> data, ReportConstants.ReportType type) throws IOException {
 
-        if (data.size() == 0) {
-            return;
-        }
+        this.<T>write(data, type);
 
-        List<ReportColumn> columns = Arrays.asList(data.get(0).getClass().getAnnotationsByType(ReportColumn.class));
-        
-        String header = columns
-                .stream()
-                .sorted(Comparator.comparing(ReportColumn::position))
-                .map(a -> a.name())
-                .collect(Collectors.joining(";"));
+        OutputStream out = response.getOutputStream();
+        response.setContentType("application/vnd.ms-excel");
+        response.setHeader("Content-disposition", "attachment; filename=exportação.xlsx");
 
+        this.wb.write(out);
+        out.flush();
+        out.close();
+        this.wb.dispose();
     }
-    
-    
-    public <T> String[] mountHeader(List<T> data) {
-        
-        List<ReportColumn> columns = Arrays.asList(data.get(0).getClass().getAnnotationsByType(ReportColumn.class));
-        
-        return  columns
+
+    public <T> String[] mountHeader(List<T> data, ReportConstants.ReportType type) {
+
+        return Arrays.asList(data.get(0)
+                .getClass()
+                .getDeclaredFields())
                 .stream()
+                .filter(field -> field.isAnnotationPresent(ReportColumn.class))
+                .map(field -> field.getAnnotation(ReportColumn.class))
+                .filter(an -> Arrays.binarySearch(an.typeReport(), type.toString()) >= 0)
                 .sorted(Comparator.comparing(ReportColumn::position))
                 .map(a -> a.name())
                 .collect(Collectors.joining(";")).split(";");
+
     }
 
-    private <T extends Report> void createAndWriteFile(List<T> regs) {
+    public <T> List<Field> getField(Class<T> cl, ReportConstants.ReportType type) {
 
-        String sheetName = "WBC";
+        return Arrays.asList(cl.getDeclaredFields())
+                .stream()
+                .filter(field -> {
+
+                    if (field.isAnnotationPresent(ReportColumn.class)) {
+
+                        ReportColumn annotation = field.getAnnotation(ReportColumn.class);
+
+                        return Arrays.binarySearch(annotation.typeReport(), type.toString()) >= 0;
+
+                    } else {
+                        return false;
+                    }
+
+                })
+                .sorted((a, b) -> {
+
+                    ReportColumn annotationA = a.getAnnotation(ReportColumn.class);
+                    ReportColumn annotationB = b.getAnnotation(ReportColumn.class);
+
+                    return Integer.compare(annotationA.position(), annotationB.position());
+
+                })
+                .collect(Collectors.toList());
+
+    }
+
+    public <T> Object[] getData(List<Field> fields, T data) {
+
+        Object[] out = new Object[fields.size()];
+
+        for (int i = 0; i < out.length; i++) {
+            try {
+                out[i] = fields.get(i).get(data);
+            } catch (Exception ex) {
+                Logger.getLogger(ReportService.class.getName()).log(Level.SEVERE, "", ex);
+            }
+        }
+
+        return out;
+    }
+
+    private <T> void write(List<T> regs, ReportConstants.ReportType type) {
+
+        String sheetName = "Informação";
 
         wb = new SXSSFWorkbook();
         wb.setCompressTempFiles(true);
@@ -122,7 +171,7 @@ public class ReportService {
         font.setItalic(true);
 
         int line = 0;
-        String[] header = this.mountHeader(regs);
+        String[] header = this.mountHeader(regs, type);
         SXSSFRow rr = sheet.createRow(0);
         cellBold.setFont(font);
 
@@ -138,11 +187,13 @@ public class ReportService {
         CellStyle style = wb.createCellStyle();
         style.setFont(fontRecord);
 
+        List<Field> fields = this.getField(regs.get(0).getClass(), type);
+
         for (T register : regs) {
 
             line++;
             SXSSFRow rrr = sheet.createRow(line);
-            Object[] values = register.export();
+            Object[] values = this.getData(fields, register);
 
             DataFormat format = sheet.getWorkbook().createDataFormat();
             NumberFormat numberFormat = NumberFormat.getIntegerInstance();
@@ -164,7 +215,10 @@ public class ReportService {
                     Date date = (Date) value;
                     cell.setCellValue(dateFormat.format(date));
                 } else {
-                    cell.setCellValue(String.valueOf(value));
+
+                    String v = Optional.ofNullable(value).isPresent() ? String.valueOf(value) : "";
+
+                    cell.setCellValue(v);
                 }
 
             }
@@ -172,6 +226,7 @@ public class ReportService {
         }
     }
 
+    @Deprecated
     private void createAndWriteFile(List<MeansurementFileResultStatusDTO> regs, ReportConstants.ReportType type) {
 
         String sheetName = "WBC";

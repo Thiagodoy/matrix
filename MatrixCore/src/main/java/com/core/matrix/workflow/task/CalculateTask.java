@@ -195,10 +195,9 @@ public class CalculateTask implements Task {
                     .orElseThrow(() -> new Exception("[Matrix] Informação do contrato não encontrada!"));
 
             //final Double factorAtt = contractInformationParent.getFactorAttendanceCharge();
-
             //Contracts sons
-            files.stream().forEach(file -> {                
-                
+            files.stream().forEach(file -> {
+
                 try {
                     List<MeansurementFileDetail> filteredByPoint = details
                             .stream()
@@ -218,14 +217,15 @@ public class CalculateTask implements Task {
                             .getInformation(file.getYear(), file.getMonth(), file.getWbcContract())
                             .orElseThrow(() -> new Exception("[WBC] -> Não foi possivel carregar as informações complementares!\n Referente as informações de [CE_SAZONALIZACAO] e [CE_REGRA_OPCIONALIDADE] "));
 
-                    
-                    
-                    
-                    
+                    /**
+                     * Set result to zero when the contract is consumer unit
+                     */
+                    boolean isConsumerUnit = contractInformation.getIsConsumerUnit().equals("1");
+
                     final Double factorAtt = contractInformation.getFactorAttendanceCharge();
                     final double percentLoss = contractInformation.getPercentOfLoss() / 100;
-                    final double proinfa = this.getProinfa(file, contractInformation.getProinfas());
-                    final Double sum = this.getSumConsumptionActive(filteredByPoint);
+                    final double proinfa = isConsumerUnit ? 0d : this.getProinfa(file, contractInformation.getProinfas());
+                    final Double sum = isConsumerUnit ? 0d : this.getSumConsumptionActive(filteredByPoint);
 
                     final ConsumptionResult result = new ConsumptionResult();
                     result.setMeansurementPoint(file.getMeansurementPoint());
@@ -237,13 +237,9 @@ public class CalculateTask implements Task {
                     String name = optEmp.isPresent() ? optEmp.get().getSNmEmpresa() : "";
 
                     MeansurementFileResult fileResult = new MeansurementFileResult(contractWbcInformation, de.getProcessInstanceId());
-                    
-                    /**
-                     * Set result to zero when the contract is consumer unit
-                     */
-                    Double amountScde = contractInformation.getIsConsumerUnit().equals("1") ? 0D : (sum / 1000d);
-                    
-                    
+
+                    Double amountScde = isConsumerUnit ? 0D : (sum / 1000d);
+
                     fileResult.setAmountScde(amountScde);
                     fileResult.setMeansurementFileId(file.getId());
 
@@ -278,8 +274,13 @@ public class CalculateTask implements Task {
                     .getInformation(file.getYear(), file.getMonth(), contractInformationParent.getWbcContract())
                     .orElseThrow(() -> new Exception("[WBC] -> Não foi possivel carregar as informações complementares!\n Referente as informações de [CE_SAZONALIZACAO] e [CE_REGRA_OPCIONALIDADE] "));
 
-            Double sum = results.stream().mapToDouble(MeansurementFileResult::getAmountBruto).reduce(0d, Double::sum);
-            Double sumScde = results.stream().mapToDouble(MeansurementFileResult::getAmountScde).reduce(0d, Double::sum);
+            /**
+             * Set result to zero when the contract is consumer unit
+             */
+            boolean isConsumerUnit = contractInformationParent.getIsConsumerUnit().equals("1");
+
+            Double sum = isConsumerUnit ? 0D : results.stream().mapToDouble(MeansurementFileResult::getAmountBruto).reduce(0d, Double::sum);
+            Double sumScde = isConsumerUnit ? 0D : results.stream().mapToDouble(MeansurementFileResult::getAmountScde).reduce(0d, Double::sum);
 
             String name = results.stream().findFirst().get().getNameCompany();
 
@@ -287,7 +288,7 @@ public class CalculateTask implements Task {
             fileResult.setFactorAtt(contractInformationParent.getFactorAttendanceCharge() / 100);
             fileResult.setAmountBruto(this.roundValue(sum, 3));
             fileResult.setAmountScde(sumScde);
-            Double consumptionLiquid = solicitadoLiquido(this.roundValue(sum, 3), contractWbcInformation);
+            Double consumptionLiquid = isConsumerUnit ? 0D : solicitadoLiquido(this.roundValue(sum, 3), contractWbcInformation);
             fileResult.setAmountLiquido(consumptionLiquid);
             fileResult.setMeansurementFileId(fileId);
             fileResult.setWbcContract(Long.valueOf(contractWbcInformation.getNrContract()));
@@ -314,15 +315,11 @@ public class CalculateTask implements Task {
 
     private Double solicitadoLiquido(Double consumptionTotal, ContractWbcInformationDTO contractWbcInformationDTO) {
 
-        
         Logger.getLogger(CheckTake.class.getName()).log(Level.INFO, "consumptionTotal -> " + consumptionTotal);
         Logger.getLogger(CheckTake.class.getName()).log(Level.INFO, "getNrQtd    ->" + contractWbcInformationDTO.getNrQtd());
         Logger.getLogger(CheckTake.class.getName()).log(Level.INFO, "getNrQtdMin ->" + contractWbcInformationDTO.getNrQtdMin());
         Logger.getLogger(CheckTake.class.getName()).log(Level.INFO, "getNrQtdMax ->" + contractWbcInformationDTO.getNrQtdMax());
-        
-            
-           
-        
+
         BigDecimal consumptionTotalArredondado = new BigDecimal(consumptionTotal).setScale(3, RoundingMode.HALF_EVEN);
 
         BigDecimal solicitadoLiquido = new BigDecimal(contractWbcInformationDTO.getNrQtdMin()).setScale(3, RoundingMode.HALF_EVEN);
@@ -346,15 +343,12 @@ public class CalculateTask implements Task {
     }
 
     public int consultaPerfilCCEE(List<ContractDTO> contracts, Long numeroContrato) {
-        int value = 0;
-        for (int i = 0; i < contracts.size(); i++) {
-
-            if (Long.valueOf(contracts.get(i).getSNrContrato()).equals(numeroContrato)) {
-                value = contracts.get(i).getNCdPerfilCCEE().intValue();
-            }
-        }
-
-        return value;
+        return  contracts
+                .stream()                
+                .filter(c-> Long.valueOf(c.getSNrContrato()).equals(numeroContrato))
+                .mapToInt(c-> c.getNCdPerfilCCEE().intValue())
+                .findFirst()
+                .orElse(0);
     }
 
     private Double getSumConsumptionActive(List<MeansurementFileDetail> details) {

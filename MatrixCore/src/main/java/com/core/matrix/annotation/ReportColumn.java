@@ -20,5 +20,6 @@ public @interface ReportColumn {
  
     int position();
     String name();        
-    Class type();        
+    Class typeValue();   
+    String [] typeReport();
 }
