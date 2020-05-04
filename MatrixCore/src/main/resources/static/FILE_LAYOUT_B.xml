@@ -27,15 +27,15 @@
             </record>  
             
             <record name="details" class="com.core.matrix.dto.FileDetailDTO" minOccurs="1" maxOccurs="unbounded" collection="list" order="3" >
-                <field type="string" name="meansurementPoint" required="true"  trim="true" regex="[a-zA-Z0-9-\s\(\)]+" />
-                <field type="string" name="date" trim="true" required="true"  regex="([0-3]?[0-9]/[0-3]?[0-9]/(?:[0-9]{2})?[0-9]{2})|([0-3]?[0-9]/(?:[0-9]{2})?[0-9]{2})|((?:[0-9]{2})?[0-9]{2}-[0-3]?[0-9]-[0-3]?[0-9])" />
-                <field type="string" name="hour" trim="true" required="true" regex="[0-9]+" />
-                <field type="string" name="energyType" trim="true" required="true" regex="[a-zA-Z\s]+" />
+                <field type="string" name="meansurementPoint"   trim="true" />
+                <field type="string" name="date" trim="true" />
+                <field type="string" name="hour" trim="true"  />
+                <field type="string" name="energyType" trim="true"  />
                 <field type="string" name="generationActive" trim="true" regex="[0-9]+(,?[0-9]+)?" />
-                <field type="string" name="consumptionActive" trim="true" required="true" regex="[0-9]+(,?[0-9]+)?" />
+                <field type="string" name="consumptionActive" trim="true" />
                 <field type="string" name="generationReactivate" trim="true"  regex="[0-9]+(,?[0-9]+)?" />
                 <field type="string" name="consumptionReactivate" trim="true" regex="[0-9]+(,?[0-9]+)?"/>
-                <field type="string" name="sourceCollection" trim="true" required="true" />
+                <field type="string" name="sourceCollection" trim="true"  />
                 <field type="string" name="notificationCollection" trim="true"/> 
             </record>
         </group>

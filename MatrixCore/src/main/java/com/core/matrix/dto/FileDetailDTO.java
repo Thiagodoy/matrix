@@ -16,6 +16,7 @@ import lombok.Data;
 public class FileDetailDTO {
 
     public long line;
+    public String fileName;
     public String agent;
     public String meansurementPoint;
     public String date;

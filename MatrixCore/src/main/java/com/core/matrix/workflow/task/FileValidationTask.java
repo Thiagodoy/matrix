@@ -19,6 +19,7 @@ import com.core.matrix.service.MeansurementFileDetailService;
 import com.core.matrix.service.MeansurementFileService;
 import com.core.matrix.utils.MeansurementFileStatus;
 import com.core.matrix.utils.MeansurementFileType;
+import com.core.matrix.validator.Validator;
 import java.io.BufferedReader;
 import java.io.ByteArrayInputStream;
 import java.io.File;
@@ -30,6 +31,7 @@ import java.io.InputStreamReader;
 import java.nio.charset.Charset;
 import java.text.MessageFormat;
 import java.util.ArrayList;
+import java.util.Collections;
 
 import java.util.List;
 import java.util.Optional;
@@ -103,13 +105,27 @@ public class FileValidationTask implements JavaDelegate {
                     }
 
                     BeanIoReader reader = new BeanIoReader();
-                    Optional<FileParsedDTO> fileParsed = reader.<FileParsedDTO>parse(stream);
+                    Optional<FileParsedDTO> opt = reader.<FileParsedDTO>parse(stream);
 
-                    if (!reader.getErrors().isEmpty()) {
-                        writeFile(fileName, reader.getErrors(), de);
-                    } else if (fileParsed.isPresent()) {
-                        mountFile(fileParsed.get(), attachmentId, user, files);
+                    if (opt.isPresent()) {
+
+                        FileParsedDTO fileDto = opt.get();
+
+                        //Filter only points thas is into process
+                        List<FileDetailDTO> result = this.filter(fileDto.getDetails(), fileName);                          
+                        fileDto.setDetails(result);
+                        
+                        MeansurementFileType type = MeansurementFileType.valueOf(fileDto.getType());                        
+                        this.validate(result, type,fileName);
+
+                        if(this.logs.isEmpty()){
+                            persistFile(fileDto, attachmentId, user, files);
+                        }
+                        
+                    } else {
+                        throw new Exception("Não foi possivel aplicar o parse no arquivo!");
                     }
+
 
                 } catch (Exception e) {
                     Logger.getLogger(FileValidationTask.class.getName()).log(Level.SEVERE, "[ forEach ]", e);
@@ -152,6 +168,55 @@ public class FileValidationTask implements JavaDelegate {
 
     }
 
+    private void validate(List<FileDetailDTO> detail, MeansurementFileType type, String fileName) {
+
+        List<String> errors = Collections.synchronizedList(new ArrayList<String>());
+
+        detail.parallelStream().forEach(d -> {
+
+            List<String> result = new Validator().validate(d, type);
+
+            if (!result.isEmpty()) {
+                errors.addAll(result);
+            }
+        });
+
+        
+        if(!errors.isEmpty()){
+            this.writeFileError(fileName, errors, delegateExecution);
+        }
+        
+       
+
+    }
+
+    private List<FileDetailDTO> filter(List<FileDetailDTO> detail, String fileName) {
+
+        List<FileDetailDTO> result = new ArrayList();
+
+        long count = 5;
+
+        for (FileDetailDTO fileDetailDTO : detail) {
+            fileDetailDTO.setLine(count);
+            fileDetailDTO.setFileName(fileName);
+            ++count;
+        }
+
+        this.files.stream().forEach(f -> {
+
+            List<FileDetailDTO> r = detail
+                    .parallelStream()
+                    .filter(d -> d.getMeansurementPoint().replaceAll("\\((L|B)\\)", "").trim().equals(f.getMeansurementPoint()))
+                    .collect(Collectors.toList());
+
+            result.addAll(r);
+
+        });
+
+        return result;
+
+    }
+
     private void generateLog(DelegateExecution de, Exception e, String message) {
         Log log = new Log();
         log.setMessage(message);
@@ -164,7 +229,7 @@ public class FileValidationTask implements JavaDelegate {
         this.logs.add(log);
     }
 
-    private void writeFile(String fileName, List<String> errors, DelegateExecution de) {
+    private void writeFileError(String fileName, List<String> errors, DelegateExecution de) {
 
         FileWriter writer = null;
         File file = null;
@@ -211,7 +276,7 @@ public class FileValidationTask implements JavaDelegate {
 
     }
 
-    public void mountFile(FileParsedDTO fileParsedDTO, String attachmentId, String userId, List<MeansurementFile> files) {
+    public void persistFile(FileParsedDTO fileParsedDTO, String attachmentId, String userId, List<MeansurementFile> files) {
 
         try {
 
