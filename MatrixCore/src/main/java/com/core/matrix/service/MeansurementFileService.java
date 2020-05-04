@@ -9,6 +9,7 @@ import com.core.matrix.dto.MeansurementFileStatusDTO;
 import com.core.matrix.model.MeansurementFile;
 import com.core.matrix.repository.MeansurementFileRepository;
 import com.core.matrix.utils.MeansurementFileStatus;
+import com.core.matrix.utils.MeansurementFileType;
 import java.util.List;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -43,6 +44,17 @@ public class MeansurementFileService {
     public void updateStatus(MeansurementFileStatus status, Long id) {
         this.repository.updateStatus(status, id);
     }
+    
+    @Transactional(transactionManager = "matrixTransactionManager")
+    public void updateFile(String file, Long id) {
+        this.repository.updateFile(file, id);
+    }
+    
+    @Transactional(transactionManager = "matrixTransactionManager")
+    public void updateType(MeansurementFileType type, Long id) {
+        this.repository.updateType(type, id);
+    }
+    
 
     @Transactional(readOnly = true)
     public MeansurementFile findById(Long id) throws Exception {

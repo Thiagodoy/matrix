@@ -8,6 +8,7 @@ package com.core.matrix.repository;
 import com.core.matrix.dto.MeansurementFileStatusDTO;
 import com.core.matrix.model.MeansurementFile;
 import com.core.matrix.utils.MeansurementFileStatus;
+import com.core.matrix.utils.MeansurementFileType;
 import java.util.List;
 import java.util.Optional;
 import org.springframework.data.jpa.repository.JpaRepository;
@@ -26,6 +27,14 @@ public interface MeansurementFileRepository extends JpaRepository<MeansurementFi
     @Modifying
     @Query(value = "update MeansurementFile c set c.status = :status where c.id = :id")
     void updateStatus(@Param("status") MeansurementFileStatus status, @Param("id") Long id);
+    
+    @Modifying
+    @Query(value = "update MeansurementFile c set c.file = :file where c.id = :id")
+    void updateFile(@Param("file") String file, @Param("id") Long id);
+    
+    @Modifying
+    @Query(value = "update MeansurementFile c set c.type = :type where c.id = :id")
+    void updateType(@Param("type") MeansurementFileType type, @Param("id") Long id);
 
     @Query(nativeQuery = true)
     List<MeansurementFileStatusDTO> getStatus(@Param("year") Long year, @Param("month") Long month);

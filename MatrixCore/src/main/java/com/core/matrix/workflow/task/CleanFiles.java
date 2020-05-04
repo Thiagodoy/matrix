@@ -66,14 +66,9 @@ public class CleanFiles implements JavaDelegate {
                     this.fileDetailService.deleteAll(file.getDetails());
                 }
 
-                file.setStatus(MeansurementFileStatus.FILE_PENDING);
-                file.setFile(null);
-                file.setType(null);
-                file.setUser(null);
-
-                this.fileService.saveFile(file);
-
-                //this.fileService.updateStatus(MeansurementFileStatus.FILE_PENDING, file.getId());
+                this.fileService.updateStatus(MeansurementFileStatus.FILE_PENDING, file.getId());
+                this.fileService.updateFile(null, file.getId());
+                
             });
 
             logService.deleteLogsByProcessInstance(execution.getProcessInstanceId());
