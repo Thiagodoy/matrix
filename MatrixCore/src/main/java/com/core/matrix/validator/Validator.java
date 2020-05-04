@@ -22,8 +22,8 @@ import lombok.Data;
 @Data
 public class Validator {
 
-    private static final String MESSAGE_ERROR_REGEX = "O registro na linha {0} está com formatação inválida para o campo [ {1} ]";
-    private static final String MESSAGE_ERROR_REQUIRED = "O registro na linha {0} está com o valor ausente para  o campo [ {1}]";
+    private static final String MESSAGE_ERROR_REGEX = "O registro na linha {0} está com formatação inválida para o campo [ {1} ]. Arquivo [ {2} ]";
+    private static final String MESSAGE_ERROR_REQUIRED = "O registro na linha {0} está com o valor ausente para  o campo [ {1}]. Arquivo [ {2} ]";
 
     private static final String REGEX_ENERGY_TYPE = "[a-zA-Z\\s]+";
     private static final String REGEX_HOUR = "[0-9]+";
@@ -32,20 +32,21 @@ public class Validator {
     private static final String REGEX_DATE = "([0-3]?[0-9]/[0-3]?[0-9]/(?:[0-9]{2})?[0-9]{2})|([0-3]?[0-9]/(?:[0-9]{2})?[0-9]{2})|((?:[0-9]{2})?[0-9]{2}-[0-3]?[0-9]-[0-3]?[0-9])";
 
     private List<String> errors;
+    private String fileName;
 
     public void validateMeansurementPoint(Long index, String value) {
 
         Optional<String> opt = Optional.ofNullable(value);
 
         if (!opt.isPresent() || (opt.isPresent() && opt.get().isEmpty())) {
-            this.errors.add(MessageFormat.format(MESSAGE_ERROR_REQUIRED, (index + 1), "Ponto de Medição"));
+            this.errors.add(MessageFormat.format(MESSAGE_ERROR_REQUIRED, (index + 1), "Ponto de Medição", this.fileName));
         } else {
 
             Pattern pattern = Pattern.compile(REGEX_POINT);
             Matcher matcher = pattern.matcher(value);
 
             if (!matcher.matches()) {
-                this.errors.add(MessageFormat.format(MESSAGE_ERROR_REGEX, (index + 1), "Ponto de Medição"));
+                this.errors.add(MessageFormat.format(MESSAGE_ERROR_REGEX, (index + 1), "Ponto de Medição", this.fileName));
             }
         }
     }
@@ -55,14 +56,14 @@ public class Validator {
         Optional<String> opt = Optional.ofNullable(value);
 
         if (!opt.isPresent() || (opt.isPresent() && opt.get().isEmpty())) {
-            this.errors.add(MessageFormat.format(MESSAGE_ERROR_REQUIRED, (index + 1), "Data"));
+            this.errors.add(MessageFormat.format(MESSAGE_ERROR_REQUIRED, (index + 1), "Data", this.fileName));
         } else {
 
             Pattern pattern = Pattern.compile(REGEX_DATE);
             Matcher matcher = pattern.matcher(value);
 
             if (!matcher.matches()) {
-                this.errors.add(MessageFormat.format(MESSAGE_ERROR_REGEX, (index + 1), "Data"));
+                this.errors.add(MessageFormat.format(MESSAGE_ERROR_REGEX, (index + 1), "Data", this.fileName));
             }
         }
 
@@ -73,14 +74,14 @@ public class Validator {
         Optional<String> opt = Optional.ofNullable(value);
 
         if (!opt.isPresent() || (opt.isPresent() && opt.get().isEmpty())) {
-            this.errors.add(MessageFormat.format(MESSAGE_ERROR_REQUIRED, (index + 1), "Hora"));
+            this.errors.add(MessageFormat.format(MESSAGE_ERROR_REQUIRED, (index + 1), "Hora", this.fileName));
         } else {
 
             Pattern pattern = Pattern.compile(REGEX_HOUR);
             Matcher matcher = pattern.matcher(value);
 
             if (!matcher.matches()) {
-                this.errors.add(MessageFormat.format(MESSAGE_ERROR_REGEX, (index + 1), "Hora"));
+                this.errors.add(MessageFormat.format(MESSAGE_ERROR_REGEX, (index + 1), "Hora", this.fileName));
             }
         }
 
@@ -91,14 +92,14 @@ public class Validator {
         Optional<String> opt = Optional.ofNullable(value);
 
         if (!opt.isPresent() || (opt.isPresent() && opt.get().isEmpty())) {
-            this.errors.add(MessageFormat.format(MESSAGE_ERROR_REQUIRED, (index + 1), "Consumo Ativo"));
+            this.errors.add(MessageFormat.format(MESSAGE_ERROR_REQUIRED, (index + 1), "Consumo Ativo", this.fileName));
         } else {
 
             Pattern pattern = Pattern.compile(REGEX_CONSUMPTION_ACTIVE);
             Matcher matcher = pattern.matcher(value);
 
             if (!matcher.matches()) {
-                this.errors.add(MessageFormat.format(MESSAGE_ERROR_REGEX, (index + 1), "Consumo Ativo"));
+                this.errors.add(MessageFormat.format(MESSAGE_ERROR_REGEX, (index + 1), "Consumo Ativo", this.fileName));
             }
         }
 
@@ -109,14 +110,14 @@ public class Validator {
         Optional<String> opt = Optional.ofNullable(value);
 
         if (!opt.isPresent() || (opt.isPresent() && opt.get().isEmpty())) {
-            this.errors.add(MessageFormat.format(MESSAGE_ERROR_REQUIRED, (index + 1), "Tipo de Energia"));
+            this.errors.add(MessageFormat.format(MESSAGE_ERROR_REQUIRED, (index + 1), "Tipo de Energia", this.fileName));
         } else {
 
             Pattern pattern = Pattern.compile(REGEX_ENERGY_TYPE);
             Matcher matcher = pattern.matcher(value);
 
             if (!matcher.matches()) {
-                this.errors.add(MessageFormat.format(MESSAGE_ERROR_REGEX, (index + 1), "Tipo de Energia"));
+                this.errors.add(MessageFormat.format(MESSAGE_ERROR_REGEX, (index + 1), "Tipo de Energia", this.fileName));
             }
         }
     }
@@ -126,13 +127,14 @@ public class Validator {
         Optional<String> opt = Optional.ofNullable(value);
 
         if (!opt.isPresent() || (opt.isPresent() && opt.get().isEmpty())) {
-            this.errors.add(MessageFormat.format(MESSAGE_ERROR_REQUIRED, (index + 1), "Origem"));
+            this.errors.add(MessageFormat.format(MESSAGE_ERROR_REQUIRED, (index + 1), "Origem", this.fileName));
         }
     }
 
     public List<String> validate(FileDetailDTO detail, MeansurementFileType type) {
 
         this.errors = new ArrayList();
+        this.fileName = detail.getFileName();
         
         this.validateMeansurementPoint(detail.getLine(), detail.getMeansurementPoint());
         this.validateHour(detail.getLine(), detail.getHour());

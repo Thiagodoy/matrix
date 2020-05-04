@@ -9,7 +9,6 @@ import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import org.activiti.engine.RuntimeService;
 import org.activiti.engine.TaskService;
 import org.activiti.engine.task.Attachment;
 import org.activiti.engine.task.Task;
@@ -20,50 +19,37 @@ import org.springframework.boot.test.context.SpringBootTest;
 @SpringBootTest
 class FlowAllTests {
 
-    
-    
-    private final String TASK_ID = "974444";
-    
+    private final String TASK_ID = "987521";
+
     @Autowired
     private TaskService taskService;
-    
-    
-    
-    
-    
 
     @Test
     void contextLoads() throws Exception {
-        
+
         Task task = taskService.createTaskQuery().taskId(TASK_ID).singleResult();
         List<String> files = Arrays.asList(
-                "exportacao_clacos0g0_248837_BAKER_HUGHES_1.csv"
-                );
-        
+                "exportacao_clacos0g0_248837_L_MERLIN_1.csv"
+        );
+
         List<String> attachmentsIDs = new ArrayList<>();
-        
+
         for (String file : files) {
             File file1 = new File(file);
             InputStream ip = new FileInputStream(file1);
-            
+
             Attachment attachment1 = taskService
-                .createAttachment("application/vnd.ms-excel", null, task.getProcessInstanceId(), file1.getName(), "attachmentDescription", ip);
-            
+                    .createAttachment("application/vnd.ms-excel", null, task.getProcessInstanceId(), file1.getName(), "attachmentDescription", ip);
+
             attachmentsIDs.add(attachment1.getId());
         }
-        
-        
-        
-        
 
-         
-         Map<String,Object>parameters = new HashMap<>();
-         
-         parameters.put(LIST_ATTACHMENT_ID, attachmentsIDs);
-         
-         taskService.complete(task.getId(), parameters);
-         
-        
+        Map<String, Object> parameters = new HashMap<>();
+
+        parameters.put(LIST_ATTACHMENT_ID, attachmentsIDs);
+
+        taskService.complete(task.getId(), parameters);
+
     }
 
 }
