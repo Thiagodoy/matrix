@@ -119,26 +119,29 @@ public class FileValidationTask implements JavaDelegate {
             });
 
             //Verify if one file not associate with a attachment and not is a consumer unit , so write a log.
-            files.stream()
-                    .filter(f -> !this.contractInformationService.isConsumerUnit(f.getWbcContract()))
-                    .filter(f -> f.getFile() == null)
-                    .forEach(f -> {
-                        String message = MessageFormat.format("Não foi encontrado nenhuma correspondência do ponto de medição, dentro dos arquivos postados.\nInformação:\nContrato: {0}\nPonto de Medição: {1}\n", f.getWbcContract().toString().replace(".", ""), f.getMeansurementPoint());
-                        this.generateLog(de, null, message);
-                    });
-            
-            //Change status of file that is consumer unit to success      
-            files.stream()
-                    .filter(f -> this.contractInformationService.isConsumerUnit(f.getWbcContract()))
-                    .forEach(f -> {
-                        f.setStatus(MeansurementFileStatus.SUCCESS);
-                        service.saveFile(f);
-                    });
+            if (this.logs.isEmpty()) {
+                files.stream()
+                        .filter(f -> !this.contractInformationService.isConsumerUnit(f.getWbcContract()))
+                        .filter(f -> f.getFile() == null)
+                        .forEach(f -> {
+                            String message = MessageFormat.format("Não foi encontrado nenhuma correspondência do ponto de medição, dentro dos arquivos postados.\nInformação:\nContrato: {0}\nPonto de Medição: {1}\n", f.getWbcContract().toString().replace(".", ""), f.getMeansurementPoint());
+                            this.generateLog(de, null, message);
+                        });
+            }
 
             if (!this.logs.isEmpty()) {
                 this.logService.save(logs);
                 delegateExecution.setVariable(CONTROLE, RESPONSE_LAYOUT_INVALID);
             } else {
+
+                //Change status of file that is consumer unit to success      
+                files.stream()
+                        .filter(f -> this.contractInformationService.isConsumerUnit(f.getWbcContract()))
+                        .forEach(f -> {
+                            f.setStatus(MeansurementFileStatus.SUCCESS);
+                            service.saveFile(f);
+                        });
+
                 delegateExecution.setVariable(CONTROLE, RESPONSE_LAYOUT_VALID);
             }
         } catch (Exception e) {
