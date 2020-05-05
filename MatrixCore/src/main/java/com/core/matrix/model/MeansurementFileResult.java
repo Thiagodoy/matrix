@@ -66,7 +66,7 @@ import lombok.NoArgsConstructor;
         + "\n"        
         + "WHERE\n"
         + "    a.status IN ('APPROVED')\n"
-    //    + "        AND (contrato_pai = 1 or contrato_pai is null)\n"
+        + "        AND b.act_id_process not in (select distinct mr.act_id_processo from mtx_aqruivo_de_medicao_recompra mr) \n"
         + "        AND a.ano = :year\n"
         + "        AND a.mes = :month\n"
         + "    order by a.data_criacao",

@@ -140,7 +140,15 @@ public class ActivitiCoreConfiguration implements EnvironmentAware {
                 .setDataSource(this.dataSource())
                 .setAsyncFailedJobWaitTime(2147483647)
                 .setDefaultFailedJobWaitTime(2147483647)
-                .setJobExecutorActivate(true);
+                .setJobExecutorActivate(true)
+                .setMailServerDefaultFrom("portal@matrixenergia.com")
+                .setMailServerHost("smtp.office365.com")
+                .setMailServerPort(587)
+                .setMailServerUsername("portal@matrixenergia.com")
+                .setMailServerPassword("P@ortal2020")
+                .setMailServerUseSSL(false)
+                .setMailServerUseTLS(true);
+        
 
         return s.buildProcessEngine();
 
