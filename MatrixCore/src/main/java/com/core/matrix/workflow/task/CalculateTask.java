@@ -190,9 +190,9 @@ public class CalculateTask implements Task {
 
             ContractCompInformation contractInformationParent = contractsInformations
                     .stream()
-                    .filter(c -> c.getCodeContractApportionment() == null)
+                    .filter(c -> c.getCodeContractApportionment() == null || c.getCodeContractApportionment().equals(0L) )
                     .findFirst()
-                    .orElseThrow(() -> new Exception("[Matrix] Informação do contrato não encontrada!"));
+                    .orElseThrow(() -> new Exception("[Matrix] Informação do contrato [ PAI ] do rateio não foi encontrada!"));
 
             //final Double factorAtt = contractInformationParent.getFactorAttendanceCharge();
             //Contracts sons
