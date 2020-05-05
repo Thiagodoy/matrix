@@ -6,7 +6,9 @@
 package com.core.matrix;
 
 import com.core.matrix.validator.Validator;
+import java.util.ArrayList;
 import org.junit.Assert;
+import org.junit.jupiter.api.BeforeAll;
 
 import org.junit.jupiter.api.Test;
 
@@ -16,16 +18,17 @@ import org.junit.jupiter.api.Test;
  */
 public class ValidatorTest {
 
-    private Validator validator;
+    private static Validator validator;
 
     public ValidatorTest() {
-        this.validator = new Validator();
+        validator = new Validator();
+        validator.setErrors(new ArrayList<>());
     }
 
     @Test
     public void validateMeansurementPointSuccess() {
 
-        validator.validateMeansurementPoint(1L, "SPRMPCENTR101 (L)");
+        validator.validateMeansurementPoint(1L, "SPTOY-ENTR101");
         boolean result = validator.getErrors().isEmpty();
         validator.getErrors().clear();
         Assert.assertEquals(true, result);
@@ -89,6 +92,33 @@ public class ValidatorTest {
     }
 
     @Test
+    public void consumptionActiveThousandOk() {
+
+        validator.validateConsumptionActive(0l, "1.800,643");
+        boolean result = validator.getErrors().isEmpty();
+        validator.getErrors().clear();
+        Assert.assertEquals(true, result);
+    }
+
+    @Test
+    public void consumptionActiveThousand2Ok() {
+
+        validator.validateConsumptionActive(0l, "1.800");
+        boolean result = validator.getErrors().isEmpty();
+        validator.getErrors().clear();
+        Assert.assertEquals(true, result);
+    }
+    
+     @Test
+    public void consumptionActive2Ok() {
+
+        validator.validateConsumptionActive(0l, "1800");
+        boolean result = validator.getErrors().isEmpty();
+        validator.getErrors().clear();
+        Assert.assertEquals(true, result);
+    }
+
+    @Test
     public void consumptionActiveError() {
 
         validator.validateConsumptionActive(0l, "a55,98");
@@ -123,7 +153,7 @@ public class ValidatorTest {
         validator.getErrors().clear();
         Assert.assertEquals(true, result);
     }
-    
+
     @Test
     public void sourceCollectionError() {
 

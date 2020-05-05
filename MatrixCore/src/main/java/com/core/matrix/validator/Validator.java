@@ -27,7 +27,7 @@ public class Validator {
 
     private static final String REGEX_ENERGY_TYPE = "[a-zA-Z\\s]+";
     private static final String REGEX_HOUR = "[0-9]+";
-    private static final String REGEX_CONSUMPTION_ACTIVE = "[0-9]+(,?[0-9]+)?";
+    private static final String REGEX_CONSUMPTION_ACTIVE = "[0-9.]+(,?[0-9]+)?";
     private static final String REGEX_POINT = "[a-zA-Z0-9-\\s\\(\\)]+";
     private static final String REGEX_DATE = "([0-3]?[0-9]/[0-3]?[0-9]/(?:[0-9]{2})?[0-9]{2})|([0-3]?[0-9]/(?:[0-9]{2})?[0-9]{2})|((?:[0-9]{2})?[0-9]{2}-[0-3]?[0-9]-[0-3]?[0-9])";
 

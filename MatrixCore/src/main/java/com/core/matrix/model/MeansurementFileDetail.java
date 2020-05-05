@@ -10,10 +10,13 @@ import com.core.matrix.utils.MeansurementFileDetailStatus;
 import com.core.matrix.utils.MeansurementFileType;
 import com.fasterxml.jackson.annotation.JsonFormat;
 import java.io.Serializable;
+import java.text.NumberFormat;
+import java.text.ParseException;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 import java.time.format.DateTimeParseException;
 import java.util.List;
+import java.util.Locale;
 import java.util.Optional;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -40,7 +43,7 @@ import lombok.NoArgsConstructor;
 public class MeansurementFileDetail implements Serializable {
 
     private static final long serialVersionUID = 5486497046886735671L;
-    
+
     @Id
     @Column(name = "id_arquivo_de_medicao_detalhe")
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -118,21 +121,25 @@ public class MeansurementFileDetail implements Serializable {
         this.meansurementPoint = meansurementPoint;
     }
 
-    private Double parseToDouble(String value) {
+    public Double parseToDouble(String value) {
 
-        if (!Optional.ofNullable(value).isPresent()) {
+        if (!Optional.ofNullable(value).isPresent() || Optional.ofNullable(value).isPresent() && value.length() == 0) {
             value = "0,0";
         }
 
-        String v = value
-                .replaceAll("[.]", "")
-                .replaceAll("[,]", ".");
+        if (value.contains("R$")) {
+            value = value.replaceAll("[R$]*", "").trim();
+        }
+
+        value = value.trim();
+        
+        NumberFormat nf = NumberFormat.getInstance(Locale.GERMANY);
 
         try {
-            return Double.parseDouble(v);
-        } catch (NumberFormatException e) {
-            Logger.getLogger(MeansurementFileDetail.class.getName()).log(Level.SEVERE, "Não foi possivel formatar -> " + v);
-            throw e;
+            return nf.parse(value).doubleValue();
+        } catch (ParseException e) {
+            Logger.getLogger(MeansurementFileDetail.class.getName()).log(Level.SEVERE, "Não foi possivel converter o valor -> " + value);
+            throw new NumberFormatException("Não foi possivel converter o valor -> " + value);
         }
 
     }

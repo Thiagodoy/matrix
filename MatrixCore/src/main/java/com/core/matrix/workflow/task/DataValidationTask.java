@@ -28,6 +28,8 @@ import org.activiti.engine.delegate.DelegateExecution;
 import org.springframework.context.ApplicationContext;
 import com.core.matrix.model.Log;
 import com.core.matrix.service.ContractCompInformationService;
+import java.text.MessageFormat;
+import org.activiti.engine.task.Attachment;
 
 /**
  *
@@ -43,6 +45,8 @@ public class DataValidationTask implements Task {
 
     private DelegateExecution delegateExecution;
     private static ApplicationContext context;
+
+    private Attachment attachment;
 
     public DataValidationTask() {
         synchronized (DataValidationTask.context) {
@@ -65,7 +69,7 @@ public class DataValidationTask implements Task {
         List<MeansurementFile> files = this.fileService
                 .findByProcessInstanceId(delegateExecution.getProcessInstanceId())
                 .stream() //Remove files that is a consumer unit
-                .filter( f-> !this.contractInformationService.isConsumerUnit(f.getWbcContract()))
+                .filter(f -> !this.contractInformationService.isConsumerUnit(f.getWbcContract()))
                 .collect(Collectors.toList());
 
         files.forEach(file -> {
@@ -74,6 +78,8 @@ public class DataValidationTask implements Task {
         });
 
         files.stream().forEach(file -> {
+
+            attachment = delegateExecution.getEngineServices().getTaskService().getAttachment(file.getFile());
 
             try {
                 this.checkCalendar(file);
@@ -84,7 +90,9 @@ public class DataValidationTask implements Task {
 
                 Log log = new Log();
                 log.setMessage(e.getMessage());
-                log.setNameProcesso(de.getProcessInstanceId());
+                log.setActIdProcesso(de.getProcessInstanceId());
+                log.setNameProcesso(de.getProcessBusinessKey());
+                log.setActivitiName(de.getCurrentActivityName());
                 this.logService.save(log);
 
                 Logger.getLogger(DataValidationTask.class.getName()).log(Level.SEVERE, "[execute]", e);
@@ -108,8 +116,6 @@ public class DataValidationTask implements Task {
     }
 
     private void checkCalendar(MeansurementFile file) throws Exception {
-
-        long monthTeste = file.getMonth();
 
         int daysOnMonth = YearMonth.of(file.getYear().intValue(), Month.of(file.getMonth().intValue())).lengthOfMonth();
         LocalDate init = LocalDate.of(file.getYear().intValue(), file.getMonth().intValue(), 1);
@@ -143,7 +149,9 @@ public class DataValidationTask implements Task {
             file.setStatus(MeansurementFileStatus.DATA_CALENDAR_ERROR);
             fileService.updateStatus(MeansurementFileStatus.DATA_CALENDAR_ERROR, file.getId());
 
-            throw new Exception("Calendário inválido! arquivo -> " + file.getId());
+            String error = MessageFormat.format("Calendário inválido para o ponto [ {0} ] dentro do arquivo [ {1} ]", file.getMeansurementPoint(), this.attachment.getName());
+
+            throw new Exception(error);
         }
 
     }
@@ -194,7 +202,10 @@ public class DataValidationTask implements Task {
         if (!details.isEmpty()) {
             file.setStatus(MeansurementFileStatus.DATA_HOUR_ERROR);
             details.forEach(mpd -> mpd.setStatus(MeansurementFileDetailStatus.HOUR_ERROR));
-            throw new Exception("Arquivo esta com a consolidação diária das hora inválida arquivo -> " + file.getId());
+
+            String error = MessageFormat.format("Arquivo esta com a consolidação diária das hora inválida, para o ponto [ {0} ] dentro do arquivo [ {1} ]", file.getMeansurementPoint(), this.attachment.getName());
+
+            throw new Exception(error);
         }
 
     }
@@ -262,7 +273,8 @@ public class DataValidationTask implements Task {
 
             file.setStatus(MeansurementFileStatus.DATA_DAY_ERROR);
             fileService.updateStatus(MeansurementFileStatus.DATA_DAY_ERROR, file.getId());
-            throw new Exception("Dados ausentes no arquivo -> " + file.getId());
+            String error = MessageFormat.format("Arquivo esta com as horas diárias ausente, para o ponto [ {0} ] dentro do arquivo [ {1} ]", file.getMeansurementPoint(), this.attachment.getName());
+            throw new Exception(error);
         }
 
     }
