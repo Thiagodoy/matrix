@@ -162,22 +162,22 @@ public class ValidatorTest {
         Assert.assertEquals(false, result);
     }
     
-    @Test
-    public void containsOk() {
-
-        validator.validateContentIfContains(0l, "DFCBAEENTR101 (L)");
-        boolean result = validator.getErrors().isEmpty();
-        validator.getErrors().clear();
-        Assert.assertEquals(true, result);
-    }
+//    @Test
+//    public void containsOk() {
+//
+//        validator.validateContentIfContains(0l, "DFCBAEENTR101 (L)");
+//        boolean result = validator.getErrors().isEmpty();
+//        validator.getErrors().clear();
+//        Assert.assertEquals(true, result);
+//    }
     
-    @Test
-    public void containsNOk() {
-
-        validator.validateContentIfContains(0l, "DFCBAEENTR101");
-        boolean result = validator.getErrors().isEmpty();
-        validator.getErrors().clear();
-        Assert.assertEquals(false, result);
-    }
+//    @Test
+//    public void containsNOk() {
+//
+//        validator.validateContentIfContains(0l, "DFCBAEENTR101");
+//        boolean result = validator.getErrors().isEmpty();
+//        validator.getErrors().clear();
+//        Assert.assertEquals(false, result);
+//    }
 
 }

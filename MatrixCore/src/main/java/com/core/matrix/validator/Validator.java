@@ -132,11 +132,9 @@ public class Validator {
         }
     }
     
-    public void validateContentIfContains(Long index, String value){
+    public synchronized static boolean validateContentIfContains(List<FileDetailDTO>details){       
         
-        if(!value.contains("(L)")){
-            this.errors.add(MessageFormat.format(MESSAGE_ERROR_REQUIRED_LIQUID, index , "Ponto de Medição", this.fileName));
-        }
+         return details.stream().anyMatch(d-> d.getMeansurementPoint().contains("(L)"));    
     }
 
     public List<String> validate(FileDetailDTO detail, MeansurementFileType type) {
@@ -153,11 +151,6 @@ public class Validator {
             this.validateSourceCollection(detail.getLine(), detail.getSourceCollection());
             this.validateEnergyType(detail.getLine(), detail.getEnergyType());
         }
-        
-        if(type.equals(MeansurementFileType.LAYOUT_C) || type.equals(MeansurementFileType.LAYOUT_C_1 )){
-            this.validateContentIfContains(detail.getLine(), detail.getMeansurementPoint());
-        }
-        
 
         return this.errors;
         

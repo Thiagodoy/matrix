@@ -112,20 +112,19 @@ public class FileValidationTask implements JavaDelegate {
                         FileParsedDTO fileDto = opt.get();
 
                         //Filter only points thas is into process
-                        List<FileDetailDTO> result = this.filter(fileDto.getDetails(), fileName);                          
+                        List<FileDetailDTO> result = this.filter(fileDto.getDetails(), fileName);
                         fileDto.setDetails(result);
-                        
-                        MeansurementFileType type = MeansurementFileType.valueOf(fileDto.getType());                        
-                        this.validate(result, type,fileName);
 
-                        if(this.logs.isEmpty()){
+                        MeansurementFileType type = MeansurementFileType.valueOf(fileDto.getType());
+                        this.validate(result, type, fileName);
+
+                        if (this.logs.isEmpty()) {
                             persistFile(fileDto, attachmentId, user, files);
                         }
-                        
+
                     } else {
                         throw new Exception("Não foi possivel aplicar o parse no arquivo!");
                     }
-
 
                 } catch (Exception e) {
                     Logger.getLogger(FileValidationTask.class.getName()).log(Level.SEVERE, "[ forEach ]", e);
@@ -181,12 +180,18 @@ public class FileValidationTask implements JavaDelegate {
             }
         });
 
-        
-        if(!errors.isEmpty()){
+        if (type.equals(MeansurementFileType.LAYOUT_C) || type.equals(MeansurementFileType.LAYOUT_C_1)) {
+
+            boolean has_L = Validator.validateContentIfContains(detail);
+            if (!has_L) {
+                errors.add(MessageFormat.format("Não foi encontrado nenhuma ocorrência [ (L) ] nos pontos de medição. Arquivo [ {0} ]", fileName));
+            }
+
+        }
+
+        if (!errors.isEmpty()) {
             this.writeFileError(fileName, errors, delegateExecution);
         }
-        
-       
 
     }
 
