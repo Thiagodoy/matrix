@@ -8,7 +8,6 @@ package com.core.matrix;
 import com.core.matrix.validator.Validator;
 import java.util.ArrayList;
 import org.junit.Assert;
-import org.junit.jupiter.api.BeforeAll;
 
 import org.junit.jupiter.api.Test;
 
@@ -158,6 +157,24 @@ public class ValidatorTest {
     public void sourceCollectionError() {
 
         validator.validateSourceCollection(0l, "");
+        boolean result = validator.getErrors().isEmpty();
+        validator.getErrors().clear();
+        Assert.assertEquals(false, result);
+    }
+    
+    @Test
+    public void containsOk() {
+
+        validator.validateContentIfContains(0l, "DFCBAEENTR101 (L)");
+        boolean result = validator.getErrors().isEmpty();
+        validator.getErrors().clear();
+        Assert.assertEquals(true, result);
+    }
+    
+    @Test
+    public void containsNOk() {
+
+        validator.validateContentIfContains(0l, "DFCBAEENTR101");
         boolean result = validator.getErrors().isEmpty();
         validator.getErrors().clear();
         Assert.assertEquals(false, result);
