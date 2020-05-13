@@ -1,6 +1,7 @@
 package com.core.matrix;
 
 import com.core.matrix.properties.ActivitiProperties;
+import com.core.matrix.properties.EmailServiceProperties;
 import com.core.matrix.properties.MatrixProperties;
 import com.core.matrix.properties.WbcProperties;
 import java.util.TimeZone;
@@ -17,7 +18,7 @@ import org.springframework.web.servlet.config.annotation.EnableWebMvc;
 import springfox.documentation.swagger2.annotations.EnableSwagger2;
 
 @SpringBootApplication(exclude = {DataSourceAutoConfiguration.class})
-@EnableConfigurationProperties({ActivitiProperties.class, MatrixProperties.class, WbcProperties.class})
+@EnableConfigurationProperties({ActivitiProperties.class, MatrixProperties.class, WbcProperties.class, EmailServiceProperties.class})
 
 @EnableAutoConfiguration
 @ComponentScan()

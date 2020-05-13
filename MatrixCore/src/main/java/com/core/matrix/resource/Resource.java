@@ -48,7 +48,7 @@ public abstract class Resource<T extends Model, S extends Service> {
     public ResponseEntity postAll(@RequestBody List<T> entity) {
 
         try {
-            List<Long> id = service.saveAll(entity);
+            List<Long> id = service.save(entity);
             return ResponseEntity.ok(id);
         } catch (Exception e) {
             Logger.getLogger(this.getClass().getName()).log(Level.SEVERE, e.getMessage());

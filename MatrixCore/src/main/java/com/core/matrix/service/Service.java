@@ -23,7 +23,7 @@ import org.springframework.transaction.annotation.Transactional;
 @Data
 public abstract class Service<T extends Model, R extends JpaRepository<T, Long> & JpaSpecificationExecutor<T>> {
 
-    private R repository;
+    protected R repository;
 
     public Service(R repositoy) {
         this.repository = repositoy;
@@ -35,7 +35,7 @@ public abstract class Service<T extends Model, R extends JpaRepository<T, Long> 
     }
 
     @Transactional
-    public List<Long> saveAll(List<T> entitys) {
+    public List<Long> save(List<T> entitys) {
         return this.repository
                 .saveAll(entitys)
                 .stream()

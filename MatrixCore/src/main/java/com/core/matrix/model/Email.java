@@ -5,6 +5,9 @@
  */
 package com.core.matrix.model;
 
+import java.io.File;
+import java.io.IOException;
+import java.io.InputStream;
 import java.text.MessageFormat;
 import java.time.LocalDateTime;
 import java.util.UUID;
@@ -20,14 +23,18 @@ import javax.persistence.ManyToOne;
 import javax.persistence.PrePersist;
 import javax.persistence.Table;
 import lombok.Data;
+import lombok.EqualsAndHashCode;
+import org.apache.commons.io.FileUtils;
+import org.beanio.StreamFactory;
 
 /**
  *
  * @author thiag
  */
 @Entity
-@Table(name = "mtx_notificacao")
+@Table(name = "mtx_email")
 @Data
+@EqualsAndHashCode
 public class Email implements Model<Email>{
    
     
@@ -39,7 +46,7 @@ public class Email implements Model<Email>{
    }
    
    @Id
-   @Column(name = "id_notificacao")
+   @Column(name = "id_email")
    @GeneratedValue(strategy = GenerationType.IDENTITY)
    protected Long id;
     
@@ -68,11 +75,23 @@ public class Email implements Model<Email>{
    @PrePersist
    public void generateDate(){
        this.createdAt = LocalDateTime.now();
+       this.retry = 1L;
    }
    
-   public String generateUiid(){
-       String value = MessageFormat.format("{0}-{1}-{2}-{3}", status,data,createdAt,template);
-       return  UUID.fromString(value).toString();
+   public String generateKey(){
+       return  MessageFormat.format("{0}-{1}-{2}",data,createdAt,template.getSubject());
+       
    }
+   
+   public static File loadLogo(String path)
+            throws IOException {
+        StreamFactory factory = StreamFactory.newInstance();
+        InputStream initialStream = factory.getClass().getClassLoader().getResourceAsStream(path);
+
+        File targetFile = File.createTempFile("logo", ".png");
+
+        FileUtils.copyInputStreamToFile(initialStream, targetFile);
+        return targetFile;
+    }
 
 }

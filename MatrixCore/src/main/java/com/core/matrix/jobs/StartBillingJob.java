@@ -59,7 +59,7 @@ public class StartBillingJob {
             Log log = new Log();
             log.setMessage("StartBillingJob");
             log.setMessageErrorApplication(e.getLocalizedMessage());
-            logService.save(log);
+            //logService.save(log);
         }
 
     }

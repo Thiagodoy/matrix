@@ -97,8 +97,8 @@ public class TemplateResourceTest extends ResourceAbstractTest {
    
     
 
-    @Test
-    @Order(4)
+    //@Test
+    //@Order(4)
     public void delete_a_template_by_id() throws Exception {
 
         super.setUp();

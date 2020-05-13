@@ -23,37 +23,37 @@ import lombok.Data;
 @Entity
 @Table(name = "mtx_log")
 @Data
-public class Log {
+public class Log implements Model<Log>{
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "id_log")
-    private Long id;
+    protected Long id;
 
     @Column(name = "anexo")
-    private String attachment;
+    protected String attachment;
 
     @Column(name = "id_arquivo")
-    private Long fileId;
+    protected Long fileId;
 
     @Column(name = "nome_processo")
-    private String nameProcesso;
+    protected String nameProcesso;
 
     @Column(name = "act_id_processo")
-    private String actIdProcesso;
+    protected String actIdProcesso;
 
     @Column(name = "mensagem")
-    private String message;
+    protected String message;
 
     @Column(name = "mensagem_erro_aplicacao")
-    private String messageErrorApplication;
+    protected String messageErrorApplication;
     
     @Column(name = "nome_atividade")
-    private String activitiName;
+    protected String activitiName;
 
     @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss", shape = JsonFormat.Shape.STRING)
     @Column(name = "data_criacao")
-    private LocalDateTime createAt;
+    protected LocalDateTime createAt;
 
     @PrePersist
     public void generateDate() {

@@ -94,4 +94,6 @@ public class Constants {
     public static final String CONST_APPROVED = "APROVADO";    
     
     
+    public static final String IMAGE_LOGO_MATRIX = "static/logo-matrix.png";
+    
 }

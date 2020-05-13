@@ -17,27 +17,20 @@ import org.springframework.transaction.annotation.Transactional;
  * @author thiag
  */
 @Service
-public class LogService {
+public class LogService extends com.core.matrix.service.Service<Log, LogRepository>{
 
-    @Autowired
-    private LogRepository repository;
+   
+
+    public LogService(LogRepository repositoy) {
+        super(repositoy);
+    }
 
     
     @Transactional(readOnly = true)
     public List<Log>listByProcessInstance(String id){
         return this.repository.findByActIdProcesso(id);
     }
-    
-    
-    @Transactional
-    public void save(Log log) {
-        this.repository.save(log);
-    }    
-    
-    @Transactional
-    public void save(List<Log> log) {
-        this.repository.saveAll(log);
-    }
+   
     
     @Transactional
     public void deleteLogsByFile(Long id) {
