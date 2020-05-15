@@ -44,6 +44,12 @@ public class JwtRequestFilter extends OncePerRequestFilter {
         String jwtToken = null;
         
         
+        if(request.getRequestURI().contains("websocket")){
+            chain.doFilter(request, response);
+            return;
+        }
+        
+        
         if (requestTokenHeader != null && requestTokenHeader.startsWith("Bearer ")) {
             jwtToken = requestTokenHeader.substring(7);
         

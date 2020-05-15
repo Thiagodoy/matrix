@@ -5,7 +5,6 @@
  */
 package com.core.matrix.utils;
 
-import com.core.matrix.workflow.model.UserActiviti;
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.SignatureAlgorithm;
@@ -25,9 +24,6 @@ import org.springframework.stereotype.Component;
 @Component
 public class JwtTokenUtil implements Serializable {
 
-    
-    
-    
     public static final long JWT_TOKEN_VALIDITY = 5 * 60 * 60;
     @Value("${jwt.secret}")
     private String secret;
@@ -51,13 +47,13 @@ public class JwtTokenUtil implements Serializable {
     private Claims getAllClaimsFromToken(String token) {
         return Jwts.parser().setSigningKey(secret).parseClaimsJws(token).getBody();
     }
-//check if the token has expired
+    //check if the token has expired
 
     private Boolean isTokenExpired(String token) {
         final Date expiration = getExpirationDateFromToken(token);
         return expiration.before(new Date());
     }
-//generate token for user
+    //generate token for user
 
     public String generateToken(UserDetails userDetails) {
         Map<String, Object> claims = new HashMap<>();

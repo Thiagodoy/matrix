@@ -30,7 +30,7 @@ public class ResendEmailJob {
 
     @Autowired
     private ThreadPoolEmail threadPoolEmail;
-
+    
     @Scheduled(cron = "0 0/2 * 1/1 * ?")
     public void run() {
 
@@ -47,6 +47,26 @@ public class ResendEmailJob {
         
         
         
+    }
+    
+    // @Scheduled(cron = "0 0/2 * 1/1 * ?")
+    public void runTestWebsochekt() {
+    
+//        messagingTemplate.convertAndSend("/topic/stocks", "TESETE");
+//        
+//        Optional<SessionWebsocket> opt = repository.findByUserId("teste1matrix@mailinator.com");
+//        
+//        
+//        if(opt.isPresent()){
+//            
+//            SimpMessageHeaderAccessor headerAccessor = SimpMessageHeaderAccessor.create(SimpMessageType.MESSAGE);
+//            headerAccessor.setSessionId(opt.get().getSessionId());
+//            
+//            messagingTemplate.convertAndSendToUser(opt.get().getSessionId(),"/queue/notification", "Vc é o Thiago",headerAccessor.getMessageHeaders());
+//        }   
+        
+        
+    
     }
 
 }

@@ -74,4 +74,8 @@ email:
     protocol: smtp
     starttls:
            enable: true
-           required: true              
+           required: true 
+           
+websocket:
+        cors:
+            origin: http://localhost:8080 

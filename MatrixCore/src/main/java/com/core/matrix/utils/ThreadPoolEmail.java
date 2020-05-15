@@ -35,9 +35,9 @@ public class ThreadPoolEmail {
 
     private final ThreadPoolExecutor pool = (ThreadPoolExecutor) Executors.newFixedThreadPool(1);
     private final Map<String,Email> map = new HashMap<>();
-    private EmailService emailService;
-    private LogService logService;
-    private JavaMailSender sender;
+    private final EmailService emailService;
+    private final LogService logService;
+    private final JavaMailSender sender;
 
     public ThreadPoolEmail(EmailService emailService, LogService logService, JavaMailSender sender) {
 

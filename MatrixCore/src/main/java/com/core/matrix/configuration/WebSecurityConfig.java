@@ -10,6 +10,7 @@ package com.core.matrix.configuration;
  * @author thiag
  */
 
+import com.core.matrix.filter.CorsFilter;
 import com.core.matrix.filter.JwtRequestFilter;
 import com.core.matrix.service.AuthService;
 import com.core.matrix.utils.JwtAuthenticationEntryPoint;
@@ -27,6 +28,7 @@ import org.springframework.security.config.annotation.web.configuration.WebSecur
 import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.security.web.access.channel.ChannelProcessingFilter;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 import org.springframework.web.cors.CorsConfiguration;
 import org.springframework.web.cors.CorsConfigurationSource;
@@ -45,6 +47,9 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
 
     @Autowired
     private JwtRequestFilter jwtRequestFilter;
+    
+    @Autowired
+    private CorsFilter corsFilter;
 
     @Autowired
     public void configureGlobal(AuthenticationManagerBuilder auth) throws Exception {
@@ -72,7 +77,7 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
                 .csrf()
                 .disable()
                 .authorizeRequests()
-                .antMatchers("/api/auth","/api/workflow/repository/diagram","/asset/versao", "/swagger**","/webjars/**", "/swagger-resources/**","/swagger-ui.html**","/v2/api-docs","/csrf", "/")
+                .antMatchers("/api/auth","/websocket/**","/api/workflow/repository/diagram","/asset/versao", "/swagger**","/webjars/**", "/swagger-resources/**","/swagger-ui.html**","/v2/api-docs","/csrf", "/")
                 .permitAll()                                            
                 .antMatchers(HttpMethod.OPTIONS, "/**")
                 .permitAll()
@@ -86,7 +91,8 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
                 .sessionCreationPolicy(SessionCreationPolicy.STATELESS).and()
                 .cors().configurationSource(corsConfigurationSource());
 
-        httpSecurity
+        httpSecurity               
+                .addFilterBefore(corsFilter,ChannelProcessingFilter.class)
                 .addFilterBefore(jwtRequestFilter, UsernamePasswordAuthenticationFilter.class);
     }
     
@@ -98,6 +104,7 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
         configuration.setAllowedMethods(Arrays.asList("DELETE","GET","POST","PUT","OPTIONS","TRACE","PATCH","HEAD"));
         UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
         source.registerCorsConfiguration("/**", configuration);
+        
         return source;
    }
 }
