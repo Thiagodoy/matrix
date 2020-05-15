@@ -9,8 +9,10 @@ import com.core.matrix.request.AuthRequest;
 import com.core.matrix.response.AuthResponse;
 import com.core.matrix.service.AuthService;
 import com.core.matrix.utils.JwtTokenUtil;
+import io.jsonwebtoken.ExpiredJwtException;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import javax.servlet.http.HttpServletRequest;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -53,6 +55,30 @@ public class AuthResource {
 
         } catch (Exception ex) {
             Logger.getLogger(AuthResource.class.getName()).log(Level.SEVERE, null, ex);
+            return ResponseEntity.status(HttpStatus.resolve(500)).body(ex.getMessage());
+        }
+
+    }
+
+    @RequestMapping(method = RequestMethod.GET)
+    public ResponseEntity checkToken(HttpServletRequest request) {
+
+        try {
+
+            final String requestTokenHeader = request.getHeader("Authorization");
+            String jwtToken = null;
+            String email = null;
+
+            jwtToken = requestTokenHeader.substring(7);
+
+            email = jwtTokenUtil.getUsernameFromToken(jwtToken);
+            final UserDetails userDetails = authService
+                    .loadUserByUsername(email);
+            final String token = jwtTokenUtil.generateToken(userDetails);
+            return ResponseEntity.ok(new AuthResponse(token, userDetails));
+
+        } catch (Exception ex) {
+            Logger.getLogger(AuthResource.class.getName()).log(Level.SEVERE, "[ checkToken ]", ex);
             return ResponseEntity.status(HttpStatus.resolve(500)).body(ex.getMessage());
         }
 

@@ -45,6 +45,32 @@
 						}
 					},
 					"response": []
+				},
+				{
+					"name": "checkToken",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer eyJhbGciOiJIUzUxMiJ9.eyJzdWIiOiJ0ZXN0ZTFtYXRyaXhAbWFpbGluYXRvci5jb20iLCJleHAiOjE1ODk1OTUwOTcsImlhdCI6MTU4OTU3NzA5N30.SwEag0szHImPuut8S4UqtzKwpj4bRyMeLvriR3VkRNSQTDpQyb8Ull7L2BvtjM467-vgL72d8qDhBdqIsBNMxA",
+								"type": "text"
+							}
+						],
+						"url": {
+							"raw": "http://localhost:8004/api/auth",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "8004",
+							"path": [
+								"api",
+								"auth"
+							]
+						}
+					},
+					"response": []
 				}
 			],
 			"protocolProfileBehavior": {}
@@ -1453,12 +1479,12 @@
 						"header": [
 							{
 								"key": "Authorization",
-								"value": "Bearer eyJhbGciOiJIUzUxMiJ9.eyJzdWIiOiJhZG1pbkBhZG1pbi5jb20iLCJleHAiOjE1ODI4MjExMjIsImlhdCI6MTU4MjgwMzEyMn0.0kCq9N_8hCtHzOIo1NgPCYVDMQndH8siebIqAKMmvAaBR-FvdZXYFLA5I12y2mIWb5xHgnOtB6JdyOCnuNtKSg",
+								"value": "Bearer eyJhbGciOiJIUzUxMiJ9.eyJzdWIiOiJ0ZXN0ZTFtYXRyaXhAbWFpbGluYXRvci5jb20iLCJleHAiOjE1ODgwMjQyMTUsImlhdCI6MTU4ODAwNjIxNX0.W0sDnuX9nJnHfP4jEnYNxQk4nEaUfHpeF4A2zh1BTFJv04SNqpb1h5w9AWpy2pt5VbaHjaBCXilNrm2fto51Qg",
 								"type": "text"
 							}
 						],
 						"url": {
-							"raw": "http://localhost:8004/api/workflow/runtime/getCandidateTask?processInstanceId=446335",
+							"raw": "http://localhost:8004/api/workflow/runtime/getCandidateTask?valueVariable=ROCA",
 							"protocol": "http",
 							"host": [
 								"localhost"
@@ -1473,12 +1499,12 @@
 							"query": [
 								{
 									"key": "valueVariable",
-									"value": "LTDA",
-									"disabled": true
+									"value": "ROCA"
 								},
 								{
 									"key": "processInstanceId",
-									"value": "446335"
+									"value": "446335",
+									"disabled": true
 								}
 							]
 						}
@@ -2527,20 +2553,23 @@
 				"header": [
 					{
 						"key": "Authorization",
-						"value": "Bearer eyJhbGciOiJIUzUxMiJ9.eyJzdWIiOiJhZG1pbkBhZG1pbi5jb20iLCJleHAiOjE1ODc2ODE4NDAsImlhdCI6MTU4NzY2Mzg0MH0.D8yeIkaB6TBofgj3CmeBj4DhmnMq9XjFwZ1Ozquuw01rZwQUR7tOGaf5QOPfr40cfQlLC8fVnDCz8U426SASCw",
+						"value": "Bearer eyJhbGciOiJIUzUxMiJ9.eyJzdWIiOiJ0ZXN0ZTFtYXRyaXhAbWFpbGluYXRvci5jb20iLCJleHAiOjE1ODgyNzU4NjIsImlhdCI6MTU4ODI1Nzg2Mn0.4CkwHr-S5j78vrC1-vACFWL6bnepK0uiCrvr_Nb3d_Kp7WP0PtGzg9_Z-nEaxu2Gck7bbnlgtDxEVgSBIzyGog",
 						"type": "text"
 					}
 				],
 				"url": {
-					"raw": "http://localhost:8004/api/monitoring?ano=2020&mes=3",
+					"raw": "http://52.225.134.57/api/monitoring/?ano=2020&mes=3&page=0&size=10",
 					"protocol": "http",
 					"host": [
-						"localhost"
+						"52",
+						"225",
+						"134",
+						"57"
 					],
-					"port": "8004",
 					"path": [
 						"api",
-						"monitoring"
+						"monitoring",
+						""
 					],
 					"query": [
 						{
@@ -2575,6 +2604,19 @@
 						{
 							"key": "mes",
 							"value": "3"
+						},
+						{
+							"key": "instanciaDoProcesso",
+							"value": "920014",
+							"disabled": true
+						},
+						{
+							"key": "page",
+							"value": "0"
+						},
+						{
+							"key": "size",
+							"value": "10"
 						}
 					]
 				}
@@ -2588,12 +2630,12 @@
 				"header": [
 					{
 						"key": "Authorization",
-						"value": "Bearer eyJhbGciOiJIUzUxMiJ9.eyJzdWIiOiJhZG1pbkBhZG1pbi5jb20iLCJleHAiOjE1ODc2ODE4NDAsImlhdCI6MTU4NzY2Mzg0MH0.D8yeIkaB6TBofgj3CmeBj4DhmnMq9XjFwZ1Ozquuw01rZwQUR7tOGaf5QOPfr40cfQlLC8fVnDCz8U426SASCw",
-						"type": "text"
+						"type": "text",
+						"value": "Bearer eyJhbGciOiJIUzUxMiJ9.eyJzdWIiOiJ0ZXN0ZTFtYXRyaXhAbWFpbGluYXRvci5jb20iLCJleHAiOjE1ODgyNzU4NjIsImlhdCI6MTU4ODI1Nzg2Mn0.4CkwHr-S5j78vrC1-vACFWL6bnepK0uiCrvr_Nb3d_Kp7WP0PtGzg9_Z-nEaxu2Gck7bbnlgtDxEVgSBIzyGog"
 					}
 				],
 				"url": {
-					"raw": "http://localhost:8004/api/monitoring?ano=2020&mes=3",
+					"raw": "http://localhost:8004/api/monitoring/export?ano=2020&mes=3&total=147",
 					"protocol": "http",
 					"host": [
 						"localhost"
@@ -2601,7 +2643,8 @@
 					"port": "8004",
 					"path": [
 						"api",
-						"monitoring"
+						"monitoring",
+						"export"
 					],
 					"query": [
 						{
@@ -2636,7 +2679,39 @@
 						{
 							"key": "mes",
 							"value": "3"
+						},
+						{
+							"key": "total",
+							"value": "147"
 						}
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Versao",
+			"request": {
+				"method": "GET",
+				"header": [
+					{
+						"key": "Authorization",
+						"value": "Bearer eyJhbGciOiJIUzUxMiJ9.eyJzdWIiOiJhZG1pbkBhZG1pbi5jb20iLCJleHAiOjE1ODUzNjQxMzYsImlhdCI6MTU4NTM0NjEzNn0.kXhitW6tm6vVCkEN-v9TVNMDrZ6PcfO1QgYakhu2GpyJccl5H21KvlGHNxhOJfgYQD99-eSCKxyZ3poBWXod_A",
+						"type": "text"
+					}
+				],
+				"url": {
+					"raw": "http://52.225.134.57/asset/versao",
+					"protocol": "http",
+					"host": [
+						"52",
+						"225",
+						"134",
+						"57"
+					],
+					"path": [
+						"asset",
+						"versao"
 					]
 				}
 			},
