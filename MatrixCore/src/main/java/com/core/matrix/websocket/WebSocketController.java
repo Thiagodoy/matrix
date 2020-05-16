@@ -7,6 +7,7 @@ package com.core.matrix.websocket;
 
 import com.core.matrix.model.SessionWebsocket;
 import com.core.matrix.repository.SessionWebsocketRepository;
+import java.util.Optional;
 import javax.transaction.Transactional;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.messaging.handler.annotation.MessageMapping;
@@ -25,7 +26,15 @@ public class WebSocketController {
     
     @MessageMapping(value = {"/register"})
     @Transactional
-    public void register(SessionWebsocket sessionWebsocket){        
+    public void register(SessionWebsocket sessionWebsocket){  
+        
+        Optional<SessionWebsocket> opt = repository.findByUserId(sessionWebsocket.getSessionId());
+        
+        if(opt.isPresent()){
+            repository.delete(opt.get());
+        }
+    
+        
         repository.save(sessionWebsocket);        
     }
     

@@ -25,7 +25,7 @@ import org.springframework.web.bind.annotation.RestController;
  */
 @RestController
 @RequestMapping(value = "/api/group")
-public class GroupResource {
+public class GroupResource{
 
     @Autowired
     private GroupActivitiService service;
