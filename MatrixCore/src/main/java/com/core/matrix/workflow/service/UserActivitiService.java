@@ -65,6 +65,15 @@ public class UserActivitiService {
     }
 
     
+    
+    @Transactional(readOnly = true)
+    public Page<UserActiviti>  list(Specification spc,  Pageable page){
+        return repository.findAll(spc, page);
+    }
+    
+    
+    
+    @Deprecated
     @Transactional(readOnly = true)
     public Page<UserActiviti>  list(String firstName, String lastName, String email, String profile,  Pageable page){
          List<Specification<UserActiviti>> predicates = new ArrayList<>();

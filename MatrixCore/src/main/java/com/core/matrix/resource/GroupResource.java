@@ -5,18 +5,23 @@
  */
 package com.core.matrix.resource;
 
+import com.core.matrix.specifications.GroupSpecification;
 import com.core.matrix.workflow.model.GroupActiviti;
 import com.core.matrix.workflow.service.GroupActivitiService;
-import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Sort;
+import org.springframework.data.jpa.domain.Specification;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 /**
@@ -25,16 +30,23 @@ import org.springframework.web.bind.annotation.RestController;
  */
 @RestController
 @RequestMapping(value = "/api/group")
-public class GroupResource{
+public class GroupResource {
 
     @Autowired
     private GroupActivitiService service;
 
-    
     @RequestMapping(method = RequestMethod.GET)
-    public ResponseEntity get() {
+    public ResponseEntity get(
+            @RequestParam(name = "name", required = false) String name,
+            @RequestParam(name = "page", defaultValue = "0") int page,
+            @RequestParam(name = "size", defaultValue = "10") int size) {
+        
+        
+            Specification spc = GroupSpecification.name(name);
+                    
+        
         try {
-            List<GroupActiviti> response = this.service.listAll();
+            Page<GroupActiviti> response = this.service.listAll(spc, PageRequest.of(page, size, Sort.by("name")));
             return ResponseEntity.ok(response);
 
         } catch (Exception e) {
@@ -55,10 +67,10 @@ public class GroupResource{
             return ResponseEntity.status(HttpStatus.resolve(500)).build();
         }
     }
-    
+
     @RequestMapping(value = "/{id}", method = RequestMethod.DELETE)
-    public ResponseEntity delete(@PathVariable(name = "id")String id){
-        
+    public ResponseEntity delete(@PathVariable(name = "id") String id) {
+
         try {
             this.service.delete(id);
             return ResponseEntity.ok().build();

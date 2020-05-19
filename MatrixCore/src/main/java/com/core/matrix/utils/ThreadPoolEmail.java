@@ -169,5 +169,9 @@ public class ThreadPoolEmail {
         }
 
     }
+    
+    public boolean  executorIsRunning(){        
+        return !this.pool.isTerminated();
+    }
 
 }

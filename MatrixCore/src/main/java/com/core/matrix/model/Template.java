@@ -12,6 +12,7 @@ import com.fasterxml.jackson.datatype.jsr310.ser.LocalDateTimeSerializer;
 import java.time.LocalDateTime;
 import javax.persistence.Column;
 import javax.persistence.Entity;
+import javax.persistence.EnumType;
 import javax.persistence.Enumerated;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
@@ -39,7 +40,8 @@ public class Template implements Model<Template>{
     
     
     public enum TemplateBusiness{
-        FORGOT_PASSWORD
+        FORGOT_PASSWORD,
+        TASK_PENDING;
     }
     
     @Id
@@ -53,7 +55,7 @@ public class Template implements Model<Template>{
     @Column(name = "assunto")
     protected String subject;    
     
-    @Enumerated
+    @Enumerated(EnumType.STRING)
     @Column(name = "logica")
     protected TemplateBusiness business;
     

@@ -8,6 +8,9 @@ package com.core.matrix.specifications;
 import com.core.matrix.model.Template;
 import com.core.matrix.model.Template_;
 import java.time.LocalDateTime;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Optional;
 import org.springframework.data.jpa.domain.Specification;
 
 /**
@@ -16,27 +19,31 @@ import org.springframework.data.jpa.domain.Specification;
  */
 public class TemplateSpecification {
 
-    public static Specification<Template> filter(Long id, String subject, int version) {
-        return (root, criteriaQuery, criteriaBuilder) -> criteriaBuilder.equal(root.get(Template_.id), id);
+    public static Specification<Template> filter(Long id, String subject, Long version, Template.TemplateBusiness business) {
+        
+        List<Specification> predicative = new ArrayList<>();
+        
+        if(Optional.ofNullable(id).isPresent()){            
+            predicative.add((root, criteriaQuery, criteriaBuilder) -> criteriaBuilder.equal(root.get(Template_.id), id));
+        }
+        
+        if(Optional.ofNullable(subject).isPresent()){            
+            predicative.add((root, criteriaQuery, criteriaBuilder) -> criteriaBuilder.like(criteriaBuilder.upper(root.get(Template_.subject)), "%" + subject.toUpperCase() + "%"));
+        }
+        
+        if(Optional.ofNullable(version).isPresent()){            
+            predicative.add((root, criteriaQuery, criteriaBuilder) -> criteriaBuilder.equal(root.get(Template_.version), version));
+        }
+        
+        if(Optional.ofNullable(business).isPresent()){            
+            predicative.add((root, criteriaQuery, criteriaBuilder) -> criteriaBuilder.equal(root.get(Template_.business), business));
+        }
+        
+        
+        Specification spc = predicative.stream().reduce((a,b)-> a.and(b)).orElse(null);
+        
+        return spc;
+        
     }  
-    
-    
-   
-    protected Long id;
-    
-   
-    protected String template;
-    
-  
-    protected String subject;    
-    
- 
-    protected Long version;
-    
-   
-    protected LocalDateTime createdAt;
-    
-   
-    protected String parameters;
 
 }

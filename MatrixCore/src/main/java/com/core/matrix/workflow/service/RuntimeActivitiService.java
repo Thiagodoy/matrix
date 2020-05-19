@@ -246,6 +246,99 @@ public class RuntimeActivitiService {
 
     }
 
+    public synchronized String getProcessDefinitionName(String processDefinitionId) {
+
+        return repositoryActivitiService
+                .listAll()
+                .stream()
+                .filter(p -> p.getId().equals(processDefinitionId))
+                .map(t -> t.getName())
+                .findFirst()
+                .orElse("");
+
+    }
+
+    public PageResponse<TaskResponse> getAssigneAndCandidateTask(UserActiviti user, String searchValue, int page, int size) {
+
+        String groupFilter = user.getGroups()
+                .stream()
+                .map(g -> "'" + g.getGroupId() + "'")
+                .filter(Objects::nonNull)
+                .collect(Collectors.joining(","));
+
+        List<String> processInstances = this.listProcessInstances(groupFilter, user.getId(), searchValue, page, size);
+
+        long total = Long.parseLong(processInstances.get(0));
+        
+        processInstances = processInstances.subList(1, processInstances.size());
+        
+        if (processInstances.isEmpty()) {
+            return new PageResponse<TaskResponse>(new ArrayList(), 1L, 1L, (long) page);
+        }
+
+        List<TaskResponse> response = taskService
+                .createTaskQuery()
+                .includeProcessVariables()
+                .includeTaskLocalVariables()
+                .processInstanceIdIn(processInstances)
+                .orderByTaskCreateTime()
+                .desc()
+                .list()
+                .parallelStream()
+                .map(t -> {
+                    TaskResponse instance = new TaskResponse(t);
+                    instance.setProcessDefinitionName(this.getProcessDefinitionName(t.getProcessDefinitionId()));
+                    return instance;
+                })
+                .collect(Collectors.toList());
+
+        return new PageResponse<TaskResponse>(response, (long) total, (long) size, (long) page);
+    }
+
+    private List<String> listProcessInstances(String groupFilter, String user, String valueSearch, int page, int size) {
+
+        int min = page * size;
+
+        String query = "SELECT DISTINCT\n"
+                + "    t.PROC_INST_ID_, t.ID_\n"
+                + "FROM\n"
+                + "    activiti.act_ru_task t\n"
+                + "        INNER JOIN\n"
+                + "    activiti.act_ru_variable v ON t.PROC_INST_ID_ = v.PROC_INST_ID_\n"
+                + "        INNER JOIN\n"
+                + "    activiti.ACT_RU_IDENTITYLINK k ON t.ID_ = k.TASK_ID_\n"
+                + "WHERE\n"
+                + "    (t.assignee_ = '" + user + "'\n"
+                + "        OR k.group_id_ in (" + groupFilter + "))\n";
+
+        if (Optional.ofNullable(valueSearch).isPresent()) {
+            query += "        AND UPPER(v.text_) LIKE '%" + valueSearch.toUpperCase() + "%'\n" + "        AND SUBSTRING(v.name_, 1, 1) = '#'\n";
+        }
+
+        query += "        ORDER BY t.CREATE_TIME_ DESC";
+
+        List<String> processInstances = taskService
+                .createNativeTaskQuery()
+                .sql(query)
+                .listPage(min, size)
+                .stream()
+                .map(t -> t.getProcessInstanceId())
+                .distinct()
+                .collect(Collectors.toList());
+
+        long total = taskService
+                .createNativeTaskQuery()
+                .sql(query)
+                .list()
+                .stream()
+                .count();
+        
+        processInstances.add(0, String.valueOf(total));
+
+        return processInstances;
+    }
+
+    @Deprecated
     public PageResponse<TaskResponse> getCandidateTasks(UserActiviti user, String variableValue, String processInstance, int page, int size) {
 
         // grou

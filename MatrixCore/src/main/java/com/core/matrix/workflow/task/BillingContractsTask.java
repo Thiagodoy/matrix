@@ -13,6 +13,8 @@ import com.core.matrix.service.LogService;
 import com.core.matrix.service.MeansurementFileService;
 import com.core.matrix.utils.Constants;
 import static com.core.matrix.utils.Constants.PROCESS_INFORMATION_CLIENT;
+import static com.core.matrix.utils.Constants.PROCESS_INFORMATION_MEANSUREMENT_POINT;
+import static com.core.matrix.utils.Constants.PROCESS_INFORMATION_PROCESSO_ID;
 import com.core.matrix.wbc.dto.ContractDTO;
 import com.core.matrix.wbc.service.ContractService;
 import java.text.MessageFormat;
@@ -31,6 +33,8 @@ import org.activiti.engine.delegate.JavaDelegate;
 import org.activiti.engine.runtime.ProcessInstance;
 import org.joda.time.LocalDate;
 import org.springframework.context.ApplicationContext;
+import static com.core.matrix.utils.Constants.PROCESS_INFORMATION_NICKNAME;
+import java.util.Objects;
 
 /**
  *
@@ -44,7 +48,7 @@ public class BillingContractsTask implements JavaDelegate {
     private LogService logService;
 
     private static ApplicationContext context;
-    
+
     public BillingContractsTask() {
         synchronized (BillingContractsTask.context) {
             this.contractService = context.getBean(ContractService.class);
@@ -58,17 +62,43 @@ public class BillingContractsTask implements JavaDelegate {
         BillingContractsTask.context = context;
     }
 
-    private ProcessInstance createAProcessForBilling(DelegateExecution execution, ContractDTO contract) {                                    
+    private ProcessInstance createAProcessForBilling(DelegateExecution execution, ContractDTO contract) {
         Map<String, Object> variables = new HashMap<>();
-        variables.put(PROCESS_INFORMATION_CLIENT, contract.getSNmEmpresaEpce().toString());       
-        
+
         return this.createAProcessForBilling(execution, Arrays.asList(contract), variables);
     }
 
+    @javax.transaction.Transactional
     private synchronized ProcessInstance createAProcessForBilling(DelegateExecution execution, List<ContractDTO> contracts, Map<String, Object> variables) {
+
         variables.put(Constants.LIST_CONTRACTS_FOR_BILLING, contracts);
 
-        return execution.getEngineServices().getRuntimeService().startProcessInstanceByMessage(Constants.PROCESS_MEANSUREMENT_FILE_MESSAGE_EVENT, variables);
+        List<String> meansurementPoint = new ArrayList();
+        List<String> nicknames = new ArrayList();
+
+        contracts.forEach(contract -> {
+            meansurementPoint.add(contract.getMeansurementPoint());
+            nicknames.add(contract.getSNmApelido());
+        });
+
+        String pointers = meansurementPoint
+                .stream()
+                .filter(p -> Objects.nonNull(p))
+                .collect(Collectors.joining(","));
+
+        String nickname = nicknames
+                .stream()
+                .collect(Collectors.joining(","));
+
+        ProcessInstance processInstance = execution.getEngineServices().getRuntimeService().startProcessInstanceByMessage(Constants.PROCESS_MEANSUREMENT_FILE_MESSAGE_EVENT, variables);
+
+        variables.put(PROCESS_INFORMATION_MEANSUREMENT_POINT, pointers);
+        variables.put(PROCESS_INFORMATION_NICKNAME, nickname);
+        variables.put(PROCESS_INFORMATION_PROCESSO_ID, processInstance.getProcessInstanceId());
+
+        execution.getEngineServices().getRuntimeService().setVariables(processInstance.getProcessInstanceId(), variables);
+
+        return processInstance;
     }
 
     private void createMeansurementFile(String processInstanceId, ContractDTO contract) {
@@ -154,16 +184,14 @@ public class BillingContractsTask implements JavaDelegate {
                 this.logService.save(logs);
                 logs.clear();
             }
-            
+
             //Contracts with rateio
             contracts
                     .parallelStream()
                     .filter(contract -> contract.getBFlRateio().equals(1L) && contract.getNCdContratoRateioControlador() != null)
                     .collect(Collectors.groupingBy(ContractDTO::getNCdContratoRateioControlador))
                     .forEach((contractParent, contractsSon) -> {
-                        
-                        
-                        
+
                         contractsSon.stream().forEach(cc -> {
 
                             try {
@@ -210,8 +238,8 @@ public class BillingContractsTask implements JavaDelegate {
                                 Optional<ContractCompInformation> ccc = this.contractCompInformationService.listByContract(Long.parseLong(c.getSNrContrato())).stream().findFirst();
 
                                 if (!this.hasMeansurementFile(ccc.get())) {
-                                    String processInstanceId = this.createAProcessForBilling(execution, sons, variables).getProcessInstanceId();                                    
-                                    this.createMeansurementFile(processInstanceId, sons);                                    
+                                    String processInstanceId = this.createAProcessForBilling(execution, sons, variables).getProcessInstanceId();
+                                    this.createMeansurementFile(processInstanceId, sons);
                                 }
 
                             } catch (Exception ex) {

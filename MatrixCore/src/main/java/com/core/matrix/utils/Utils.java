@@ -5,6 +5,7 @@
  */
 package com.core.matrix.utils;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import java.io.File;
 import java.io.FileInputStream;
@@ -21,6 +22,8 @@ import java.time.format.DateTimeFormatter;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.text.similarity.JaroWinklerDistance;
 import org.beanio.StreamFactory;
@@ -102,6 +105,15 @@ public class Utils {
 
         FileUtils.copyInputStreamToFile(initialStream, targetFile);
         return targetFile;
+    }
+
+    public static String mapToString(Map ma) {
+        try {
+            return new ObjectMapper().writeValueAsString(ma);
+        } catch (JsonProcessingException ex) {
+            Logger.getLogger(Utils.class.getName()).log(Level.SEVERE, null, ex);
+            return "";
+        }
     }
 
 }

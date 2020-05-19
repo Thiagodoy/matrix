@@ -1,6 +1,7 @@
 package com.core.matrix.workflow.model;
 
 
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import java.util.Arrays;
 import java.util.Collection;
 
@@ -32,6 +33,7 @@ import org.springframework.security.core.userdetails.UserDetails;
 @Entity
 @Table(schema = "activiti", name = "act_id_user")
 @Data
+@JsonIgnoreProperties(value = {"authorities"})
 public class UserActiviti implements UserDetails, User{
 
     @Id
@@ -58,14 +60,9 @@ public class UserActiviti implements UserDetails, User{
     
     @Column(name = "PROFILE_ID_")
     private  String profile;
-
-//    @Column(name = "USER_MASTER_ID_")
-//    private String userMasterId;    
-   
-
-//    @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd HH:mm:ss")
-//    @Column(name = "created_at_")
-//    private LocalDateTime createdAt;
+    
+    @Column(name = "IS_ENABLED_")
+    private boolean isEnabled;
 
     @OneToMany(cascade = {CascadeType.ALL}, orphanRemoval = true,  fetch = FetchType.EAGER)
     @JoinColumn(name = "USER_ID_")
@@ -73,14 +70,12 @@ public class UserActiviti implements UserDetails, User{
 
     @OneToMany(cascade = CascadeType.ALL, orphanRemoval = true, fetch = FetchType.EAGER)
     @JoinColumn(name = "USER_ID_")
-    private List<UserInfoActiviti> info;   
-    
+    private List<UserInfoActiviti> info;    
     
     
     @PrePersist
-    public void associateUserWithProfile(){
-//      Optional<GroupMemberActiviti> opt =  this.groups.stream().findFirst();
-//      this.profile = opt.isPresent() ? opt.get().getGroupId() : "without-profile";
+    public void setValues(){
+        this.isEnabled = true;
     }
 
     public UserActiviti() {
@@ -114,7 +109,7 @@ public class UserActiviti implements UserDetails, User{
 
     @Override
     public boolean isEnabled() {
-        return true;
+        return this.isEnabled;
     } 
 
     @Override

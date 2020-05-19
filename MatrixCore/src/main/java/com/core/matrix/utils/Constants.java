@@ -78,7 +78,11 @@ public class Constants {
     public static final String RESPONSE_STATUS_FILE_OK = "SEM PENDÊNCIA";
     public static final String RESPONSE_STATUS_FILE_NOK = "COM PENDÊNCIA";    
 
-    public static final String PROCESS_INFORMATION_CLIENT = "@Cliente";
+    public static final String PROCESS_INFORMATION_CLIENT = "#Cliente";
+    public static final String PROCESS_INFORMATION_MEANSUREMENT_POINT = "#Ponto";
+    public static final String PROCESS_INFORMATION_NICKNAME = "#Apelido";
+    public static final String PROCESS_INFORMATION_PROCESSO_ID= "#Processo";
+    
     public static final String RESPONSE_NIVEL = "AVANÇAR";
     public static final String RESPONSE_SEM_ALCADA = "SEM ALÇADA DE APROVAÇÃO";
                                                       
@@ -95,5 +99,11 @@ public class Constants {
     
     
     public static final String IMAGE_LOGO_MATRIX = "static/logo-matrix.png";
+    
+    public static final String USER_INFO_ATTEMPTS = "tentativas";
+    
+    public static final String TEMPLATE_PARAM_LINK = ":link";
+    public static final String TEMPLATE_PARAM_USER_NAME = ":user_name";
+    public static final String TEMPLATE_PARAM_USER_EMAIL = ":email";
     
 }

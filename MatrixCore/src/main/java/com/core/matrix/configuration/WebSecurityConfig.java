@@ -10,7 +10,7 @@ package com.core.matrix.configuration;
  * @author thiag
  */
 
-import com.core.matrix.filter.CorsFilter;
+import com.core.matrix.filter.WebSocketCorsFilter;
 import com.core.matrix.filter.JwtRequestFilter;
 import com.core.matrix.service.AuthService;
 import com.core.matrix.utils.JwtAuthenticationEntryPoint;
@@ -49,7 +49,7 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
     private JwtRequestFilter jwtRequestFilter;
     
     @Autowired
-    private CorsFilter corsFilter;
+    private WebSocketCorsFilter corsFilter;
 
     @Autowired
     public void configureGlobal(AuthenticationManagerBuilder auth) throws Exception {

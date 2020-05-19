@@ -79,3 +79,6 @@ email:
 websocket:
         cors:
             origin: http://localhost:8080 
+            
+portal:
+        url:  http://localhost:8080/troca-senha            

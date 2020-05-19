@@ -5,10 +5,14 @@
  */
 package com.core.matrix.workflow.service;
 
+import com.core.matrix.specifications.GroupSpecification;
 import com.core.matrix.workflow.model.GroupActiviti;
 import com.core.matrix.workflow.repository.GroupRepository;
 import java.util.List;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -33,8 +37,8 @@ public class GroupActivitiService {
     }
     
     @Transactional(readOnly = true)
-    public List<GroupActiviti>listAll(){
-        return this.repository.findAll();
+    public Page<GroupActiviti>listAll(Specification spc, Pageable page ){
+        return this.repository.findAll(spc,page);
     }
     
     @Transactional(readOnly = true)
