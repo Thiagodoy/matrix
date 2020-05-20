@@ -63,6 +63,7 @@ public class Notification {
     
     public  Notification(){
         this.createdAt = LocalDateTime.now();
+        this.isRead = false;
     }
     
     

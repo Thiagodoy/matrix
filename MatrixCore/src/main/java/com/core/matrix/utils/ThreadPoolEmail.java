@@ -13,6 +13,7 @@ import com.core.matrix.service.LogService;
 import java.io.File;
 import java.util.Date;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ThreadPoolExecutor;
@@ -46,6 +47,13 @@ public class ThreadPoolEmail {
         this.sender = sender;
     }
 
+    
+    public synchronized void submit(List<Email> emails){
+        emails.forEach(email->{        
+            this.submit(email);
+        });
+    }
+    
     public synchronized void submit(Email email){
 
         email.setStatus(Email.EmailStatus.QUEUE);

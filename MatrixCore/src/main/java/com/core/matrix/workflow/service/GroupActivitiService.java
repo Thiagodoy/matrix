@@ -42,6 +42,11 @@ public class GroupActivitiService {
     }
     
     @Transactional(readOnly = true)
+    public GroupActiviti findById(String id)throws Exception{
+        return this.repository.findById(id).orElseThrow(()-> new Exception("NOT_FOUND_GROUP"));
+    }
+    
+    @Transactional(readOnly = true)
     public List<GroupActiviti>listAllCache(){
         return this.repository.findAll();
     }

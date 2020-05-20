@@ -58,6 +58,12 @@ public class UserActiviti implements UserDetails, User {
 
     @Column(name = "IS_ENABLED_")
     private boolean isEnabled;
+    
+    @Column(name = "RECEIVE_EMAIL_")
+    private boolean isReceiveEmail;
+    
+    @Column(name = "RECEIVE_NOTIFICATION_")
+    private boolean isReceiveNotification;
 
     @OneToMany(cascade = {CascadeType.REMOVE,CascadeType.PERSIST}, fetch = FetchType.EAGER)
     @JoinColumn(name = "USER_ID_")

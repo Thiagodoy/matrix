@@ -104,6 +104,12 @@ public class Constants {
     
     public static final String TEMPLATE_PARAM_LINK = ":link";
     public static final String TEMPLATE_PARAM_USER_NAME = ":user_name";
+    public static final String TEMPLATE_PARAM_GROUP_NAME = ":group";
     public static final String TEMPLATE_PARAM_USER_EMAIL = ":email";
+    
+    public static final String TEMPLATE_PARAM_TASK_NAME = ":task_name";
+    public static final String TEMPLATE_PARAM_PROCESS_NAME = ":process_name";
+    public static final String TEMPLATE_PARAM_NUMBER_PROCESS = ":number_process";
+    public static final String TEMPLATE_PARAM_TASK_CREATE_DATE = ":task_create_date";
     
 }

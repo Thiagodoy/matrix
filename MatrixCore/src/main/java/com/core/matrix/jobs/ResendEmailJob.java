@@ -31,6 +31,7 @@ public class ResendEmailJob {
     @Autowired
     private ThreadPoolEmail threadPoolEmail;
     
+    
     @Scheduled(cron = "0 0/2 * 1/1 * ?")
     public void run() {
 
