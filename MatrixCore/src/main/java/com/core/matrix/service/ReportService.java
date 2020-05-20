@@ -77,6 +77,12 @@ public class ReportService {
         out.flush();
         out.close();
         this.wb.dispose();
+
+        results.stream()
+                .forEach(r -> {
+                    fileResultService.updateToExported(r.getId());
+                });
+
     }
 
     public <T> void export(HttpServletResponse response, List<T> data, ReportConstants.ReportType type) throws IOException {

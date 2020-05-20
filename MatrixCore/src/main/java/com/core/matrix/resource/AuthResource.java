@@ -148,16 +148,15 @@ public class AuthResource {
             String email = null;
 
             jwtToken = requestTokenHeader.substring(7);
-
-            email = jwtTokenUtil.getUsernameFromToken(jwtToken);
+           
             final UserDetails userDetails = authService
                     .loadUserByUsername(email);
             final String token = jwtTokenUtil.generateToken(userDetails);
-            return ResponseEntity.ok(new AuthResponse(token, userDetails));
+            return ResponseEntity.ok(new AuthResponse(jwtToken, userDetails));
 
         } catch (Exception ex) {
             Logger.getLogger(AuthResource.class.getName()).log(Level.SEVERE, "[ checkToken ]", ex);
-            return ResponseEntity.status(HttpStatus.resolve(500)).body(ex.getMessage());
+            return ResponseEntity.status(HttpStatus.resolve(500)).body("TOKEN_EXPIRED");
         }
 
     }

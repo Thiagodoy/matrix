@@ -69,7 +69,7 @@ public class UserResource {
             List<UserInfoResponse> response = this.service.getUserInfo(request);
             return ResponseEntity.ok(response);
         } catch (Exception e) {
-            Logger.getLogger(UserResource.class.getName()).log(Level.SEVERE, "[getUserInfo]", e.getMessage());
+            Logger.getLogger(UserResource.class.getName()).log(Level.SEVERE, "[getUserInfo]", e);
             return ResponseEntity.status(HttpStatus.resolve(500)).build();
         }
     }
@@ -87,7 +87,7 @@ public class UserResource {
             return ResponseEntity.ok(response);
 
         } catch (Exception e) {
-            Logger.getLogger(UserResource.class.getName()).log(Level.SEVERE, "[get]", e.getMessage());
+            Logger.getLogger(UserResource.class.getName()).log(Level.SEVERE, "[get]", e);
             return ResponseEntity.status(HttpStatus.resolve(500)).build();
         }
     }
@@ -153,7 +153,7 @@ public class UserResource {
             return ResponseEntity.ok().build();
 
         } catch (Exception e) {
-            Logger.getLogger(UserResource.class.getName()).log(Level.SEVERE, "[delete]", e.getMessage());
+            Logger.getLogger(UserResource.class.getName()).log(Level.SEVERE, "[delete]", e);
             return ResponseEntity.status(HttpStatus.resolve(500)).build();
         }
     }

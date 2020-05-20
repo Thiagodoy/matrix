@@ -12,6 +12,9 @@ import com.core.matrix.utils.Utils;
 import com.core.matrix.workflow.model.GroupActiviti;
 import com.core.matrix.workflow.model.GroupMemberActiviti;
 import com.core.matrix.workflow.model.UserActiviti;
+import com.core.matrix.workflow.repository.GroupMemberRepository;
+import com.core.matrix.workflow.repository.GroupRepository;
+import com.core.matrix.workflow.repository.UserInfoRepository;
 import com.core.matrix.workflow.repository.UserRepository;
 import com.core.matrix.workflow.specification.UserActivitiSpecification;
 import java.util.ArrayList;
@@ -31,76 +34,88 @@ import org.springframework.transaction.annotation.Transactional;
  */
 @Service
 public class UserActivitiService {
-    
+
     @Autowired
     private UserRepository repository;
-    
+
+    @Autowired
+    private UserInfoRepository infoRepository;
+
+    @Autowired
+    private GroupMemberRepository groupRepository;
+
     @Transactional
-    public void save(UserActiviti user){        
-        user.setPassword(Utils.encodePassword(user.getPassword())); 
-        
-        Optional<GroupMemberActiviti> opt =  user.getGroups().stream().findFirst();
+    public void save(UserActiviti user) {
+        user.setPassword(Utils.encodePassword(user.getPassword()));
+
+        Optional<GroupMemberActiviti> opt = user.getGroups().stream().findFirst();
         String profile = opt.isPresent() ? opt.get().getGroupId() : "without-profile";
         user.setProfile(profile);
-        
-        
+
         this.repository.save(user);
     }
-    
+
     @Transactional
-    public void delete(UserDeleteRequest request){
-        this.repository.deleteById(request.getEmail());
-    }
-    
-    
-    @Transactional(readOnly = true) 
-    public UserActiviti findById(String id) throws Exception{
-        return this.repository.
-                findById(id)
-                .orElseThrow(()-> new Exception("User not found."));
-    }
-    
-    public List<UserInfoResponse> getUserInfo(UserInfoRequest request){       
-        return this.repository.findAllById(request.getUsers()).parallelStream().map( u -> new UserInfoResponse(u)).collect(Collectors.toList());
+    public void delete(UserDeleteRequest request) {
+
+        UserActiviti user = repository.findById(request.getEmail()).get();
+
+        
+        
+        user.getGroups().stream().forEach(g->{
+            groupRepository.delete(g);
+        });
+        
+        user.setGroups(null);
+        
+
+        this.repository.delete(user);
     }
 
-    
-    
     @Transactional(readOnly = true)
-    public Page<UserActiviti>  list(Specification spc,  Pageable page){
+    public UserActiviti findById(String id) throws Exception {
+        return this.repository.
+                findById(id)
+                .orElseThrow(() -> new Exception("User not found."));
+    }
+
+    public List<UserInfoResponse> getUserInfo(UserInfoRequest request) {
+        return this.repository.findAllById(request.getUsers()).parallelStream().map(u -> new UserInfoResponse(u)).collect(Collectors.toList());
+    }
+
+    @Transactional(readOnly = true)
+    public Page<UserActiviti> list(Specification spc, Pageable page) {
         return repository.findAll(spc, page);
     }
-    
-    
-    
+
     @Deprecated
     @Transactional(readOnly = true)
-    public Page<UserActiviti>  list(String firstName, String lastName, String email, String profile,  Pageable page){
-         List<Specification<UserActiviti>> predicates = new ArrayList<>();
+    public Page<UserActiviti> list(String firstName, String lastName, String email, String profile, Pageable page) {
+        List<Specification<UserActiviti>> predicates = new ArrayList<>();
 
         if (Optional.ofNullable(firstName).isPresent()) {
             predicates.add(UserActivitiSpecification.firstName(firstName));
         }
-        
+
         if (Optional.ofNullable(lastName).isPresent()) {
             predicates.add(UserActivitiSpecification.lastName(lastName));
         }
-        
+
         if (Optional.ofNullable(email).isPresent()) {
             predicates.add(UserActivitiSpecification.email(email));
-        }    
-        
+        }
+
         if (Optional.ofNullable(profile).isPresent()) {
             predicates.add(UserActivitiSpecification.profile(profile));
-        } 
+        }
 
         Specification<UserActiviti> specification = predicates.stream().reduce((a, b) -> a.and(b)).orElse(null);
 
         return repository.findAll(specification, page);
     }
-    
-    public GroupActiviti getProfile(){
+
+    public GroupActiviti getProfile() {
         return null;
     }
-    
+
 }

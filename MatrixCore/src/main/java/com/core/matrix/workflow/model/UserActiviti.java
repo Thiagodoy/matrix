@@ -1,6 +1,5 @@
 package com.core.matrix.workflow.model;
 
-
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import java.util.Arrays;
 import java.util.Collection;
@@ -26,15 +25,11 @@ import org.springframework.security.core.userdetails.UserDetails;
  *
  * @author Thiago H. Godoy <thiagodoy@hotmail.com>
  */
-
-
-
-
 @Entity
 @Table(schema = "activiti", name = "act_id_user")
 @Data
 @JsonIgnoreProperties(value = {"authorities"})
-public class UserActiviti implements UserDetails, User{
+public class UserActiviti implements UserDetails, User {
 
     @Id
     @Column(name = "ID_")
@@ -57,24 +52,23 @@ public class UserActiviti implements UserDetails, User{
 
     @Column(name = "PICTURE_ID_")
     private String picture;
-    
+
     @Column(name = "PROFILE_ID_")
-    private  String profile;
-    
+    private String profile;
+
     @Column(name = "IS_ENABLED_")
     private boolean isEnabled;
 
-    @OneToMany(cascade = {CascadeType.ALL}, orphanRemoval = true,  fetch = FetchType.EAGER)
+    @OneToMany(cascade = {CascadeType.REMOVE,CascadeType.PERSIST}, fetch = FetchType.EAGER)
     @JoinColumn(name = "USER_ID_")
     private Set<GroupMemberActiviti> groups;
 
-    @OneToMany(cascade = CascadeType.ALL, orphanRemoval = true, fetch = FetchType.EAGER)
+    @OneToMany(cascade = {CascadeType.REMOVE,CascadeType.PERSIST}, fetch = FetchType.EAGER)
     @JoinColumn(name = "USER_ID_")
-    private List<UserInfoActiviti> info;    
-    
-    
+    private List<UserInfoActiviti> info;
+
     @PrePersist
-    public void setValues(){
+    public void setValues() {
         this.isEnabled = true;
     }
 
@@ -110,12 +104,12 @@ public class UserActiviti implements UserDetails, User{
     @Override
     public boolean isEnabled() {
         return this.isEnabled;
-    } 
+    }
 
     @Override
     public boolean isPictureSet() {
 
-       return Optional.ofNullable(this.picture).isPresent();
+        return Optional.ofNullable(this.picture).isPresent();
 
     }
 

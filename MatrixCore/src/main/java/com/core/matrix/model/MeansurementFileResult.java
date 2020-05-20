@@ -45,6 +45,12 @@ import lombok.NoArgsConstructor;
                     @ColumnResult(name = "status", type = String.class)
                     ,
                     @ColumnResult(name = "data_criacao", type = Date.class)
+                    ,
+                    @ColumnResult(name = "exportado", type = Boolean.class)
+                    ,
+                    @ColumnResult(name = "nome_empresa", type = String.class)
+                    ,
+                    @ColumnResult(name = "responsavel", type = String.class)
                 }))
 
 @NamedNativeQuery(name = "MeansurementFileResult.getStatusBilling",
@@ -56,14 +62,19 @@ import lombok.NoArgsConstructor;
         + "    a.wbc_ponto_de_medicao,\n"
         + " case b.justificativa when 'APROVADO' then b.montante_liquido_ajustado else b.montante_liquido end as montante_liquido,\n"
         + "    a.status,\n"
-        + "    a.data_criacao\n"
+        + "    a.data_criacao,\n"
+        + "    b.exportado,\n"
+        + "    b.nome_empresa,\n"
+        + "    CONCAT(u.FIRST_ ,' ', u.LAST_) as responsavel\n"
         + "FROM\n"
         + "    mtx_arquivo_de_medicao a\n"
         + "        INNER JOIN\n"
         + "    mtx_arquivo_de_medicao_resultado b ON a.id_arquivo_de_medicao = b.id_arquivo_de_medicao\n"
-        + "        LEFT JOIN\n"        
+        + "        LEFT JOIN\n"
         + "    mtx_contrato_informacao_complementar c ON  b.wbc_contrato = c.wbc_codigo_contrato or b.wbc_contrato = c.wbc_contrato\n"
-        + "\n"        
+        + "LEFT JOIN\n"
+        + "activiti.act_id_user u ON a.act_id_usuario = u.ID_"
+        + "\n"
         + "WHERE\n"
         + "    a.status IN ('APPROVED')\n"
         + "        AND b.act_id_process not in (select distinct mr.act_id_processo from mtx_aqruivo_de_medicao_recompra mr) \n"
@@ -109,7 +120,7 @@ public class MeansurementFileResult {
 
     @Column(name = "limite_maximo")
     private Double limitMax;
-  
+
     @Column(name = "quantidade_contratada")
     private Double qtdHired;
 
@@ -136,22 +147,25 @@ public class MeansurementFileResult {
 
     @Column(name = "contrato_pai")
     private Long contractParent;
-    
+
     @Column(name = "montante_liquido_ajustado")
     private Double amountLiquidoAdjusted;
-    
+
     @Column(name = "justificativa")
     private String justify;
 
     @Column(name = "preco_contratado")
     private Double price;
-    
+
     @Column(name = "wbc_submercado")
     private Integer wbcSubmercado;
-    
+
     @Column(name = "wbc_perfilCCEE")
     private Integer wbcPerfilCCEE;
-    
+
+    @Column(name = "exportado")
+    private boolean isExported;
+
     public MeansurementFileResult(ContractWbcInformationDTO informationDTO, String idProcess) {
 
         this.qtdHiredMin = informationDTO.getQtdHiredMin();
@@ -163,18 +177,17 @@ public class MeansurementFileResult {
         this.price = informationDTO.getPrice();
 
     }
-    
-    
-    public void update(MeansurementFileResult result){
-        
-        if(Optional.fromNullable(result.getAmountLiquidoAdjusted()).isPresent() && !result.getAmountLiquidoAdjusted().equals(this.amountLiquidoAdjusted)){
+
+    public void update(MeansurementFileResult result) {
+
+        if (Optional.fromNullable(result.getAmountLiquidoAdjusted()).isPresent() && !result.getAmountLiquidoAdjusted().equals(this.amountLiquidoAdjusted)) {
             this.amountLiquidoAdjusted = result.getAmountLiquidoAdjusted();
         }
-        
-        if(Optional.fromNullable(result.getJustify()).isPresent() && !result.getJustify().equals(this.justify)){
+
+        if (Optional.fromNullable(result.getJustify()).isPresent() && !result.getJustify().equals(this.justify)) {
             this.justify = result.getJustify();
         }
-        
+
     }
 
 }

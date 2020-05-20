@@ -4,6 +4,7 @@ import com.core.matrix.workflow.model.UserActiviti_;
 import com.core.matrix.workflow.model.UserActiviti;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 
 import org.springframework.data.jpa.domain.Specification;
 
@@ -17,10 +18,12 @@ public class UserActivitiSpecification {
 
         List<Specification> predicatives = new ArrayList<>();
 
-        predicatives.add(UserActivitiSpecification.firstName(searchValue));
-        predicatives.add(UserActivitiSpecification.lastName(searchValue));
-        predicatives.add(UserActivitiSpecification.email(searchValue));
-        predicatives.add(UserActivitiSpecification.profile(searchValue));
+        if (Optional.ofNullable(searchValue).isPresent()) {
+            predicatives.add(UserActivitiSpecification.firstName(searchValue));
+            predicatives.add(UserActivitiSpecification.lastName(searchValue));
+            predicatives.add(UserActivitiSpecification.email(searchValue));
+            predicatives.add(UserActivitiSpecification.profile(searchValue));
+        }
 
         return predicatives.stream().reduce((a, b) -> a.or(b)).orElse(null);
 

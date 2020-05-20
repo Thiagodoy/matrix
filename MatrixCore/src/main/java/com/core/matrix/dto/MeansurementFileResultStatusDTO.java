@@ -24,30 +24,36 @@ public class MeansurementFileResultStatusDTO {
 
     public Long id;
 
-    @ReportColumn(name = "ANO", position = 0, typeValue = Long.class, typeReport = {"FULL","SHORT"})
+    @ReportColumn(name = "ANO", position = 0, typeValue = Long.class, typeReport = {"FULL", "SHORT"})
     public Long year;
 
-    @ReportColumn(name = "MES", position = 1, typeValue = Long.class, typeReport = {"FULL","SHORT"})
+    @ReportColumn(name = "MES", position = 1, typeValue = Long.class, typeReport = {"FULL", "SHORT"})
     public Long month;
 
-    @ReportColumn(name = "CONTRATO", position = 3, typeValue = Long.class, typeReport = {"FULL","SHORT"})
+    @ReportColumn(name = "CONTRATO", position = 3, typeValue = Long.class, typeReport = {"FULL", "SHORT"})
     public Long wbcContract;
 
     @ReportColumn(name = "PONTO MEDIÇÃO", position = 4, typeValue = String.class, typeReport = {"FULL"})
     public String wbcMeansurementPoint;
 
-    @ReportColumn(name = "MONTANTE", position = 6, typeValue = String.class, typeReport = {"FULL","SHORT"})
+    @ReportColumn(name = "MONTANTE", position = 6, typeValue = String.class, typeReport = {"FULL", "SHORT"})
     public Double mount;
 
     @ReportColumn(name = "STATUS", position = 5, typeValue = String.class, typeReport = {"FULL"})
     public String status;
 
-    @ReportColumn(name = "CÓD. CCEE", position = 2, typeValue = String.class, typeReport = {"FULL","SHORT"})
+    @ReportColumn(name = "CÓD. CCEE", position = 2, typeValue = String.class, typeReport = {"FULL", "SHORT"})
     public String scde;
 
     public Date dataCriacao;
 
-    public MeansurementFileResultStatusDTO(Long id, Long year, Long month, Long wbcContract, String wbcMeansurementPoint, Double mount, String status, Date dataCriacao) {
+    public Boolean isExported;
+
+    public String empresa;
+
+    public String responsavel;
+
+    public MeansurementFileResultStatusDTO(Long id, Long year, Long month, Long wbcContract, String wbcMeansurementPoint, Double mount, String status, Date dataCriacao, Boolean isExported,String empresa, String responsavel) {
         this.id = id;
         this.year = year;
         this.month = month;
@@ -56,7 +62,11 @@ public class MeansurementFileResultStatusDTO {
         this.mount = mount;
         this.status = status;
         this.dataCriacao = dataCriacao;
+        this.isExported = isExported;
         this.scde = "";
+        this.empresa = empresa;
+        this.responsavel = responsavel;
+
     }
 
     public Object[] export(ReportConstants.ReportType type) {

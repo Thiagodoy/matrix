@@ -29,5 +29,9 @@ public interface MeansurementFileResultRepository extends JpaRepository<Meansure
     @Query(nativeQuery = true)
     List<MeansurementFileResultStatusDTO> getStatusBilling(@Param("year")Long year, @Param("month")Long month);
     
+    @Modifying
+    @Query(value = "update MeansurementFileResult s set s.isExported = true where s.meansurementFileId = :id ")    
+    void updateToExported(@Param("id")Long id);
+    
     
 }

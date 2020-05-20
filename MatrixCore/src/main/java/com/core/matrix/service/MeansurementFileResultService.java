@@ -59,5 +59,10 @@ public class MeansurementFileResultService {
     public List<MeansurementFileResult> findByIds(List<Long> ids) {
         return this.repository.findAllById(ids);
     }
+    
+    @Transactional(transactionManager = "matrixTransactionManager")
+    public void updateToExported(Long id){
+        this.repository.updateToExported(id);
+    }
 
 }
