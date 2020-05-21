@@ -83,10 +83,7 @@ public class RuntimeActivitiService {
     private RepositoryActivitiService repositoryActivitiService;
 
     @Autowired
-    private CommentActivitiService commentActivitiService;
-
-    @Autowired
-    private GroupActivitiService groupActivitiService;
+    private CommentActivitiService commentActivitiService;    
 
     @Transactional
     public void startProcessByMessage(String message, Map<String, Object> variables) {

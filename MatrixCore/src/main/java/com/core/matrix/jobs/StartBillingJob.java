@@ -27,11 +27,9 @@ import org.springframework.stereotype.Component;
 @Component
 public class StartBillingJob {
 
-    @Autowired
-    private RuntimeActivitiService service;
+   
 
-    @Autowired
-    private LogService logService;
+   
     
     public void startBilling() {
 
@@ -51,7 +49,7 @@ public class StartBillingJob {
 
             //Start process for cheking results of all contracts
                     
-            service.startProcessByMessage(PROCESS_STATUS_PROCESS_FILE_MESSAGE_EVENT, variables);
+           // service.startProcessByMessage(PROCESS_STATUS_PROCESS_FILE_MESSAGE_EVENT, variables);
             
            
         } catch (Exception e) {

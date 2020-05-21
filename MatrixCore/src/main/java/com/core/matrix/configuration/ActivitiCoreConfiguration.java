@@ -61,6 +61,9 @@ public class ActivitiCoreConfiguration implements EnvironmentAware {
     @Autowired
     private ActivitiProperties activitiProperties;
 
+    @Autowired
+    private ApplicationContext context;
+
     private Environment environment;
 
     @org.springframework.beans.factory.annotation.Value("${spring.profiles.active}")
@@ -148,12 +151,16 @@ public class ActivitiCoreConfiguration implements EnvironmentAware {
                 .setMailServerPort(587)
                 .setMailServerUsername("portal@matrixenergia.com")
                 .setMailServerPassword("P@ortal2020")
-                .setMailServerUseSSL(false) 
-                .setMailServerUseTLS(true);        
+                .setMailServerUseSSL(false)
+                .setMailServerUseTLS(true);
 
-        
-        
-        return s.buildProcessEngine();
+        ProcessEngine processEngine = s.buildProcessEngine();
+        RuntimeService runtimeService = processEngine.getRuntimeService();
+        runtimeService.addEventListener(new RuntimeListener(context, processEngine.getIdentityService()),
+                ActivitiEventType.TASK_ASSIGNED,
+                ActivitiEventType.TASK_CREATED);
+
+        return processEngine;
 
     }
 
@@ -163,11 +170,8 @@ public class ActivitiCoreConfiguration implements EnvironmentAware {
     }
 
     @Bean
-    @Scope(value = "singleton")
-    public RuntimeService runtimeService(ApplicationContext context) {
-        RuntimeService runtimeService =  this.processEngine().getRuntimeService();        
-        runtimeService.addEventListener(new RuntimeListener(context), ActivitiEventType.TASK_ASSIGNED,ActivitiEventType.TASK_CREATED);
-        return runtimeService;
+    public RuntimeService runtimeService() {
+        return this.processEngine().getRuntimeService();
     }
 
     @Bean
@@ -195,10 +199,6 @@ public class ActivitiCoreConfiguration implements EnvironmentAware {
         return new FileValidationTask(context);
     }
 
-//    @Bean 
-//    public PointMeansurementValidationTask pointMeansurementValidationTask(ApplicationContext context){
-//        return new PointMeansurementValidationTask(context);
-//    }
     @Bean
     public DataValidationTask dataValidationTask(ApplicationContext context) {
         return new DataValidationTask(context);
@@ -244,5 +244,4 @@ public class ActivitiCoreConfiguration implements EnvironmentAware {
         return new CheckTake(context);
     }
 
-    
 }
