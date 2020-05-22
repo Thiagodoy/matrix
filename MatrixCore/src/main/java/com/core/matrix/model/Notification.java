@@ -54,6 +54,9 @@ public class Notification {
     @Column(name = "visualizado")
     private boolean isRead;
     
+    @Column(name = "template")
+    private String form;
+    
     @Enumerated(EnumType.STRING)
     @Column(name = "tipo")
     private NotificationType type;

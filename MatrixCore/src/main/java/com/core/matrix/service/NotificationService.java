@@ -29,11 +29,24 @@ public class NotificationService {
 
     @Autowired
     private SessionWebsocketRepository sessionWebsocketRepository;
-    
+
     @Autowired
     private NotificationRepository repository;
 
     private final String URL_SUBSCRIBER_QUEUE = "/queue/notification";
+
+    @Transactional(readOnly = true)
+    public void push(String userId, String sessionId) {
+
+        List<Notification> notifications = repository.findByToAndIsRead(userId, false);
+
+        notifications.forEach(n -> {
+            SimpMessageHeaderAccessor headerAccessor = SimpMessageHeaderAccessor.create(SimpMessageType.MESSAGE);
+            headerAccessor.setSessionId(sessionId);
+            messagingTemplate.convertAndSendToUser(sessionId, URL_SUBSCRIBER_QUEUE, n, headerAccessor.getMessageHeaders());
+        });
+
+    }
 
     public void push(List<Notification> notification) {
         notification.forEach(n -> {
@@ -43,9 +56,9 @@ public class NotificationService {
 
     @Transactional
     public void push(Notification notification) {
-        
+
         notification = repository.save(notification);
-        
+
         Optional<SessionWebsocket> opt = sessionWebsocketRepository.findByUserId(notification.getTo());
 
         if (opt.isPresent()) {
