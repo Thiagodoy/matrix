@@ -7,14 +7,24 @@ package com.core.matrix.service;
 
 import com.core.matrix.dto.ContractInformationDTO;
 import com.core.matrix.model.ContractCompInformation;
+import com.core.matrix.model.MeansurementFile;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import com.core.matrix.repository.ContractCompInformationRepository;
+import static com.core.matrix.utils.Constants.PROCESS_BILLING_CONTRACT_MESSAGE_EVENT;
+import static com.core.matrix.utils.Constants.PROCESS_CONTRACTS_RELOAD_BILLING;
+import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
+import org.activiti.engine.RuntimeService;
+import org.activiti.engine.TaskService;
+import org.activiti.engine.task.Attachment;
+import org.activiti.engine.task.Comment;
 
 /**
  *
@@ -27,7 +37,22 @@ public class ContractCompInformationService {
     private ContractCompInformationRepository repository;
 
     @Autowired
-    private ContractProInfaService proInfaService;
+    private MeansurementFileService meansurementFileService;
+
+    @Autowired
+    private TaskService taskService;
+
+    @Autowired
+    private LogService logService;
+
+    @Autowired
+    private MeansurementFileResultService fileResultService;
+
+    @Autowired
+    private MeansurementFileDetailService fileDetailService;
+
+    @Autowired
+    private RuntimeService runtimeService;
 
     @Transactional
     public void save(ContractCompInformation information) {
@@ -113,6 +138,60 @@ public class ContractCompInformationService {
 
     public Optional<ContractCompInformation> findByMeansurementPoint(String point) {
         return this.repository.findByMeansurementPoint(point);
+    }
+
+    public void reloadProcess(Long contractId) throws Exception {
+        List<ContractCompInformation> list = this.listByContract(contractId);
+
+        LocalDate now = LocalDate.now();
+
+        for (ContractCompInformation m : list) {
+            Optional<MeansurementFile> opt = meansurementFileService
+                    .findByWbcContractAndMeansurementPointAndMonthAndYear(
+                            m.getWbcContract(),
+                            m.getMeansurementPoint(),
+                            Integer.valueOf(now.getMonthValue()).longValue() -1,
+                            Integer.valueOf(now.getYear()).longValue()
+                    );
+
+            if (opt.isPresent()) {
+
+                List<Attachment> attachments = taskService.getProcessInstanceAttachments(opt.get().getProcessInstanceId());
+                List<Comment> comments = taskService.getProcessInstanceComments(opt.get().getProcessInstanceId());
+
+                attachments.forEach(att -> {
+                    taskService.deleteAttachment(att.getId());
+                });
+
+                comments.forEach(com -> {
+                    taskService.deleteComment(com.getId());
+                });
+
+                this.meansurementFileService.findByProcessInstanceId(opt.get().getProcessInstanceId()).forEach(file -> {
+
+                    if (!file.getDetails().isEmpty()) {
+                        this.fileDetailService.deleteAll(file.getDetails());
+                    }
+
+                    meansurementFileService.delete(file.getId());
+
+                });
+
+                logService.deleteLogsByProcessInstance(opt.get().getProcessInstanceId());
+                fileResultService.deleteByProcess(opt.get().getProcessInstanceId());
+
+                Map<String,Object> variables = new HashMap<>();
+                
+                variables.put(PROCESS_CONTRACTS_RELOAD_BILLING, list);
+                
+                
+                runtimeService.startProcessInstanceByMessage(PROCESS_BILLING_CONTRACT_MESSAGE_EVENT,variables);
+
+                break;
+            }
+
+        }
+
     }
 
 }

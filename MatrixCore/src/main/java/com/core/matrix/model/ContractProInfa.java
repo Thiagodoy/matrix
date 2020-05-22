@@ -11,7 +11,6 @@ import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
-import javax.persistence.IdClass;
 import javax.persistence.Table;
 import lombok.Data;
 
@@ -22,8 +21,9 @@ import lombok.Data;
 @Entity
 @Table(name = "mtx_contrato_proinfa")
 @Data
-public class ContractProInfa {
+public class ContractProInfa implements Serializable{
 
+    private static final long serialVersionUID = -4258355186535810797L;    
     
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)

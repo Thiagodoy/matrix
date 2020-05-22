@@ -12,6 +12,7 @@ import com.core.matrix.service.ContractCompInformationService;
 import com.core.matrix.service.LogService;
 import com.core.matrix.service.MeansurementFileService;
 import com.core.matrix.utils.Constants;
+import static com.core.matrix.utils.Constants.PROCESS_CONTRACTS_RELOAD_BILLING;
 import static com.core.matrix.utils.Constants.PROCESS_INFORMATION_CLIENT;
 import static com.core.matrix.utils.Constants.PROCESS_INFORMATION_MEANSUREMENT_POINT;
 import static com.core.matrix.utils.Constants.PROCESS_INFORMATION_PROCESSO_ID;
@@ -141,7 +142,16 @@ public class BillingContractsTask implements JavaDelegate {
     public void execute(DelegateExecution execution) throws Exception {
 
         try {
-            List<ContractDTO> contracts = Collections.synchronizedList(this.contractService.listForBilling());
+            List<ContractDTO> contracts;
+
+            if (execution.hasVariable(PROCESS_CONTRACTS_RELOAD_BILLING)) {
+                List<ContractCompInformation> cc = (List<ContractCompInformation>) execution.getVariable(PROCESS_CONTRACTS_RELOAD_BILLING, List.class);
+
+              contracts = Collections.synchronizedList(this.contractService.listForBilling(cc));
+
+            }else{
+              contracts = Collections.synchronizedList(this.contractService.listForBilling(null));  
+            }
 
             List<Log> logs = new ArrayList<>();
 

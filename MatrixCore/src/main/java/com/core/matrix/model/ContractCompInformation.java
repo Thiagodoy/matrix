@@ -8,6 +8,7 @@ package com.core.matrix.model;
 import com.core.matrix.dto.ContractInformationDTO;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+import java.io.Serializable;
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
@@ -65,8 +66,10 @@ import lombok.Data;
 @Table(name = "mtx_contrato_informacao_complementar")
 @Data
 @JsonIgnoreProperties(value = {"lastUpdate", "createAt"})
-public class ContractCompInformation {
+public class ContractCompInformation  implements Serializable{
 
+    private static final long serialVersionUID = -6849689118029240029L;
+    
     @Id
     @Column(name = "wbc_contrato")
     private Long wbcContract;

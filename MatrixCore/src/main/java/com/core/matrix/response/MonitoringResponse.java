@@ -18,7 +18,6 @@ import org.springframework.data.domain.Page;
 @Data
 @AllArgsConstructor
 public class MonitoringResponse {
-
     private Page<MonitoringResponse> data;
     private List<MonitoringStatusDTO> status;
 }

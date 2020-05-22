@@ -11,6 +11,7 @@ import com.core.matrix.repository.MeansurementFileRepository;
 import com.core.matrix.utils.MeansurementFileStatus;
 import com.core.matrix.utils.MeansurementFileType;
 import java.util.List;
+import java.util.Optional;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -60,6 +61,14 @@ public class MeansurementFileService {
     public MeansurementFile findById(Long id) throws Exception {
         return this.repository.findById(id).orElseThrow(() -> new Exception("Arquivo não encontrado"));
     }
+    
+    
+    @Transactional(readOnly = true)
+    public Optional<MeansurementFile> findByWbcContractAndMeansurementPointAndMonthAndYear(Long contract, String point, Long month, Long year) {
+        return this.repository.findByWbcContractAndMeansurementPointAndMonthAndYear(contract, point, month, year);
+    }
+    
+    
 
     @Transactional(readOnly = true)
     public List<MeansurementFileStatusDTO> getStatus(Long year, Long month) {
