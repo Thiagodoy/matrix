@@ -12,9 +12,6 @@ import com.core.matrix.utils.Utils;
 import com.core.matrix.workflow.model.GroupActiviti;
 import com.core.matrix.workflow.model.GroupMemberActiviti;
 import com.core.matrix.workflow.model.UserActiviti;
-import com.core.matrix.workflow.repository.GroupMemberRepository;
-import com.core.matrix.workflow.repository.GroupRepository;
-import com.core.matrix.workflow.repository.UserInfoRepository;
 import com.core.matrix.workflow.repository.UserRepository;
 import com.core.matrix.workflow.specification.UserActivitiSpecification;
 import java.util.ArrayList;
@@ -39,10 +36,7 @@ public class UserActivitiService {
     private UserRepository repository;
 
     @Autowired
-    private UserInfoRepository infoRepository;
-
-    @Autowired
-    private GroupMemberRepository groupRepository;
+    private GroupMemberActivitiService groupMemberSevice;
 
     @Transactional
     public void save(UserActiviti user) {
@@ -56,19 +50,16 @@ public class UserActivitiService {
     }
 
     @Transactional
+    public void update(UserActiviti update) throws Exception {
+        UserActiviti entity = this.findById(update.getId());
+        entity.update(update);
+
+    }
+
+    @Transactional
     public void delete(UserDeleteRequest request) {
 
         UserActiviti user = repository.findById(request.getEmail()).get();
-
-        
-        
-        user.getGroups().stream().forEach(g->{
-            groupRepository.delete(g);
-        });
-        
-        user.setGroups(null);
-        
-
         this.repository.delete(user);
     }
 

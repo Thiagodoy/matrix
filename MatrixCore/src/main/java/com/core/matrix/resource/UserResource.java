@@ -16,6 +16,7 @@ import com.core.matrix.specifications.TemplateSpecification;
 import com.core.matrix.utils.Constants;
 import com.core.matrix.utils.JwtTokenUtil;
 import com.core.matrix.utils.ThreadPoolEmail;
+import static com.core.matrix.utils.Url.URL_API_USER;
 import com.core.matrix.utils.Utils;
 import com.core.matrix.workflow.model.UserActiviti;
 import com.core.matrix.workflow.service.UserActivitiService;
@@ -45,7 +46,7 @@ import org.springframework.web.bind.annotation.RestController;
  * @author thiag
  */
 @RestController
-@RequestMapping(value = "/api/user")
+@RequestMapping(value = URL_API_USER)
 public class UserResource {
 
     @Autowired
@@ -53,13 +54,13 @@ public class UserResource {
 
     @Autowired
     private JwtTokenUtil jwtTokenUtil;
-    
+
     @Autowired
     private TemplateService templateService;
-    
+
     @org.springframework.beans.factory.annotation.Value("${portal.url}")
     private String urlPortal;
-    
+
     @Autowired
     private ThreadPoolEmail threadPoolEmail;
 
@@ -80,9 +81,9 @@ public class UserResource {
             @RequestParam(name = "page", defaultValue = "0") int page,
             @RequestParam(name = "size", defaultValue = "10") int size) {
         try {
-            
-            Specification spc = UserActivitiSpecification.filter(searchValue);           
-            
+
+            Specification spc = UserActivitiSpecification.filter(searchValue);
+
             Page<UserActiviti> response = this.service.list(spc, PageRequest.of(page, size, Sort.by("firstName")));
             return ResponseEntity.ok(response);
 
@@ -108,15 +109,28 @@ public class UserResource {
         }
     }
 
+    @RequestMapping(method = RequestMethod.PUT)
+    public ResponseEntity put(@RequestBody UserActiviti request) {
+        try {
+
+            this.service.update(request);
+            return ResponseEntity.ok().build();
+
+        } catch (Exception e) {
+            Logger.getLogger(UserResource.class.getName()).log(Level.SEVERE, "[put]", e);
+            return ResponseEntity.status(HttpStatus.resolve(500)).build();
+        }
+    }
+
     @RequestMapping(value = "/unblock", method = RequestMethod.POST)
     public ResponseEntity post(@RequestBody UnblockUserRequest request) {
         try {
 
-            final UserActiviti userDetails = service.findById(request.getEmail());            
-            userDetails.setEnabled(true);            
+            final UserActiviti userDetails = service.findById(request.getEmail());
+            userDetails.setEnabled(true);
             this.service.save(userDetails);
-            
-            final String token =  jwtTokenUtil.generateToken(userDetails);
+
+            final String token = jwtTokenUtil.generateToken(userDetails);
             final String userName = ((UserActiviti) userDetails).getFirstName();
 
             Specification spc = TemplateSpecification.filter(null, null, null, Template.TemplateBusiness.FORGOT_PASSWORD);
@@ -136,7 +150,6 @@ public class UserResource {
 
             threadPoolEmail.submit(email);
 
-            
             return ResponseEntity.ok().build();
 
         } catch (Exception e) {

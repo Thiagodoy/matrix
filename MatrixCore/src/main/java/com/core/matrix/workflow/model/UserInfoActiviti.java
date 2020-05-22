@@ -41,7 +41,8 @@ public class UserInfoActiviti {
     private String key;
 
     @Column(name = "VALUE_")
-    private String value;
+    private String value;   
+    
 
     public UserInfoActiviti(String userId, String key, String value) {
         this.rev = 1;

@@ -15,5 +15,7 @@ public class Url {
     public static final String URL_API_AUTH = "/api/auth";
     public static final String URL_API_TEMPLATE = "/api/template";
     public static final String URL_API_NOTIFICATION = "/api/notification";
+    public static final String URL_API_USER = "/api/user";
+    public static final String URL_API_USER_METRICS = "/api/user/metrics";
     
 }

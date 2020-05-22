@@ -14,10 +14,12 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.text.SimpleDateFormat;
+import java.time.Instant;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.Month;
 import java.time.YearMonth;
+import java.time.ZoneId;
 import java.time.format.DateTimeFormatter;
 import java.util.Date;
 import java.util.HashMap;
@@ -116,4 +118,19 @@ public class Utils {
         }
     }
 
+    public static Date localDateToDate(LocalDate date) {
+        return Date.from(date.atStartOfDay(ZoneId.systemDefault()).toInstant());
+    }
+
+    public static Date localDateTimeToDate(LocalDateTime dateToConvert) {
+        return java.util.Date
+                .from(dateToConvert.atZone(ZoneId.systemDefault())
+                        .toInstant());
+    }
+    
+     public synchronized static LocalDateTime dateToLocalDateTime(Date date) {
+        return Instant.ofEpochMilli(date.getTime())
+                .atZone(ZoneId.systemDefault())
+                .toLocalDateTime();
+    }
 }

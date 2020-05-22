@@ -10,6 +10,6 @@ import org.springframework.stereotype.Repository;
  * @author Thiago H. Godoy <thiagodoy@hotmail.com>
  */
 @Repository
-public interface GroupMemberRepository extends JpaRepository<GroupMemberActiviti, String>, JpaSpecificationExecutor<GroupMemberActiviti> {
+public interface GroupMemberRepository extends JpaRepository<GroupMemberActiviti, GroupMemberActiviti.IdClass>, JpaSpecificationExecutor<GroupMemberActiviti> {
 
 }

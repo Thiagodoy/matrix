@@ -12,7 +12,6 @@ import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.FetchType;
 import javax.persistence.Id;
-import javax.persistence.JoinColumn;
 import javax.persistence.OneToMany;
 import javax.persistence.PrePersist;
 import javax.persistence.Table;
@@ -29,53 +28,66 @@ import org.springframework.security.core.userdetails.UserDetails;
 @Table(schema = "activiti", name = "act_id_user")
 @Data
 @JsonIgnoreProperties(value = {"authorities"})
-public class UserActiviti implements UserDetails, User {
+public class UserActiviti implements UserDetails, User, Model<UserActiviti> {
 
     @Id
     @Column(name = "ID_")
-    private String id;
+    protected String id;
 
     @Column(name = "REV_")
-    private Long rev;
+    protected Long rev;
 
     @Column(name = "FIRST_")
-    private String firstName;
+    protected String firstName;
 
     @Column(name = "LAST_")
-    private String lastName;
+    protected String lastName;
 
     @Column(name = "EMAIL_")
-    private String email;
+    protected String email;
 
     @Column(name = "PWD_")
-    private String password;
+    protected String password;
 
     @Column(name = "PICTURE_ID_")
-    private String picture;
+    protected String picture;
 
     @Column(name = "PROFILE_ID_")
-    private String profile;
+    protected String profile;
 
     @Column(name = "IS_ENABLED_")
-    private boolean isEnabled;
-    
+    protected boolean isEnabled;
+
     @Column(name = "RECEIVE_EMAIL_")
-    private boolean isReceiveEmail;
-    
+    protected boolean isReceiveEmail;
+
     @Column(name = "RECEIVE_NOTIFICATION_")
-    private boolean isReceiveNotification;
+    protected boolean isReceiveNotification;
 
-    @OneToMany(cascade = {CascadeType.REMOVE,CascadeType.PERSIST}, fetch = FetchType.EAGER)
-    @JoinColumn(name = "USER_ID_")
-    private Set<GroupMemberActiviti> groups;
+    @OneToMany(cascade = {CascadeType.ALL}, orphanRemoval = true, fetch = FetchType.EAGER, mappedBy = "userId")
+    //@JoinColumn(name = "USER_ID_", referencedColumnName = "ID_")
+    protected Set<GroupMemberActiviti> groups;
 
-    @OneToMany(cascade = {CascadeType.REMOVE,CascadeType.PERSIST}, fetch = FetchType.EAGER)
-    @JoinColumn(name = "USER_ID_")
-    private List<UserInfoActiviti> info;
+    @OneToMany(cascade = {CascadeType.ALL}, orphanRemoval = true, fetch = FetchType.EAGER, mappedBy = "userId")
+    //@JoinColumn(name = "USER_ID_",referencedColumnName = "ID_")
+    protected List<UserInfoActiviti> info;
 
     @PrePersist
     public void setValues() {
         this.isEnabled = true;
+
+        if (Optional.ofNullable(this.groups).isPresent() && !this.groups.isEmpty()) {
+            this.groups.forEach(g -> {
+                g.setUserId(this.id);
+            });
+        }
+
+        if (Optional.ofNullable(this.info).isPresent() && !this.info.isEmpty()) {
+            this.info.forEach(i -> {
+                i.setUserId(this.id);
+            });
+        }
+
     }
 
     public UserActiviti() {

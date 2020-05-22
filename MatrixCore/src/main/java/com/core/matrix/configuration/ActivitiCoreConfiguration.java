@@ -6,7 +6,6 @@
 package com.core.matrix.configuration;
 
 import com.core.matrix.properties.ActivitiProperties;
-import com.core.matrix.workflow.listener.RuntimeListener;
 import com.core.matrix.workflow.task.BillingContractsTask;
 import com.core.matrix.workflow.task.CalculateTask;
 import com.core.matrix.workflow.task.ChangeStatusFileTask;
@@ -31,7 +30,6 @@ import org.activiti.engine.ProcessEngineConfiguration;
 import org.activiti.engine.RepositoryService;
 import org.activiti.engine.RuntimeService;
 import org.activiti.engine.TaskService;
-import org.activiti.engine.delegate.event.ActivitiEventType;
 import org.activiti.engine.impl.cfg.StandaloneProcessEngineConfiguration;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ApplicationContext;
@@ -60,9 +58,6 @@ public class ActivitiCoreConfiguration implements EnvironmentAware {
 
     @Autowired
     private ActivitiProperties activitiProperties;
-
-    @Autowired
-    private ApplicationContext context;
 
     private Environment environment;
 
@@ -155,10 +150,10 @@ public class ActivitiCoreConfiguration implements EnvironmentAware {
                 .setMailServerUseTLS(true);
 
         ProcessEngine processEngine = s.buildProcessEngine();
-        RuntimeService runtimeService = processEngine.getRuntimeService();
-        runtimeService.addEventListener(new RuntimeListener(context, processEngine.getIdentityService()),
-                ActivitiEventType.TASK_ASSIGNED,
-                ActivitiEventType.TASK_CREATED);
+//        RuntimeService runtimeService = processEngine.getRuntimeService();
+//        runtimeService.addEventListener(new RuntimeListener(context, processEngine.getIdentityService()),
+//                ActivitiEventType.TASK_ASSIGNED,
+//                ActivitiEventType.TASK_CREATED);
 
         return processEngine;
 
