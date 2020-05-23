@@ -42,6 +42,7 @@ public class Template implements Model<Template>{
     public enum TemplateBusiness{
         FORGOT_PASSWORD,
         USER_TASK_PENDING,
+        WELCOME_USER,
         GROUP_TASK_PENDING;
     }
     

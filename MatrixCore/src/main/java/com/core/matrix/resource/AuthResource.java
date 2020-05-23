@@ -215,7 +215,7 @@ public class AuthResource {
             UserActiviti user = (UserActiviti) authService.loadUserByUsername(principal.getName());
 
             user.setPassword(request.getNewPassword());
-            userActivitiService.save(user);
+            userActivitiService.update(user);
 
             return ResponseEntity.ok().build();
 

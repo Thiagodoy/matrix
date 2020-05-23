@@ -107,6 +107,7 @@ public class Constants {
     
     public static final String TEMPLATE_PARAM_LINK = ":link";
     public static final String TEMPLATE_PARAM_USER_NAME = ":user_name";
+    public static final String TEMPLATE_PARAM_USER_PASSWORD = ":password";
     public static final String TEMPLATE_PARAM_GROUP_NAME = ":group";
     public static final String TEMPLATE_PARAM_USER_EMAIL = ":email";
     
