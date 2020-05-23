@@ -35,6 +35,15 @@ public class NotificationService {
 
     private final String URL_SUBSCRIBER_QUEUE = "/queue/notification";
 
+    @Transactional
+    public void read(Long id) {
+
+        Notification notification = repository.findById(id).get();
+        notification.setRead(true);
+
+        repository.save(notification);
+    }
+
     @Transactional(readOnly = true)
     public void push(String userId, String sessionId) {
 
@@ -59,14 +68,14 @@ public class NotificationService {
 
         notification = repository.save(notification);
 
-        Optional<SessionWebsocket> opt = sessionWebsocketRepository.findByUserId(notification.getTo());
+        List<SessionWebsocket> opt = sessionWebsocketRepository.findByUserId(notification.getTo());
 
-        if (opt.isPresent()) {
-
+        if (!opt.isEmpty()) {
+            SessionWebsocket session = opt.get(0);
             SimpMessageHeaderAccessor headerAccessor = SimpMessageHeaderAccessor.create(SimpMessageType.MESSAGE);
-            headerAccessor.setSessionId(opt.get().getSessionId());
+            headerAccessor.setSessionId(session.getSessionId());
 
-            messagingTemplate.convertAndSendToUser(opt.get().getSessionId(), URL_SUBSCRIBER_QUEUE, notification, headerAccessor.getMessageHeaders());
+            messagingTemplate.convertAndSendToUser(session.getSessionId(), URL_SUBSCRIBER_QUEUE, notification, headerAccessor.getMessageHeaders());
         }
     }
 

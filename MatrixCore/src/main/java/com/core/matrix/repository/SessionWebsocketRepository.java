@@ -6,7 +6,7 @@
 package com.core.matrix.repository;
 
 import com.core.matrix.model.SessionWebsocket;
-import java.util.Optional;
+import java.util.List;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.JpaSpecificationExecutor;
 import org.springframework.stereotype.Repository;
@@ -18,5 +18,5 @@ import org.springframework.stereotype.Repository;
 @Repository
 public interface SessionWebsocketRepository extends JpaRepository<SessionWebsocket, String>, JpaSpecificationExecutor<SessionWebsocket> {
 
-   Optional<SessionWebsocket> findByUserId(String user);
+   List<SessionWebsocket> findByUserId(String user);
 }

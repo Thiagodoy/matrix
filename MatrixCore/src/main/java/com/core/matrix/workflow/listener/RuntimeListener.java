@@ -104,6 +104,11 @@ public class RuntimeListener implements ActivitiEventListener {
                                 .createTaskQuery()
                                 .executionId(executionId)
                                 .singleResult();
+                        
+                        if(!Optional.ofNullable(task1.getAssignee()).isPresent()){
+                            return;
+                        }
+                    
 
                         final String processInstanceID = event.getProcessDefinitionId();
                         List<UserActiviti> users1 = this.getUsersFromTaskAndProcessDef(task1.getId(), processInstanceID);
@@ -143,6 +148,7 @@ public class RuntimeListener implements ActivitiEventListener {
                 notification.setTo(u.getId());
                 notification.setType(type);
                 notifications.add(notification);
+                notification.setForm(task.getFormKey());
             }
         });
 
