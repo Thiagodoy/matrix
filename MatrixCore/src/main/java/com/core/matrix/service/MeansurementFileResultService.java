@@ -8,7 +8,9 @@ package com.core.matrix.service;
 import com.core.matrix.dto.MeansurementFileResultStatusDTO;
 import com.core.matrix.model.MeansurementFileResult;
 import com.core.matrix.repository.MeansurementFileResultRepository;
+import java.util.Comparator;
 import java.util.List;
+import java.util.stream.Collectors;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -42,7 +44,11 @@ public class MeansurementFileResultService {
 
     @Transactional(readOnly = true)
     public List<MeansurementFileResult> getResult(String id) {
-        return this.repository.findByIdProcess(id);
+        return this.repository.findByIdProcess(id)
+                .stream()
+                .sorted(Comparator.comparing(MeansurementFileResult::getContractParent)
+                        .reversed())
+                .collect(Collectors.toList());
     }
 
     @Transactional(transactionManager = "matrixTransactionManager")
@@ -59,9 +65,9 @@ public class MeansurementFileResultService {
     public List<MeansurementFileResult> findByIds(List<Long> ids) {
         return this.repository.findAllById(ids);
     }
-    
+
     @Transactional(transactionManager = "matrixTransactionManager")
-    public void updateToExported(Long id){
+    public void updateToExported(Long id) {
         this.repository.updateToExported(id);
     }
 

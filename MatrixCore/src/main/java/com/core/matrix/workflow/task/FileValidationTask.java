@@ -182,6 +182,10 @@ public class FileValidationTask implements JavaDelegate {
 
         if (type.equals(MeansurementFileType.LAYOUT_C) || type.equals(MeansurementFileType.LAYOUT_C_1)) {
 
+            
+            detail.removeIf(d-> Optional.ofNullable(d.getOrigem()).isPresent() && d.getOrigem().equals("DADOS FALTANTES"));
+            
+            
             boolean has_L = Validator.validateContentIfContains(detail);
             if (!has_L) {
                 errors.add(MessageFormat.format("Não foi encontrado nenhuma ocorrência [ (L) ] nos pontos de medição. Arquivo [ {0} ]", fileName));

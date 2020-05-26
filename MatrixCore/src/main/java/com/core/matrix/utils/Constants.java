@@ -28,6 +28,7 @@ public class Constants {
     public static final String VAR_FILE_NAME = "file_name";
 
     public static final String RESPONSE_LAYOUT_VALID = "Layout Válido";
+    public static final String RESPONSE_SHOW_MODAL = "show-modal";
     public static final String RESPONSE_LAYOUT_INVALID = "Layout Inválido";
     
     public static final String RESPONSE_MEANSUREMENT_POINT_VALID = "Ponto de Medição Válido";
@@ -76,8 +77,8 @@ public class Constants {
     public static final String PROCESS_MONTH_REFERENCE = "month_reference";
     public static final String PROCESS_YEAR_REFERENCE = "year_reference";
     
-    public static final String RESPONSE_STATUS_FILE_OK = "SEM PENDÊNCIA";
-    public static final String RESPONSE_STATUS_FILE_NOK = "COM PENDÊNCIA";    
+    public static final String RESPONSE_STATUS_FILE_OK = "Não existe arquivos pendentes";
+    public static final String RESPONSE_STATUS_FILE_NOK = "Existem Arquivos Pendentes";    
 
     
     public static final String PROCESS_CONTRACTS_RELOAD_BILLING = "contracts_reload_process_billing";

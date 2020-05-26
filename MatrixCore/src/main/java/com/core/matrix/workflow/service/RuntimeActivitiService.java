@@ -38,7 +38,6 @@ import org.activiti.engine.RepositoryService;
 import org.activiti.engine.RuntimeService;
 import org.activiti.engine.TaskService;
 import org.activiti.engine.history.HistoricProcessInstance;
-import org.activiti.engine.history.HistoricTaskInstance;
 import org.activiti.engine.impl.RepositoryServiceImpl;
 import org.activiti.engine.impl.bpmn.behavior.ExclusiveGatewayActivityBehavior;
 import org.activiti.engine.impl.persistence.entity.ExecutionEntity;
@@ -869,8 +868,8 @@ public class RuntimeActivitiService {
     }
     
     @Transactional
-    public void writeDraftOnTask(TaskDraftRequest request){        
-        this.runtimeService.setVariableLocal(request.getTaskId(), TASK_DRAFT, request.getData());        
+    public void writeDraftOnTask(TaskDraftRequest request){ 
+        this.taskService.setVariableLocal(request.getTaskId(), TASK_DRAFT, request.getData());        
     }
 
 }

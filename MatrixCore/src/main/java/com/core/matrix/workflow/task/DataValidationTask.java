@@ -109,9 +109,7 @@ public class DataValidationTask implements Task {
         
         boolean hasInvalidaData = files.stream().anyMatch(mdf -> mdf.getStatus().equals(MeansurementFileStatus.DATA_CALENDAR_ERROR));
         boolean hasDataForPersist = files.stream().anyMatch(mdf -> mdf.getStatus().equals(MeansurementFileStatus.DATA_DAY_ERROR) || mdf.getStatus().equals(MeansurementFileStatus.DATA_HOUR_ERROR));
-
-        Logger.getLogger(DataValidationTask.class.getName()).log(Level.INFO, "[hasInvalidaData] => " + hasInvalidaData);
-        Logger.getLogger(DataValidationTask.class.getName()).log(Level.INFO, "[hasDataForPersist] => " + hasDataForPersist );
+        
         
         if (hasInvalidaData) {
             de.setVariable(CONTROLE, RESPONSE_INVALID_DATA);

@@ -92,6 +92,11 @@ public class Validator {
     public void validateConsumptionActive(Long index, String value) {
 
         Optional<String> opt = Optional.ofNullable(value);
+        
+        
+        if(Optional.ofNullable(this.detail.getOrigem()).isPresent() && this.detail.getOrigem().equals("DADOS FALTANTES")){        
+            return;
+        }
 
         if (!opt.isPresent() || (opt.isPresent() && opt.get().isEmpty())) {
             this.errors.add(MessageFormat.format(MESSAGE_ERROR_REQUIRED, index , "Consumo Ativo", this.fileName));
@@ -112,9 +117,7 @@ public class Validator {
         Optional<String> opt = Optional.ofNullable(value);
 
         
-        if(this.detail.getOrigem().equals("DADOS FALTANTES")){        
-            return;
-        }
+        
         
         if (!opt.isPresent() || (opt.isPresent() && opt.get().isEmpty())) {
             this.errors.add(MessageFormat.format(MESSAGE_ERROR_REQUIRED, index , "Tipo de Energia", this.fileName));

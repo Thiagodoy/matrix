@@ -9,6 +9,7 @@ import com.core.matrix.service.MeansurementFileService;
 import static com.core.matrix.utils.Constants.CONTROLE;
 import static com.core.matrix.utils.Constants.PROCESS_MONTH_REFERENCE;
 import static com.core.matrix.utils.Constants.PROCESS_YEAR_REFERENCE;
+import static com.core.matrix.utils.Constants.RESPONSE_SHOW_MODAL;
 import static com.core.matrix.utils.Constants.RESPONSE_STATUS_FILE_NOK;
 import static com.core.matrix.utils.Constants.RESPONSE_STATUS_FILE_OK;
 import java.util.logging.Level;
@@ -46,6 +47,8 @@ public class CheckStatusFileResultTask implements JavaDelegate {
 
             if (fileService.hasFilePending(yearReference, monthReference)) {
                 execution.setVariable(CONTROLE, RESPONSE_STATUS_FILE_NOK);
+                execution.setVariable(RESPONSE_SHOW_MODAL, true);
+                
             } else {
                 execution.setVariable(CONTROLE, RESPONSE_STATUS_FILE_OK);
             }

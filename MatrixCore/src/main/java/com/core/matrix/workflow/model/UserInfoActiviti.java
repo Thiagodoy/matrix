@@ -1,5 +1,6 @@
 package com.core.matrix.workflow.model;
 
+import java.time.LocalDateTime;
 import java.util.Optional;
 import javax.annotation.PostConstruct;
 import javax.persistence.Column;
@@ -57,7 +58,7 @@ public class UserInfoActiviti implements Model<UserInfoActiviti>{
     public void generateId() {
         
         if(!Optional.ofNullable(this.id).isPresent()){
-            this.id = String.valueOf(hashCode());
+            this.id = String.valueOf(hashCode() + LocalDateTime.now().hashCode());
         }
     }
 }

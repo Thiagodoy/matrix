@@ -128,7 +128,7 @@ public class UserResource {
             return ResponseEntity.status(HttpStatus.resolve(500)).body("Usuário " + request.getEmail() + " já cadastrado!");
         } catch (Exception e) {
             Logger.getLogger(UserResource.class.getName()).log(Level.SEVERE, "[post]", e);
-            return ResponseEntity.status(HttpStatus.resolve(500)).build();
+            return ResponseEntity.status(HttpStatus.resolve(500)).body(e.getMessage());
         }
     }
 
