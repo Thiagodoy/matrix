@@ -26,24 +26,24 @@ import lombok.NoArgsConstructor;
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
-public class GroupActiviti {
+public class GroupActiviti implements Model<GroupActiviti>{
 
     @Id
     @Column(name = "ID_")
-    private String id;
+    public String id;
     
     @Column(name = "REV_")
-    private String rev;
+    public String rev;
     
     @Column(name = "NAME_")
-    private String name;
+    public String name;
     
     @Column(name = "TYPE_")
-    private String type;
+    public String type;
     
     @OneToMany( cascade = {CascadeType.ALL}, fetch = FetchType.EAGER)
     @JoinColumn(name = "group_id_")
-    private List<AbilityActiviti> abilitys;
+    public List<AbilityActiviti> abilitys;
     
    
     

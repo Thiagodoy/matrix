@@ -16,6 +16,7 @@ import javax.persistence.Transient;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;
+import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
 
 /**
@@ -28,21 +29,27 @@ import lombok.NoArgsConstructor;
 @Entity
 @Table(schema = "activiti", name = "act_id_membership")
 @IdClass(GroupMemberActiviti.IdClass.class)
-public class GroupMemberActiviti implements Serializable {
+@EqualsAndHashCode(of = {"userId","groupId"})
+public class GroupMemberActiviti implements Serializable , Model<GroupMemberActiviti> {
 
-    private static final long serialVersionUID = -2636531586488935713L;
+    protected static final long serialVersionUID = -2636531586488935713L;
 
     @Id
     @Column(name = "USER_ID_")
-    private String userId;
+    protected String userId;
 
     @Id
     @Column(name = "GROUP_ID_")
-    private String groupId;    
+    protected String groupId;    
     
     
     @Transient
-    private List<AbilityActiviti> abilitys;
+    protected List<AbilityActiviti> abilitys;
+
+    @Override
+    public String getId() {
+        return userId + groupId;
+    }
     
 
     @Data

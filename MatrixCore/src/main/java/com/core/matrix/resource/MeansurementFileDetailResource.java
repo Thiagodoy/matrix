@@ -5,6 +5,7 @@
  */
 package com.core.matrix.resource;
 
+import com.core.matrix.dto.DataValidationResultDTO;
 import com.core.matrix.model.MeansurementFileDetail;
 import com.core.matrix.service.MeansurementFileDetailService;
 import java.util.List;
@@ -40,15 +41,30 @@ public class MeansurementFileDetailResource {
             return ResponseEntity.status(HttpStatus.resolve(500)).body(e.getMessage());
         }
     }
-    
+
     @RequestMapping(method = RequestMethod.GET)
-    public ResponseEntity post(@RequestParam("id")Long id) {
-        try {            
+    public ResponseEntity post(@RequestParam("id") Long id) {
+        try {
             return ResponseEntity.ok(this.service.listByFileId(id));
         } catch (Exception e) {
             Logger.getLogger(MeansurementFileDetailResource.class.getName()).log(Level.SEVERE, "[post]", e);
             return ResponseEntity.status(HttpStatus.resolve(500)).body(e.getMessage());
         }
+    }
+
+    @RequestMapping(value = "/fixFile", method = RequestMethod.POST)
+    public ResponseEntity fixFile(@RequestBody DataValidationResultDTO request) {
+
+        try {
+
+            this.service.fixFile(request);
+            return ResponseEntity.ok().build();
+
+        } catch (Exception e) {
+            Logger.getLogger(MeansurementFileDetailResource.class.getName()).log(Level.SEVERE, "[post]", e);
+            return ResponseEntity.status(HttpStatus.resolve(500)).body(e.getMessage());
+        }
+
     }
 
 }

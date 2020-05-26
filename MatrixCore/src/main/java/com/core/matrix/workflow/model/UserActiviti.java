@@ -57,6 +57,9 @@ public class UserActiviti implements UserDetails, User, Model<UserActiviti> {
 
     @Column(name = "IS_ENABLED_")
     protected boolean isEnabled;
+    
+    @Column(name = "IS_BLOCKED_FOR_ATTEMPS")
+    protected boolean isBlockedForAttemps;
 
     @Column(name = "RECEIVE_EMAIL_")
     protected boolean isReceiveEmail;

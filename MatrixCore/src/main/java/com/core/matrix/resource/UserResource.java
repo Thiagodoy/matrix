@@ -24,6 +24,7 @@ import com.core.matrix.workflow.specification.UserActivitiSpecification;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import org.hibernate.exception.ConstraintViolationException;
@@ -78,11 +79,20 @@ public class UserResource {
     @RequestMapping(method = RequestMethod.GET)
     public ResponseEntity get(
             @RequestParam(name = "searchValue", required = false) String searchValue,
+            @RequestParam(name = "id", required = false) String id,
             @RequestParam(name = "page", defaultValue = "0") int page,
             @RequestParam(name = "size", defaultValue = "10") int size) {
         try {
 
-            Specification spc = UserActivitiSpecification.filter(searchValue);
+            
+            Specification spc = null;
+            
+            if(Optional.ofNullable(id).isPresent()){
+                spc = UserActivitiSpecification.id(id);
+            }else{
+                spc = UserActivitiSpecification.filter(searchValue);
+            }
+            
 
             Page<UserActiviti> response = this.service.list(spc, PageRequest.of(page, size, Sort.by("firstName")));
             return ResponseEntity.ok(response);
@@ -92,6 +102,19 @@ public class UserResource {
             return ResponseEntity.status(HttpStatus.resolve(500)).build();
         }
     }
+    
+    
+     @RequestMapping(value="/checkEmail",method = RequestMethod.GET)
+    public ResponseEntity checkEmail(
+            @RequestParam(name = "email") String email) {
+        try {
+            return ResponseEntity.ok(this.service.checkEmail(email));
+        } catch (Exception e) {
+            Logger.getLogger(UserResource.class.getName()).log(Level.SEVERE, "[get]", e);
+            return ResponseEntity.status(HttpStatus.resolve(500)).build();
+        }
+    }
+    
 
     @RequestMapping(method = RequestMethod.POST)
     public ResponseEntity post(@RequestBody UserActiviti request) {

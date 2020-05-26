@@ -18,6 +18,7 @@ import com.core.matrix.utils.Utils;
 import com.core.matrix.workflow.model.GroupActiviti;
 import com.core.matrix.workflow.model.GroupMemberActiviti;
 import com.core.matrix.workflow.model.UserActiviti;
+import com.core.matrix.workflow.model.UserInfoActiviti;
 import com.core.matrix.workflow.repository.UserRepository;
 import com.core.matrix.workflow.specification.UserActivitiSpecification;
 import java.util.ArrayList;
@@ -94,9 +95,8 @@ public class UserActivitiService {
         try {
             threadPoolEmail.submit(email);
         } catch (Throwable e) {
-            Logger.getLogger(ThreadPoolEmail.class.getName()).log(Level.SEVERE,"Erro ao enviar email para o usuário ->" + user.getEmail() );
+            Logger.getLogger(ThreadPoolEmail.class.getName()).log(Level.SEVERE, "Erro ao enviar email para o usuário ->" + user.getEmail());
         }
-        
 
     }
 
@@ -114,6 +114,49 @@ public class UserActivitiService {
         if (encrypt) {
             entity.setPassword(Utils.encodePassword(entity.getPassword()));
         }
+
+        
+        //workaround
+        update.getInfo().forEach(info -> {
+            Optional<UserInfoActiviti> optModel = entity.getInfo().stream().filter(mm -> mm.getId().equals(info.getId())).findFirst();
+            if (optModel.isPresent()) {
+                optModel.get().update(info);
+            } else {
+                entity.getInfo().add(info);
+            }
+        });
+
+        entity.getInfo().forEach(m -> {
+            Optional<UserInfoActiviti> optModel = update.getInfo().stream().filter(mm -> mm.getId().equals(m.getId())).findFirst();
+            if (!optModel.isPresent()) {
+                 entity.getInfo().remove(m);
+            }
+        });
+        
+        
+         update.getGroups().forEach(group -> {
+            Optional<GroupMemberActiviti> optModel = entity.getGroups().stream().filter(mm -> mm.getId().equals(group.getId())).findFirst();
+            if (optModel.isPresent()) {
+                optModel.get().update(group);
+            } else {
+                entity.getGroups().add(group);
+            }
+        });
+
+        List<GroupMemberActiviti> temp = new ArrayList<>();
+        entity.getGroups().forEach(m -> {
+            Optional<GroupMemberActiviti> optModel = update.getGroups().stream().filter(mm -> mm.getId().equals(m.getId())).findFirst();
+            if (!optModel.isPresent()) {
+                 temp.add(m);
+            }
+        });
+
+        temp.forEach(g->{
+        
+            entity.getGroups().remove(g);
+        
+        });
+        
 
         repository.save(entity);
 
@@ -170,6 +213,11 @@ public class UserActivitiService {
 
     public GroupActiviti getProfile() {
         return null;
+    }
+
+    @Transactional(readOnly = true)
+    public boolean checkEmail(String email) {
+        return this.repository.findById(email).isPresent();
     }
 
 }

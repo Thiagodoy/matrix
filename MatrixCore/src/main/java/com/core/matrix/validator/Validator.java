@@ -34,6 +34,7 @@ public class Validator {
 
     private List<String> errors;
     private String fileName;
+    private FileDetailDTO detail;
 
     public void validateMeansurementPoint(Long index, String value) {
 
@@ -110,6 +111,11 @@ public class Validator {
 
         Optional<String> opt = Optional.ofNullable(value);
 
+        
+        if(this.detail.getOrigem().equals("DADOS FALTANTES")){        
+            return;
+        }
+        
         if (!opt.isPresent() || (opt.isPresent() && opt.get().isEmpty())) {
             this.errors.add(MessageFormat.format(MESSAGE_ERROR_REQUIRED, index , "Tipo de Energia", this.fileName));
         } else {
@@ -141,6 +147,7 @@ public class Validator {
 
         this.errors = new ArrayList();
         this.fileName = detail.getFileName();
+        this.detail = detail;
         
         this.validateMeansurementPoint(detail.getLine(), detail.getMeansurementPoint());
         this.validateHour(detail.getLine(), detail.getHour());

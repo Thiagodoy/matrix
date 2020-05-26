@@ -189,6 +189,7 @@ public class AuthResource {
 
                     if (attempts > 3) {
                         user.setEnabled(false);
+                        user.setBlockedForAttemps(true);
                         userActivitiService.save(user);
                         throw new Exception("USER_BLOCKED", e);
                     }
@@ -229,26 +230,32 @@ public class AuthResource {
     public ResponseEntity forgotPassword(@RequestBody ForgotPasswordRequest request) {
         try {
 
-            final UserDetails userDetails = authService.loadUserByUsername(request.getEmail());
-            final String token = jwtTokenUtil.generateToken(userDetails);
-            final String userName = ((UserActiviti) userDetails).getFirstName();
+            final UserActiviti userDetails = (UserActiviti) authService.loadUserByUsername(request.getEmail());
 
-            Specification spc = TemplateSpecification.filter(null, null, null, Template.TemplateBusiness.FORGOT_PASSWORD);
-            Template template = (Template) templateService.find(spc, Pageable.unpaged()).getContent().get(0);
+            if (userDetails.isEnabled()) {
 
-            Map<String, String> data = new HashMap<String, String>();
+                final String token = jwtTokenUtil.generateToken(userDetails);
+                final String userName = userDetails.getFirstName();
 
-            data.put(Constants.TEMPLATE_PARAM_LINK, urlPortal + "?token=" + token);
-            data.put(Constants.TEMPLATE_PARAM_USER_EMAIL, request.getEmail());
-            data.put(Constants.TEMPLATE_PARAM_USER_NAME, userName);
+                Specification spc = TemplateSpecification.filter(null, null, null, Template.TemplateBusiness.FORGOT_PASSWORD);
+                Template template = (Template) templateService.find(spc, Pageable.unpaged()).getContent().get(0);
 
-            String emailData = Utils.mapToString(data);
+                Map<String, String> data = new HashMap<String, String>();
 
-            Email email = new Email();
-            email.setTemplate(template);
-            email.setData(emailData);
+                data.put(Constants.TEMPLATE_PARAM_LINK, urlPortal + "?token=" + token);
+                data.put(Constants.TEMPLATE_PARAM_USER_EMAIL, request.getEmail());
+                data.put(Constants.TEMPLATE_PARAM_USER_NAME, userName);
 
-            threadPoolEmail.submit(email);
+                String emailData = Utils.mapToString(data);
+
+                Email email = new Email();
+                email.setTemplate(template);
+                email.setData(emailData);
+
+                threadPoolEmail.submit(email);
+            }else{
+                new Exception("USER_DISABLED");
+            }
 
             return ResponseEntity.ok().build();
 

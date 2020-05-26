@@ -190,7 +190,7 @@ public class CalculateTask implements Task {
 
             ContractCompInformation contractInformationParent = contractsInformations
                     .stream()
-                    .filter(c -> c.getCodeContractApportionment() == null || c.getCodeContractApportionment().equals(0L) )
+                    .filter(c -> c.getCodeContractApportionment() == null || c.getCodeContractApportionment().equals(0L))
                     .findFirst()
                     .orElseThrow(() -> new Exception("[Matrix] Informação do contrato [ PAI ] do rateio não foi encontrada!"));
 
@@ -209,9 +209,8 @@ public class CalculateTask implements Task {
                             .map(MeansurementFileDetail::getMeansurementPoint)
                             .findFirst()
                             .orElse(file.getMeansurementPoint());
-                    
+
                     String point = pointTemp.replaceAll("\\((L|B)\\)", "").trim();
-                    
 
                     ContractCompInformation contractInformation = contractsInformations
                             .stream()
@@ -292,7 +291,12 @@ public class CalculateTask implements Task {
             String name = results.stream().findFirst().get().getNameCompany();
 
             MeansurementFileResult fileResult = new MeansurementFileResult(contractWbcInformation, de.getProcessInstanceId());
-            fileResult.setFactorAtt(contractInformationParent.getFactorAttendanceCharge() / 100);
+
+            Double factorAttParent = Optional.ofNullable(contractInformationParent.getFactorAttendanceCharge()).isPresent()
+                    ? contractInformationParent.getFactorAttendanceCharge() / 100
+                    : 0;
+
+            fileResult.setFactorAtt(factorAttParent);
             fileResult.setAmountBruto(this.roundValue(sum, 3));
             fileResult.setAmountScde(sumScde);
             Double consumptionLiquid = isConsumerUnit ? 0D : solicitadoLiquido(this.roundValue(sum, 3), contractWbcInformation);
@@ -350,10 +354,10 @@ public class CalculateTask implements Task {
     }
 
     public int consultaPerfilCCEE(List<ContractDTO> contracts, Long numeroContrato) {
-        return  contracts
-                .stream()                
-                .filter(c-> Long.valueOf(c.getSNrContrato()).equals(numeroContrato))
-                .mapToInt(c-> c.getNCdPerfilCCEE().intValue())
+        return contracts
+                .stream()
+                .filter(c -> Long.valueOf(c.getSNrContrato()).equals(numeroContrato))
+                .mapToInt(c -> c.getNCdPerfilCCEE().intValue())
                 .findFirst()
                 .orElse(0);
     }

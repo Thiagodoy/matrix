@@ -21,5 +21,7 @@ public interface NotificationRepository extends JpaRepository<Notification, Long
     
     List<Notification> findByToAndIsRead(String user, boolean isRead);
     
+    List<Notification> findByToAndTaskIdAndProcessId(String user, String task,String process);
+    
     
 }

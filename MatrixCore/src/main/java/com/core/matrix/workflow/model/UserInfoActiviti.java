@@ -22,30 +22,30 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 @AllArgsConstructor
 @EqualsAndHashCode(of = {"userId", "key", "value"})
-public class UserInfoActiviti {
+public class UserInfoActiviti implements Model<UserInfoActiviti>{
 
     @Id
     @Column(name = "ID_")
-    private String id;
+    public String id;
 
     @Column(name = "REV_")
-    private long rev;
+    public Long rev;
 
     @Column(name = "USER_ID_")
-    private String userId;
+    public String userId;
 
     @Column(name = "TYPE_")
-    private String type;
+    public String type;
 
     @Column(name = "KEY_")
-    private String key;
+    public String key;
 
     @Column(name = "VALUE_")
-    private String value;   
+    public String value;   
     
 
     public UserInfoActiviti(String userId, String key, String value) {
-        this.rev = 1;
+        this.rev = 1L;
         this.type = "userinfo";
         this.key = key;
         this.value = value;

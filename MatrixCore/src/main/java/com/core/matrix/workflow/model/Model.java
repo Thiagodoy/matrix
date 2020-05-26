@@ -6,6 +6,7 @@
 package com.core.matrix.workflow.model;
 
 import java.lang.reflect.Field;
+import java.lang.reflect.ParameterizedType;
 import java.lang.reflect.Type;
 import java.util.Arrays;
 import java.util.Collection;
@@ -31,10 +32,45 @@ public interface Model<T extends Model> {
 
             try {
 
-                boolean isCollection = Collection.class.isAssignableFrom(f.getType());
+                boolean isCollection = Collection.class.isAssignableFrom(f.getType());                
+               
+                
+                //boolean isModel = Model.class.isAssignableFrom(((ParameterizedType )f.getGenericType()).getRawType().getClass());
 
                 if (isCollection) {
                     //TODO: Create flow for implmentation
+                    
+//                    ParameterizedType collectionType = (ParameterizedType) f.getGenericType();
+//                    Class<?> stringListClass = (Class<?>) collectionType.getActualTypeArguments()[0];
+//                    System.out.println(stringListClass);
+//                    
+//                    boolean isModel = Model.class.isAssignableFrom(stringListClass);
+//                    
+//                    
+//                    Collection<Model> collection = (Collection<Model>)f.get(this);
+//                    Collection<Model> collectionEntity = (Collection<Model>)f.get(entity);
+//                    
+//                    collectionEntity.forEach(m->{
+//                        
+//                        Optional<Model> optModel = collection.stream().filter(mm-> mm.getId().equals(m.getId())).findFirst();
+//                        
+//                        if(optModel.isPresent()){
+//                            optModel.get().update(m);
+//                        }else{
+//                            collection.add(m);
+//                        }
+//                    });
+//                    
+//                    collection.forEach(m->{                    
+//                        Optional<Model> optModel = collectionEntity.stream().filter(mm-> mm.getId().equals(m.getId())).findFirst();                        
+//                        if(!optModel.isPresent()){
+//                           collection.remove(m);
+//                        }
+//                    });
+                    
+                    
+                    
+                    
                 } else {
                     Object valueOfInstance = f.get(this);
                     Object valueOfEntity = f.get(entity);

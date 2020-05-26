@@ -41,6 +41,7 @@ public class Constants {
     public static final String RESPONSE_DATA_IS_VALID = "Dados Válidos";
     
     public static final String RESPONSE_RESULT = "result";
+    
     public static final String RESPONSE_RESULT_MESSAGE = "resultMessage";
     
     
@@ -115,5 +116,8 @@ public class Constants {
     public static final String TEMPLATE_PARAM_PROCESS_NAME = ":process_name";
     public static final String TEMPLATE_PARAM_NUMBER_PROCESS = ":number_process";
     public static final String TEMPLATE_PARAM_TASK_CREATE_DATE = ":task_create_date";
+    
+    
+    public static final String TASK_DRAFT = "task_draft";
     
 }

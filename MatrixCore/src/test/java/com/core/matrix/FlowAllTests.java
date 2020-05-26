@@ -19,7 +19,7 @@ import org.springframework.boot.test.context.SpringBootTest;
 @SpringBootTest
 class FlowAllTests {
 
-    private final String TASK_ID = "997715";
+    private final String TASK_ID = "1132533";
 
     @Autowired
     private TaskService taskService;
@@ -29,7 +29,7 @@ class FlowAllTests {
 
         Task task = taskService.createTaskQuery().taskId(TASK_ID).singleResult();
         List<String> files = Arrays.asList(
-                "TOYOTA_1.csv"
+              "exportacao_clacos0g0_248837_HADEX_1.csv"                
         );
 
         List<String> attachmentsIDs = new ArrayList<>();

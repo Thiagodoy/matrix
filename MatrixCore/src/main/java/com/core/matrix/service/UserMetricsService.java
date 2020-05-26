@@ -25,8 +25,6 @@ import java.util.Objects;
 import java.util.OptionalDouble;
 import java.util.TreeMap;
 import java.util.concurrent.TimeUnit;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 import java.util.stream.Collectors;
 import org.activiti.engine.HistoryService;
 import org.activiti.engine.TaskService;
@@ -230,13 +228,11 @@ public class UserMetricsService {
                 .stream()
                 .filter(t -> Objects.nonNull(t.getDurationInMillis())).count();
 
-        Logger.getLogger(UserMetricsService.class.getName()).log(Level.INFO, "Quantidades de registros -> " + count);
         result
                 .stream()
                 .filter(t -> Objects.nonNull(t.getDurationInMillis()))
                 .mapToLong(HistoricTaskInstance::getDurationInMillis).forEach(l -> {
 
-            Logger.getLogger(UserMetricsService.class.getName()).log(Level.INFO, "Value -> " + l);
         });
 
         OptionalDouble value = result

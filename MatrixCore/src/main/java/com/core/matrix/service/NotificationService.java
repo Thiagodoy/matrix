@@ -66,17 +66,21 @@ public class NotificationService {
     @Transactional
     public void push(Notification notification) {
 
-        notification = repository.save(notification);
+        boolean canWrite = repository.findByToAndTaskIdAndProcessId(notification.getTo(), notification.getTaskId(), notification.getProcessId()).isEmpty();
 
-        List<SessionWebsocket> opt = sessionWebsocketRepository.findByUserId(notification.getTo());
+        if (canWrite) {
+            notification = repository.save(notification);
+            List<SessionWebsocket> opt = sessionWebsocketRepository.findByUserId(notification.getTo());
 
-        if (!opt.isEmpty()) {
-            SessionWebsocket session = opt.get(0);
-            SimpMessageHeaderAccessor headerAccessor = SimpMessageHeaderAccessor.create(SimpMessageType.MESSAGE);
-            headerAccessor.setSessionId(session.getSessionId());
+            if (!opt.isEmpty()) {
+                SessionWebsocket session = opt.get(0);
+                SimpMessageHeaderAccessor headerAccessor = SimpMessageHeaderAccessor.create(SimpMessageType.MESSAGE);
+                headerAccessor.setSessionId(session.getSessionId());
 
-            messagingTemplate.convertAndSendToUser(session.getSessionId(), URL_SUBSCRIBER_QUEUE, notification, headerAccessor.getMessageHeaders());
+                messagingTemplate.convertAndSendToUser(session.getSessionId(), URL_SUBSCRIBER_QUEUE, notification, headerAccessor.getMessageHeaders());
+            }
         }
+
     }
 
 }

@@ -9,6 +9,7 @@ import com.core.matrix.request.AddComment;
 import com.core.matrix.request.CompleteTaskRequest;
 import com.core.matrix.request.DeleteProcessRequest;
 import com.core.matrix.request.StartProcessRequest;
+import com.core.matrix.request.TaskDraftRequest;
 import com.core.matrix.response.AttachmentResponse;
 import com.core.matrix.response.PageResponse;
 import com.core.matrix.response.ProcessDetailResponse;
@@ -303,5 +304,29 @@ public class RuntimeResource {
             return ResponseEntity.status(HttpStatus.resolve(500)).body(e.getMessage());
         }
     }
+    
+    @RequestMapping(value = "/taskHistory", method = RequestMethod.GET)
+    public ResponseEntity taskHistory(@RequestParam(name = "processInstanceId")String id) {
+        try {
+            List response = service.getTaskHistoryByProcess(id);
+            return ResponseEntity.ok(response);
+        } catch (Exception e) {
+            Logger.getLogger(RepositoryResource.class.getName()).log(Level.SEVERE, "[post]", e);
+            return ResponseEntity.status(HttpStatus.resolve(500)).body(e.getMessage());
+        }
+    }
+    
+    
+    @RequestMapping(value = "/task/draft", method = RequestMethod.POST)
+    public ResponseEntity writeDraftOnTask(@RequestBody TaskDraftRequest request) {
+        try {
+            service.writeDraftOnTask(request);
+            return ResponseEntity.ok().build();
+        } catch (Exception e) {
+            Logger.getLogger(RepositoryResource.class.getName()).log(Level.SEVERE, "[taskHistory]", e);
+            return ResponseEntity.status(HttpStatus.resolve(500)).body(e.getMessage());
+        }
+    }
+    
 
 }

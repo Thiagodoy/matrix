@@ -3,16 +3,19 @@
  * To change this template file, choose Tools | Templates
  * and open the template in the editor.
  */
-package com.core.matrix.utils;
+package com.core.matrix.request;
+
+import lombok.Data;
 
 /**
  *
  * @author thiag
  */
-public enum MeansurementFileDetailStatus {
-    HOUR_ERROR,
-    DAY_ERROR,
-    CALENDAR_ERROR,
-    INPUT_MANUAL,
-    SUCCESS
+@Data
+public class TaskDraftRequest {
+
+    private String processInstanceId;
+    private String taskId;
+    private String data;
+    
 }

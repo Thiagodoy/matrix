@@ -44,4 +44,8 @@ public class UserActivitiSpecification {
     public static Specification<UserActiviti> profile(String profile) {
         return (root, criteriaQuery, criteriaBuilder) -> criteriaBuilder.like(root.get(UserActiviti_.profile), "%" + profile.trim() + "%");
     }
+    
+    public static Specification<UserActiviti> id(String id) {
+        return (root, criteriaQuery, criteriaBuilder) -> criteriaBuilder.equal(root.get(UserActiviti_.id), id);
+    }
 }

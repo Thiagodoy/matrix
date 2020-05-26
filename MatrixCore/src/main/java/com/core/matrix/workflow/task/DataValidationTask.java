@@ -5,6 +5,7 @@
  */
 package com.core.matrix.workflow.task;
 
+import com.core.matrix.dto.DataValidationResultDTO;
 import com.core.matrix.io.BeanIoReader;
 import com.core.matrix.model.MeansurementFile;
 import com.core.matrix.model.MeansurementFileDetail;
@@ -47,6 +48,8 @@ public class DataValidationTask implements Task {
     private static ApplicationContext context;
 
     private Attachment attachment;
+
+    List<DataValidationResultDTO> results = new ArrayList<>();
 
     public DataValidationTask() {
         synchronized (DataValidationTask.context) {
@@ -102,13 +105,19 @@ public class DataValidationTask implements Task {
 
         });
 
+        
+        
         boolean hasInvalidaData = files.stream().anyMatch(mdf -> mdf.getStatus().equals(MeansurementFileStatus.DATA_CALENDAR_ERROR));
         boolean hasDataForPersist = files.stream().anyMatch(mdf -> mdf.getStatus().equals(MeansurementFileStatus.DATA_DAY_ERROR) || mdf.getStatus().equals(MeansurementFileStatus.DATA_HOUR_ERROR));
 
+        Logger.getLogger(DataValidationTask.class.getName()).log(Level.INFO, "[hasInvalidaData] => " + hasInvalidaData);
+        Logger.getLogger(DataValidationTask.class.getName()).log(Level.INFO, "[hasDataForPersist] => " + hasDataForPersist );
+        
         if (hasInvalidaData) {
             de.setVariable(CONTROLE, RESPONSE_INVALID_DATA);
         } else if (hasDataForPersist) {
             de.setVariable(CONTROLE, RESPONSE_INCONSISTENT_DATA);
+            de.setVariable(RESPONSE_RESULT, results);
         } else {
             de.setVariable(CONTROLE, RESPONSE_DATA_IS_VALID);
         }
@@ -188,11 +197,44 @@ public class DataValidationTask implements Task {
 
                 if (!hoursOut.isEmpty()) {
 
+                    DataValidationResultDTO result = new DataValidationResultDTO();
+                    result.setIdFile(file.getId());
+
+                    Optional<Attachment> opta = delegateExecution
+                            .getEngineServices()
+                            .getTaskService()
+                            .getProcessInstanceAttachments(delegateExecution.getProcessInstanceId())
+                            .stream()
+                            .filter(t -> t.getId().equals(file.getFile()))
+                            .findFirst();
+
+                    String name = "";
+                    if (opta.isPresent()) {
+                        name = opta.get().getName();
+                    }
+
+                    result.setFileName(name);
+                    result.setPoint(point);
+
+                    Double sum = lote
+                            .stream()
+                            .mapToDouble(MeansurementFileDetail::getConsumptionActive)
+                            .reduce(Double::sum)
+                            .getAsDouble();
+
+                    result.setTotalScde(sum);
+
+                    final Long qtdHours = hoursOut.stream().count();
+                    result.setHours(qtdHours);
+
+                    results.add(result);
+
                     hoursOut.parallelStream().forEach(d -> {
                         d.setStatus(MeansurementFileDetailStatus.HOUR_ERROR);
                     });
 
                     details.addAll(hoursOut);
+                    file.getDetails().addAll(hoursOut);
                     this.fileDetailService.save(details);
                 }
             }
@@ -201,13 +243,12 @@ public class DataValidationTask implements Task {
 
         if (!details.isEmpty()) {
             file.setStatus(MeansurementFileStatus.DATA_HOUR_ERROR);
-            details.forEach(mpd -> mpd.setStatus(MeansurementFileDetailStatus.HOUR_ERROR));
+            //details.forEach(mpd -> mpd.setStatus(MeansurementFileDetailStatus.HOUR_ERROR));
 
             String error = MessageFormat.format("Arquivo esta com a consolidação diária das hora inválida, para o ponto [ {0} ] dentro do arquivo [ {1} ]", file.getMeansurementPoint(), this.attachment.getName());
 
             throw new Exception(error);
         }
-
     }
 
     private boolean hourIsNotPresent(final Long hour, MeansurementFile file, LocalDate day) {
@@ -258,6 +299,41 @@ public class DataValidationTask implements Task {
                         });
 
                         if (!detailsOut.isEmpty()) {
+
+                            DataValidationResultDTO result = new DataValidationResultDTO();
+                            result.setIdFile(file.getId());
+
+                            Optional<Attachment> opta = delegateExecution
+                                    .getEngineServices()
+                                    .getTaskService()
+                                    .getProcessInstanceAttachments(delegateExecution.getProcessInstanceId())
+                                    .stream()
+                                    .filter(t -> t.getId().equals(file.getFile()))
+                                    .findFirst();
+
+                            String name = "";
+                            if (opta.isPresent()) {
+                                name = opta.get().getName();
+                            }
+
+                            result.setFileName(name);
+                            result.setPoint(point);
+
+                            Double sum = lote
+                                    .stream()
+                                    .mapToDouble(MeansurementFileDetail::getConsumptionActive)
+                                    .reduce(Double::sum)
+                                    .getAsDouble();
+
+                            result.setTotalScde(sum);
+
+                            final Long qtdDays = detailsOut.stream().count();
+                            result.setDays(qtdDays);
+
+                            results.add(result);
+
+                            file.getDetails().addAll(detailsOut);
+
                             this.fileDetailService.save(detailsOut);
                         }
 

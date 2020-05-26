@@ -9,12 +9,14 @@ import com.core.matrix.request.AddComment;
 import com.core.matrix.request.CompleteTaskRequest;
 import com.core.matrix.request.DeleteProcessRequest;
 import com.core.matrix.request.StartProcessRequest;
+import com.core.matrix.request.TaskDraftRequest;
 import com.core.matrix.response.AttachmentResponse;
 import com.core.matrix.response.PageResponse;
 import com.core.matrix.response.ProcessDefinitionResponse;
 import com.core.matrix.response.ProcessDetailResponse;
 import com.core.matrix.response.TaskResponse;
 import com.core.matrix.utils.Constants;
+import static com.core.matrix.utils.Constants.TASK_DRAFT;
 import com.core.matrix.utils.Utils;
 import com.core.matrix.workflow.model.GroupMemberActiviti;
 import com.core.matrix.workflow.model.UserActiviti;
@@ -36,6 +38,7 @@ import org.activiti.engine.RepositoryService;
 import org.activiti.engine.RuntimeService;
 import org.activiti.engine.TaskService;
 import org.activiti.engine.history.HistoricProcessInstance;
+import org.activiti.engine.history.HistoricTaskInstance;
 import org.activiti.engine.impl.RepositoryServiceImpl;
 import org.activiti.engine.impl.bpmn.behavior.ExclusiveGatewayActivityBehavior;
 import org.activiti.engine.impl.persistence.entity.ExecutionEntity;
@@ -83,7 +86,7 @@ public class RuntimeActivitiService {
     private RepositoryActivitiService repositoryActivitiService;
 
     @Autowired
-    private CommentActivitiService commentActivitiService;    
+    private CommentActivitiService commentActivitiService;
 
     @Transactional
     public void startProcessByMessage(String message, Map<String, Object> variables) {
@@ -266,9 +269,9 @@ public class RuntimeActivitiService {
         List<String> processInstances = this.listProcessInstances(groupFilter, user.getId(), searchValue, page, size);
 
         long total = Long.parseLong(processInstances.get(0));
-        
+
         processInstances = processInstances.subList(1, processInstances.size());
-        
+
         if (processInstances.isEmpty()) {
             return new PageResponse<TaskResponse>(new ArrayList(), 1L, 1L, (long) page);
         }
@@ -329,7 +332,7 @@ public class RuntimeActivitiService {
                 .list()
                 .stream()
                 .count();
-        
+
         processInstances.add(0, String.valueOf(total));
 
         return processInstances;
@@ -846,6 +849,28 @@ public class RuntimeActivitiService {
         for (String id : request.getIds()) {
             runtimeService.deleteProcessInstance(id, null);
         }
+    }
+
+    @Transactional
+    public List<TaskResponse> getTaskHistoryByProcess(String id) {
+
+        return historyService
+                .createHistoricTaskInstanceQuery()
+                .processInstanceId(id)
+                .orderByTaskDueDate()
+                .asc()
+                .list()
+                .parallelStream()
+                .map(ht -> {
+                    return new TaskResponse(ht);
+                })
+                .collect(Collectors.toList());
+
+    }
+    
+    @Transactional
+    public void writeDraftOnTask(TaskDraftRequest request){        
+        this.runtimeService.setVariableLocal(request.getTaskId(), TASK_DRAFT, request.getData());        
     }
 
 }

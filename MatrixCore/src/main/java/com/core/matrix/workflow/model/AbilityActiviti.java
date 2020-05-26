@@ -60,5 +60,7 @@ public class AbilityActiviti implements GrantedAuthority, Serializable {
     public String getAuthority() {
         return this.subject;
     }
+
+   
     
 }
