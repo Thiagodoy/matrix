@@ -49,7 +49,7 @@ public class DataValidationTask implements Task {
 
     private Attachment attachment;
 
-    List<DataValidationResultDTO> results = new ArrayList<>();
+    private List<DataValidationResultDTO> results = null;
 
     public DataValidationTask() {
         synchronized (DataValidationTask.context) {
@@ -68,6 +68,9 @@ public class DataValidationTask implements Task {
     public void execute(DelegateExecution de) throws Exception {
 
         delegateExecution = de;
+        
+        final String responseResult = MessageFormat.format("{0}:{1}", RESPONSE_RESULT, de.getProcessInstanceId());        
+        this.results = new ArrayList<>();
 
         List<MeansurementFile> files = this.fileService
                 .findByProcessInstanceId(delegateExecution.getProcessInstanceId())
@@ -115,7 +118,13 @@ public class DataValidationTask implements Task {
             de.setVariable(CONTROLE, RESPONSE_INVALID_DATA);
         } else if (hasDataForPersist) {
             de.setVariable(CONTROLE, RESPONSE_INCONSISTENT_DATA);
-            de.setVariable(RESPONSE_RESULT, results);
+            
+            if(de.hasVariable(responseResult)){
+                de.removeVariable(responseResult );
+                Logger.getLogger(DataValidationTask.class.getName()).log(Level.INFO, "[Removeu a variavel responseResult]");
+            }
+            
+            de.setVariable(responseResult, results,true);
         } else {
             de.setVariable(CONTROLE, RESPONSE_DATA_IS_VALID);
         }

@@ -46,7 +46,8 @@ public class RuntimeListenerConfiguration implements EnvironmentAware {
 
         runtimeService.addEventListener(listener,
                 ActivitiEventType.TASK_ASSIGNED,
-                ActivitiEventType.TASK_CREATED);
+                ActivitiEventType.TASK_CREATED,
+                ActivitiEventType.TASK_COMPLETED);
 
         return listener;
 

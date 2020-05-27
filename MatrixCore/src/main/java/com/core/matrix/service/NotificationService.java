@@ -5,6 +5,7 @@
  */
 package com.core.matrix.service;
 
+import com.core.matrix.dto.Action;
 import com.core.matrix.model.Notification;
 import com.core.matrix.model.SessionWebsocket;
 import com.core.matrix.repository.NotificationRepository;
@@ -34,6 +35,7 @@ public class NotificationService {
     private NotificationRepository repository;
 
     private final String URL_SUBSCRIBER_QUEUE = "/queue/notification";
+    private final String URL_SUBSCRIBER_TOPIC_ACTION = "/topic/action/notification";
 
     @Transactional
     public void read(Long id) {
@@ -79,6 +81,22 @@ public class NotificationService {
 
                 messagingTemplate.convertAndSendToUser(session.getSessionId(), URL_SUBSCRIBER_QUEUE, notification, headerAccessor.getMessageHeaders());
             }
+        }
+
+    }
+
+    @Transactional
+    public void pushActionRemoveTask(String taskId) {
+
+        List<Notification> notifications = this.repository.findByTaskId(taskId);
+
+        if (!notifications.isEmpty()) {
+
+            notifications.forEach(n -> {
+                this.repository.delete(n);
+            });
+
+            messagingTemplate.convertAndSend(URL_SUBSCRIBER_TOPIC_ACTION, new Action(taskId, Action.ActionType.REMOVE));
         }
 
     }

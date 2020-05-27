@@ -311,7 +311,7 @@ public class RuntimeActivitiService {
                 + "        OR k.group_id_ in (" + groupFilter + "))\n";
 
         if (Optional.ofNullable(valueSearch).isPresent()) {
-            query += "        AND UPPER(v.text_) LIKE '%" + valueSearch.toUpperCase() + "%'\n" + "        AND SUBSTRING(v.name_, 1, 1) = '#'\n";
+            query += "        AND ((UPPER(v.text_) LIKE '%" + valueSearch.toUpperCase() + "%'\n" + "        AND SUBSTRING(v.name_, 1, 1) = '#') OR t.NAME_ like '%" + valueSearch.toUpperCase() + "%')\n";
         }
 
         query += "        ORDER BY t.CREATE_TIME_ DESC";

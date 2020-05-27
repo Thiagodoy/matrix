@@ -104,11 +104,10 @@ public class RuntimeListener implements ActivitiEventListener {
                                 .createTaskQuery()
                                 .executionId(executionId)
                                 .singleResult();
-                        
-                        if(Optional.ofNullable(task1.getAssignee()).isPresent()){
+
+                        if (Optional.ofNullable(task1.getAssignee()).isPresent()) {
                             return;
                         }
-                    
 
                         final String processInstanceID = event.getProcessDefinitionId();
                         List<UserActiviti> users1 = this.getUsersFromTaskAndProcessDef(task1.getId(), processInstanceID);
@@ -124,6 +123,19 @@ public class RuntimeListener implements ActivitiEventListener {
                 }).start();
 
                 break;
+
+            case TASK_COMPLETED:
+
+                task = event.getEngineServices()
+                        .getTaskService()
+                        .createTaskQuery()
+                        .executionId(executionId)
+                        .singleResult();
+
+                this.notificationService.pushActionRemoveTask(task.getId());
+
+                break;
+
         }
 
     }

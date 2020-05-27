@@ -60,10 +60,6 @@ public class CleanFiles implements JavaDelegate {
             for (Comment comment : comments) {
                 execution.getEngineServices().getTaskService().deleteComment(comment.getId());
             }
-            
-            
-            execution.setVariable(RESPONSE_RESULT, null);
-            
 
             this.fileService.findByProcessInstanceId(execution.getProcessInstanceId()).forEach(file -> {
 
