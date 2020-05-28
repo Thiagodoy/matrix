@@ -18,46 +18,58 @@ import org.springframework.data.jpa.domain.Specification;
  */
 public class MonitoringSpecification {
 
-    public static Specification<Monitoring> parameters(String status, String instanciaDoProcesso,String wbcContrato, String pontoMedicao, String empresa, String ano, String mes ) {
-        
-        List<Specification> predicatives = new ArrayList<>();        
-        
-        
-        if(Optional.ofNullable(instanciaDoProcesso).isPresent()){
+    public static Specification<Monitoring> parameters(String status,
+                                                       String instanciaDoProcesso, 
+                                                       String wbcContrato, 
+                                                       String pontoMedicao, 
+                                                       String empresa, 
+                                                       String ano, 
+                                                       String mes, 
+                                                       String atividade, 
+                                                       String usuario) {
+
+        List<Specification> predicatives = new ArrayList<>();
+
+        if (Optional.ofNullable(instanciaDoProcesso).isPresent()) {
             predicatives.add((root, criteriaQuery, criteriaBuilder) -> criteriaBuilder.equal(root.get(Monitoring_.instanciaDoProcesso), instanciaDoProcesso));
         }
-        
-        if(Optional.ofNullable(status).isPresent()){
+
+        if (Optional.ofNullable(status).isPresent()) {
             predicatives.add((root, criteriaQuery, criteriaBuilder) -> criteriaBuilder.equal(root.get(Monitoring_.status), status));
         }
-        
-        if(Optional.ofNullable(wbcContrato).isPresent()){
+
+        if (Optional.ofNullable(wbcContrato).isPresent()) {
             predicatives.add((root, criteriaQuery, criteriaBuilder) -> criteriaBuilder.equal(root.get(Monitoring_.wbcContrato), wbcContrato));
         }
-        
-        if(Optional.ofNullable(pontoMedicao).isPresent()){
+
+        if (Optional.ofNullable(pontoMedicao).isPresent()) {
             predicatives.add((root, criteriaQuery, criteriaBuilder) -> criteriaBuilder.equal(root.get(Monitoring_.pontoDeMedicao), pontoMedicao));
         }
-        
-        if(Optional.ofNullable(empresa).isPresent()){
+
+        if (Optional.ofNullable(empresa).isPresent()) {
             predicatives.add((root, criteriaQuery, criteriaBuilder) -> criteriaBuilder.like(criteriaBuilder.upper(root.get(Monitoring_.empresa)), "%" + empresa.toUpperCase() + "%"));
         }
-        
-        if(Optional.ofNullable(mes).isPresent()){
+
+        if (Optional.ofNullable(mes).isPresent()) {
             predicatives.add((root, criteriaQuery, criteriaBuilder) -> criteriaBuilder.equal(root.get(Monitoring_.mes), mes));
         }
-        
-        if(Optional.ofNullable(ano).isPresent()){
-             predicatives.add((root, criteriaQuery, criteriaBuilder) -> criteriaBuilder.equal(root.get(Monitoring_.ano), ano));
+
+        if (Optional.ofNullable(ano).isPresent()) {
+            predicatives.add((root, criteriaQuery, criteriaBuilder) -> criteriaBuilder.equal(root.get(Monitoring_.ano), ano));
         }
         
+        if (Optional.ofNullable(atividade).isPresent()) {
+            predicatives.add((root, criteriaQuery, criteriaBuilder) -> criteriaBuilder.equal(root.get(Monitoring_.atividadeNoMomento), atividade));
+        }
         
-        Specification<Monitoring> spc = predicatives.stream().reduce((a,b)-> a.and(b)).orElse(null);
-        
-        return spc;
-        
-    }
+        if (Optional.ofNullable(usuario).isPresent()) {
+            predicatives.add((root, criteriaQuery, criteriaBuilder) -> criteriaBuilder.equal(root.get(Monitoring_.responsavel), usuario ));
+        }
 
-   
+        Specification<Monitoring> spc = predicatives.stream().reduce((a, b) -> a.and(b)).orElse(null);
+
+        return spc;
+
+    }
 
 }

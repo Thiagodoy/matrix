@@ -5,6 +5,7 @@
  */
 package com.core.matrix.response;
 
+import com.core.matrix.dto.CommentDTO;
 import java.util.Date;
 import java.util.List;
 import lombok.Data;
@@ -18,7 +19,7 @@ import org.activiti.engine.task.Comment;
 @Data
 public class ProcessDetailResponse {
 
-    private List<Comment> comments;
+    private List<CommentDTO> comments;
     private List<AttachmentResponse> attachments;
     private Date processCreatedDate;
     private String processCreatedUser;    

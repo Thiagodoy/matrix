@@ -144,6 +144,8 @@ public class CalculateTask implements Task {
             fileResult.setFactorAtt(factorAtt);
             fileResult.setWbcSubmercado(compInformation.getWbcSubmercado());
             fileResult.setWbcPerfilCCEE(consultaPerfilCCEE(contracts, Long.valueOf(contractWbcInformationDTO.getNrContract())));
+            
+            
 
             resultService.save(fileResult);
 

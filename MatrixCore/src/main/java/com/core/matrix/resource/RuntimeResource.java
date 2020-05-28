@@ -5,6 +5,7 @@
  */
 package com.core.matrix.resource;
 
+import com.core.matrix.dto.CommentDTO;
 import com.core.matrix.request.AddComment;
 import com.core.matrix.request.CompleteTaskRequest;
 import com.core.matrix.request.DeleteProcessRequest;
@@ -218,7 +219,7 @@ public class RuntimeResource {
     public ResponseEntity addComment(@RequestBody AddComment request, Principal principal) {
         try {
 
-            Comment response = service.addComment(request, principal.getName());
+            CommentDTO response = service.addComment(request, principal.getName());
             return ResponseEntity.ok(response);
         } catch (Exception e) {
             Logger.getLogger(RuntimeResource.class.getName()).log(Level.SEVERE, "[addComment]", e);

@@ -51,29 +51,36 @@ import lombok.NoArgsConstructor;
                     @ColumnResult(name = "nome_empresa", type = String.class)
                     ,
                     @ColumnResult(name = "responsavel", type = String.class)
+                    ,
+                    @ColumnResult(name = "rateio", type = String.class)
                 }))
 
 @NamedNativeQuery(name = "MeansurementFileResult.getStatusBilling",
-        query = "SELECT \n"
+        query = "SELECT distinct \n"
         + "    a.id_arquivo_de_medicao,\n"
         + "    a.ano,\n"
         + "    a.mes,\n"
         + "    case b.contrato_pai when 1 then c.wbc_contrato else a.wbc_contrato end as wbc_contrato,\n"
         + "    a.wbc_ponto_de_medicao,\n"
         + " case b.justificativa when 'APROVADO' then b.montante_liquido_ajustado else b.montante_liquido end as montante_liquido,\n"
-        + "    a.status,\n"
+        + "    'APROVADO' as status,\n"
         + "    a.data_criacao,\n"
         + "    b.exportado,\n"
         + "    b.nome_empresa,\n"
-        + "    CONCAT(u.FIRST_ ,' ', u.LAST_) as responsavel\n"
-        + "FROM\n"
-        + "    mtx_arquivo_de_medicao a\n"
-        + "        INNER JOIN\n"
-        + "    mtx_arquivo_de_medicao_resultado b ON a.id_arquivo_de_medicao = b.id_arquivo_de_medicao\n"
+        + "    CONCAT(u.FIRST_ ,' ', u.LAST_) as responsavel,\n"
+        + "   (CASE WHEN c.wbc_rateio = 1 THEN 'SIM'\n"
+        + "            ELSE 'NÃO'\n"
+        + "    END) as rateio\n"
+        + " FROM\n"
+        + "  mtx_arquivo_de_medicao a\n"
+        + "                INNER JOIN\n"
+        + "            mtx_arquivo_de_medicao_resultado b ON a.id_arquivo_de_medicao = b.id_arquivo_de_medicao\n"
+        + "                LEFT JOIN\n"
+        + "            mtx_contrato_informacao_complementar c ON  b.wbc_contrato = c.wbc_codigo_contrato or b.wbc_contrato = c.wbc_contrato\n"
+        + "            LEFT JOIN \n"
+        + "			activiti.act_hi_varinst v ON v.PROC_INST_ID_ = a.act_id_processo  \n"
         + "        LEFT JOIN\n"
-        + "    mtx_contrato_informacao_complementar c ON  b.wbc_contrato = c.wbc_codigo_contrato or b.wbc_contrato = c.wbc_contrato\n"
-        + "LEFT JOIN\n"
-        + "activiti.act_id_user u ON a.act_id_usuario = u.ID_"
+        + "			activiti.act_id_user u ON u.ID_ = v.TEXT_ and v.NAME_ = 'created_by'"
         + "\n"
         + "WHERE\n"
         + "    a.status IN ('APPROVED')\n"

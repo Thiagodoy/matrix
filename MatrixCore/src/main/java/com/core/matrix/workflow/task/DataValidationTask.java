@@ -335,8 +335,7 @@ public class DataValidationTask implements Task {
                             result.setTotalScde(sum);
 
                             final Long qtdDays = detailsOut.stream().count();
-                            result.setDays(qtdDays);
-
+                            result.setHours(qtdDays * 24);
                             results.add(result);
 
                             file.getDetails().addAll(detailsOut);

@@ -216,6 +216,8 @@ public class AuthResource {
             UserActiviti user = (UserActiviti) authService.loadUserByUsername(principal.getName());
 
             user.setPassword(request.getNewPassword());
+            user.setEnabled(true);
+            user.setBlockedForAttemps(false);
             userActivitiService.update(user);
 
             return ResponseEntity.ok().build();
@@ -232,7 +234,7 @@ public class AuthResource {
 
             final UserActiviti userDetails = (UserActiviti) authService.loadUserByUsername(request.getEmail());
 
-            if (userDetails.isEnabled()) {
+            if (userDetails.isEnabled() || (!userDetails.isEnabled() && userDetails.isBlockedForAttemps())) {
 
                 final String token = jwtTokenUtil.generateToken(userDetails);
                 final String userName = userDetails.getFirstName();

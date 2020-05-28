@@ -5,6 +5,7 @@
  */
 package com.core.matrix.resource;
 
+import com.core.matrix.dto.MonitoringFilterDTO;
 import com.core.matrix.dto.MonitoringStatusDTO;
 import com.core.matrix.model.Monitoring;
 import com.core.matrix.repository.MonitoringRepository;
@@ -49,6 +50,8 @@ public class MonitoringResource {
             @RequestParam(required = false, name = "wbcContrato") String wbcContrato,
             @RequestParam(required = false, name = "pontoMedicao") String pontoMedicao,
             @RequestParam(required = false, name = "empresa") String empresa,
+            @RequestParam(required = false, name = "atividade") String atividade,
+            @RequestParam(required = false, name = "usuario") String usuario,
             @RequestParam(required = true, name = "ano") String ano,
             @RequestParam(required = true, name = "mes") String mes,
             @RequestParam(name = "page", defaultValue = "0") int page,
@@ -56,10 +59,20 @@ public class MonitoringResource {
 
         try {
 
-            Specification spc = MonitoringSpecification.parameters(status, instanciaDoProcesso, wbcContrato, pontoMedicao, empresa, ano, mes);
+            Specification spc = MonitoringSpecification.parameters(status,
+                    instanciaDoProcesso,
+                    wbcContrato,
+                    pontoMedicao,
+                    empresa,
+                    ano,
+                    mes,
+                    atividade,
+                    usuario);
+
             Page data = monitoringRepository.findAll(spc, PageRequest.of(page, size, Sort.by("instanciaDoProcesso").ascending()));
             List<MonitoringStatusDTO> statusM = monitoringRepository.status(Long.parseLong(mes), Long.parseLong(ano));
-            MonitoringResponse response = new MonitoringResponse(data, statusM);
+            List<MonitoringFilterDTO> filters = monitoringRepository.filters();
+            MonitoringResponse response = new MonitoringResponse(data, statusM, filters);
             return ResponseEntity.ok(response);
         } catch (Exception e) {
             Logger.getLogger(MonitoringResource.class.getName()).log(Level.SEVERE, "[get]", e);
@@ -75,18 +88,28 @@ public class MonitoringResource {
             @RequestParam(required = false, name = "wbcContrato") String wbcContrato,
             @RequestParam(required = false, name = "pontoMedicao") String pontoMedicao,
             @RequestParam(required = false, name = "empresa") String empresa,
+            @RequestParam(required = false, name = "atividade") String atividade,
+            @RequestParam(required = false, name = "usuario") String usuario,
             @RequestParam(required = true, name = "ano") String ano,
-            @RequestParam(required = true, name = "mes") String mes,            
+            @RequestParam(required = true, name = "mes") String mes,
             @RequestParam(name = "total") int total,
             HttpServletResponse response) {
 
         try {
 
-            Specification spc = MonitoringSpecification.parameters(status, instanciaDoProcesso, wbcContrato, pontoMedicao, empresa, ano, mes);
-            Page data = monitoringRepository.findAll(spc, PageRequest.of(0, total, Sort.by("instanciaDoProcesso").ascending()));            
-            
-            reportService.<Monitoring>export(response, data.getContent(), ReportConstants.ReportType.FULL);            
-            
+             Specification spc = MonitoringSpecification.parameters(status,
+                    instanciaDoProcesso,
+                    wbcContrato,
+                    pontoMedicao,
+                    empresa,
+                    ano,
+                    mes,
+                    atividade,
+                    usuario);
+            Page data = monitoringRepository.findAll(spc, PageRequest.of(0, total, Sort.by("instanciaDoProcesso").ascending()));
+
+            reportService.<Monitoring>export(response, data.getContent(), ReportConstants.ReportType.FULL);
+
             return ResponseEntity.ok().build();
         } catch (Exception e) {
             Logger.getLogger(MonitoringResource.class.getName()).log(Level.SEVERE, "[get]", e);

@@ -5,6 +5,7 @@
  */
 package com.core.matrix.workflow.service;
 
+import com.core.matrix.dto.CommentDTO;
 import com.core.matrix.request.AddComment;
 import com.core.matrix.request.CompleteTaskRequest;
 import com.core.matrix.request.DeleteProcessRequest;
@@ -22,6 +23,7 @@ import com.core.matrix.workflow.model.GroupMemberActiviti;
 import com.core.matrix.workflow.model.UserActiviti;
 import java.io.IOException;
 import java.io.InputStream;
+import java.text.MessageFormat;
 import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.HashMap;
@@ -29,6 +31,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 import java.util.Optional;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import java.util.stream.Collectors;
 import org.activiti.engine.ActivitiTaskAlreadyClaimedException;
 import org.activiti.engine.delegate.Expression;
@@ -132,6 +136,8 @@ public class RuntimeActivitiService {
         boolean delegated = false;
         String owner = userId;
 
+        verifyExistsCreatedBy(currentTask.getProcessInstanceId(), userId);
+
         if (currentTask != null && currentTask.getDelegationState() != null && currentTask.getDelegationState().equals(DelegationState.PENDING)) {
             owner = currentTask.getOwner();
             delegated = true;
@@ -164,6 +170,15 @@ public class RuntimeActivitiService {
         }
 
         return Optional.empty();
+    }
+
+    private void verifyExistsCreatedBy(String processInstanceId, String userId) {
+
+        boolean hasCreatedBy = runtimeService.hasVariable(processInstanceId, Constants.CREATED_BY);
+
+        if (!hasCreatedBy) {
+            runtimeService.setVariable(processInstanceId, Constants.CREATED_BY, userId);
+        }
     }
 
     public TaskResponse getTask(String taskId) {
@@ -781,11 +796,23 @@ public class RuntimeActivitiService {
 
         ProcessDetailResponse detail = new ProcessDetailResponse();
 
-        List<Comment> comments = taskService
+        List<CommentDTO> comments = taskService
                 .getProcessInstanceComments(processInstanceId)
                 .stream()
-                .sorted(Comparator.comparing(Comment::getTime).reversed())
+                .map(c -> new CommentDTO(c))
+                .sorted(Comparator.comparing(CommentDTO::getTime).reversed())
                 .collect(Collectors.toList());
+
+        comments.stream().forEach(c -> {
+
+            try {
+                UserActiviti user = userActivitiService.findById(c.getUserId());
+                c.setUsername(MessageFormat.format("{0} {1}", user.getFirstName(), user.getLastName()));
+                c.setPhoto(user.getPicture());
+            } catch (Exception ex) {
+                Logger.getLogger(RuntimeActivitiService.class.getName()).log(Level.SEVERE, null, ex);
+            }
+        });
 
         detail.setComments(comments);
         List<AttachmentResponse> attachmentResponses = taskService.getProcessInstanceAttachments(processInstanceId).parallelStream().map(a -> new AttachmentResponse(a)).collect(Collectors.toList());
@@ -799,13 +826,13 @@ public class RuntimeActivitiService {
     }
 
     @Transactional
-    public Comment addComment(AddComment request, String user) {
+    public CommentDTO addComment(AddComment request, String user) {
 
         Comment comment = taskService.addComment(null, request.getProcessInstanceId(), request.getMessage());
 
         commentActivitiService.setUser(comment.getId(), user);
         comment = taskService.getComment(comment.getId());
-        return comment;
+        return new CommentDTO(comment);
     }
 
     @Transactional
@@ -866,10 +893,10 @@ public class RuntimeActivitiService {
                 .collect(Collectors.toList());
 
     }
-    
+
     @Transactional
-    public void writeDraftOnTask(TaskDraftRequest request){ 
-        this.taskService.setVariableLocal(request.getTaskId(), TASK_DRAFT, request.getData());        
+    public void writeDraftOnTask(TaskDraftRequest request) {
+        this.taskService.setVariableLocal(request.getTaskId(), TASK_DRAFT, request.getData());
     }
 
 }

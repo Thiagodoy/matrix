@@ -15,6 +15,7 @@ import com.core.matrix.utils.Constants;
 import static com.core.matrix.utils.Constants.PROCESS_CONTRACTS_RELOAD_BILLING;
 import static com.core.matrix.utils.Constants.PROCESS_INFORMATION_CLIENT;
 import static com.core.matrix.utils.Constants.PROCESS_INFORMATION_MEANSUREMENT_POINT;
+import static com.core.matrix.utils.Constants.PROCESS_INFORMATION_MONITOR_CLIENT;
 import static com.core.matrix.utils.Constants.PROCESS_INFORMATION_PROCESSO_ID;
 import com.core.matrix.wbc.dto.ContractDTO;
 import com.core.matrix.wbc.service.ContractService;
@@ -65,7 +66,7 @@ public class BillingContractsTask implements JavaDelegate {
 
     private ProcessInstance createAProcessForBilling(DelegateExecution execution, ContractDTO contract) {
         Map<String, Object> variables = new HashMap<>();
-
+        variables.put(PROCESS_INFORMATION_MONITOR_CLIENT, contract.getSNmEmpresaEpce().toString());        
         return this.createAProcessForBilling(execution, Arrays.asList(contract), variables);
     }
 
@@ -241,6 +242,7 @@ public class BillingContractsTask implements JavaDelegate {
                             sons.add(opt.get());
 
                             Map<String, Object> variables = new HashMap<>();
+                            variables.put(PROCESS_INFORMATION_MONITOR_CLIENT, sons.stream().findFirst().get().getSNmEmpresaEpce());
                             variables.put(PROCESS_INFORMATION_CLIENT, sons.stream().findFirst().get().getSNmEmpresaEpce());
                             ContractDTO c = sons.stream().findFirst().get();
 

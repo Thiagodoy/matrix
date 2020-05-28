@@ -6,6 +6,7 @@
 package com.core.matrix.model;
 
 import com.core.matrix.annotation.ReportColumn;
+import com.core.matrix.dto.MonitoringFilterDTO;
 import com.core.matrix.dto.MonitoringStatusDTO;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import java.io.Serializable;
@@ -23,6 +24,21 @@ import lombok.Data;
  *
  * @author thiag
  */
+@NamedNativeQuery(name = "Monitoring.filters", query = "SELECT distinct 'TASK' as type, ATIVIDADE_NO_MOMENTO as name FROM matrix.monitoramento_view where ATIVIDADE_NO_MOMENTO is not null \n"
+        + "union all\n"
+        + "SELECT distinct 'USER' as type, RESPONSAVEL as name FROM matrix.monitoramento_view where RESPONSAVEL is not null ",
+        resultSetMapping = "filterMonitoringDTO")
+
+
+@SqlResultSetMapping(name = "filterMonitoringDTO",
+        classes = @ConstructorResult(
+                targetClass = MonitoringFilterDTO.class,
+                columns = {
+                    @ColumnResult(name = "type", type = String.class)
+                    ,
+                    @ColumnResult(name = "name", type = String.class)
+                }))
+
 @SqlResultSetMapping(name = "statusMonitoringDTO",
         classes = @ConstructorResult(
                 targetClass = MonitoringStatusDTO.class,
@@ -144,11 +160,11 @@ public class Monitoring implements Serializable {
 
     @Id
     @Column(name = "ID")
-    public Long id;    
-    
+    public Long id;
+
     @Column(name = "ID_TASK")
     public String taskId;
-    
+
     @Column(name = "TEMPLATE")
     public String template;
 
@@ -192,7 +208,7 @@ public class Monitoring implements Serializable {
     @Column(name = "PERCENTUAL_DE_PERDA")
     public String percentualDeCarga;
 
-    @ReportColumn(name = "SOLICITADO_BRUTO", position = 0, typeValue = String.class, typeReport = {"FULL"})    
+    @ReportColumn(name = "SOLICITADO_BRUTO", position = 0, typeValue = String.class, typeReport = {"FULL"})
     @Column(name = "SOLICITADO_BRUTO")
     public String solicitadoBruto;
 

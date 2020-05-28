@@ -45,15 +45,17 @@ public class MeansurementFileResultStatusDTO {
     @ReportColumn(name = "CÓD. CCEE", position = 2, typeValue = String.class, typeReport = {"FULL", "SHORT"})
     public String scde;
 
-    public Date dataCriacao;
+    public Date createdAt;
 
     public Boolean isExported;
 
-    public String empresa;
+    public String company;
 
-    public String responsavel;
+    public String responsible;
+    
+    public String rateio;
 
-    public MeansurementFileResultStatusDTO(Long id, Long year, Long month, Long wbcContract, String wbcMeansurementPoint, Double mount, String status, Date dataCriacao, Boolean isExported,String empresa, String responsavel) {
+    public MeansurementFileResultStatusDTO(Long id, Long year, Long month, Long wbcContract, String wbcMeansurementPoint, Double mount, String status, Date dataCriacao, Boolean isExported,String empresa, String responsavel, String rateio) {
         this.id = id;
         this.year = year;
         this.month = month;
@@ -61,11 +63,12 @@ public class MeansurementFileResultStatusDTO {
         this.wbcMeansurementPoint = wbcMeansurementPoint;
         this.mount = mount;
         this.status = status;
-        this.dataCriacao = dataCriacao;
+        this.createdAt = dataCriacao;
         this.isExported = isExported;
         this.scde = "";
-        this.empresa = empresa;
-        this.responsavel = responsavel;
+        this.company = empresa;
+        this.responsible = responsavel;
+        this.rateio = rateio;
 
     }
 

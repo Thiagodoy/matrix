@@ -83,6 +83,7 @@ public class Constants {
     
     public static final String PROCESS_CONTRACTS_RELOAD_BILLING = "contracts_reload_process_billing";
     
+    public static final String PROCESS_INFORMATION_MONITOR_CLIENT = "@Cliente";
     public static final String PROCESS_INFORMATION_CLIENT = "#Cliente";
     public static final String PROCESS_INFORMATION_MEANSUREMENT_POINT = "#Ponto";
     public static final String PROCESS_INFORMATION_NICKNAME = "#Apelido";
