@@ -91,7 +91,7 @@ public class ContractCompInformationService {
             ContractCompInformation contractCompInformation = opt.get();
             Optional<Long> isSon = Optional.ofNullable(contractCompInformation.getCodeContractApportionment());
 
-            if (isSon.isPresent()) {
+            if (isSon.isPresent() && isSon.get() > 0L) {
                 //load all sons
                 List<ContractCompInformation> rateioSon = this.repository.findByCodeContractApportionment(isSon.get());
                 ContractCompInformation rateioFather = this.repository.findByCodeWbcContract(isSon.get())

@@ -113,6 +113,11 @@ public class ContractCompInformation  implements Serializable{
     @PrePersist
     public void generateCreatedAt() {
         this.createdAt = LocalDateTime.now();
+        
+        if(!Optional.ofNullable(this.codeContractApportionment).isPresent()){
+            this.codeContractApportionment = 0L;
+        }
+        
     }
 
     @PreUpdate
