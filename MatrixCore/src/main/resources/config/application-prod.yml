@@ -79,7 +79,7 @@ email:
            
 websocket:
         cors:
-            origin: http://localhost:8080    
+            origin: https://prefixo.matrixenergia.com    
             
 portal:
-        url:  http://localhost:8080/troca-senha            
+        url:  https://prefixo.matrixenergia.com/troca-senha            
