@@ -22,9 +22,6 @@ import lombok.Data;
 public class ContractDTO implements Serializable{
 
     private static final long serialVersionUID = 3749064926674036404L;
-    
-    
-    
 
     private Long nCdContrato;
 
@@ -84,6 +81,8 @@ public class ContractDTO implements Serializable{
     private Long nCdSiglaCCEEContratante;
     
     private Long nCdPerfilCCEE;
+    
+    private String sNrCnpj;
 
     public ContractDTO(
             Long nCdContrato,
@@ -112,7 +111,8 @@ public class ContractDTO implements Serializable{
             Long bFlRateio,
             Long nCdContratoRateioControlador,
             Long nCdSiglaCCEEContratante,
-            Long nCdPerfilCCEE
+            Long nCdPerfilCCEE,
+            String sNrCnpj
     ) {
 
         this.nCdContrato = nCdContrato;
@@ -142,6 +142,7 @@ public class ContractDTO implements Serializable{
         this.nCdContratoRateioControlador = nCdContratoRateioControlador;
         this.nCdSiglaCCEEContratante = nCdSiglaCCEEContratante;
         this.nCdPerfilCCEE = nCdPerfilCCEE;
+        this.sNrCnpj = sNrCnpj;
     }
 
     public ContractDTO(
@@ -162,7 +163,8 @@ public class ContractDTO implements Serializable{
             Long bFlRateio,
             Long nCdContratoRateioControlador,
             Long nCdSiglaCCEEContratante,
-            Long nCdPerfilCCEE        
+            Long nCdPerfilCCEE,
+            String sNrCnpj
     ) {
 
         this.nCdContrato = nCdContrato;
@@ -182,7 +184,8 @@ public class ContractDTO implements Serializable{
         this.bFlRateio = bFlRateio;
         this.nCdContratoRateioControlador = nCdContratoRateioControlador;
         this.nCdSiglaCCEEContratante = nCdSiglaCCEEContratante;
-        this.nCdPerfilCCEE = nCdPerfilCCEE;      
+        this.nCdPerfilCCEE = nCdPerfilCCEE;  
+        this.sNrCnpj = sNrCnpj;
     }
 
     public ContractDTO(
@@ -210,7 +213,8 @@ public class ContractDTO implements Serializable{
             Long nCdAgrupador,
             String sDsAgrupador,
             Long nCdSiglaCCEEContratante,
-            Long nCdPerfilCCEE
+            Long nCdPerfilCCEE,
+            String sNrCnpj
     ) {
 
         this.nCdContrato = nCdContrato;
@@ -238,6 +242,7 @@ public class ContractDTO implements Serializable{
         this.sDsAgrupador = sDsAgrupador;
         this.nCdSiglaCCEEContratante = nCdSiglaCCEEContratante;
         this.nCdPerfilCCEE = nCdPerfilCCEE;
+        this.sNrCnpj = sNrCnpj;
     }
     
     @Override

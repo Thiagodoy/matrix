@@ -6,11 +6,14 @@
 package com.core.matrix.workflow.service;
 
 import com.core.matrix.response.ProcessDefinitionResponse;
+import com.core.matrix.workflow.model.UserActiviti;
 import java.io.IOException;
 import java.io.InputStream;
+import java.text.MessageFormat;
 import java.util.List;
 import java.util.stream.Collectors;
 import org.activiti.bpmn.model.BpmnModel;
+import org.activiti.engine.IdentityService;
 import org.activiti.engine.RepositoryService;
 import org.activiti.engine.RuntimeService;
 import org.activiti.engine.impl.RepositoryServiceImpl;
@@ -34,9 +37,11 @@ public class RepositoryActivitiService {
     private RepositoryService repositoryService;
 
     @Autowired
-    private RuntimeService runtimeService;   
-    
-    
+    private RuntimeService runtimeService;
+
+    @Autowired
+    private IdentityService identityService;
+
     public Deployment getDeployment(String deploymentId) {
         return this.repositoryService.createDeploymentQuery().deploymentId(deploymentId).singleResult();
     }
@@ -69,12 +74,42 @@ public class RepositoryActivitiService {
                 .collect(Collectors.toList());
 
     }
-    
+
     @Cacheable("processDefinition")
     public List<ProcessDefinitionResponse> listAllFromCache() {
         return this.repositoryService
                 .createProcessDefinitionQuery()
                 .latestVersion()
+                .list()
+                .parallelStream()
+                .map(p -> new ProcessDefinitionResponse(p))
+                .collect(Collectors.toList());
+
+    }
+
+    public List<ProcessDefinitionResponse> listCadidateProcessByUser(UserActiviti user) {
+
+        String ids = this.repositoryService
+                .createProcessDefinitionQuery()
+                .latestVersion()
+                .list()
+                .parallelStream()
+                .map(p -> "'"+ p.getId() + "'")
+                .collect(Collectors.joining(","));
+
+        String groups = user
+                .getGroups()
+                .stream()
+                .map(p -> "'" +  p.getGroupId() + "'")
+                .collect(Collectors.joining(","));
+
+        return this.repositoryService.createNativeProcessDefinitionQuery().sql("SELECT \n"
+                + "    b.*\n"
+                + "FROM\n"
+                + "    activiti.act_ru_identitylink a\n"
+                + "        INNER JOIN\n"
+                + "    activiti.act_re_procdef b ON a.PROC_DEF_ID_ = b.ID_\n"
+                + "    where a.GROUP_ID_ in (" + groups + ") and b.ID_ in(" + ids + ")")
                 .list()
                 .parallelStream()
                 .map(p -> new ProcessDefinitionResponse(p))
@@ -90,9 +125,9 @@ public class RepositoryActivitiService {
                     .createProcessDefinitionQuery()
                     .processDefinitionId(processDefinitionId)
                     .singleResult();
-            
+
             String diagramResourceName = processDefinition.getDiagramResourceName();
-            
+
             return this.repositoryService.getResourceAsStream(processDefinition.getDeploymentId(), diagramResourceName);
 
         } else {

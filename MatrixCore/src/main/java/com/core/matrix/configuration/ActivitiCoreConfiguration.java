@@ -150,10 +150,6 @@ public class ActivitiCoreConfiguration implements EnvironmentAware {
                 .setMailServerUseTLS(true);
 
         ProcessEngine processEngine = s.buildProcessEngine();
-//        RuntimeService runtimeService = processEngine.getRuntimeService();
-//        runtimeService.addEventListener(new RuntimeListener(context, processEngine.getIdentityService()),
-//                ActivitiEventType.TASK_ASSIGNED,
-//                ActivitiEventType.TASK_CREATED);
 
         return processEngine;
 

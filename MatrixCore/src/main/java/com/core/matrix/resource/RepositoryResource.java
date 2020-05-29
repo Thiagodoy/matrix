@@ -6,9 +6,11 @@
 package com.core.matrix.resource;
 
 import com.core.matrix.response.ProcessDefinitionResponse;
+import com.core.matrix.workflow.model.UserActiviti;
 import com.core.matrix.workflow.service.RepositoryActivitiService;
 
 import java.io.InputStream;
+import java.security.Principal;
 import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -16,6 +18,7 @@ import javax.servlet.http.HttpServletResponse;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
@@ -51,6 +54,17 @@ public class RepositoryResource {
     public ResponseEntity get() {
         try {
             List<ProcessDefinitionResponse> response = this.repositoryActivitiService.listAll();
+            return ResponseEntity.ok(response);
+        } catch (Exception e) {
+            Logger.getLogger(RepositoryResource.class.getName()).log(Level.SEVERE, "[get]", e);
+            return ResponseEntity.status(HttpStatus.resolve(500)).body(e.getMessage());
+        }
+    }
+    
+     @RequestMapping(value="/listCadidateProcessByUser",method = RequestMethod.GET)
+    public ResponseEntity listCadidateProcessByUser(UsernamePasswordAuthenticationToken principal) {
+        try {
+            List<ProcessDefinitionResponse> response = this.repositoryActivitiService.listCadidateProcessByUser((UserActiviti)principal.getPrincipal());
             return ResponseEntity.ok(response);
         } catch (Exception e) {
             Logger.getLogger(RepositoryResource.class.getName()).log(Level.SEVERE, "[get]", e);

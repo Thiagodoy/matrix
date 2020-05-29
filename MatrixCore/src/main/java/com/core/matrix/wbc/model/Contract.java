@@ -60,7 +60,9 @@ import lombok.Data;
                     ,
                         @ColumnResult(name = "nCdSiglaCCEEContratante", type = Long.class)
                     ,
-                        @ColumnResult(name = "nCdPerfilCCEE", type = Long.class) 
+                        @ColumnResult(name = "nCdPerfilCCEE", type = Long.class)
+                    ,
+                        @ColumnResult(name = "sNrCnpj", type = String.class)
                 }))
 
 @SqlResultSetMapping(name = "contractDTO",
@@ -111,12 +113,13 @@ import lombok.Data;
                     ,
                         @ColumnResult(name = "nCdAgrupador", type = Long.class)
                     ,
-                        @ColumnResult(name = "sDsAgrupador", type = String.class)                      
+                        @ColumnResult(name = "sDsAgrupador", type = String.class)
                     ,
                         @ColumnResult(name = "nCdSiglaCCEEContratante", type = Long.class)
                     ,
-                        @ColumnResult(name = "nCdPerfilCCEE", type = Long.class)    
-                        
+                        @ColumnResult(name = "nCdPerfilCCEE", type = Long.class)
+                    ,
+                        @ColumnResult(name = "sNrCnpj", type = String.class)
 
                 }))
 
@@ -176,7 +179,9 @@ import lombok.Data;
                     ,
                         @ColumnResult(name = "nCdSiglaCCEEContratante", type = Long.class)
                     ,
-                        @ColumnResult(name = "nCdPerfilCCEE", type = Long.class)      
+                        @ColumnResult(name = "nCdPerfilCCEE", type = Long.class)
+                    ,
+                        @ColumnResult(name = "sNrCnpj", type = String.class)    
 
                 }))
 
@@ -253,7 +258,7 @@ import lombok.Data;
         + "      ,CT.[nCdEmpresaContratante]\n"
         + "      ,EPCE.[sNmEmpresa] as sNmEmpresaEpce\n"
         + "	 ,EPCE.[sNmFantasia] as sNmFantasia\n"
-	+ "      ,EPCE.[sNmApelido] as sNmApelido\n"
+        + "      ,EPCE.[sNmApelido] as sNmApelido\n"
         + "      ,CT.[bFlPublicado]\n"
         + "      ,CT.[nCdSituacaoContrato]\n"
         + "      ,SC.[sDsSituacaoContrato]\n"
@@ -262,8 +267,9 @@ import lombok.Data;
         + "      ,CT.[sNrReferencia]\n"
         + "      ,CT.[nCdAgrupador]\n"
         + "      ,CA.[sDsAgrupador]\n"
-        + "      ,CT.[nCdSiglaCCEEContratante]\n"        
-        + "      ,SI.[nCdPerfilCCEE]\n"      
+        + "      ,CT.[nCdSiglaCCEEContratante]\n"
+        + "      ,SI.[nCdPerfilCCEE]\n"
+        + "      ,EPCE.sNrCnpj\n"
         + "  FROM [CE_CONTRATO] CT\n"
         + "      ,[CE_SUBMERCADO] SM\n"
         + "	  ,[CE_TIPO_CONTRATO] TP\n"
@@ -271,112 +277,114 @@ import lombok.Data;
         + "	  ,[EMPRESA] EPCE\n"
         + "	  ,[CE_SITUACAO_CONTRATO] SC\n"
         + "	  ,[CE_CONTRATO_AGRUPADOR] CA\n"
-        + "	  ,[CE_SIGLA_CCEE] SI\n"        
+        + "	  ,[CE_SIGLA_CCEE] SI\n"
         + " WHERE CT.nCdSubmercado = SM.nCdSubmercado\n"
         + "   AND CT.nCdTipo = TP.nCdTipo\n"
         + "   AND CT.nCdEmpresaContratada = EPCA.[nCdEmpresa]\n"
         + "   AND CT.nCdEmpresaContratante = EPCE.[nCdEmpresa]\n"
         + "   AND CT.[nCdSituacaoContrato] = SC.nCdSituacaoContrato\n"
         + "   AND CT.[nCdAgrupador] = CA.nCdAgrupador\n"
-        + "   AND CT.[nCdSiglaCCEEContratante] = SI.nCdSiglaCCEE\n"      
+        + "   AND CT.[nCdSiglaCCEEContratante] = SI.nCdSiglaCCEE\n"
         + "   AND CT.[nCdSituacaoContrato] = 8\n"
         + "   AND CT.[sNrContrato] = :contractId", name = "Contract.shortInfomation", resultSetMapping = "contractDTO")
 
-@NamedNativeQuery(query = "SELECT CT.nCdContrato ,\n" +
-"       CT.sNrContrato ,\n" +
-"       CT.sNmContrato ,\n" +
-"       CT.sNrReferencia ,\n" +
-"       CT.tDdInicio ,\n" +
-"       CT.tDdTermino ,\n" +
-"       CT.nCdSubmercado ,\n" +
-"       SM.sDsSubmercado ,\n" +
-"       CT.nCdTipo ,\n" +
-"       TP.sDsTipo ,\n" +
-"       CT.nCdEmpresaContratada ,\n" +
-"       EPCA.sNmEmpresa AS sNmEmpresaEpca ,\n" +
-"       CT.nCdEmpresaContratante ,\n" +
-"       EPCE.sNmEmpresa AS sNmEmpresaEpce ,\n" +
-"       EPCE.sNmFantasia AS sNmFantasia ,\n" +
-"       EPCE.sNmApelido AS sNmApelido ,\n" +
-"       CT.bFlPublicado ,\n" +
-"       CT.nCdSituacaoContrato ,\n" +
-"       SC.sDsSituacaoContrato ,\n" +
-"       CT.sDsObservacao ,\n" +
-"       CT.nCdContratoPai ,\n" +
-"       CT.nCdAgrupador ,\n" +
-"       CA.sDsAgrupador ,\n" +
-"       CT.bFlRateio ,\n" +
-"       CT.nCdContratoRateioControlador,\n" +
-"       CT.nCdSiglaCCEEContratante,\n" +
-"       SI.nCdPerfilCCEE\n" +        
-"FROM CE_CONTRATO CT ,\n" +
-"     CE_SUBMERCADO SM ,\n" +
-"     CE_TIPO_CONTRATO TP ,\n" +
-"     EMPRESA EPCA ,\n" +
-"     EMPRESA EPCE ,\n" +
-"     CE_SITUACAO_CONTRATO SC ,\n" +
-"     CE_CONTRATO_AGRUPADOR CA,\n" +
-"     CE_SIGLA_CCEE SI\n" +        
-"WHERE CT.nCdSubmercado = SM.nCdSubmercado\n" +
-"  AND CT.nCdTipo = TP.nCdTipo\n" +
-"  AND CT.nCdEmpresaContratada = EPCA.nCdEmpresa\n" +
-"  AND CT.nCdEmpresaContratante = EPCE.nCdEmpresa\n" +
-"  AND CT.nCdSituacaoContrato = SC.nCdSituacaoContrato\n" +
-"  AND CT.nCdAgrupador = CA.nCdAgrupador\n" +
-"  AND CT.nCdSiglaCCEEContratante = SI.nCdSiglaCCEE\n" +      
-"  AND CT.nCdSituacaoContrato IN (8)\n" +
-"  AND CT.bFlRateio = 1\n" +
-"  AND CT.sNrReferencia IN\n" +
-"    (SELECT CTC.sNrReferencia\n" +
-"     FROM CE_CONTRATO CTC\n" +
-"     WHERE CTC.sNrContrato = :numeroDoContrato )\n" +
-"UNION ALL\n" +
-"SELECT CT.nCdContrato ,\n" +
-"       CT.sNrContrato ,\n" +
-"       CT.sNmContrato ,\n" +
-"       CT.sNrReferencia ,\n" +
-"       CT.tDdInicio ,\n" +
-"       CT.tDdTermino ,\n" +
-"       CT.nCdSubmercado ,\n" +
-"       SM.sDsSubmercado ,\n" +
-"       CT.nCdTipo ,\n" +
-"       TP.sDsTipo ,\n" +
-"       CT.nCdEmpresaContratada ,\n" +
-"       EPCA.sNmEmpresa AS sNmEmpresaEpca ,\n" +
-"       CT.nCdEmpresaContratante ,\n" +
-"       EPCE.sNmEmpresa AS sNmEmpresaEpce ,\n" +
-"       EPCE.sNmFantasia AS sNmFantasia ,\n" +
-"       EPCE.sNmApelido AS sNmApelido ,\n" +
-"       CT.bFlPublicado ,\n" +
-"       CT.nCdSituacaoContrato ,\n" +
-"       SC.sDsSituacaoContrato ,\n" +
-"       CT.sDsObservacao ,\n" +
-"       CT.nCdContratoPai ,\n" +
-"       CT.nCdAgrupador ,\n" +
-"       CA.sDsAgrupador ,\n" +
-"       CT.bFlRateio ,\n" +
-"       CT.nCdContratoRateioControlador,\n" +
-"       CT.nCdSiglaCCEEContratante,\n" +
-"       SI.nCdPerfilCCEE\n" +          
-"FROM CE_CONTRATO CT ,\n" +
-"     CE_SUBMERCADO SM ,\n" +
-"     CE_TIPO_CONTRATO TP ,\n" +
-"     EMPRESA EPCA ,\n" +
-"     EMPRESA EPCE ,\n" +
-"     CE_SITUACAO_CONTRATO SC ,\n" +
-"     CE_CONTRATO_AGRUPADOR CA,\n" +
-"     CE_SIGLA_CCEE SI\n" +          
-"WHERE CT.nCdSubmercado = SM.nCdSubmercado\n" +
-"  AND CT.nCdTipo = TP.nCdTipo\n" +
-"  AND CT.nCdEmpresaContratada = EPCA.nCdEmpresa\n" +
-"  AND CT.nCdEmpresaContratante = EPCE.nCdEmpresa\n" +
-"  AND CT.nCdSituacaoContrato = SC.nCdSituacaoContrato\n" +
-"  AND CT.nCdAgrupador = CA.nCdAgrupador\n" +
-"  AND CT.nCdSiglaCCEEContratante = SI.nCdSiglaCCEE\n" +          
-"  AND CT.nCdSituacaoContrato IN (8)\n" +
-"  AND CT.bFlRateio = 0\n" +
-"  AND CT.sNrContrato = :numeroDoContrato\n" +
-"ORDER BY CT.sNrContrato", name = "Contract.fullInformation", resultSetMapping = "contractFullInformationDTO")
+@NamedNativeQuery(query = "SELECT CT.nCdContrato ,\n"
+        + "       CT.sNrContrato ,\n"
+        + "       CT.sNmContrato ,\n"
+        + "       CT.sNrReferencia ,\n"
+        + "       CT.tDdInicio ,\n"
+        + "       CT.tDdTermino ,\n"
+        + "       CT.nCdSubmercado ,\n"
+        + "       SM.sDsSubmercado ,\n"
+        + "       CT.nCdTipo ,\n"
+        + "       TP.sDsTipo ,\n"
+        + "       CT.nCdEmpresaContratada ,\n"
+        + "       EPCA.sNmEmpresa AS sNmEmpresaEpca ,\n"
+        + "       CT.nCdEmpresaContratante ,\n"
+        + "       EPCE.sNmEmpresa AS sNmEmpresaEpce ,\n"
+        + "       EPCE.sNmFantasia AS sNmFantasia ,\n"
+        + "       EPCE.sNmApelido AS sNmApelido ,\n"
+        + "       CT.bFlPublicado ,\n"
+        + "       CT.nCdSituacaoContrato ,\n"
+        + "       SC.sDsSituacaoContrato ,\n"
+        + "       CT.sDsObservacao ,\n"
+        + "       CT.nCdContratoPai ,\n"
+        + "       CT.nCdAgrupador ,\n"
+        + "       CA.sDsAgrupador ,\n"
+        + "       CT.bFlRateio ,\n"
+        + "       CT.nCdContratoRateioControlador,\n"
+        + "       CT.nCdSiglaCCEEContratante,\n"
+        + "       SI.nCdPerfilCCEE,\n"
+        + "       EPCE.sNrCnpj\n"
+        + "FROM CE_CONTRATO CT ,\n"
+        + "     CE_SUBMERCADO SM ,\n"
+        + "     CE_TIPO_CONTRATO TP ,\n"
+        + "     EMPRESA EPCA ,\n"
+        + "     EMPRESA EPCE ,\n"
+        + "     CE_SITUACAO_CONTRATO SC ,\n"
+        + "     CE_CONTRATO_AGRUPADOR CA,\n"
+        + "     CE_SIGLA_CCEE SI\n"
+        + "WHERE CT.nCdSubmercado = SM.nCdSubmercado\n"
+        + "  AND CT.nCdTipo = TP.nCdTipo\n"
+        + "  AND CT.nCdEmpresaContratada = EPCA.nCdEmpresa\n"
+        + "  AND CT.nCdEmpresaContratante = EPCE.nCdEmpresa\n"
+        + "  AND CT.nCdSituacaoContrato = SC.nCdSituacaoContrato\n"
+        + "  AND CT.nCdAgrupador = CA.nCdAgrupador\n"
+        + "  AND CT.nCdSiglaCCEEContratante = SI.nCdSiglaCCEE\n"
+        + "  AND CT.nCdSituacaoContrato IN (8)\n"
+        + "  AND CT.bFlRateio = 1\n"
+        + "  AND CT.sNrReferencia IN\n"
+        + "    (SELECT CTC.sNrReferencia\n"
+        + "     FROM CE_CONTRATO CTC\n"
+        + "     WHERE CTC.sNrContrato = :numeroDoContrato )\n"
+        + "UNION ALL\n"
+        + "SELECT CT.nCdContrato ,\n"
+        + "       CT.sNrContrato ,\n"
+        + "       CT.sNmContrato ,\n"
+        + "       CT.sNrReferencia ,\n"
+        + "       CT.tDdInicio ,\n"
+        + "       CT.tDdTermino ,\n"
+        + "       CT.nCdSubmercado ,\n"
+        + "       SM.sDsSubmercado ,\n"
+        + "       CT.nCdTipo ,\n"
+        + "       TP.sDsTipo ,\n"
+        + "       CT.nCdEmpresaContratada ,\n"
+        + "       EPCA.sNmEmpresa AS sNmEmpresaEpca ,\n"
+        + "       CT.nCdEmpresaContratante ,\n"
+        + "       EPCE.sNmEmpresa AS sNmEmpresaEpce ,\n"
+        + "       EPCE.sNmFantasia AS sNmFantasia ,\n"
+        + "       EPCE.sNmApelido AS sNmApelido ,\n"
+        + "       CT.bFlPublicado ,\n"
+        + "       CT.nCdSituacaoContrato ,\n"
+        + "       SC.sDsSituacaoContrato ,\n"
+        + "       CT.sDsObservacao ,\n"
+        + "       CT.nCdContratoPai ,\n"
+        + "       CT.nCdAgrupador ,\n"
+        + "       CA.sDsAgrupador ,\n"
+        + "       CT.bFlRateio ,\n"
+        + "       CT.nCdContratoRateioControlador,\n"
+        + "       CT.nCdSiglaCCEEContratante,\n"
+        + "       SI.nCdPerfilCCEE,\n"
+        + "       EPCE.sNrCnpj\n"
+        + "FROM CE_CONTRATO CT ,\n"
+        + "     CE_SUBMERCADO SM ,\n"
+        + "     CE_TIPO_CONTRATO TP ,\n"
+        + "     EMPRESA EPCA ,\n"
+        + "     EMPRESA EPCE ,\n"
+        + "     CE_SITUACAO_CONTRATO SC ,\n"
+        + "     CE_CONTRATO_AGRUPADOR CA,\n"
+        + "     CE_SIGLA_CCEE SI\n"
+        + "WHERE CT.nCdSubmercado = SM.nCdSubmercado\n"
+        + "  AND CT.nCdTipo = TP.nCdTipo\n"
+        + "  AND CT.nCdEmpresaContratada = EPCA.nCdEmpresa\n"
+        + "  AND CT.nCdEmpresaContratante = EPCE.nCdEmpresa\n"
+        + "  AND CT.nCdSituacaoContrato = SC.nCdSituacaoContrato\n"
+        + "  AND CT.nCdAgrupador = CA.nCdAgrupador\n"
+        + "  AND CT.nCdSiglaCCEEContratante = SI.nCdSiglaCCEE\n"
+        + "  AND CT.nCdSituacaoContrato IN (8)\n"
+        + "  AND CT.bFlRateio = 0\n"
+        + "  AND CT.sNrContrato = :numeroDoContrato\n"
+        + "ORDER BY CT.sNrContrato", name = "Contract.fullInformation", resultSetMapping = "contractFullInformationDTO")
 
 @NamedNativeQuery(query = "SELECT CT.[ncdcontrato], \n"
         + "       CT.[snrcontrato], \n"
@@ -389,22 +397,23 @@ import lombok.Data;
         + "       CT.[ncdempresacontratante], \n"
         + "       EPCE.[snmempresa] as sNmEmpresaEpce, \n"
         + "	  EPCE.[sNmFantasia] as sNmFantasia, \n"
-	+ "       EPCE.[sNmApelido] as sNmApelido, \n"        
+        + "       EPCE.[sNmApelido] as sNmApelido, \n"
         + "       CT.[ncdsituacaocontrato], \n"
         + "       SC.sdssituacaocontrato, \n"
         + "       CT.bflrateio, \n"
         + "       CT.ncdcontratorateiocontrolador, \n"
         + "       CT.nCdSiglaCCEEContratante,\n"
-        + "       SI.nCdPerfilCCEE \n"
+        + "       SI.nCdPerfilCCEE,\n"
+        + "       EPCE.sNrCnpj\n"
         + "FROM   [ce_contrato] CT, \n"
         + "       [empresa] EPCA, \n"
         + "       [empresa] EPCE, \n"
         + "       [ce_situacao_contrato] SC, \n"
-        + "       [ce_sigla_ccee] SI \n"          
+        + "       [ce_sigla_ccee] SI \n"
         + "WHERE  CT.ncdempresacontratada = EPCA.[ncdempresa] \n"
         + "       AND CT.ncdempresacontratante = EPCE.[ncdempresa] \n"
         + "       AND CT.[ncdsituacaocontrato] = SC.ncdsituacaocontrato \n"
-        + "       AND CT.nCdSiglaCCEEContratante = SI.nCdSiglaCCEE \n"  
+        + "       AND CT.nCdSiglaCCEEContratante = SI.nCdSiglaCCEE \n"
         + "       AND CT.[ncdsituacaocontrato] IN ( 8 ) \n"
         + "       AND CT.bflrateio = 1 \n"
         + "       AND CT.nidmovfinanc = 1 \n"
@@ -427,22 +436,23 @@ import lombok.Data;
         + "       CT.[ncdempresacontratante], \n"
         + "       EPCE.[snmempresa] as sNmEmpresaEpce, \n"
         + "	  EPCE.[sNmFantasia] as sNmFantasia, \n"
-	+ "       EPCE.[sNmApelido] as sNmApelido, \n"        
+        + "       EPCE.[sNmApelido] as sNmApelido, \n"
         + "       CT.[ncdsituacaocontrato], \n"
         + "       SC.sdssituacaocontrato, \n"
         + "       CT.bflrateio, \n"
         + "       CT.ncdcontratorateiocontrolador, \n"
         + "       CT.nCdSiglaCCEEContratante,\n"
-        + "       SI.nCdPerfilCCEE \n"        
+        + "       SI.nCdPerfilCCEE,\n"
+        + "       EPCE.sNrCnpj\n"
         + "FROM   [ce_contrato] CT, \n"
         + "       [empresa] EPCA, \n"
         + "       [empresa] EPCE, \n"
         + "       [ce_situacao_contrato] SC, \n"
-        + "       [ce_sigla_ccee] SI \n"          
+        + "       [ce_sigla_ccee] SI \n"
         + "WHERE  CT.ncdempresacontratada = EPCA.[ncdempresa] \n"
         + "       AND CT.ncdempresacontratante = EPCE.[ncdempresa] \n"
         + "       AND CT.[ncdsituacaocontrato] = SC.ncdsituacaocontrato \n"
-        + "       AND CT.nCdSiglaCCEEContratante = SI.nCdSiglaCCEE \n"         
+        + "       AND CT.nCdSiglaCCEEContratante = SI.nCdSiglaCCEE \n"
         + "       AND CT.[ncdsituacaocontrato] IN ( 8 ) \n"
         + "       AND CT.bflrateio = 0 \n"
         + "       AND CT.nidmovfinanc = 1 \n"
@@ -465,22 +475,23 @@ import lombok.Data;
         + "       CT.[ncdempresacontratante], \n"
         + "       EPCE.[snmempresa] as sNmEmpresaEpce, \n"
         + "	  EPCE.[sNmFantasia] as sNmFantasia, \n"
-	+ "       EPCE.[sNmApelido] as sNmApelido, \n"
+        + "       EPCE.[sNmApelido] as sNmApelido, \n"
         + "       CT.[ncdsituacaocontrato], \n"
         + "       SC.sdssituacaocontrato, \n"
         + "       CT.bflrateio, \n"
         + "       CT.ncdcontratorateiocontrolador, \n"
         + "       CT.nCdSiglaCCEEContratante,\n"
-        + "       SI.nCdPerfilCCEE \n"     
+        + "       SI.nCdPerfilCCEE,\n"
+        + "       EPCE.sNrCnpj\n"
         + "FROM   [ce_contrato] CT, \n"
         + "       [empresa] EPCA, \n"
         + "       [empresa] EPCE, \n"
         + "       [ce_situacao_contrato] SC, \n"
-        + "       [ce_sigla_ccee] SI \n"           
+        + "       [ce_sigla_ccee] SI \n"
         + "WHERE  CT.ncdempresacontratada = EPCA.[ncdempresa] \n"
         + "       AND CT.ncdempresacontratante = EPCE.[ncdempresa] \n"
         + "       AND CT.[ncdsituacaocontrato] = SC.ncdsituacaocontrato \n"
-        + "       AND CT.nCdSiglaCCEEContratante = SI.nCdSiglaCCEE \n"         
+        + "       AND CT.nCdSiglaCCEEContratante = SI.nCdSiglaCCEE \n"
         + "       AND CT.[ncdsituacaocontrato] IN ( 8 ) \n"
         + "       AND CT.bflrateio = 1 \n"
         + "       AND CT.nidmovfinanc = 1 \n"

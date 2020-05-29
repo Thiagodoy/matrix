@@ -68,8 +68,8 @@ public class DataValidationTask implements Task {
     public void execute(DelegateExecution de) throws Exception {
 
         delegateExecution = de;
-        
-        final String responseResult = MessageFormat.format("{0}:{1}", RESPONSE_RESULT, de.getProcessInstanceId());        
+
+        final String responseResult = MessageFormat.format("{0}:{1}", RESPONSE_RESULT, de.getProcessInstanceId());
         this.results = new ArrayList<>();
 
         List<MeansurementFile> files = this.fileService
@@ -108,23 +108,20 @@ public class DataValidationTask implements Task {
 
         });
 
-        
-        
         boolean hasInvalidaData = files.stream().anyMatch(mdf -> mdf.getStatus().equals(MeansurementFileStatus.DATA_CALENDAR_ERROR));
         boolean hasDataForPersist = files.stream().anyMatch(mdf -> mdf.getStatus().equals(MeansurementFileStatus.DATA_DAY_ERROR) || mdf.getStatus().equals(MeansurementFileStatus.DATA_HOUR_ERROR));
-        
-        
+
         if (hasInvalidaData) {
             de.setVariable(CONTROLE, RESPONSE_INVALID_DATA);
         } else if (hasDataForPersist) {
             de.setVariable(CONTROLE, RESPONSE_INCONSISTENT_DATA);
-            
-            if(de.hasVariable(responseResult)){
-                de.removeVariable(responseResult );
+
+            if (de.hasVariable(responseResult)) {
+                de.removeVariable(responseResult);
                 Logger.getLogger(DataValidationTask.class.getName()).log(Level.INFO, "[Removeu a variavel responseResult]");
             }
-            
-            de.setVariable(responseResult, results,true);
+
+            de.setVariable(responseResult, results, true);
         } else {
             de.setVariable(CONTROLE, RESPONSE_DATA_IS_VALID);
         }
@@ -290,9 +287,11 @@ public class DataValidationTask implements Task {
                     if (daysOnMonth != days.size()) {
 
                         LocalDate checkDay = LocalDate.of(file.getYear().intValue(), Month.of(file.getMonth().intValue()), 1);
+
                         for (int day = 1; day <= daysOnMonth; day++) {
 
                             if (!days.containsKey(checkDay)) {
+
                                 // Make hours of day
                                 for (int i = 1; i <= 24; i++) {
                                     detailsOut.add(new MeansurementFileDetail(checkDay, (long) i, file.getId(), point));
@@ -334,8 +333,8 @@ public class DataValidationTask implements Task {
 
                             result.setTotalScde(sum);
 
-                            final Long qtdDays = detailsOut.stream().count();
-                            result.setHours(qtdDays * 24);
+                            final Long qtdHours = detailsOut.stream().count();
+                            result.setHours(qtdHours);
                             results.add(result);
 
                             file.getDetails().addAll(detailsOut);

@@ -42,6 +42,9 @@ public class GroupResource {
             @RequestParam(name = "size", defaultValue = "10") int size) {
         
         
+        
+                
+        
             Specification spc = GroupSpecification.name(name);
                     
         

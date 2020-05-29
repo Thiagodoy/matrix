@@ -10,6 +10,8 @@ import static com.core.matrix.utils.Constants.*;
 import com.core.matrix.dto.FileDetailDTO;
 import com.core.matrix.dto.FileParsedDTO;
 import com.core.matrix.io.BeanIoReader;
+import com.core.matrix.model.ContractCompInformation;
+import com.core.matrix.model.ContractProInfa;
 import com.core.matrix.model.Log;
 import com.core.matrix.model.MeansurementFile;
 import com.core.matrix.model.MeansurementFileDetail;
@@ -91,7 +93,9 @@ public class FileValidationTask implements JavaDelegate {
             final List<String> attachmentIds = (List<String>) de.getVariable(LIST_ATTACHMENT_ID, Object.class);
             final String user = de.getVariable(USER_UPLOAD, String.class);
             files = this.service.findByProcessInstanceId(delegateExecution.getProcessInstanceId());
-
+            
+            this.checkProinfaOfContracts();
+            
             attachmentIds.stream().forEach(attachmentId -> {
 
                 InputStream stream = null;
@@ -167,6 +171,40 @@ public class FileValidationTask implements JavaDelegate {
 
     }
 
+    private void checkProinfaOfContracts() throws Exception {
+
+        List<Exception> execExceptions = new ArrayList<>();
+
+        files.forEach(file -> {
+
+            try {
+                ContractCompInformation information = contractInformationService
+                        .findByWbcContractAndMeansurementPoint(file.getWbcContract(), file.getMeansurementPoint())
+                        .orElseThrow(() -> new Exception("[Matrix] -> Não foi possivel encontrar as informações complementares do contrato!"));
+
+                information.getProinfas()
+                        .stream()
+                        .filter(infa -> infa.getMonth().equals(file.getMonth()) && infa.getYear().equals(file.getYear()))
+                        .findFirst()
+                        .orElseThrow(() -> new Exception("Não foi encontrado nenhum proinfa cadastrada para esse contrato [" + file.getWbcContract() + "]!\n Mês/Ano refência: " + file.getMonth() + "/" + file.getYear()));
+
+            } catch (Exception ex) {
+                execExceptions.add(ex);
+            }
+        });
+        
+        
+        if(!execExceptions.isEmpty()){
+            execExceptions.forEach(ex->{
+                this.generateLog(delegateExecution, ex, ex.getMessage());
+            });            
+            throw new Exception("Processo encerrado devido a ausência de informações!");            
+        }
+        
+        
+
+    }
+
     private void validate(List<FileDetailDTO> detail, MeansurementFileType type, String fileName) {
 
         List<String> errors = Collections.synchronizedList(new ArrayList<String>());
@@ -182,10 +220,8 @@ public class FileValidationTask implements JavaDelegate {
 
         if (type.equals(MeansurementFileType.LAYOUT_C) || type.equals(MeansurementFileType.LAYOUT_C_1)) {
 
-            
-            detail.removeIf(d-> Optional.ofNullable(d.getOrigem()).isPresent() && d.getOrigem().equals("DADOS FALTANTES"));
-            
-            
+            detail.removeIf(d -> Optional.ofNullable(d.getOrigem()).isPresent() && d.getOrigem().equals("DADOS FALTANTES"));
+
             boolean has_L = Validator.validateContentIfContains(detail);
             if (!has_L) {
                 errors.add(MessageFormat.format("Não foi encontrado nenhuma ocorrência [ (L) ] nos pontos de medição. Arquivo [ {0} ]", fileName));

@@ -77,10 +77,12 @@ public class BillingContractsTask implements JavaDelegate {
 
         List<String> meansurementPoint = new ArrayList();
         List<String> nicknames = new ArrayList();
+        List<String> cnpjs = new ArrayList();
 
         contracts.forEach(contract -> {
             meansurementPoint.add(contract.getMeansurementPoint());
             nicknames.add(contract.getSNmApelido());
+            cnpjs.add(contract.getSNrCnpj());
         });
 
         String pointers = meansurementPoint
@@ -90,12 +92,20 @@ public class BillingContractsTask implements JavaDelegate {
 
         String nickname = nicknames
                 .stream()
+                .filter(p -> Objects.nonNull(p))
+                .collect(Collectors.joining(","));
+        
+        
+        String cnpjsString = cnpjs
+                .stream()
+                .filter(p -> Objects.nonNull(p))
                 .collect(Collectors.joining(","));
 
         ProcessInstance processInstance = execution.getEngineServices().getRuntimeService().startProcessInstanceByMessage(Constants.PROCESS_MEANSUREMENT_FILE_MESSAGE_EVENT, variables);
 
         variables.put(PROCESS_INFORMATION_MEANSUREMENT_POINT, pointers);
         variables.put(PROCESS_INFORMATION_NICKNAME, nickname);
+        variables.put(Constants.PROCESS_INFORMATION_CNPJ, cnpjsString);
         variables.put(PROCESS_INFORMATION_PROCESSO_ID, processInstance.getProcessInstanceId());
 
         execution.getEngineServices().getRuntimeService().setVariables(processInstance.getProcessInstanceId(), variables);

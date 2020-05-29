@@ -87,6 +87,7 @@ public class Constants {
     public static final String PROCESS_INFORMATION_CLIENT = "#Cliente";
     public static final String PROCESS_INFORMATION_MEANSUREMENT_POINT = "#Ponto";
     public static final String PROCESS_INFORMATION_NICKNAME = "#Apelido";
+    public static final String PROCESS_INFORMATION_CNPJ = "#Cnpj";
     public static final String PROCESS_INFORMATION_PROCESSO_ID= "#Processo";
     
     public static final String RESPONSE_NIVEL = "AVANÇAR";

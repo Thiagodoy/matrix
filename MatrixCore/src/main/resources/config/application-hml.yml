@@ -68,7 +68,7 @@ email:
     host: smtp.office365.com
     port: 587
     username: portal@matrixenergia.com
-    password: P@ortal2020
+    password: M@atrix2@2@
     auth: true  
     protocol: smtp
     starttls:

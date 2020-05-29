@@ -99,6 +99,7 @@ public class RuntimeActivitiService {
     @Transactional
     public String startProcessByMessage(String message) {
         return runtimeService.startProcessInstanceByMessage(message).getProcessInstanceId();
+
     }
 
     @Transactional
@@ -805,13 +806,16 @@ public class RuntimeActivitiService {
 
         comments.stream().forEach(c -> {
 
-            try {
-                UserActiviti user = userActivitiService.findById(c.getUserId());
-                c.setUsername(MessageFormat.format("{0} {1}", user.getFirstName(), user.getLastName()));
-                c.setPhoto(user.getPicture());
-            } catch (Exception ex) {
-                Logger.getLogger(RuntimeActivitiService.class.getName()).log(Level.SEVERE, null, ex);
+            if (Optional.ofNullable(c.getUserId()).isPresent()) {
+                try {
+                    UserActiviti user = userActivitiService.findById(c.getUserId());
+                    c.setUsername(MessageFormat.format("{0} {1}", user.getFirstName(), user.getLastName()));
+                    c.setPhoto(user.getPicture());
+                } catch (Exception ex) {
+                    Logger.getLogger(RuntimeActivitiService.class.getName()).log(Level.SEVERE, null, ex);
+                }
             }
+
         });
 
         detail.setComments(comments);
