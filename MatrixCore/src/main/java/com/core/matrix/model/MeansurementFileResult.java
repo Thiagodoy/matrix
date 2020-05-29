@@ -79,7 +79,7 @@ import lombok.NoArgsConstructor;
         + "            mtx_contrato_informacao_complementar c ON  b.wbc_contrato = c.wbc_codigo_contrato or b.wbc_contrato = c.wbc_contrato\n"
         + "            LEFT JOIN \n"
         + "			activiti.act_hi_varinst v ON v.PROC_INST_ID_ = a.act_id_processo  \n"
-        + "        LEFT JOIN\n"
+        + "        INNER JOIN\n"
         + "			activiti.act_id_user u ON u.ID_ = v.TEXT_ and v.NAME_ = 'created_by'"
         + "\n"
         + "WHERE\n"
