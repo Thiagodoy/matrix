@@ -220,12 +220,17 @@ public class FileValidationTask implements JavaDelegate {
 
         if (type.equals(MeansurementFileType.LAYOUT_C) || type.equals(MeansurementFileType.LAYOUT_C_1)) {
 
-            detail.removeIf(d -> Optional.ofNullable(d.getOrigem()).isPresent() && d.getOrigem().equals("DADOS FALTANTES"));
-
+            
             boolean has_L = Validator.validateContentIfContains(detail);
             if (!has_L) {
-                errors.add(MessageFormat.format("Não foi encontrado nenhuma ocorrência [ (L) ] nos pontos de medição. Arquivo [ {0} ]", fileName));
+                errors.add(MessageFormat.format("Os registros do layout C ou C.1, não apresenta em sua composição a palavra [ (L) ] nos pontos de medições. Arquivo [ {0} ]", fileName));
             }
+            
+            detail.removeIf(d -> Optional.ofNullable(d.getOrigem()).isPresent() && d.getOrigem().equals("DADOS FALTANTES"));
+
+            if(detail.isEmpty()){
+                errors.add(MessageFormat.format("O arquivo [ {0} ] não apresenta registros que possam ser processados de acordo com as regras estabelecidas para o layout [ {1} ].\n Favor analisar o arquivo.", fileName, type.toString() ));
+            } 
 
         }
 

@@ -108,7 +108,7 @@ public class CheckTake implements JavaDelegate {
             //retorna o pai
             return results
                     .stream()
-                    .filter(r -> Optional.ofNullable(r.getContractParent()).isPresent() && r.getContractParent().equals(1L))
+                    .filter(r -> Optional.ofNullable(r.getContractParent()).isPresent() && r.getContractParent() > 0)
                     .findFirst()
                     .get();
         }
