@@ -182,9 +182,15 @@ public class FileValidationTask implements JavaDelegate {
                         .findByWbcContractAndMeansurementPoint(file.getWbcContract(), file.getMeansurementPoint())
                         .orElseThrow(() -> new Exception("[Matrix] -> Não foi possivel encontrar as informações complementares do contrato!"));
 
+                
+                if(!Optional.ofNullable(information.getProinfas()).isPresent() || information.getProinfas().isEmpty()){
+                   throw new Exception("O contrato [" + file.getWbcContract() + "] não possui nenhum cadastro de proinfa!");
+                }
+                
+                
                 information.getProinfas()
                         .stream()
-                        .filter(infa -> infa.getMonth().equals(file.getMonth()) && infa.getYear().equals(file.getYear()))
+                        .filter(infa -> file.getMonth().equals(infa.getMonth()) && file.getYear().equals(infa.getYear()))
                         .findFirst()
                         .orElseThrow(() -> new Exception("Não foi encontrado nenhum proinfa cadastrada para esse contrato [" + file.getWbcContract() + "]!\n Mês/Ano refência: " + file.getMonth() + "/" + file.getYear()));
 
@@ -197,7 +203,9 @@ public class FileValidationTask implements JavaDelegate {
         if(!execExceptions.isEmpty()){
             execExceptions.forEach(ex->{
                 this.generateLog(delegateExecution, ex, ex.getMessage());
-            });            
+            });    
+            
+            this.logService.save(logs);            
             throw new Exception("Processo encerrado devido a ausência de informações!");            
         }
         
