@@ -192,7 +192,7 @@ public class FileValidationTask implements JavaDelegate {
                         .stream()
                         .filter(infa -> file.getMonth().equals(infa.getMonth()) && file.getYear().equals(infa.getYear()))
                         .findFirst()
-                        .orElseThrow(() -> new Exception("Não foi encontrado nenhum proinfa cadastrada para esse contrato [" + file.getWbcContract() + "]!\n Mês/Ano refência: " + file.getMonth() + "/" + file.getYear()));
+                        .orElseThrow(() -> new Exception("Não foi encontrado nenhum proinfa cadastrada para esse contrato [" + file.getWbcContract() + "]!\n Mês/Ano referência: " + file.getMonth() + "/" + file.getYear()));
 
             } catch (Exception ex) {
                 execExceptions.add(ex);
