@@ -53,6 +53,7 @@ public class CheckTake implements JavaDelegate {
             final MeansurementFileResult result = this.getResult(execution);
 
             Double value = null;
+            boolean isApproved = false;
 
             if (Optional.ofNullable(result.getAmountLiquidoAdjusted()).isPresent()) {
                 Optional<MeansurementFileAuthority> opt = fileAuthorityService.findByProcess(execution.getProcessInstanceId())
@@ -62,6 +63,7 @@ public class CheckTake implements JavaDelegate {
 
                 if (opt.isPresent() && opt.get().getResult().equals(CONST_APPROVED)) {
                     value = result.getAmountLiquidoAdjusted();
+                    isApproved = true;
                 } else {
                     value = result.getAmountBruto();
                 }
@@ -70,19 +72,24 @@ public class CheckTake implements JavaDelegate {
                 value = result.getAmountBruto();
             }
 
-            
             Logger.getLogger(CheckTake.class.getName()).log(Level.INFO, "value -> " + value);
             Logger.getLogger(CheckTake.class.getName()).log(Level.INFO, "value min ->" + result.getQtdHiredMin());
             Logger.getLogger(CheckTake.class.getName()).log(Level.INFO, "value max->" + result.getQtdHiredMax());
-            
+
             Logger.getLogger(CheckTake.class.getName()).log(Level.INFO, "RESPONSE_RECOMPRA ->" + (value.compareTo(result.getQtdHiredMin()) < 0));
             Logger.getLogger(CheckTake.class.getName()).log(Level.INFO, "RESPONSE_CURTOPRAZO ->" + (value.compareTo(result.getQtdHiredMax()) > 0));
             Logger.getLogger(CheckTake.class.getName()).log(Level.INFO, "RESPONSE_FATURAMENTO ->" + (value.compareTo(result.getQtdHiredMin()) >= 0 && value.compareTo(result.getQtdHiredMax()) <= 0));
-            
-            
-            
+
             if (value.compareTo(result.getQtdHiredMin()) < 0) {
-                execution.setVariable(CONTROLE, RESPONSE_RECOMPRA);
+                //value.compareTo(result.getAmountBruto()) >= 0 && value.compareTo(result.getAmountLiquido()) < 0 
+                if (Optional.ofNullable(result.getAmountLiquidoAdjusted()).isPresent()
+                        && result.getAmountLiquidoAdjusted().compareTo(result.getAmountBruto()) >= 0
+                        && result.getAmountLiquidoAdjusted().compareTo(result.getAmountLiquido()) < 0
+                        && isApproved) {
+                    execution.setVariable(CONTROLE, RESPONSE_FATURAMENTO);
+                } else {
+                    execution.setVariable(CONTROLE, RESPONSE_RECOMPRA);
+                }
             } else if (value.compareTo(result.getQtdHiredMax()) > 0) {
                 execution.setVariable(CONTROLE, RESPONSE_CURTOPRAZO);
             } else if (value.compareTo(result.getQtdHiredMin()) >= 0 && value.compareTo(result.getQtdHiredMax()) <= 0) {

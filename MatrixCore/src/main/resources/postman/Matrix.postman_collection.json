@@ -9,6 +9,12 @@
 			"name": "auth",
 			"item": [
 				{
+					"name": "metrics",
+					"item": [],
+					"protocolProfileBehavior": {},
+					"_postman_isSubFolder": true
+				},
+				{
 					"name": "Authentication",
 					"request": {
 						"method": "POST",
@@ -18,6 +24,11 @@
 								"name": "Content-Type",
 								"type": "text",
 								"value": "application/json"
+							},
+							{
+								"key": "Authorization",
+								"value": "Bearer",
+								"type": "text"
 							}
 						],
 						"body": {
@@ -431,25 +442,32 @@
 						"header": [
 							{
 								"key": "Authorization",
-								"value": "Bearer eyJhbGciOiJIUzUxMiJ9.eyJzdWIiOiJhZG1pbkBhZG1pbi5jb20iLCJleHAiOjE1Nzg4NzI5OTMsImlhdCI6MTU3ODg1NDk5M30.nBgx55bG6hTC3X-FDCVMvTa5zeVoTk5tnPRtaYDWRsK-MGBdBBAMrqWwcPu7BVj6jUbX7DjAl-U3HjKRTX63eA",
+								"value": "Bearer eyJhbGciOiJIUzUxMiJ9.eyJzdWIiOiJwb3N2ZW5kYUB0ZXN0ZSIsImV4cCI6MTU5MDA1NDA4OCwiaWF0IjoxNTkwMDM2MDg4fQ.mNRh7OMzu9X9ZdT_DGPp-Z60rrODF5M-_PP6fl1dAoclx6SpFVYqq6v1TpqYH92FFwFZBlD-U1eMPdozpUwTVw",
 								"type": "text"
 							}
 						],
 						"url": {
-							"raw": "http://localhost:8004/api/group",
+							"raw": "http://52.225.134.57/api/group/?size=10&page=0",
 							"protocol": "http",
 							"host": [
-								"localhost"
+								"52",
+								"225",
+								"134",
+								"57"
 							],
-							"port": "8004",
 							"path": [
 								"api",
-								"group"
+								"group",
+								""
 							],
 							"query": [
 								{
-									"key": "",
-									"value": ""
+									"key": "size",
+									"value": "10"
+								},
+								{
+									"key": "page",
+									"value": "0"
 								}
 							]
 						}
@@ -815,11 +833,11 @@
 							{
 								"key": "Authorization",
 								"type": "text",
-								"value": "Bearer eyJhbGciOiJIUzUxMiJ9.eyJzdWIiOiJhZG1pbkBhZG1pbi5jb20iLCJleHAiOjE1NzkyNDEwNzMsImlhdCI6MTU3OTIyMzA3M30.fj3tsFIxW80X_Rs4i02glyn_IAh3-et-1xn8EX6fGdSfjZKTrU2pRjiJq6ayU7x6ZtPi-qsWKxrwypeqMjAHRw"
+								"value": "Bearer eyJhbGciOiJIUzUxMiJ9.eyJzdWIiOiJ0ZXN0ZTFtYXRyaXhAbWFpbGluYXRvci5jb20iLCJleHAiOjE1ODk5MTE1MDYsImlhdCI6MTU4OTg5MzUwNn0.uwjEl-vQL2aROmCW6Qa00MbgQQ5FsH9kjLM-Y8IViBpaQbVw5EusciHtb8SFs-4EE477eJmKhhZlslZqTpwqGQ"
 							}
 						],
 						"url": {
-							"raw": "http://localhost:8004/api/user?profile=profile-gestor-portal",
+							"raw": "http://localhost:8004/api/user?searchValue=thiago",
 							"protocol": "http",
 							"host": [
 								"localhost"
@@ -831,33 +849,8 @@
 							],
 							"query": [
 								{
-									"key": "firstName",
-									"value": "gustavo",
-									"disabled": true
-								},
-								{
-									"key": "lastName",
-									"value": "",
-									"disabled": true
-								},
-								{
-									"key": "email",
-									"value": "",
-									"disabled": true
-								},
-								{
-									"key": "page",
-									"value": "",
-									"disabled": true
-								},
-								{
-									"key": "size",
-									"value": "",
-									"disabled": true
-								},
-								{
-									"key": "profile",
-									"value": "profile-gestor-portal"
+									"key": "searchValue",
+									"value": "thiago"
 								}
 							]
 						}
@@ -1080,12 +1073,15 @@
 				},
 				{
 					"name": "completeTask",
+					"protocolProfileBehavior": {
+						"disableBodyPruning": true
+					},
 					"request": {
-						"method": "POST",
+						"method": "GET",
 						"header": [
 							{
 								"key": "Authorization",
-								"value": "Bearer eyJhbGciOiJIUzUxMiJ9.eyJzdWIiOiJ0ZXN0ZTFtYXRyaXhAbWFpbGluYXRvci5jb20iLCJleHAiOjE1ODUyODcwMTEsImlhdCI6MTU4NTI2OTAxMX0.VVltWzO6PWSFNPh10H5OHGCXQ5zlKgiaj8LsCEAcQjVd8HNTNGJ-q9t_Ue4RlPAZ-j3-whqVRFsbIuNTWtbxqA",
+								"value": "Bearer eyJhbGciOiJIUzUxMiJ9.eyJzdWIiOiJ0ZXN0ZTFtYXRyaXhAbWFpbGluYXRvci5jb20iLCJleHAiOjE1ODk5MTE1MDYsImlhdCI6MTU4OTg5MzUwNn0.uwjEl-vQL2aROmCW6Qa00MbgQQ5FsH9kjLM-Y8IViBpaQbVw5EusciHtb8SFs-4EE477eJmKhhZlslZqTpwqGQ",
 								"type": "text"
 							},
 							{
@@ -1097,7 +1093,7 @@
 						],
 						"body": {
 							"mode": "raw",
-							"raw": "{\"processInstanceId\":\"732735\",\"taskId\":\"732848\",\"variables\":{\"_controle\":\"AVANÇAR\"}}",
+							"raw": "",
 							"options": {
 								"raw": {
 									"language": "json"
@@ -1105,7 +1101,7 @@
 							}
 						},
 						"url": {
-							"raw": "http://localhost:8004/api/workflow/runtime/completeTask",
+							"raw": "http://localhost:8004/api/workflow/runtime/getAssigneAndCandidateTask?valueSearch=1035005",
 							"protocol": "http",
 							"host": [
 								"localhost"
@@ -1115,7 +1111,13 @@
 								"api",
 								"workflow",
 								"runtime",
-								"completeTask"
+								"getAssigneAndCandidateTask"
+							],
+							"query": [
+								{
+									"key": "valueSearch",
+									"value": "1035005"
+								}
 							]
 						}
 					},
@@ -1519,11 +1521,11 @@
 							{
 								"key": "Authorization",
 								"type": "text",
-								"value": "Bearer eyJhbGciOiJIUzUxMiJ9.eyJzdWIiOiJhZG1pbkBhZG1pbi5jb20iLCJleHAiOjE1ODE3MjMwNjUsImlhdCI6MTU4MTcwNTA2NX0.ikwRIA_IYKENZJMRV8UiRht-6yqI343HWESJudGEQKE2aMkSOvXkBUK4Wd_ciYbzOwg_IAxpvy15jSaxGIENxA"
+								"value": "Bearer eyJhbGciOiJIUzUxMiJ9.eyJzdWIiOiJwb3N2ZW5kYUB0ZXN0ZSIsImV4cCI6MTU5MDAzNTkxMiwiaWF0IjoxNTkwMDE3OTEyfQ.ntdinPXyZvqUb6154n_Q5uTPnpJKUWWjm6Iy-1kf7RlStWi7z4MSR6y52fzAlGk_ZrybGWN_yu87Ag9tV6tcEw"
 							}
 						],
 						"url": {
-							"raw": "http://localhost:8004/api/workflow/runtime/assigneeTask?taskId=166314",
+							"raw": "http://localhost:8004/api/workflow/runtime/assigneeTask?taskId=1090004",
 							"protocol": "http",
 							"host": [
 								"localhost"
@@ -1538,7 +1540,7 @@
 							"query": [
 								{
 									"key": "taskId",
-									"value": "166314"
+									"value": "1090004"
 								}
 							]
 						}
@@ -1552,19 +1554,17 @@
 						"header": [
 							{
 								"key": "Authorization",
-								"value": "Bearer eyJhbGciOiJIUzUxMiJ9.eyJzdWIiOiJhZG1pbkBhZG1pbi5jb20iLCJleHAiOjE1ODUyOTA2NjgsImlhdCI6MTU4NTI3MjY2OH0.UzDqUqEqEDELAAFPN0FLYSE9x731UUqdw8m1_6TCj7ky3qOXIs3H16jhuy5QzxS2ZKfSwALS1pzxkZ98HwMmJg",
+								"value": "Bearer eyJhbGciOiJIUzUxMiJ9.eyJzdWIiOiJwb3N2ZW5kYUB0ZXN0ZSIsImV4cCI6MTU5MDA1ODE2OSwiaWF0IjoxNTkwMDQwMTY5fQ.E9GZfI0vi7puHcgRdnwBk4br-xPfRrLKDR6No7r8MfVE4lxqcKetg-4l5TfvFw9Dts7Qq8AnfJlDLmScC4Yjdw",
 								"type": "text"
 							}
 						],
 						"url": {
-							"raw": "http://52.225.134.57/api/workflow/runtime/startProcessByMessage?message=p131",
+							"raw": "http://localhost:8004/api/workflow/runtime/startProcessByMessage?message=p132",
 							"protocol": "http",
 							"host": [
-								"52",
-								"225",
-								"134",
-								"57"
+								"localhost"
 							],
+							"port": "8004",
 							"path": [
 								"api",
 								"workflow",
@@ -1574,7 +1574,7 @@
 							"query": [
 								{
 									"key": "message",
-									"value": "p131"
+									"value": "p132"
 								}
 							]
 						}
@@ -1621,6 +1621,107 @@
 								"workflow",
 								"runtime",
 								"startProcessByMessageWithParams"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "getAssigneAndCandidateTask",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer eyJhbGciOiJIUzUxMiJ9.eyJzdWIiOiJwb3N2ZW5kYUB0ZXN0ZSIsImV4cCI6MTU5MDAxMzQ1MiwiaWF0IjoxNTg5OTk1NDUyfQ.HFL7pRuR1BJk74oGQvW2F1GOlgAvZItnhS_qsF4x_A7p2f9dvt2LV0KlWw8QC0JlXZyv_eWfF-ZnllNCC606nw",
+								"type": "text"
+							}
+						],
+						"url": {
+							"raw": "http://52.225.134.57/api/workflow/runtime/getAssigneAndCandidateTask",
+							"protocol": "http",
+							"host": [
+								"52",
+								"225",
+								"134",
+								"57"
+							],
+							"path": [
+								"api",
+								"workflow",
+								"runtime",
+								"getAssigneAndCandidateTask"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "TaskHistoric",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer eyJhbGciOiJIUzUxMiJ9.eyJzdWIiOiJwb3N2ZW5kYUB0ZXN0ZSIsImV4cCI6MTU5MDQzNTg2NywiaWF0IjoxNTkwNDE3ODY3fQ.Wnj2ZXpCpTCp7dIJidtfEdL0ZfAQ36YtWve3ciUQFBb8yLzaGUwor6QKhfcW7xbv8XFlYnJqguUB8SzxMj_xEA",
+								"type": "text"
+							}
+						],
+						"url": {
+							"raw": "http://localhost:8004/api/workflow/runtime/taskHistory?processInstanceId=1101779",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "8004",
+							"path": [
+								"api",
+								"workflow",
+								"runtime",
+								"taskHistory"
+							],
+							"query": [
+								{
+									"key": "processInstanceId",
+									"value": "1101779"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "FixFile",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer eyJhbGciOiJIUzUxMiJ9.eyJzdWIiOiJwb3N2ZW5kYUB0ZXN0ZSIsImV4cCI6MTU5MDQ1NjU4MCwiaWF0IjoxNTkwNDM4NTgwfQ.F34UCuMPLqzsjjxasBD5gNkIB_-lZfrj3MlEeNKoV0qD3i1VBLc1obYzWcib8znLzMB0kCH3eKJ9GFuxBgnN7A",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n\t\"idFile\":7341,\n    \"fileName\":\"exportacao_clacos0g0_248837_HADEX_TESTE.cs\",\n    \"point\":\"PAHXBVENTR101 (L)\",\n    \"totalScde\": 62736.60000000008,\n    \"hours\":1,\n    \"days\":null,\n    \"inputManual\": 63000.0\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "http://localhost:8004/api/file/detail/fixFile",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "8004",
+							"path": [
+								"api",
+								"file",
+								"detail",
+								"fixFile"
 							]
 						}
 					},
@@ -1863,6 +1964,40 @@
 						}
 					},
 					"response": []
+				},
+				{
+					"name": "ReloadProcess",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer eyJhbGciOiJIUzUxMiJ9.eyJzdWIiOiJwb3N2ZW5kYUB0ZXN0ZSIsImV4cCI6MTU5MDE4NzE1MSwiaWF0IjoxNTkwMTY5MTUxfQ.3n9UCE7OIZZxslAuli0NvOyJeYBOnHDWtA6ge_P7peh866o4hA1QvjsBWFzBticr2gTL_1uuD3PGAyaDVgrkMA",
+								"type": "text"
+							}
+						],
+						"url": {
+							"raw": "http://localhost:8004/api/complement/information/reloadProcess?contractId=61122",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "8004",
+							"path": [
+								"api",
+								"complement",
+								"information",
+								"reloadProcess"
+							],
+							"query": [
+								{
+									"key": "contractId",
+									"value": "61122"
+								}
+							]
+						}
+					},
+					"response": []
 				}
 			],
 			"protocolProfileBehavior": {}
@@ -2028,17 +2163,17 @@
 				{
 					"name": "ResultFile",
 					"request": {
-						"method": "OPTIONS",
+						"method": "POST",
 						"header": [
 							{
 								"key": "Authorization",
-								"value": "Bearer eyJhbGciOiJIUzUxMiJ9.eyJzdWIiOiJ0ZXN0ZTJtYXRyaXhAbWFpbGluYXRvci5jb20iLCJleHAiOjE1ODUwNzczOTYsImlhdCI6MTU4NTA1OTM5Nn0.t7-WaogrFjiesDEv0XX_66VeoBoV7GLp3lMKgBdcDUojCcxzWHyipDI5TRe-hQUQ-F6GM1kZ5qOhysDgaaEDpw",
+								"value": "Bearer eyJhbGciOiJIUzUxMiJ9.eyJzdWIiOiJhZG1pbkBhZG1pbi5jb20iLCJleHAiOjE1OTEwNDkxMTIsImlhdCI6MTU5MTAzMTExMn0.IZfmZsF9wP6LH1oKTRmedlmK5hCvxjY4P7XdYlp4NoF2EXiLg5khm6J5NJd--QfzdruqfeLtrfPJN0S9u5PTTA",
 								"type": "text"
 							}
 						],
 						"body": {
 							"mode": "raw",
-							"raw": "{\"ids\":[3300,3247],\"type\":\"EXPORT_RESULT_WBC\",\"month\":2,\"year\":2020}",
+							"raw": "{\"ids\":[10020],\"type\":\"EXPORT_RESULT_WBC\",\"month\":5,\"year\":2020}",
 							"options": {
 								"raw": {
 									"language": "json"
@@ -2431,6 +2566,114 @@
 								{
 									"key": "description",
 									"value": "SE/CO"
+								}
+							]
+						}
+					},
+					"response": []
+				}
+			],
+			"protocolProfileBehavior": {}
+		},
+		{
+			"name": "metrics",
+			"item": [
+				{
+					"name": "closedTask",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer eyJhbGciOiJIUzUxMiJ9.eyJzdWIiOiJwb3N2ZW5kYUB0ZXN0ZSIsImV4cCI6MTU5MDE3MTczMCwiaWF0IjoxNTkwMTUzNzMwfQ.KhRtSgZi75Mq4a-8vvNCneK7eThpQSkc6r7UpEh9Tm79F7Ea3JghkPM0u6hDzhYAZnZJcm16_qgF23ZVX-O2kw",
+								"type": "text"
+							}
+						],
+						"url": {
+							"raw": "http://localhost:8004/api/user/metrics/closedTask?type=YEARLY",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "8004",
+							"path": [
+								"api",
+								"user",
+								"metrics",
+								"closedTask"
+							],
+							"query": [
+								{
+									"key": "type",
+									"value": "YEARLY"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "userOpenClosedTasksMetrics",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer eyJhbGciOiJIUzUxMiJ9.eyJzdWIiOiJwb3N2ZW5kYUB0ZXN0ZSIsImV4cCI6MTU5MDE3MTczMCwiaWF0IjoxNTkwMTUzNzMwfQ.KhRtSgZi75Mq4a-8vvNCneK7eThpQSkc6r7UpEh9Tm79F7Ea3JghkPM0u6hDzhYAZnZJcm16_qgF23ZVX-O2kw",
+								"type": "text"
+							}
+						],
+						"url": {
+							"raw": "http://localhost:8004/api/user/metrics/userOpenClosedTasksMetrics?type=MONTHLY",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "8004",
+							"path": [
+								"api",
+								"user",
+								"metrics",
+								"userOpenClosedTasksMetrics"
+							],
+							"query": [
+								{
+									"key": "type",
+									"value": "MONTHLY"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "userTimeOnTaskMetric",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer eyJhbGciOiJIUzUxMiJ9.eyJzdWIiOiJwb3N2ZW5kYUB0ZXN0ZSIsImV4cCI6MTU5MDE3MTczMCwiaWF0IjoxNTkwMTUzNzMwfQ.KhRtSgZi75Mq4a-8vvNCneK7eThpQSkc6r7UpEh9Tm79F7Ea3JghkPM0u6hDzhYAZnZJcm16_qgF23ZVX-O2kw",
+								"type": "text"
+							}
+						],
+						"url": {
+							"raw": "http://localhost:8004/api/user/metrics/userTimeOnTaskMetric?type=MONTHLY",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "8004",
+							"path": [
+								"api",
+								"user",
+								"metrics",
+								"userTimeOnTaskMetric"
+							],
+							"query": [
+								{
+									"key": "type",
+									"value": "MONTHLY"
 								}
 							]
 						}

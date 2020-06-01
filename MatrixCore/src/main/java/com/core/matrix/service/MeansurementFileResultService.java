@@ -58,7 +58,10 @@ public class MeansurementFileResultService {
 
     @Transactional(readOnly = true)
     public List<MeansurementFileResultStatusDTO> getStatusBilling(Long year, Long month) {
-        return this.repository.getStatusBilling(year, month);
+        return this.repository.getStatusBilling(year, month)
+                .stream()
+                .sorted(Comparator.comparing(MeansurementFileResultStatusDTO::getId))
+                .collect(Collectors.toList());
     }
 
     @Transactional(readOnly = true)

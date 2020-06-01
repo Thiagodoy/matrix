@@ -58,12 +58,7 @@ public class ReportService {
         final ReportConstants.ReportType type = request.getType();
         List<MeansurementFileResultStatusDTO> report = results
                 .stream()
-                .filter(t -> request
-                .getIds()
-                .stream()
-                .filter(tt -> tt.equals(t.getId()))
-                .findFirst()
-                .isPresent())
+                .filter(t -> request.getIds().stream().anyMatch(tt -> tt.equals(t.getId())))
                 .collect(Collectors.toList());
 
         this.createAndWriteFile(report, type);
@@ -78,7 +73,7 @@ public class ReportService {
         out.close();
         this.wb.dispose();
 
-        results.stream()
+        report.stream()
                 .forEach(r -> {
                     fileResultService.updateToExported(r.getId());
                 });
