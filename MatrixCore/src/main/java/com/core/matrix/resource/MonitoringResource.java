@@ -69,7 +69,7 @@ public class MonitoringResource {
                     atividade,
                     usuario);
 
-            Page data = monitoringRepository.findAll(spc, PageRequest.of(page, size, Sort.by("instanciaDoProcesso").ascending()));
+            Page data = monitoringRepository.findAll(spc, PageRequest.of(page, size));
             List<MonitoringStatusDTO> statusM = monitoringRepository.status(Long.parseLong(mes), Long.parseLong(ano));
             List<MonitoringFilterDTO> filters = monitoringRepository.filters();
             MonitoringResponse response = new MonitoringResponse(data, statusM, filters);

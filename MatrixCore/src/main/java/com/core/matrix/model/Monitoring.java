@@ -29,7 +29,6 @@ import lombok.Data;
         + "SELECT distinct 'USER' as type, RESPONSAVEL as name FROM matrix.monitoramento_view where RESPONSAVEL is not null ",
         resultSetMapping = "filterMonitoringDTO")
 
-
 @SqlResultSetMapping(name = "filterMonitoringDTO",
         classes = @ConstructorResult(
                 targetClass = MonitoringFilterDTO.class,
@@ -183,6 +182,9 @@ public class Monitoring implements Serializable {
     @ReportColumn(name = "WBC_CONTRATO", position = 0, typeValue = String.class, typeReport = {"FULL"})
     @Column(name = "WBC_CONTRATO")
     public String wbcContrato;
+
+    @Column(name = "WBC_CONTRATO_REFERENCIA")
+    public String wbcContratoReferencia;
 
     @ReportColumn(name = "WBC_RATEIO", position = 0, typeValue = String.class, typeReport = {"FULL"})
     @Column(name = "WBC_RATEIO")
