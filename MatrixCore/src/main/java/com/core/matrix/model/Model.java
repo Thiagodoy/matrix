@@ -7,7 +7,9 @@ package com.core.matrix.model;
 
 import java.lang.reflect.Field;
 import java.lang.reflect.Type;
+import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collection;
 import java.util.List;
 import java.util.Optional;
 import java.util.logging.Level;
@@ -29,11 +31,58 @@ public interface Model<T extends Model> {
             Type type = f.getGenericType();
 
             try {
-                Object valueOfInstance = f.get(this);
-                Object valueOfEntity = f.get(entity);
 
-                if (Optional.ofNullable(valueOfEntity).isPresent() && !valueOfEntity.equals(valueOfInstance)) {
-                    f.set(this, valueOfEntity);
+                boolean isCollection = Collection.class.isAssignableFrom(f.getType());
+                
+                if (isCollection) {
+                    
+                    Collection<Model> collection = (Collection<Model>)f.get(this);
+                    Collection<Model> collectionEntity = (Collection<Model>)f.get(entity);
+                    
+                    
+                    if(!Optional.ofNullable(collectionEntity).isPresent() || collectionEntity.isEmpty() ){
+                        if(!collection.isEmpty()){
+                            collection.clear();
+                        }
+                        return;
+                    }
+                    
+                    
+                    collectionEntity.forEach(m->{
+                        
+                        Optional<Model> optModel = collection.stream().filter(mm-> mm.getId().equals(m.getId())).findFirst();
+                        
+                        if(optModel.isPresent()){
+                            optModel.get().update(m);
+                        }else{
+                            collection.add(m);
+                        }
+                    });
+                    
+                    
+                    List<Model>removeEntitys = new ArrayList<>();
+                    
+                    collection.forEach(m->{                    
+                        Optional<Model> optModel = collectionEntity.stream().filter(mm-> mm.getId().equals(m.getId())).findFirst();                        
+                        if(!optModel.isPresent()){
+                            removeEntitys.add(m);
+                           //collection.remove(m);
+                        }
+                    });
+                    
+                    if(!removeEntitys.isEmpty()){                        
+                        collection.removeAll(removeEntitys);
+                    }
+                    
+                    
+                } else {
+
+                    Object valueOfInstance = f.get(this);
+                    Object valueOfEntity = f.get(entity);
+
+                    if (Optional.ofNullable(valueOfEntity).isPresent() && !valueOfEntity.equals(valueOfInstance)) {
+                        f.set(this, valueOfEntity);
+                    }
                 }
 
             } catch (IllegalArgumentException ex) {

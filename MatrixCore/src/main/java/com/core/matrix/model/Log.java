@@ -25,6 +25,15 @@ import lombok.Data;
 @Data
 public class Log implements Model<Log>{
 
+    
+    public enum LogType{
+        LAYOUT_INVALID,
+        DATA_INVALID,
+        DATA_NOT_PERSISTED
+        
+    }
+    
+    
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "id_log")

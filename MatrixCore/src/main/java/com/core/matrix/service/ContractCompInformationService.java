@@ -55,16 +55,24 @@ public class ContractCompInformationService {
     private RuntimeService runtimeService;
 
     @Transactional
-    public void save(ContractCompInformation information) {
+    public void save(ContractCompInformation information) throws Exception {
 
-        if (information.getProinfas() != null) {
-            information.getProinfas().stream().forEach(p -> {
-                p.setWbcContract(information.getWbcContract());
-                p.setMeansurementPoint(information.getMeansurementPoint());
-            });
+        Optional<ContractCompInformation> entity = this.repository
+                .findById(information.getWbcContract());
+
+        if (entity.isPresent()) {
+            this.update(information);
+        } else {
+            if (information.getProinfas() != null) {
+                information.getProinfas().stream().forEach(p -> {
+                    p.setWbcContract(information.getWbcContract());
+                    p.setMeansurementPoint(information.getMeansurementPoint());
+                });
+            }
+
+            this.repository.save(information);
         }
 
-        this.repository.save(information);
     }
 
     @Transactional
@@ -74,8 +82,8 @@ public class ContractCompInformationService {
                 .findById(information.getWbcContract())
                 .orElseThrow(() -> new Exception("Não foi encontrado nenhuma informação adicional para o contrato"));
 
-        this.repository.delete(entity);
-        this.save(information);
+        entity.update(information);
+        this.repository.save(entity);
 
     }
 
@@ -150,7 +158,7 @@ public class ContractCompInformationService {
                     .findByWbcContractAndMeansurementPointAndMonthAndYear(
                             m.getWbcContract(),
                             m.getMeansurementPoint(),
-                            Integer.valueOf(now.getMonthValue()).longValue() -1,
+                            Integer.valueOf(now.getMonthValue()).longValue() - 1,
                             Integer.valueOf(now.getYear()).longValue()
                     );
 
@@ -180,12 +188,11 @@ public class ContractCompInformationService {
                 logService.deleteLogsByProcessInstance(opt.get().getProcessInstanceId());
                 fileResultService.deleteByProcess(opt.get().getProcessInstanceId());
 
-                Map<String,Object> variables = new HashMap<>();
-                
+                Map<String, Object> variables = new HashMap<>();
+
                 variables.put(PROCESS_CONTRACTS_RELOAD_BILLING, list);
-                
-                
-                runtimeService.startProcessInstanceByMessage(PROCESS_BILLING_CONTRACT_MESSAGE_EVENT,variables);
+
+                runtimeService.startProcessInstanceByMessage(PROCESS_BILLING_CONTRACT_MESSAGE_EVENT, variables);
 
                 break;
             }

@@ -328,10 +328,10 @@ public class CalculateTask implements Task {
 
     private Double solicitadoLiquido(Double consumptionTotal, ContractWbcInformationDTO contractWbcInformationDTO) {
 
-        Logger.getLogger(CheckTake.class.getName()).log(Level.INFO, "consumptionTotal -> " + consumptionTotal);
-        Logger.getLogger(CheckTake.class.getName()).log(Level.INFO, "getNrQtd    ->" + contractWbcInformationDTO.getNrQtd());
-        Logger.getLogger(CheckTake.class.getName()).log(Level.INFO, "getNrQtdMin ->" + contractWbcInformationDTO.getNrQtdMin());
-        Logger.getLogger(CheckTake.class.getName()).log(Level.INFO, "getNrQtdMax ->" + contractWbcInformationDTO.getNrQtdMax());
+        Logger.getLogger(CalculateTask.class.getName()).log(Level.INFO, "consumptionTotal -> " + consumptionTotal);
+        Logger.getLogger(CalculateTask.class.getName()).log(Level.INFO, "getNrQtd    ->" + contractWbcInformationDTO.getNrQtd());
+        Logger.getLogger(CalculateTask.class.getName()).log(Level.INFO, "getNrQtdMin ->" + contractWbcInformationDTO.getNrQtdMin());
+        Logger.getLogger(CalculateTask.class.getName()).log(Level.INFO, "getNrQtdMax ->" + contractWbcInformationDTO.getNrQtdMax());
 
         BigDecimal consumptionTotalArredondado = new BigDecimal(consumptionTotal).setScale(3, RoundingMode.HALF_EVEN);
 

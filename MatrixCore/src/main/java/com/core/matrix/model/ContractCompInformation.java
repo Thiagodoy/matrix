@@ -66,49 +66,49 @@ import lombok.Data;
 @Table(name = "mtx_contrato_informacao_complementar")
 @Data
 @JsonIgnoreProperties(value = {"lastUpdate", "createAt"})
-public class ContractCompInformation  implements Serializable{
+public class ContractCompInformation  implements Serializable,Model<ContractCompInformation>{
 
-    private static final long serialVersionUID = -6849689118029240029L;
+    protected static final long serialVersionUID = -6849689118029240029L;
     
     @Id
     @Column(name = "wbc_contrato")
-    private Long wbcContract;
+    protected Long wbcContract;
 
     @Column(name = "wbc_ponto_de_medicao")
-    private String meansurementPoint;
+    protected String meansurementPoint;
 
     @Column(name = "wbc_codigo_contrato")
-    private Long codeWbcContract;
+    protected Long codeWbcContract;
 
     @Column(name = "wbc_rateio")
-    private Long isApportionment;
+    protected Long isApportionment;
 
     @Column(name = "wbc_codigo_contrato_rateio")
-    private Long codeContractApportionment;
+    protected Long codeContractApportionment;
 
     @Column(name = "percentual_de_perda")
-    private Double percentOfLoss;
+    protected Double percentOfLoss;
 
     @Column(name = "fator_atendimento_carga")
-    private Double factorAttendanceCharge;
+    protected Double factorAttendanceCharge;
 
     @Column(name = "wbc_submercado")
-    private Integer wbcSubmercado;        
+    protected Integer wbcSubmercado;        
         
     @JsonIgnore
     @Column(name = "data_criacao")
-    private LocalDateTime createdAt;
+    protected LocalDateTime createdAt;
 
     @JsonIgnore
     @Column(name = "data_ultima_alteracao")
-    private LocalDateTime lastUpdate;
+    protected LocalDateTime lastUpdate;
 
     @OneToMany(fetch = FetchType.EAGER, orphanRemoval = true, cascade = CascadeType.ALL)
     @JoinColumn(name = "wbc_contrato")
-    private List<ContractProInfa> proinfas;    
+    protected List<ContractProInfa> proinfas;    
     
     @Column(name = "unidade_consumidora")
-    private String isConsumerUnit;
+    protected String isConsumerUnit;
 
     @PrePersist
     public void generateCreatedAt() {
@@ -125,43 +125,9 @@ public class ContractCompInformation  implements Serializable{
         this.lastUpdate = LocalDateTime.now();
     }
 
-    public void update(ContractCompInformation entity) {
-
-        if (Optional.ofNullable(entity.getWbcContract()).isPresent() && !entity.getWbcContract().equals(this.wbcContract)) {
-            this.wbcContract = entity.getWbcContract();
-        }
-
-        if (Optional.ofNullable(entity.getMeansurementPoint()).isPresent() && !entity.getMeansurementPoint().equals(this.meansurementPoint)) {
-            this.meansurementPoint = entity.getMeansurementPoint();
-        }
-
-        if (Optional.ofNullable(entity.getCodeWbcContract()).isPresent() && !entity.getCodeWbcContract().equals(this.codeWbcContract)) {
-            this.codeWbcContract = entity.getCodeWbcContract();
-        }
-
-        if (Optional.ofNullable(entity.getIsApportionment()).isPresent() && !entity.getIsApportionment().equals(this.isApportionment)) {
-            this.isApportionment = entity.getIsApportionment();
-        }
-
-        if (Optional.ofNullable(entity.getCodeContractApportionment()).isPresent() && !entity.getCodeContractApportionment().equals(this.codeContractApportionment)) {
-            this.codeContractApportionment = entity.getCodeContractApportionment();
-        }
-
-        if (Optional.ofNullable(entity.getPercentOfLoss()).isPresent() && !entity.getPercentOfLoss().equals(this.percentOfLoss)) {
-            this.percentOfLoss = entity.getPercentOfLoss();
-        }
-
-        if (Optional.ofNullable(entity.getFactorAttendanceCharge()).isPresent() && !entity.getFactorAttendanceCharge().equals(this.factorAttendanceCharge)) {
-            this.factorAttendanceCharge = entity.getFactorAttendanceCharge();
-        }
-
-        if (Optional.ofNullable(entity.getWbcSubmercado()).isPresent() && !entity.getWbcSubmercado().equals(this.wbcSubmercado)) {
-            this.wbcSubmercado = entity.getWbcSubmercado();
-        }
-        
-        if (Optional.ofNullable(entity.getIsConsumerUnit()).isPresent() && !entity.getIsConsumerUnit().equals(this.isConsumerUnit)) {
-            this.isConsumerUnit = entity.getIsConsumerUnit();
-        }
+    @Override
+    public Long getId() {
+        return this.wbcContract;
     }
 
 }

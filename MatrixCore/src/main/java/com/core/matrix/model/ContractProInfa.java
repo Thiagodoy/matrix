@@ -21,34 +21,32 @@ import lombok.Data;
 @Entity
 @Table(name = "mtx_contrato_proinfa")
 @Data
-public class ContractProInfa implements Serializable{
+public class ContractProInfa implements Serializable, Model<ContractProInfa>{
 
-    private static final long serialVersionUID = -4258355186535810797L;    
+    protected static final long serialVersionUID = -4258355186535810797L;    
     
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "id_proinfa")
-    private Long id;
+    protected Long id;
     
     
     @Column(name = "wbc_contrato", nullable = false)
-    private Long wbcContract;
+    protected Long wbcContract;
 
     
     @Column(name = "wbc_ponto_de_medicao")
-    private String meansurementPoint;
+    protected String meansurementPoint;
 
     
     @Column(name = "ano")
-    private Long year;
+    protected Long year;
 
     
     @Column(name = "mes")
-    private Long month;
+    protected Long month;
 
     @Column(name = "proinfa")
-    private Double proinfa;
-
-   
+    protected Double proinfa;   
 
 }
