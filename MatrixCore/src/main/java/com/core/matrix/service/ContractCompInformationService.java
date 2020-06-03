@@ -164,6 +164,9 @@ public class ContractCompInformationService {
 
             if (opt.isPresent()) {
 
+                
+                final String processInstanceId = opt.get().getProcessInstanceId();
+                
                 List<Attachment> attachments = taskService.getProcessInstanceAttachments(opt.get().getProcessInstanceId());
                 List<Comment> comments = taskService.getProcessInstanceComments(opt.get().getProcessInstanceId());
 
@@ -191,7 +194,9 @@ public class ContractCompInformationService {
                 Map<String, Object> variables = new HashMap<>();
 
                 variables.put(PROCESS_CONTRACTS_RELOAD_BILLING, list);
-
+                
+                runtimeService.deleteProcessInstance(processInstanceId, "Contract was updated!");
+                
                 runtimeService.startProcessInstanceByMessage(PROCESS_BILLING_CONTRACT_MESSAGE_EVENT, variables);
 
                 break;

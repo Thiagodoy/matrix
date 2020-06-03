@@ -18,6 +18,8 @@ import com.core.matrix.service.LogService;
 import com.core.matrix.service.MeansurementFileResultService;
 import com.core.matrix.service.MeansurementFileService;
 import com.core.matrix.utils.Constants;
+import static com.core.matrix.utils.Constants.PROCESS_INFORMATION_CLIENT;
+import static com.core.matrix.utils.Constants.PROCESS_INFORMATION_NICKNAME;
 import com.core.matrix.wbc.dto.ContractWbcInformationDTO;
 import com.core.matrix.wbc.dto.CompanyDTO;
 import com.core.matrix.wbc.dto.ContractDTO;
@@ -124,9 +126,14 @@ public class CalculateTask implements Task {
 
             String point = file.getMeansurementPoint().replaceAll("\\((L|B)\\)", "").trim();
 
-            Optional<CompanyDTO> optEmp = this.empresaService.listByPoint(point);
-            String nickname = optEmp.isPresent() ? optEmp.get().getSNmApelido() : "";
-            String name = optEmp.isPresent() ? optEmp.get().getSNmEmpresa() : "";
+            
+            String nickname = de.hasVariable(PROCESS_INFORMATION_NICKNAME) ? de.getVariable(PROCESS_INFORMATION_NICKNAME, String.class): "";
+            String name =  de.hasVariable(PROCESS_INFORMATION_CLIENT) ? de.getVariable(PROCESS_INFORMATION_CLIENT, String.class) : ""; 
+            
+//            
+//            Optional<CompanyDTO> optEmp = this.empresaService.listByPoint(point);
+//            String nickname = optEmp.isPresent() ? optEmp.get().getSNmApelido() : "";
+//            String name = optEmp.isPresent() ? optEmp.get().getSNmEmpresa() : "";
 
             MeansurementFileResult fileResult = new MeansurementFileResult(contractWbcInformationDTO, de.getProcessInstanceId());
             fileResult.setAmountScde(this.roundValue((sum / 1000), 6));

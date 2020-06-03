@@ -23,8 +23,8 @@ activiti:
         initializationFailFast: false        
         sqlserver:            
             dataUrl: jdbc:mysql://localhost:3306/activiti?rewriteBatchedStatements=true&useTimezone=true&serverTimezone=America/Cuiaba&useLegacyDatetimeCode=false&autoReconnect=true            
-            dataSourceUser: root
-            dataSourcePassword: root
+            dataSourceUser: matrix
+            dataSourcePassword: thi@go3516490
             port: 3306            
             connectionTestQuery: SELECT 1  
  
@@ -41,8 +41,8 @@ matrix:
         initializationFailFast: false        
         sqlserver:            
             dataUrl: jdbc:mysql://localhost:3306/matrix?rewriteBatchedStatements=true&useTimezone=true&serverTimezone=America/Cuiaba&useLegacyDatetimeCode=false&autoReconnect=true            
-            dataSourceUser: root
-            dataSourcePassword: root
+            dataSourceUser: matrix
+            dataSourcePassword: thi@go3516490
             port: 3306            
             connectionTestQuery: SELECT 1  
   
@@ -58,12 +58,11 @@ wbc:
         autoCommit: false
         initializationFailFast: false        
         sqlserver:            
-            dataUrl: jdbc:sqlserver://192.168.0.22;databaseName=WBC_ENERGY_DB;user=matrix_portal;password=portal_matrix
+            dataUrl: jdbc:sqlserver://192.168.0.22\homologacao;databaseName=WBC_ENERGY_DB_HML;user=matrix_portal;password=portal_matrix
             dataSourceUser: matrix_portal
             dataSourcePassword: portal_matrix
             port: 3306            
-            connectionTestQuery: SELECT 1    
-            
+            connectionTestQuery: SELECT 1   
             
 email:
     host: smtp.office365.com
@@ -74,11 +73,11 @@ email:
     protocol: smtp
     starttls:
            enable: true
-           required: true 
+           required: true      
            
 websocket:
         cors:
-            origin: http://localhost:8080 
+            origin: http://portalhml.eastus2.cloudapp.azure.com        
             
 portal:
-        url:  http://localhost:8080/troca-senha            
+        url:  http://portalhml.eastus2.cloudapp.azure.com/troca-senha

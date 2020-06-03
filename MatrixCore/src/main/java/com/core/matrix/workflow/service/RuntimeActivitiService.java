@@ -315,26 +315,26 @@ public class RuntimeActivitiService {
         int min = page * size;
 
         String query = "SELECT DISTINCT\n"
-                + "    t.PROC_INST_ID_, t.ID_\n"
+                + "    t.PROC_INST_ID_, t.ID_,t.CREATE_TIME_\n"
                 + "FROM\n"
-                + "    activiti.act_ru_task t\n"
+                + "    activiti.ACT_RU_TASK t\n"
                 + "        INNER JOIN\n"
-                + "    activiti.act_ru_variable v ON t.PROC_INST_ID_ = v.PROC_INST_ID_\n"
+                + "    activiti.ACT_RU_VARIABLE v ON t.PROC_INST_ID_ = v.PROC_INST_ID_\n"
                 + "        INNER JOIN\n"
                 + "    activiti.ACT_RU_IDENTITYLINK k ON t.ID_ = k.TASK_ID_\n"
                 + "WHERE\n"
-                + "    (t.assignee_ = '" + user + "'\n"
-                + "        OR k.group_id_ in (" + groupFilter + "))\n";
+                + "    (t.ASSIGNEE_ = '" + user + "'\n"
+                + "        OR k.GROUP_ID_ in (" + groupFilter + "))\n";
 
         if (Optional.ofNullable(valueSearch).isPresent()) {
-            query += "        AND ((UPPER(v.text_) LIKE '%" + valueSearch.toUpperCase() + "%'\n" + "        AND SUBSTRING(v.name_, 1, 1) = '#') OR t.NAME_ like '%" + valueSearch.toUpperCase() + "%')\n";
+            query += "  AND ((UPPER(v.TEXT_) LIKE '%" + valueSearch.toUpperCase() + "%'\n" + "   AND SUBSTRING(v.NAME_, 1, 1) = '#') OR t.NAME_ like '%" + valueSearch.toUpperCase() + "%')\n";
         }
 
-        query += "        ORDER BY t.CREATE_TIME_ DESC";
+        query += "  order by t.CREATE_TIME_ desc";
 
         List<String> processInstances = taskService
                 .createNativeTaskQuery()
-                .sql(query)
+                .sql(query)                
                 .listPage(min, size)
                 .stream()
                 .map(t -> t.getProcessInstanceId())
@@ -369,14 +369,14 @@ public class RuntimeActivitiService {
                             + " distinct   t.PROC_INST_ID_,\n"
                             + "    t.ID_ \n"
                             + "FROM\n"
-                            + "    activiti.act_ru_task t\n"
+                            + "    activiti.ACT_RU_TASK t\n"
                             + "        INNER JOIN\n"
-                            + "    activiti.act_ru_variable v ON t.PROC_INST_ID_ = v.PROC_INST_ID_\n"
+                            + "    activiti.ACT_RU_VARIABLE v ON t.PROC_INST_ID_ = v.PROC_INST_ID_\n"
                             + "        INNER JOIN\n"
                             + "    activiti.ACT_RU_IDENTITYLINK k ON t.ID_ = k.TASK_ID_\n"
                             + "WHERE\n"
                             + "    upper(v.TEXT_) LIKE '%" + variableValue.toUpperCase() + "%'\n"
-                            + "        AND k.group_id_ in(" + gro + ") ")
+                            + "        AND k.GROUP_ID_ in(" + gro + ") ")
                     .list()
                     .stream()
                     .map(t -> t.getProcessInstanceId())
@@ -520,14 +520,14 @@ public class RuntimeActivitiService {
                             + "    distinct t.PROC_INST_ID_,\n"
                             + "    t.ID_ \n"
                             + "FROM\n"
-                            + "    activiti.act_ru_task t\n"
+                            + "    activiti.ACT_RU_TASK t\n"
                             + "        INNER JOIN\n"
-                            + "    activiti.act_ru_variable v ON t.PROC_INST_ID_ = v.PROC_INST_ID_\n"
+                            + "    activiti.ACT_RU_VARIABLE v ON t.PROC_INST_ID_ = v.PROC_INST_ID_\n"
                             + "        INNER JOIN\n"
                             + "    activiti.ACT_RU_IDENTITYLINK k ON t.PROC_INST_ID_ = k.PROC_INST_ID_\n"
                             + "WHERE\n"
                             + "    upper(v.TEXT_) LIKE '%" + variableValue.toUpperCase() + "%'\n"
-                            + "        AND k.user_id_ = '" + user + "'; ").list()
+                            + "        AND k.USER_ID_ = '" + user + "'; ").list()
                     .stream()
                     .map(t -> t.getProcessInstanceId())
                     .distinct()

@@ -84,6 +84,10 @@ public class ActivitiCoreConfiguration implements EnvironmentAware {
         //properties.put("hibernate.hbm2ddl.auto", "update");
         properties.put("hibernate.dialect", "org.hibernate.dialect.MySQL5InnoDBDialect");
         // properties.put("hibernate.tool.hbm2ddl.SchemaUpdate", "true");
+        if(activeProfile.equals("test")){
+            properties.put("hibernate.physical_naming_strategy","com.core.matrix.utils.PhysicalNamingStrategyImpl");
+        }
+        
         em.setJpaPropertyMap(properties);
 
         return em;

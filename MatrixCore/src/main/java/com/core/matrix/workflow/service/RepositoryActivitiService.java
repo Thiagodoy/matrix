@@ -9,7 +9,6 @@ import com.core.matrix.response.ProcessDefinitionResponse;
 import com.core.matrix.workflow.model.UserActiviti;
 import java.io.IOException;
 import java.io.InputStream;
-import java.text.MessageFormat;
 import java.util.List;
 import java.util.stream.Collectors;
 import org.activiti.bpmn.model.BpmnModel;
@@ -106,9 +105,9 @@ public class RepositoryActivitiService {
         return this.repositoryService.createNativeProcessDefinitionQuery().sql("SELECT \n"
                 + "    b.*\n"
                 + "FROM\n"
-                + "    activiti.act_ru_identitylink a\n"
+                + "    activiti.ACT_RU_IDENTITYLINK a\n"
                 + "        INNER JOIN\n"
-                + "    activiti.act_re_procdef b ON a.PROC_DEF_ID_ = b.ID_\n"
+                + "    activiti.ACT_RE_PROCDEF b ON a.PROC_DEF_ID_ = b.ID_\n"
                 + "    where a.GROUP_ID_ in (" + groups + ") and b.ID_ in(" + ids + ")")
                 .list()
                 .parallelStream()
