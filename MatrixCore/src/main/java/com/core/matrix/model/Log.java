@@ -9,6 +9,8 @@ import com.fasterxml.jackson.annotation.JsonFormat;
 import java.time.LocalDateTime;
 import javax.persistence.Column;
 import javax.persistence.Entity;
+import javax.persistence.EnumType;
+import javax.persistence.Enumerated;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
@@ -29,8 +31,7 @@ public class Log implements Model<Log>{
     public enum LogType{
         LAYOUT_INVALID,
         DATA_INVALID,
-        DATA_NOT_PERSISTED
-        
+        DATA_NOT_PERSISTED        
     }
     
     
@@ -46,10 +47,10 @@ public class Log implements Model<Log>{
     protected Long fileId;
 
     @Column(name = "nome_processo")
-    protected String nameProcesso;
+    protected String processName;
 
     @Column(name = "act_id_processo")
-    protected String actIdProcesso;
+    protected String processInstanceId;
 
     @Column(name = "mensagem")
     protected String message;
@@ -63,6 +64,10 @@ public class Log implements Model<Log>{
     @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss", shape = JsonFormat.Shape.STRING)
     @Column(name = "data_criacao")
     protected LocalDateTime createAt;
+    
+    @Column(name = "tipo")
+    @Enumerated(EnumType.STRING)
+    protected LogType type;
 
     @PrePersist
     public void generateDate() {

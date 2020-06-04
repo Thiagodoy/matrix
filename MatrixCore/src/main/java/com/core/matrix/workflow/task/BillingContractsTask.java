@@ -187,7 +187,7 @@ public class BillingContractsTask implements JavaDelegate {
                                 String message = MessageFormat.format("Não foi possivel criar processo de medição para o contrato abaixo:\n{0}", contract.toString());
                                 Log log = new Log();
                                 log.setMessage(message);
-                                log.setNameProcesso(execution.getProcessDefinitionId());
+                                log.setProcessName(execution.getProcessDefinitionId());
                                 logs.add(log);
                             }
 
@@ -195,7 +195,7 @@ public class BillingContractsTask implements JavaDelegate {
                             Logger.getLogger(BillingContractsTask.class.getName()).log(Level.SEVERE, "[execute]", e);
                             Log log = new Log();
                             log.setMessage(e.getMessage());
-                            log.setNameProcesso(execution.getProcessDefinitionId());
+                            log.setProcessName(execution.getProcessDefinitionId());
                             logs.add(log);
                         }
 
@@ -225,14 +225,14 @@ public class BillingContractsTask implements JavaDelegate {
                                     String message = MessageFormat.format("Não foi possivel criar processo de medição para o contrato [rateio] abaixo:\n{0}", cc.toString());
                                     Log log = new Log();
                                     log.setMessage(message);
-                                    log.setNameProcesso(execution.getProcessDefinitionId());
+                                    log.setProcessName(execution.getProcessDefinitionId());
                                     logs.add(log);
                                 }
                             } catch (Exception e) {
                                 Logger.getLogger(BillingContractsTask.class.getName()).log(Level.SEVERE, "[execute]", e);
                                 Log log = new Log();
                                 log.setMessage(e.getMessage());
-                                log.setNameProcesso(execution.getProcessDefinitionId());
+                                log.setProcessName(execution.getProcessDefinitionId());
                                 logs.add(log);
 
                             }
@@ -279,7 +279,7 @@ public class BillingContractsTask implements JavaDelegate {
             Logger.getLogger(BillingContractsTask.class.getName()).log(Level.SEVERE, "[ execute ]", e);
             Log log = new Log();
             log.setMessage(e.getMessage());
-            log.setNameProcesso(execution.getProcessDefinitionId());
+            log.setProcessName(execution.getProcessDefinitionId());
             this.logService.save(log);
         }
     }

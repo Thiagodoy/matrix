@@ -30,6 +30,7 @@ import org.springframework.context.ApplicationContext;
 import com.core.matrix.model.Log;
 import com.core.matrix.service.ContractCompInformationService;
 import java.text.MessageFormat;
+import java.util.Collections;
 import org.activiti.engine.task.Attachment;
 
 /**
@@ -72,9 +73,10 @@ public class DataValidationTask implements Task {
         final String responseResult = MessageFormat.format("{0}:{1}", RESPONSE_RESULT, de.getProcessInstanceId());
         this.results = new ArrayList<>();
 
+        //REMOVE FILES THAT CONTRACT IS CONSUMER UNIT
         List<MeansurementFile> files = this.fileService
                 .findByProcessInstanceId(delegateExecution.getProcessInstanceId())
-                .stream() //Remove files that is a consumer unit
+                .stream()
                 .filter(f -> !this.contractInformationService.isConsumerUnit(f.getWbcContract()))
                 .collect(Collectors.toList());
 
@@ -96,8 +98,8 @@ public class DataValidationTask implements Task {
 
                 Log log = new Log();
                 log.setMessage(e.getMessage());
-                log.setActIdProcesso(de.getProcessInstanceId());
-                log.setNameProcesso(de.getProcessBusinessKey());
+                log.setProcessInstanceId(de.getProcessInstanceId());
+                log.setProcessName(de.getProcessBusinessKey());
                 log.setActivitiName(de.getCurrentActivityName());
                 this.logService.save(log);
 
@@ -113,9 +115,10 @@ public class DataValidationTask implements Task {
 
         if (hasInvalidaData) {
             de.setVariable(CONTROLE, RESPONSE_INVALID_DATA);
+            this.writeLogMetrics();
         } else if (hasDataForPersist) {
             de.setVariable(CONTROLE, RESPONSE_INCONSISTENT_DATA);
-
+            this.writeLogMetrics();
             if (de.hasVariable(responseResult)) {
                 de.removeVariable(responseResult);
                 Logger.getLogger(DataValidationTask.class.getName()).log(Level.INFO, "[Removeu a variavel responseResult]");
@@ -128,8 +131,15 @@ public class DataValidationTask implements Task {
 
     }
 
+    private void writeLogMetrics() {
+        Log log = new Log();
+        log.setType(Log.LogType.DATA_INVALID);
+        log.setProcessInstanceId(delegateExecution.getProcessInstanceId());
+        this.logService.save(log);
+    }
+
     private void checkCalendar(MeansurementFile file) throws Exception {
-        
+
         Logger.getLogger(BeanIoReader.class.getName()).log(Level.INFO, "[checkCalendar] File id -> " + file.getId());
 
         int daysOnMonth = YearMonth.of(file.getYear().intValue(), Month.of(file.getMonth().intValue())).lengthOfMonth();
@@ -174,7 +184,7 @@ public class DataValidationTask implements Task {
     private void checkHour(MeansurementFile file) throws Exception {
 
         Logger.getLogger(BeanIoReader.class.getName()).log(Level.INFO, "[checkHour] File id -> " + file.getId());
-        
+
         Map<String, List<MeansurementFileDetail>> lotes = this.getDetails(file, delegateExecution)
                 .stream()
                 .collect(Collectors.groupingBy(MeansurementFileDetail::getMeansurementPoint));
@@ -272,14 +282,14 @@ public class DataValidationTask implements Task {
     private void checkDays(MeansurementFile file) throws Exception {
 
         Logger.getLogger(BeanIoReader.class.getName()).log(Level.INFO, "[checkDays] File id -> " + file.getId());
-        
+
         int daysOnMonth = YearMonth.of(file.getYear().intValue(), Month.of(file.getMonth().intValue())).lengthOfMonth();
 
         Map<String, List<MeansurementFileDetail>> lotes = this.getDetails(file, delegateExecution)
                 .stream()
                 .collect(Collectors.groupingBy(MeansurementFileDetail::getMeansurementPoint));
 
-        List<MeansurementFileDetail> detailsOut = new ArrayList<>();
+        List<MeansurementFileDetail> detailsOut = Collections.synchronizedList(new ArrayList<>());
 
         lotes.values()
                 .parallelStream()
@@ -296,11 +306,14 @@ public class DataValidationTask implements Task {
 
                         for (int day = 1; day <= daysOnMonth; day++) {
 
-                            if (!days.containsKey(checkDay)) {
+                            if (!(days.containsKey(checkDay) && days.get(checkDay).compareTo(24L) == 0)) {
 
+                                final List<MeansurementFileDetail> hours = getHours(lote, checkDay);
                                 // Make hours of day
                                 for (int i = 1; i <= 24; i++) {
-                                    detailsOut.add(new MeansurementFileDetail(checkDay, (long) i, file.getId(), point));
+                                    if (!existsHours(hours, (long) i)) {
+                                        detailsOut.add(new MeansurementFileDetail(checkDay, (long) i, file.getId(), point));
+                                    }
                                 }
                             }
                             checkDay = checkDay.plusDays(1L);
@@ -364,6 +377,14 @@ public class DataValidationTask implements Task {
             throw new Exception(error);
         }
 
+    }
+
+    public synchronized List<MeansurementFileDetail> getHours(List<MeansurementFileDetail> lote, LocalDate checkDay) {
+        return lote.stream().filter(detail -> detail.getDate().isEqual(checkDay)).collect(Collectors.toList());
+    }
+
+    public synchronized boolean existsHours(List<MeansurementFileDetail> lote, Long hour) {
+        return lote.stream().anyMatch(d -> d.getHour().equals(hour));
     }
 
 }

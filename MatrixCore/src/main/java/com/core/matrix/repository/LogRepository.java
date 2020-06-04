@@ -25,11 +25,11 @@ public interface LogRepository extends JpaRepository<Log, Long>, JpaSpecificatio
     void deleteByFileId(Long id);
 
     @Modifying
-    @Query(value = "delete from Log l where l.actIdProcesso = :idPro")
+    @Query(value = "delete from Log l where l.processInstanceId = :idPro")
     void deleteBulk(@Param("idPro")String process);
     
-    long deleteByActIdProcesso(String id);
+    long deleteByprocessInstanceId(String id);
     
     
-    List<Log> findByActIdProcesso(String process);
+    List<Log> findByProcessInstanceId(String process);
 }

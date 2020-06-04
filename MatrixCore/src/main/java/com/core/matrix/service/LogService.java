@@ -28,7 +28,7 @@ public class LogService extends com.core.matrix.service.Service<Log, LogReposito
     
     @Transactional(readOnly = true)
     public List<Log>listByProcessInstance(String id){
-        return this.repository.findByActIdProcesso(id);
+        return this.repository.findByProcessInstanceId(id);
     }
    
     
@@ -39,7 +39,7 @@ public class LogService extends com.core.matrix.service.Service<Log, LogReposito
     
     @Transactional(transactionManager = "matrixTransactionManager")
     public void deleteLogsByProcessInstance(String id) {
-        this.repository.deleteByActIdProcesso(id);
+        this.repository.deleteByprocessInstanceId(id);
     }
 
 }

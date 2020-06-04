@@ -89,7 +89,7 @@ public class CalculateTask implements Task {
         } catch (Exception e) {
             Logger.getLogger(CalculateTask.class.getName()).log(Level.SEVERE, "[ execute ]", e);
             Log log = new Log();
-            log.setActIdProcesso(de.getProcessInstanceId());
+            log.setProcessInstanceId(de.getProcessInstanceId());
             log.setMessage("Erro ao selecionar processo de rateio ou sem rateio.");
             log.setMessageErrorApplication(e.getMessage());
             logService.save(log);
@@ -159,7 +159,7 @@ public class CalculateTask implements Task {
         } catch (Exception e) {
             Logger.getLogger(CalculateTask.class.getName()).log(Level.SEVERE, "[ calculateWithoutRateio ]", e);
             Log log = new Log();
-            log.setActIdProcesso(de.getProcessInstanceId());
+            log.setProcessInstanceId(de.getProcessInstanceId());
             log.setMessage(MessageFormat.format("Erro ao calcular a medição referente ao ponto : {0} - \n Contrato : {1}", file.getMeansurementPoint(), file.getWbcContract()));
             log.setMessageErrorApplication(e.getMessage());
             logService.save(log);
@@ -276,7 +276,7 @@ public class CalculateTask implements Task {
                 } catch (Exception e) {
                     Logger.getLogger(CalculateTask.class.getName()).log(Level.SEVERE, "[ calculateWithRateio ]", e);
                     Log log = new Log();
-                    log.setActIdProcesso(de.getProcessInstanceId());
+                    log.setProcessInstanceId(de.getProcessInstanceId());
                     log.setMessage(MessageFormat.format("Erro ao calcular a medição referente ao ponto : {0} - \n Contrato : {1}", file.getMeansurementPoint(), file.getWbcContract()));
                     log.setMessageErrorApplication(e.getMessage());
                     logService.save(log);
@@ -323,7 +323,7 @@ public class CalculateTask implements Task {
             Logger.getLogger(CalculateTask.class.getName()).log(Level.SEVERE, "[ calculateWithRateio ]", e);
 
             Log log = new Log();
-            log.setActIdProcesso(de.getProcessInstanceId());
+            log.setProcessInstanceId(de.getProcessInstanceId());
             log.setMessage(MessageFormat.format("Erro ao calcular a medição de contratos com rateio processo : {0}", de.getProcessInstanceId()));
             log.setMessageErrorApplication(e.getMessage());
 

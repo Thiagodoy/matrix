@@ -150,8 +150,15 @@ public class FileValidationTask implements JavaDelegate {
                             this.generateLog(de, null, message);
                         });
             }
-
+            
+            
             if (!this.logs.isEmpty()) {
+                
+                Log log = new Log();
+                log.setType(Log.LogType.LAYOUT_INVALID);
+                log.setProcessInstanceId(delegateExecution.getProcessInstanceId());             
+                logs.add(log);
+                
                 this.logService.save(logs);
                 delegateExecution.setVariable(CONTROLE, RESPONSE_LAYOUT_INVALID);
             } else {
@@ -284,8 +291,8 @@ public class FileValidationTask implements JavaDelegate {
         String messageError = Optional.ofNullable(e).isPresent() ? e.getMessage() : "";
 
         log.setMessageErrorApplication(messageError);
-        log.setActIdProcesso(de.getProcessInstanceId());
-        log.setNameProcesso(de.getProcessBusinessKey());
+        log.setProcessInstanceId(de.getProcessInstanceId());
+        log.setProcessName(de.getProcessBusinessKey());
         log.setActivitiName(de.getCurrentActivityName());
         this.logs.add(log);
     }
@@ -304,7 +311,7 @@ public class FileValidationTask implements JavaDelegate {
                 Log log = new Log();
                 log.setMessage(msg);
                 log.setActivitiName(de.getCurrentActivityName());
-                log.setActIdProcesso(de.getProcessInstanceId());
+                log.setProcessInstanceId(de.getProcessInstanceId());
                 logs.add(log);
             });
 
