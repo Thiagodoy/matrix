@@ -21,6 +21,8 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import java.util.stream.Collectors;
 import org.activiti.engine.RuntimeService;
 import org.activiti.engine.TaskService;
@@ -41,24 +43,26 @@ public class ContractService {
 
     @Autowired
     private ContractRepository repository;
-    
+
     @Autowired
     private LogService logService;
-    
+
     @Autowired
     private ContractCompInformationService compInformationService;
-    
+
     @Autowired
     private MeansurementFileService meansurementFileService;
-    
+
     @Autowired
     private MeansurementFileResultService fileResultService;
 
     @Autowired
     private TaskService taskService;
-    
+
     @Autowired
     private RuntimeService runtimeService;
+    
+    private String processInstanceId ;
 
     @Transactional(readOnly = true)
     public Page findShortInformation(Long contractId, PageRequest page) {
@@ -99,56 +103,57 @@ public class ContractService {
 
         return contracts;
     }
-    
-     public void reloadProcess(Long contractId) throws Exception {
-       List<ContractCompInformation> list = this.compInformationService.listByContract(contractId);
+
+    public void reloadProcess(Long contractId) throws Exception {
+        List<ContractCompInformation> list = this.compInformationService.listByContract(contractId);
 
         LocalDate now = LocalDate.now();
         Map<String, Object> variables = new HashMap<>();
 
-        for (ContractCompInformation m : list) {
-            Optional<MeansurementFile> opt = meansurementFileService
+        list.stream().forEach(contract -> {
+
+            meansurementFileService
                     .findByWbcContractAndMeansurementPointAndMonthAndYear(
-                            m.getWbcContract(),
-                            m.getMeansurementPoint(),
+                            contract.getWbcContract(),
+                            contract.getMeansurementPoint(),
                             Integer.valueOf(now.getMonthValue()).longValue() - 1,
                             Integer.valueOf(now.getYear()).longValue()
-                    );
-            
-            variables.put(PROCESS_CONTRACTS_RELOAD_BILLING, list);
+                    ).forEach(file -> {
 
-            if (opt.isPresent()) {
+                        if(!Optional.ofNullable(processInstanceId).isPresent()){
+                            processInstanceId = file.getProcessInstanceId();
+                        }
+                        
 
-                
-                final String processInstanceId = opt.get().getProcessInstanceId();
-                
-                List<Attachment> attachments = taskService.getProcessInstanceAttachments(opt.get().getProcessInstanceId());
-                List<Comment> comments = taskService.getProcessInstanceComments(opt.get().getProcessInstanceId());
+                        List<Attachment> attachments = taskService.getProcessInstanceAttachments(file.getProcessInstanceId());
+                        List<Comment> comments = taskService.getProcessInstanceComments(file.getProcessInstanceId());
 
-                attachments.forEach(att -> {
-                    taskService.deleteAttachment(att.getId());
-                });
+                        attachments.forEach(att -> {
+                            taskService.deleteAttachment(att.getId());
+                        });
 
-                comments.forEach(com -> {
-                    taskService.deleteComment(com.getId());
-                });
+                        comments.forEach(com -> {
+                            taskService.deleteComment(com.getId());
+                        });
 
-                this.meansurementFileService.findByProcessInstanceId(opt.get().getProcessInstanceId()).forEach(file -> {
-                    meansurementFileService.delete(file.getId());
+                        meansurementFileService.delete(file.getId());
 
-                });
+                        logService.deleteLogsByProcessInstance(file.getProcessInstanceId());
+                        fileResultService.deleteByProcess(file.getProcessInstanceId());
 
-                logService.deleteLogsByProcessInstance(opt.get().getProcessInstanceId());
-                fileResultService.deleteByProcess(opt.get().getProcessInstanceId());
-                runtimeService.deleteProcessInstance(processInstanceId, "Contract was updated!");
-                break;
-            }
+                    });
+
+        });
+
+        try {
+            runtimeService.deleteProcessInstance(processInstanceId, "Contract was updated!");
+        } catch (Exception e) {
+            Logger.getLogger(ContractService.class.getName()).log(Level.WARNING, "[reloadProcess] -> não encontrou o processo para deletar [" + processInstanceId + "]");
         }
-        
-        
+
+        variables.put(PROCESS_CONTRACTS_RELOAD_BILLING, list);
         runtimeService.startProcessInstanceByMessage(PROCESS_BILLING_CONTRACT_MESSAGE_EVENT, variables);
 
     }
-    
-    
+
 }

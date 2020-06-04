@@ -43,6 +43,7 @@ public class Template implements Model<Template>{
         FORGOT_PASSWORD,
         USER_TASK_PENDING,
         WELCOME_USER,
+        PROCESS_ERROR,
         GROUP_TASK_PENDING;
     }
     

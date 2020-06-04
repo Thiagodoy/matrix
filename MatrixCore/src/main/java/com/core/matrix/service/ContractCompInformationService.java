@@ -150,60 +150,47 @@ public class ContractCompInformationService {
     }
 
     public void reloadProcess(Long contractId) throws Exception {
+        
         List<ContractCompInformation> list = this.listByContract(contractId);
 
         LocalDate now = LocalDate.now();
+        Map<String, Object> variables = new HashMap<>();
 
-        for (ContractCompInformation m : list) {
-            Optional<MeansurementFile> opt = meansurementFileService
+        list.stream().forEach(contract -> {
+
+            meansurementFileService
                     .findByWbcContractAndMeansurementPointAndMonthAndYear(
-                            m.getWbcContract(),
-                            m.getMeansurementPoint(),
+                            contract.getWbcContract(),
+                            contract.getMeansurementPoint(),
                             Integer.valueOf(now.getMonthValue()).longValue() - 1,
                             Integer.valueOf(now.getYear()).longValue()
-                    );
+                    ).forEach(file -> {
 
-            if (opt.isPresent()) {
+                        final String processInstanceId = file.getProcessInstanceId();
 
-                
-                final String processInstanceId = opt.get().getProcessInstanceId();
-                
-                List<Attachment> attachments = taskService.getProcessInstanceAttachments(opt.get().getProcessInstanceId());
-                List<Comment> comments = taskService.getProcessInstanceComments(opt.get().getProcessInstanceId());
+                        List<Attachment> attachments = taskService.getProcessInstanceAttachments(file.getProcessInstanceId());
+                        List<Comment> comments = taskService.getProcessInstanceComments(file.getProcessInstanceId());
 
-                attachments.forEach(att -> {
-                    taskService.deleteAttachment(att.getId());
-                });
+                        attachments.forEach(att -> {
+                            taskService.deleteAttachment(att.getId());
+                        });
 
-                comments.forEach(com -> {
-                    taskService.deleteComment(com.getId());
-                });
+                        comments.forEach(com -> {
+                            taskService.deleteComment(com.getId());
+                        });
 
-                this.meansurementFileService.findByProcessInstanceId(opt.get().getProcessInstanceId()).forEach(file -> {
+                        meansurementFileService.delete(file.getId());
 
-                    if (!file.getDetails().isEmpty()) {
-                        this.fileDetailService.deleteAll(file.getDetails());
-                    }
+                        logService.deleteLogsByProcessInstance(file.getProcessInstanceId());
+                        fileResultService.deleteByProcess(file.getProcessInstanceId());
+                        runtimeService.deleteProcessInstance(processInstanceId, "Contract was updated!");
 
-                    meansurementFileService.delete(file.getId());
+                    });
 
-                });
+        });
 
-                logService.deleteLogsByProcessInstance(opt.get().getProcessInstanceId());
-                fileResultService.deleteByProcess(opt.get().getProcessInstanceId());
-
-                Map<String, Object> variables = new HashMap<>();
-
-                variables.put(PROCESS_CONTRACTS_RELOAD_BILLING, list);
-                
-                runtimeService.deleteProcessInstance(processInstanceId, "Contract was updated!");
-                
-                runtimeService.startProcessInstanceByMessage(PROCESS_BILLING_CONTRACT_MESSAGE_EVENT, variables);
-
-                break;
-            }
-
-        }
+        variables.put(PROCESS_CONTRACTS_RELOAD_BILLING, list);
+        runtimeService.startProcessInstanceByMessage(PROCESS_BILLING_CONTRACT_MESSAGE_EVENT, variables);
 
     }
     

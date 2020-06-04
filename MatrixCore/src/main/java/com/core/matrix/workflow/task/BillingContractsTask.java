@@ -6,12 +6,17 @@
 package com.core.matrix.workflow.task;
 
 import com.core.matrix.model.ContractCompInformation;
+import com.core.matrix.model.Email;
 import com.core.matrix.model.Log;
 import com.core.matrix.model.MeansurementFile;
+import com.core.matrix.model.Template;
 import com.core.matrix.service.ContractCompInformationService;
 import com.core.matrix.service.LogService;
 import com.core.matrix.service.MeansurementFileService;
+import com.core.matrix.service.TemplateService;
+import com.core.matrix.specifications.TemplateSpecification;
 import com.core.matrix.utils.Constants;
+import static com.core.matrix.utils.Constants.GROUP_SUPPORT_TI;
 import static com.core.matrix.utils.Constants.PROCESS_CONTRACTS_RELOAD_BILLING;
 import static com.core.matrix.utils.Constants.PROCESS_INFORMATION_CLIENT;
 import static com.core.matrix.utils.Constants.PROCESS_INFORMATION_MEANSUREMENT_POINT;
@@ -36,7 +41,11 @@ import org.activiti.engine.runtime.ProcessInstance;
 import org.joda.time.LocalDate;
 import org.springframework.context.ApplicationContext;
 import static com.core.matrix.utils.Constants.PROCESS_INFORMATION_NICKNAME;
+import com.core.matrix.utils.ThreadPoolEmail;
+import com.core.matrix.utils.Utils;
 import java.util.Objects;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.jpa.domain.Specification;
 
 /**
  *
@@ -48,6 +57,8 @@ public class BillingContractsTask implements JavaDelegate {
     private MeansurementFileService meansurementFileService;
     private ContractCompInformationService contractCompInformationService;
     private LogService logService;
+    private TemplateService templateService;
+    private ThreadPoolEmail threadPoolEmail;
 
     private static ApplicationContext context;
 
@@ -57,6 +68,8 @@ public class BillingContractsTask implements JavaDelegate {
             this.meansurementFileService = context.getBean(MeansurementFileService.class);
             this.contractCompInformationService = context.getBean(ContractCompInformationService.class);
             this.logService = context.getBean(LogService.class);
+            this.templateService = context.getBean(TemplateService.class);
+            this.threadPoolEmail = context.getBean(ThreadPoolEmail.class);
         }
     }
 
@@ -190,7 +203,7 @@ public class BillingContractsTask implements JavaDelegate {
 
                     });
 
-        } catch (Exception e) {
+        } catch (Throwable e) {
             Logger.getLogger(BillingContractsTask.class.getName()).log(Level.SEVERE, "[ execute ]", e);
             Log log = new Log();
             log.setMessage(e.getMessage());
@@ -237,14 +250,47 @@ public class BillingContractsTask implements JavaDelegate {
 
         ProcessInstance processInstance = execution.getEngineServices().getRuntimeService().startProcessInstanceByMessage(Constants.PROCESS_MEANSUREMENT_FILE_MESSAGE_EVENT, variables);
 
-        variables.put(PROCESS_INFORMATION_MEANSUREMENT_POINT, pointers);
-        variables.put(PROCESS_INFORMATION_NICKNAME, nickname);
-        variables.put(Constants.PROCESS_INFORMATION_CNPJ, cnpjsString);
-        variables.put(PROCESS_INFORMATION_PROCESSO_ID, processInstance.getProcessInstanceId());
-
-        execution.getEngineServices().getRuntimeService().setVariables(processInstance.getProcessInstanceId(), variables);
+        if (Optional.ofNullable(processInstance).isPresent()) {
+            variables.put(PROCESS_INFORMATION_MEANSUREMENT_POINT, pointers);
+            variables.put(PROCESS_INFORMATION_NICKNAME, nickname);
+            variables.put(Constants.PROCESS_INFORMATION_CNPJ, cnpjsString);
+            variables.put(PROCESS_INFORMATION_PROCESSO_ID, processInstance.getProcessInstanceId());
+            execution.getEngineServices().getRuntimeService().setVariables(processInstance.getProcessInstanceId(), variables);
+        } else {
+            this.sendEmailError(execution, contracts.stream().findFirst().get().getSNrContrato());
+            throw new NullPointerException();
+        }
 
         return processInstance;
+    }
+
+    private void sendEmailError(DelegateExecution execution, String contract) {
+        try {
+            Specification spc = TemplateSpecification.filter(null, null, null, Template.TemplateBusiness.PROCESS_ERROR);
+            Template template = (Template) templateService.find(spc, Pageable.unpaged()).getContent().get(0);
+
+            Map<String, String> data = new HashMap<String, String>();
+
+            String emails = execution
+                    .getEngineServices()
+                    .getIdentityService()
+                    .createUserQuery()
+                    .memberOfGroup(GROUP_SUPPORT_TI)
+                    .list()
+                    .stream()
+                    .map(u -> u.getEmail())
+                    .collect(Collectors.joining(";"));
+
+            data.put(Constants.TEMPLATE_PARAM_USER_EMAIL, emails);
+            data.put(Constants.TEMPLATE_PARAM_CONTRACT, contract);
+            String emailData = Utils.mapToString(data);
+            Email email = new Email();
+            email.setTemplate(template);
+            email.setData(emailData);
+            threadPoolEmail.submit(email);
+        } catch (Exception e) {
+            Logger.getLogger(BillingContractsTask.class.getName()).log(Level.SEVERE, "[sendEmailError]", e);
+        }
     }
 
     private void createMeansurementFile(String processInstanceId, ContractDTO contract) {

@@ -64,7 +64,7 @@ public class MeansurementFileService {
     
     
     @Transactional(readOnly = true)
-    public Optional<MeansurementFile> findByWbcContractAndMeansurementPointAndMonthAndYear(Long contract, String point, Long month, Long year) {
+    public List<MeansurementFile> findByWbcContractAndMeansurementPointAndMonthAndYear(Long contract, String point, Long month, Long year) {
         return this.repository.findByWbcContractAndMeansurementPointAndMonthAndYear(contract, point, month, year);
     }
     

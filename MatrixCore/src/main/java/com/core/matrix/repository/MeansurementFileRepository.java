@@ -51,6 +51,6 @@ public interface MeansurementFileRepository extends JpaRepository<MeansurementFi
     Optional<MeansurementFile> exists(@Param("contract")Long contract, @Param("point")String meansurementPoint, @Param("month")Long month, @Param("year") Long year);
     
 
-    Optional<MeansurementFile> findByWbcContractAndMeansurementPointAndMonthAndYear(Long contract, String point, Long month, Long year);
+    List<MeansurementFile> findByWbcContractAndMeansurementPointAndMonthAndYear(Long contract, String point, Long month, Long year);
     
 }
