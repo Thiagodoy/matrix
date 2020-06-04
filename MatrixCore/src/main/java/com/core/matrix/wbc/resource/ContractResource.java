@@ -42,5 +42,28 @@ public class ContractResource {
             return ResponseEntity.status(HttpStatus.resolve(500)).body(e.getMessage());
         }
     }
+    
+    @RequestMapping(value = "/getBilling", method = RequestMethod.GET)
+    public ResponseEntity getBilling() {
+        try {
+            List<ContractDTO> contracts = service.listForBilling(null);
+            return ResponseEntity.ok(contracts);
+        } catch (Exception e) {
+            Logger.getLogger(ContractResource.class.getName()).log(Level.SEVERE, "[get]", e);
+            return ResponseEntity.status(HttpStatus.resolve(500)).body(e.getMessage());
+        }
+    }
+    
+    
+    @RequestMapping(value = "/reloadBilling", method = RequestMethod.POST)
+    public ResponseEntity reloadBilling(@RequestParam(name = "contractId")Long contractId) {
+        try {
+            service.reloadProcess(contractId);
+            return ResponseEntity.ok().build();
+        } catch (Exception e) {
+            Logger.getLogger(ContractResource.class.getName()).log(Level.SEVERE, "[get]", e);
+            return ResponseEntity.status(HttpStatus.resolve(500)).body(e.getMessage());
+        }
+    }
 
 }

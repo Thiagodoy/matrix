@@ -105,7 +105,7 @@ public class RuntimeListener implements ActivitiEventListener {
                                 .executionId(executionId)
                                 .singleResult();
 
-                        if (Optional.ofNullable(task1.getAssignee()).isPresent()) {
+                        if (Optional.ofNullable(task1).isPresent() && Optional.ofNullable(task1.getAssignee()).isPresent()) {
                             return;
                         }
 

@@ -14,6 +14,7 @@ import org.springframework.transaction.annotation.Transactional;
 import com.core.matrix.repository.ContractCompInformationRepository;
 import static com.core.matrix.utils.Constants.PROCESS_BILLING_CONTRACT_MESSAGE_EVENT;
 import static com.core.matrix.utils.Constants.PROCESS_CONTRACTS_RELOAD_BILLING;
+import com.core.matrix.wbc.dto.ContractDTO;
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -205,5 +206,8 @@ public class ContractCompInformationService {
         }
 
     }
+    
+    
+    
 
 }
