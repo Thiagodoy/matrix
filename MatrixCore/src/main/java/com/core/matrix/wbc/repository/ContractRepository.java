@@ -26,9 +26,9 @@ public interface ContractRepository extends JpaRepository<Contract, Long> {
 
     @Query(nativeQuery = true)
     Page<ContractDTO> shortInfomation(@Param("contractId") Long contractId, Pageable page);
-    
+
     @Query(nativeQuery = true)
-     List<ContractDTO> fullInformation(@Param("numeroDoContrato") Long contractId);
+    List<ContractDTO> fullInformation(@Param("numeroDoContrato") Long contractId);
 
     @Query(nativeQuery = true, value = "SELECT COUNT(1) \n"
             + "  FROM [CE_CONTRATO] CT\n"
@@ -39,10 +39,10 @@ public interface ContractRepository extends JpaRepository<Contract, Long> {
             + "  WHERE CC.sCdClassificador = CL.sCdClassificador\n"
             + "    AND CL.[sNmClassificador] = 'PORTAL')")
     Long countContract();
-    
+
     @Query(nativeQuery = true)
-    Optional<ContractWbcInformationDTO> getInformation(@Param("year")Long year, @Param("month")Long month, @Param("contractId")Long contractId);
-    
+    Optional<ContractWbcInformationDTO> getInformation(@Param("year") Long year, @Param("month") Long month, @Param("contractId") Long contractId);
+
     @Query(nativeQuery = true)
-    List<ContractDTO>listForBilling();
+    List<ContractDTO> listForBilling();
 }

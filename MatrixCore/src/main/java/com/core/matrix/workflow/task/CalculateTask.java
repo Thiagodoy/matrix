@@ -36,6 +36,8 @@ import java.util.logging.Logger;
 import java.util.stream.Collectors;
 import org.activiti.engine.delegate.DelegateExecution;
 import org.springframework.context.ApplicationContext;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 
 /**
  *
@@ -126,14 +128,8 @@ public class CalculateTask implements Task {
 
             String point = file.getMeansurementPoint().replaceAll("\\((L|B)\\)", "").trim();
 
-            
-            String nickname = de.hasVariable(PROCESS_INFORMATION_NICKNAME) ? de.getVariable(PROCESS_INFORMATION_NICKNAME, String.class): "";
-            String name =  de.hasVariable(PROCESS_INFORMATION_CLIENT) ? de.getVariable(PROCESS_INFORMATION_CLIENT, String.class) : ""; 
-            
-//            
-//            Optional<CompanyDTO> optEmp = this.empresaService.listByPoint(point);
-//            String nickname = optEmp.isPresent() ? optEmp.get().getSNmApelido() : "";
-//            String name = optEmp.isPresent() ? optEmp.get().getSNmEmpresa() : "";
+            String nickname = de.hasVariable(PROCESS_INFORMATION_NICKNAME) ? de.getVariable(PROCESS_INFORMATION_NICKNAME, String.class) : null;
+            String name = de.hasVariable(PROCESS_INFORMATION_CLIENT) ? de.getVariable(PROCESS_INFORMATION_CLIENT, String.class) : null;
 
             MeansurementFileResult fileResult = new MeansurementFileResult(contractWbcInformationDTO, de.getProcessInstanceId());
             fileResult.setAmountScde(this.roundValue((sum / 1000), 6));
@@ -151,8 +147,6 @@ public class CalculateTask implements Task {
             fileResult.setFactorAtt(factorAtt);
             fileResult.setWbcSubmercado(compInformation.getWbcSubmercado());
             fileResult.setWbcPerfilCCEE(consultaPerfilCCEE(contracts, Long.valueOf(contractWbcInformationDTO.getNrContract())));
-            
-            
 
             resultService.save(fileResult);
 
@@ -247,9 +241,14 @@ public class CalculateTask implements Task {
 
                     double consumptionTotal = ((sum / 1000) + ((sum / 1000) * percentLoss) - proinfa) * factorAtt;
 
-                    Optional<CompanyDTO> optEmp = this.empresaService.listByPoint(point);
-                    String nickname = optEmp.isPresent() ? optEmp.get().getSNmApelido() : "";
-                    String name = optEmp.isPresent() ? optEmp.get().getSNmEmpresa() : "";
+                    Optional<ContractDTO> contractDTO = this.contractWbcService
+                            .findAll(file.getWbcContract(), null)
+                            .stream()
+                            .filter(c-> c.getSNrContrato().equals(file.getWbcContract().toString()))
+                            .findFirst();
+                    
+                    String nickname = contractDTO.isPresent() ? contractDTO.get().getSNmApelido() : null;
+                    String name = contractDTO.isPresent() ? contractDTO.get().getSNmContrato() : null;
 
                     MeansurementFileResult fileResult = new MeansurementFileResult(contractWbcInformation, de.getProcessInstanceId());
 
