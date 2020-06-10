@@ -95,7 +95,19 @@ public class RuntimeResource {
         }
     }
 
-    
+    @RequestMapping(value = "/findTask", method = RequestMethod.GET)
+    public ResponseEntity findTask(@RequestParam(value = "searchValue", required = true) String searchValue,
+            @RequestParam(name = "page", required = true, defaultValue = "0") int page,
+            @RequestParam(name = "size", required = true, defaultValue = "10") int size) {
+        try {
+            PageResponse<TaskResponse> response = this.service.findTask(searchValue, page, size);
+            return ResponseEntity.ok(response);
+        } catch (Exception e) {
+            Logger.getLogger(RuntimeResource.class.getName()).log(Level.SEVERE, "[findTask]", e);
+            return ResponseEntity.status(HttpStatus.resolve(500)).body(e.getMessage());
+        }
+    }
+
     @RequestMapping(value = "/completeTask", method = RequestMethod.POST)
     public ResponseEntity completeTask(@RequestBody CompleteTaskRequest request, Principal principal) {
         try {
@@ -119,7 +131,8 @@ public class RuntimeResource {
             @RequestParam(name = "valueVariable", required = false) String valueVariable,
             @RequestParam(name = "processInstanceId", required = false) String processInstanceId,
             @RequestParam(name = "page", required = true, defaultValue = "0") int page,
-            @RequestParam(name = "size", required = true, defaultValue = "10") int size, UsernamePasswordAuthenticationToken principal) {
+            @RequestParam(name = "size", required = true, defaultValue = "10") int size, 
+            UsernamePasswordAuthenticationToken principal) {
         try {
 
             PageResponse<TaskResponse> response = this.service.getCandidateTasks((UserActiviti) principal.getPrincipal(), valueVariable, processInstanceId, page, size);
@@ -304,9 +317,9 @@ public class RuntimeResource {
             return ResponseEntity.status(HttpStatus.resolve(500)).body(e.getMessage());
         }
     }
-    
+
     @RequestMapping(value = "/taskHistory", method = RequestMethod.GET)
-    public ResponseEntity taskHistory(@RequestParam(name = "processInstanceId")String id) {
+    public ResponseEntity taskHistory(@RequestParam(name = "processInstanceId") String id) {
         try {
             List response = service.getTaskHistoryByProcess(id);
             return ResponseEntity.ok(response);
@@ -315,8 +328,7 @@ public class RuntimeResource {
             return ResponseEntity.status(HttpStatus.resolve(500)).body(e.getMessage());
         }
     }
-    
-    
+
     @RequestMapping(value = "/task/draft", method = RequestMethod.POST)
     public ResponseEntity writeDraftOnTask(@RequestBody TaskDraftRequest request) {
         try {
@@ -327,6 +339,5 @@ public class RuntimeResource {
             return ResponseEntity.status(HttpStatus.resolve(500)).body(e.getMessage());
         }
     }
-    
 
 }

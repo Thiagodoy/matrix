@@ -17,6 +17,7 @@ import javax.persistence.Id;
 import javax.persistence.PrePersist;
 import javax.persistence.Table;
 import lombok.Data;
+import lombok.EqualsAndHashCode;
 
 /**
  *
@@ -25,6 +26,7 @@ import lombok.Data;
 @Entity
 @Table(name = "mtx_log")
 @Data
+@EqualsAndHashCode
 public class Log implements Model<Log>{
 
     

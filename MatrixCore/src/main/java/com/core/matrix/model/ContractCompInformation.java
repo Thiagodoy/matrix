@@ -124,8 +124,7 @@ public class ContractCompInformation  implements Serializable,Model<ContractComp
     public void generateLastUpdate() {
         this.lastUpdate = LocalDateTime.now();
     }
-
-    @Override
+    
     public Long getId() {
         return this.wbcContract;
     }

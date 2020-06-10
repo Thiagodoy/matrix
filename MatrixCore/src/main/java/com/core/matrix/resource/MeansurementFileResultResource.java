@@ -73,8 +73,7 @@ public class MeansurementFileResultResource {
     
     @RequestMapping(value = "/export")
     public ResponseEntity export(){
-        try {
-            
+        try {            
             
             return ResponseEntity.ok().build();
 

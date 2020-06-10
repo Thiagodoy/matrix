@@ -33,48 +33,49 @@ public interface Model<T extends Model> {
             try {
 
                 boolean isCollection = Collection.class.isAssignableFrom(f.getType());
-                
+
                 if (isCollection) {
-                    
-                    Collection<Model> collection = (Collection<Model>)f.get(this);
-                    Collection<Model> collectionEntity = (Collection<Model>)f.get(entity);
-                    
-                    
-                    if(!Optional.ofNullable(collectionEntity).isPresent() || collectionEntity.isEmpty() ){
-                        if(!collection.isEmpty()){
+
+                    Collection<Model> collection = (Collection<Model>) f.get(this);
+                    Collection<Model> collectionEntity = (Collection<Model>) f.get(entity);
+
+                    if (!Optional.ofNullable(collectionEntity).isPresent() || collectionEntity.isEmpty()) {
+                        if (!collection.isEmpty()) {
                             collection.clear();
                         }
                         return;
                     }
-                    
-                    
-                    collectionEntity.forEach(m->{
-                        
-                        Optional<Model> optModel = collection.stream().filter(mm-> mm.getId().equals(m.getId())).findFirst();
-                        
-                        if(optModel.isPresent()){
+
+                    // update object if exits into collections
+                    collectionEntity.forEach(m -> {
+
+                        Optional<Model> optModel = collection
+                                .stream()
+                                .filter(mm -> Optional.ofNullable(m.getId()).isPresent() && mm.getId().equals(m.getId()))
+                                .findFirst();
+
+                        if (optModel.isPresent()) {
                             optModel.get().update(m);
-                        }else{
+                        } else {
                             collection.add(m);
                         }
                     });
-                    
-                    
-                    List<Model>removeEntitys = new ArrayList<>();
-                    
-                    collection.forEach(m->{                    
-                        Optional<Model> optModel = collectionEntity.stream().filter(mm-> mm.getId().equals(m.getId())).findFirst();                        
-                        if(!optModel.isPresent()){
+
+                    List<Model> removeEntitys = new ArrayList<>();
+
+                    collection.forEach(m -> {
+                        boolean has = collectionEntity
+                                .stream()
+                                .anyMatch(mm -> Optional.ofNullable(m.getId()).isPresent() && mm.getId().equals(m.getId()));
+                        if (!has) {
                             removeEntitys.add(m);
-                           //collection.remove(m);
                         }
                     });
-                    
-                    if(!removeEntitys.isEmpty()){                        
+
+                    if (!removeEntitys.isEmpty()) {
                         collection.removeAll(removeEntitys);
                     }
-                    
-                    
+
                 } else {
 
                     Object valueOfInstance = f.get(this);

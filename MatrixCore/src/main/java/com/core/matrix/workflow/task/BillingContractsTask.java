@@ -19,6 +19,7 @@ import com.core.matrix.utils.Constants;
 import static com.core.matrix.utils.Constants.GROUP_SUPPORT_TI;
 import static com.core.matrix.utils.Constants.PROCESS_CONTRACTS_RELOAD_BILLING;
 import static com.core.matrix.utils.Constants.PROCESS_INFORMATION_CLIENT;
+import static com.core.matrix.utils.Constants.PROCESS_INFORMATION_CONTRACT_NUMBERS;
 import static com.core.matrix.utils.Constants.PROCESS_INFORMATION_MEANSUREMENT_POINT;
 import static com.core.matrix.utils.Constants.PROCESS_INFORMATION_MONITOR_CLIENT;
 import static com.core.matrix.utils.Constants.PROCESS_INFORMATION_PROCESSO_ID;
@@ -41,6 +42,7 @@ import org.activiti.engine.runtime.ProcessInstance;
 import org.joda.time.LocalDate;
 import org.springframework.context.ApplicationContext;
 import static com.core.matrix.utils.Constants.PROCESS_INFORMATION_NICKNAME;
+import static com.core.matrix.utils.Constants.PROCESS_NEW_INSTANCE_ID;
 import com.core.matrix.utils.ThreadPoolEmail;
 import com.core.matrix.utils.Utils;
 import java.util.Objects;
@@ -106,7 +108,7 @@ public class BillingContractsTask implements JavaDelegate {
                                 ContractCompInformation compInformation = opt.get();
                                 contract.setMeansurementPoint(compInformation.getMeansurementPoint());
 
-                                if (!this.hasMeansurementFile(compInformation)) {
+                                if (execution.hasVariable(PROCESS_CONTRACTS_RELOAD_BILLING) || !this.hasMeansurementFile(compInformation)) {
                                     String processInstanceId = this.createAProcessForBilling(execution, contract).getProcessInstanceId();
                                     this.createMeansurementFile(processInstanceId, contract);
                                 }
@@ -187,7 +189,7 @@ public class BillingContractsTask implements JavaDelegate {
                             try {
                                 Optional<ContractCompInformation> ccc = this.contractCompInformationService.listByContract(Long.parseLong(c.getSNrContrato())).stream().findFirst();
 
-                                if (!this.hasMeansurementFile(ccc.get())) {
+                                if (execution.hasVariable(PROCESS_CONTRACTS_RELOAD_BILLING) || !this.hasMeansurementFile(ccc.get())) {
                                     String processInstanceId = this.createAProcessForBilling(execution, sons, variables).getProcessInstanceId();
                                     this.createMeansurementFile(processInstanceId, sons);
                                 }
@@ -248,14 +250,27 @@ public class BillingContractsTask implements JavaDelegate {
                 .filter(p -> Objects.nonNull(p))
                 .collect(Collectors.joining(","));
 
+        String contractsNumber = contracts.stream().map(c -> c.getSNrContrato()).collect(Collectors.joining(";"));
+
         ProcessInstance processInstance = execution.getEngineServices().getRuntimeService().startProcessInstanceByMessage(Constants.PROCESS_MEANSUREMENT_FILE_MESSAGE_EVENT, variables);
 
         if (Optional.ofNullable(processInstance).isPresent()) {
             variables.put(PROCESS_INFORMATION_MEANSUREMENT_POINT, pointers);
             variables.put(PROCESS_INFORMATION_NICKNAME, nickname);
             variables.put(Constants.PROCESS_INFORMATION_CNPJ, cnpjsString);
+            variables.put(PROCESS_INFORMATION_CONTRACT_NUMBERS, contractsNumber);
             variables.put(PROCESS_INFORMATION_PROCESSO_ID, processInstance.getProcessInstanceId());
-            execution.getEngineServices().getRuntimeService().setVariables(processInstance.getProcessInstanceId(), variables);
+            
+            if (execution.hasVariable(PROCESS_CONTRACTS_RELOAD_BILLING)) {                
+                execution.setVariable(PROCESS_NEW_INSTANCE_ID, processInstance.getProcessInstanceId());
+            }
+            
+            execution.getEngineServices()
+                    .getRuntimeService()
+                    .setVariables(processInstance.getProcessInstanceId(), variables);
+
+            
+
         } else {
             this.sendEmailError(execution, contracts.stream().findFirst().get().getSNrContrato());
             throw new NullPointerException();

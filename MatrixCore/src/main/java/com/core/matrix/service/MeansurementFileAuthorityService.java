@@ -10,11 +10,9 @@ import com.core.matrix.repository.MeansurementFileAuthorityRepository;
 import com.core.matrix.specifications.MeansurementFileAuthoritySpecification;
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -24,28 +22,11 @@ import org.springframework.transaction.annotation.Transactional;
  * @author thiag
  */
 @Service
-public class MeansurementFileAuthorityService {
+public class MeansurementFileAuthorityService extends com.core.matrix.service.Service<MeansurementFileAuthority, MeansurementFileAuthorityRepository>{    
 
-    @Autowired
-    private MeansurementFileAuthorityRepository repository;
-
-    @Transactional
-    public void save(MeansurementFileAuthority request) {
-        this.repository.save(request);
-    }
-
-    @Transactional
-    public void update(MeansurementFileAuthority request) throws Exception {
-
-        MeansurementFileAuthority entiAuthority = this.repository
-                .findById(request.getId())
-                .orElseThrow(() -> new Exception("Nenhum aprovação foi encontrada!"));
-
-        entiAuthority.update(request);
-        this.repository.save(entiAuthority);
-
-    }
-
+    public MeansurementFileAuthorityService(MeansurementFileAuthorityRepository repositoy) {
+        super(repositoy);
+    }    
     
     @Transactional(readOnly = true)
     public List<MeansurementFileAuthority> findByProcess(String processInstanceId){
@@ -87,11 +68,6 @@ public class MeansurementFileAuthorityService {
 
         return this.repository.findAll(spc);
 
-    }
-
-    @Transactional
-    public void delete(Long id) {
-        this.repository.deleteById(id);
-    }
+    }  
 
 }

@@ -23,57 +23,18 @@ import org.springframework.transaction.annotation.Transactional;
  * @author thiag
  */
 @Service
-public class ProductService {
+public class ProductService extends com.core.matrix.service.Service<Product, ProductRepository> {
 
-    @Autowired
-    private ProductRepository repository;
-
-    @Transactional
-    public void save(Product product) {
-        this.repository.save(product);
-    }
-
-    @Transactional
-    public void update(Product product) throws Exception {
-
-        Product entiProduct = this.repository
-                .findById(product.getId())
-                .orElseThrow(() -> new Exception("Nenhum produto foi encontrado!"));
-
-        entiProduct.update(product);
-        this.repository.save(entiProduct);
-
-    }
-
-    @Transactional
-    public void delete(Long id) {
-        this.repository.deleteById(id);
+    public ProductService(ProductRepository repositoy) {
+        super(repositoy);
     }
 
     @Transactional(readOnly = true)
-    public Page find(Long subMarket, Long wbcCodigoPerfilCCEE, String wbcPerfilCCEE, String subMarketDescription, Pageable page) {
+    public Page find(Long subMarket, Long wbcCodigoPerfilCCEE, String wbcPerfilCCEE, String subMarketDescription, Pageable page) throws Exception {
 
-        List<Specification> predicates = new ArrayList<>();
+        Specification<Product> spc = ProductSpecification.find(subMarket, wbcCodigoPerfilCCEE, wbcPerfilCCEE, subMarketDescription);
 
-        if (Optional.ofNullable(subMarket).isPresent()) {
-            predicates.add(ProductSpecification.subMarket(subMarket));
-        }
-
-        if (Optional.ofNullable(wbcPerfilCCEE).isPresent()) {
-            predicates.add(ProductSpecification.product(wbcPerfilCCEE));
-        }
-
-        if (Optional.ofNullable(wbcCodigoPerfilCCEE).isPresent()) {
-            predicates.add(ProductSpecification.codigoPerfilCCEE(wbcCodigoPerfilCCEE));
-        }
-        
-        if (Optional.ofNullable(subMarketDescription).isPresent()) {
-            predicates.add(ProductSpecification.subMarketDescription(subMarketDescription));
-        }
-                
-        Specification<Product> spc = predicates.stream().reduce((a, b) -> a.and(b)).orElse(null);
-
-        return this.repository.findAll(spc, page);
+        return this.find(spc, page);
 
     }
 

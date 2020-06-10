@@ -15,6 +15,7 @@ import com.core.matrix.workflow.task.CheckTake;
 import com.core.matrix.workflow.task.CleanFileResult;
 import com.core.matrix.workflow.task.CleanFiles;
 import com.core.matrix.workflow.task.DataValidationTask;
+import com.core.matrix.workflow.task.DeleteProcessInstanceTask;
 import com.core.matrix.workflow.task.FileValidationTask;
 import com.zaxxer.hikari.HikariConfig;
 import com.zaxxer.hikari.HikariDataSource;
@@ -212,6 +213,11 @@ public class ActivitiCoreConfiguration implements EnvironmentAware {
     @Bean
     public BillingContractsTask billingContractsTask(ApplicationContext context) {
         return new BillingContractsTask(context);
+    }
+    
+    @Bean
+    public DeleteProcessInstanceTask deleteProcessInstanceTask(ApplicationContext context){
+        return new DeleteProcessInstanceTask(context);
     }
 
     @Bean

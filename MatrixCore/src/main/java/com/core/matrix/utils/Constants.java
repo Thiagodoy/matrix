@@ -84,6 +84,10 @@ public class Constants {
     public static final String PROCESS_INFORMATION_NICKNAME = "#Apelido";
     public static final String PROCESS_INFORMATION_CNPJ = "#Cnpj";
     public static final String PROCESS_INFORMATION_PROCESSO_ID = "#Processo";
+    public static final String PROCESS_INFORMATION_CONTRACT_NUMBERS = "#Contracts";
+    
+    public static final String PROCESS_INSTANCE_ID = "process_instance_id";
+    public static final String PROCESS_NEW_INSTANCE_ID = "process_new_instance_id";
 
     public static final String RESPONSE_NIVEL = "AVANÇAR";
     public static final String RESPONSE_SEM_ALCADA = "SEM ALÇADA DE APROVAÇÃO";

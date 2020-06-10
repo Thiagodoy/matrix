@@ -11,7 +11,6 @@ import com.core.matrix.repository.MeansurementFileRepository;
 import com.core.matrix.utils.MeansurementFileStatus;
 import com.core.matrix.utils.MeansurementFileType;
 import java.util.List;
-import java.util.Optional;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -39,6 +38,11 @@ public class MeansurementFileService {
     @Transactional
     public void delete(Long id) {
         this.repository.deleteById(id);
+    }
+    
+    @Transactional(transactionManager = "matrixTransactionManager")
+    public void deleteByProcessInstance(String id){
+        this.repository.deleteByProcessInstanceId(id);
     }
 
     @Transactional(transactionManager = "matrixTransactionManager")

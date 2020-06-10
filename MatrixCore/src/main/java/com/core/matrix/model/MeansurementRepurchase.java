@@ -14,6 +14,7 @@ import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.Table;
 import lombok.Data;
+import lombok.EqualsAndHashCode;
 
 /**
  *
@@ -22,121 +23,59 @@ import lombok.Data;
 @Entity
 @Table(name = "mtx_aqruivo_de_medicao_recompra")
 @Data
-public class MeansurementRepurchase implements Serializable {
+@EqualsAndHashCode
+public class MeansurementRepurchase implements Serializable, Model<MeansurementRepurchase> {
 
-    private static final long serialVersionUID = -7514701442313318250L;
+    protected static final long serialVersionUID = -7514701442313318250L;
 
     @Id
     @Column(name = "id_aqruivo_de_medicao_recompra")
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long id;
+    protected Long id;
 
     @Column(name = "id_arquivo_de_medicao")
-    private Long meansurementFileId;
+    protected Long meansurementFileId;
 
     @Column(name = "id_produtos")
-    private Long productId;
+    protected Long productId;
 
     @Column(name = "preco_contrato")
-    private Double priceContract;
+    protected Double priceContract;
 
     @Column(name = "notional_contratado")
-    private Double notionalHired;
+    protected Double notionalHired;
 
     @Column(name = "take")
-    private Double take;
+    protected Double take;
 
     @Column(name = "volume_recompra")
-    private Double repurchaseVolume;
+    protected Double repurchaseVolume;
 
     @Column(name = "preco_recompra")
-    private Double repurchasePrice;
+    protected Double repurchasePrice;
 
     @Column(name = "notional_recompra")
-    private Double repurchaseNotional;
+    protected Double repurchaseNotional;
 
     @Column(name = "novo_faturamento")
-    private Double newBilling;
+    protected Double newBilling;
 
     @Column(name = "novo_preco")
-    private Double newPrice;
+    protected Double newPrice;
 
     @Column(name = "novo_notional")
-    private Double newNotional;
+    protected Double newNotional;
 
     @Column(name = "recompra")
-    private String repurchase;
+    protected String repurchase;
     
     @Column(name = "act_id_processo")
-    private String processInstanceId;
+    protected String processInstanceId;
 
     @Column(name = "pld")
-    private Double pld;
+    protected Double pld;
         
     @Column(name = "spread")
-    private Double spread;
-            
-    public void update(MeansurementRepurchase meansurementRepurchase) {
-
-        if (Optional.ofNullable(meansurementRepurchase.getMeansurementFileId()).isPresent() && !this.meansurementFileId.equals(meansurementRepurchase.getMeansurementFileId())) {
-            this.meansurementFileId = meansurementRepurchase.getMeansurementFileId();
-        }
-
-        if (Optional.ofNullable(meansurementRepurchase.getProductId()).isPresent() && !this.productId.equals(meansurementRepurchase.getProductId())) {
-            this.productId = meansurementRepurchase.getProductId();
-        }
-
-        if (Optional.ofNullable(meansurementRepurchase.getPriceContract()).isPresent() && !this.priceContract.equals(meansurementRepurchase.getPriceContract())) {
-            this.priceContract = meansurementRepurchase.getPriceContract();
-        }
-
-        if (Optional.ofNullable(meansurementRepurchase.getNotionalHired()).isPresent() && !this.notionalHired.equals(meansurementRepurchase.getNotionalHired())) {
-            this.notionalHired = meansurementRepurchase.getNotionalHired();
-        }
-
-        if (Optional.ofNullable(meansurementRepurchase.getTake()).isPresent() && !this.take.equals(meansurementRepurchase.getTake())) {
-            this.take = meansurementRepurchase.getTake();
-        }
-
-        if (Optional.ofNullable(meansurementRepurchase.getRepurchaseVolume()).isPresent() && !this.repurchaseVolume.equals(meansurementRepurchase.getRepurchaseVolume())) {
-            this.repurchaseVolume = meansurementRepurchase.getRepurchaseVolume();
-        }
-
-        if (Optional.ofNullable(meansurementRepurchase.getRepurchasePrice()).isPresent() && !this.repurchasePrice.equals(meansurementRepurchase.getRepurchasePrice())) {
-            this.repurchasePrice = meansurementRepurchase.getRepurchasePrice();
-        }
-
-        if (Optional.ofNullable(meansurementRepurchase.getRepurchaseNotional()).isPresent() && !this.repurchaseNotional.equals(meansurementRepurchase.getRepurchaseNotional())) {
-            this.repurchaseNotional = meansurementRepurchase.getRepurchaseNotional();
-        }
-
-        if (Optional.ofNullable(meansurementRepurchase.getNewBilling()).isPresent() && !this.newBilling.equals(meansurementRepurchase.getNewBilling())) {
-            this.newBilling = meansurementRepurchase.getNewBilling();
-        }
-
-        if (Optional.ofNullable(meansurementRepurchase.getNewPrice()).isPresent() && !this.newPrice.equals(meansurementRepurchase.getNewPrice())) {
-            this.newPrice = meansurementRepurchase.getNewPrice();
-        }
-
-        if (Optional.ofNullable(meansurementRepurchase.getNewNotional()).isPresent() && !this.newNotional.equals(meansurementRepurchase.getNewNotional())) {
-            this.newNotional = meansurementRepurchase.getNewNotional();
-        }
-
-        if (Optional.ofNullable(meansurementRepurchase.getRepurchase()).isPresent() && !this.repurchase.equals(meansurementRepurchase.getRepurchase())) {
-            this.repurchase = meansurementRepurchase.getRepurchase();
-        }
-        
-         if (Optional.ofNullable(meansurementRepurchase.getProcessInstanceId()).isPresent() && !this.processInstanceId.equals(meansurementRepurchase.getProcessInstanceId())) {
-            this.processInstanceId = meansurementRepurchase.getProcessInstanceId();
-        }
-         
-        if (Optional.ofNullable(meansurementRepurchase.getPld()).isPresent() && !this.pld.equals(meansurementRepurchase.getPld())) {
-            this.pld = meansurementRepurchase.getPld();
-        }
-                
-        if (Optional.ofNullable(meansurementRepurchase.getSpread()).isPresent() && !this.spread.equals(meansurementRepurchase.getSpread())) {
-            this.spread = meansurementRepurchase.getSpread();
-        }
-    }
-
+    protected Double spread;           
+    
 }

@@ -17,6 +17,7 @@ import com.core.matrix.response.ProcessDefinitionResponse;
 import com.core.matrix.response.ProcessDetailResponse;
 import com.core.matrix.response.TaskResponse;
 import com.core.matrix.utils.Constants;
+import static com.core.matrix.utils.Constants.PROCESS_INFORMATION_PROCESSO_ID;
 import static com.core.matrix.utils.Constants.TASK_DRAFT;
 import com.core.matrix.utils.Utils;
 import com.core.matrix.workflow.model.GroupMemberActiviti;
@@ -24,6 +25,9 @@ import com.core.matrix.workflow.model.UserActiviti;
 import java.io.IOException;
 import java.io.InputStream;
 import java.text.MessageFormat;
+import java.time.LocalDate;
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.HashMap;
@@ -113,6 +117,10 @@ public class RuntimeActivitiService {
         request.getVariables().put(Constants.CREATED_AT, Utils.dateTimeNowFormated());
         //request.getVariables().put("taskSe", taskService);
         ProcessInstance processInstance = this.runtimeService.startProcessInstanceByKey(request.getKey(), request.getVariables());
+        
+        request.getVariables().put(PROCESS_INFORMATION_PROCESSO_ID, processInstance.getProcessInstanceId());
+        
+        this.runtimeService.setVariables(processInstance.getProcessInstanceId(), request.getVariables());
 
         Task task = this.getNextUserTaskByProcessInstanceId(processInstance.getId(), userId, true);
 
@@ -273,6 +281,51 @@ public class RuntimeActivitiService {
 
     }
 
+    public PageResponse<TaskResponse> findTask(String searchValue, int page, int size) {
+
+        int min = page * size;
+
+        LocalDateTime now = LocalDateTime.now();        
+        int daysOfMonth = Utils.getDaysOfMonth(now.toLocalDate());
+        
+        String start = LocalDateTime.of(now.getYear(), now.getMonth(), 1, 0, 1).format(DateTimeFormatter.ISO_LOCAL_DATE_TIME).replace("T", " ");
+        String end = LocalDateTime.of(now.getYear(), now.getMonth(), daysOfMonth, 23, 59).format(DateTimeFormatter.ISO_LOCAL_DATE_TIME).replace("T", " ");
+
+        String query = "SELECT DISTINCT\n"
+                + "    t.*\n"
+                + "FROM\n"
+                + "    activiti.ACT_RU_TASK t\n"
+                + "        INNER JOIN\n"
+                + "    activiti.ACT_RU_VARIABLE v ON t.PROC_INST_ID_ = v.PROC_INST_ID_\n"
+                + "        INNER JOIN\n"
+                + "    activiti.ACT_RU_IDENTITYLINK k ON t.ID_ = k.TASK_ID_\n"
+                + "WHERE\n"
+                + " ((UPPER(v.TEXT_) LIKE '%" + searchValue.toUpperCase() + "%'\n" + "   AND SUBSTRING(v.NAME_, 1, 1) = '#') OR t.NAME_ like '%" + searchValue.toUpperCase() + "%')\n"
+                + "AND t.CREATE_TIME_ between '" + start + "' and '" + end + "'";
+
+        query += "  order by t.CREATE_TIME_ desc";
+
+        List<TaskResponse> responses = taskService
+                .createNativeTaskQuery()
+                .sql(query)
+                .listPage(min, size)
+                .stream()
+                .map(t -> {
+                    TaskResponse response = new TaskResponse(t);
+                    response.setProcessDefinitionName(this.getProcessDefinitionName(t.getProcessDefinitionId()));
+                    return response;
+                })
+                .distinct()
+                .collect(Collectors.toList());
+
+        long total = taskService
+                .createNativeTaskQuery()
+                .sql(query).list().size();
+
+        return new PageResponse<TaskResponse>(responses, (long) total, (long) size, (long) page);
+
+    }
+
     public PageResponse<TaskResponse> getAssigneAndCandidateTask(UserActiviti user, String searchValue, int page, int size) {
 
         String groupFilter = user.getGroups()
@@ -334,7 +387,7 @@ public class RuntimeActivitiService {
 
         List<String> processInstances = taskService
                 .createNativeTaskQuery()
-                .sql(query)                
+                .sql(query)
                 .listPage(min, size)
                 .stream()
                 .map(t -> t.getProcessInstanceId())

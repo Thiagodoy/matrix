@@ -11,7 +11,6 @@ import com.core.matrix.specifications.PriceSpecification;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.domain.Specification;
@@ -23,27 +22,13 @@ import org.springframework.transaction.annotation.Transactional;
  * @author thiag
  */
 @Service
-public class PriceService {
+public class PriceService extends com.core.matrix.service.Service<Price, PriceRepository>{
+    
 
-    @Autowired
-    private PriceRepository repository;
-
-    @Transactional(readOnly = true)
-    public void save(Price request) {
-        this.repository.save(request);
+    public PriceService(PriceRepository repositoy) {
+        super(repositoy);
     }
-
-    @Transactional(readOnly = true)
-    public void update(Price request) throws Exception {
-        Price price = this.repository
-                .findById(request.getId())
-                .orElseThrow(() -> new Exception("Não foi encontrado nehum preço!"));
-
-        price.update(request);
-
-        this.repository.save(price);
-    }
-
+    
     @Transactional
     public Page find(Long id, Long subMarket, String description, Pageable page) {
 
@@ -65,11 +50,6 @@ public class PriceService {
 
         return this.repository.findAll(spc, page);
 
-    }
-
-    @Transactional
-    public void delete(Long id) {
-        this.repository.deleteById(id);
-    }
+    }  
 
 }

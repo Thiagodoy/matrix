@@ -61,8 +61,8 @@ public class ContractService {
 
     @Autowired
     private RuntimeService runtimeService;
-    
-    private String processInstanceId ;
+
+    private String processInstanceId;
 
     @Transactional(readOnly = true)
     public Page findShortInformation(Long contractId, PageRequest page) {
@@ -93,10 +93,7 @@ public class ContractService {
 
             contracts = contracts.stream().filter(intern -> {
                 return filter.stream()
-                        .filter(xx -> xx.getWbcContract().equals(Long.parseLong(intern.getSNrContrato())))
-                        .findFirst()
-                        .isPresent();
-
+                        .anyMatch(xx -> xx.getWbcContract().equals(Long.parseLong(intern.getSNrContrato())));
             }).collect(Collectors.toList());
 
         }
@@ -120,10 +117,9 @@ public class ContractService {
                             Integer.valueOf(now.getYear()).longValue()
                     ).forEach(file -> {
 
-                        if(!Optional.ofNullable(processInstanceId).isPresent()){
+                        if (!Optional.ofNullable(processInstanceId).isPresent()) {
                             processInstanceId = file.getProcessInstanceId();
                         }
-                        
 
                         List<Attachment> attachments = taskService.getProcessInstanceAttachments(file.getProcessInstanceId());
                         List<Comment> comments = taskService.getProcessInstanceComments(file.getProcessInstanceId());

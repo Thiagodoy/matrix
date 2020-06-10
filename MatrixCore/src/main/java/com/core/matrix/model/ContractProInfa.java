@@ -13,6 +13,7 @@ import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.Table;
 import lombok.Data;
+import lombok.EqualsAndHashCode;
 
 /**
  *
@@ -21,6 +22,7 @@ import lombok.Data;
 @Entity
 @Table(name = "mtx_contrato_proinfa")
 @Data
+@EqualsAndHashCode
 public class ContractProInfa implements Serializable, Model<ContractProInfa>{
 
     protected static final long serialVersionUID = -4258355186535810797L;    

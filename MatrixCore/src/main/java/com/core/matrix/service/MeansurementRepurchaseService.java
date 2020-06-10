@@ -11,7 +11,6 @@ import com.core.matrix.specifications.MeansurementRepurchaseSpecification;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.domain.Specification;
@@ -23,27 +22,14 @@ import org.springframework.transaction.annotation.Transactional;
  * @author thiag
  */
 @Service
-public class MeansurementRepurchaseService {
+public class MeansurementRepurchaseService extends com.core.matrix.service.Service<MeansurementRepurchase, MeansurementRepurchaseRepository> {
+    
 
-    @Autowired
-    private MeansurementRepurchaseRepository repository;
+    public MeansurementRepurchaseService(MeansurementRepurchaseRepository repositoy) {
+        super(repositoy);
+    } 
 
-    @Transactional
-    public void save(MeansurementRepurchase repurchase) {
-        this.repository.save(repurchase);
-    }
-
-    @Transactional
-    public void update(MeansurementRepurchase request) throws Exception {
-
-        MeansurementRepurchase repurchase = this.repository
-                .findById(request.getId())
-                .orElseThrow(() -> new Exception("Nehuma recompra foi localizada!"));
-
-        repurchase.update(request);
-        this.repository.save(repurchase);
-
-    }
+    
 
     @Transactional
     public Page find(Long id, Long meansurementFileId, String processIntanceId, Pageable page) {
@@ -68,11 +54,6 @@ public class MeansurementRepurchaseService {
         return this.repository.findAll(spc, page);
         
         
-    }
-
-    @Transactional
-    public void delete(Long id) {
-        this.repository.deleteById(id);
-    }
+    }  
 
 }

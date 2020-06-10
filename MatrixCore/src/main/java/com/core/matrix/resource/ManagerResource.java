@@ -29,7 +29,7 @@ import org.springframework.web.bind.annotation.RestController;
  */
 @RestController
 @RequestMapping(value = "/api/manager")
-public class ManagerResource {
+public class ManagerResource  {
 
     @Autowired
     private ManagerService managerService;
