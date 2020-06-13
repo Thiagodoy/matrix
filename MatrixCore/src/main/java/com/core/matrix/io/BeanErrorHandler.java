@@ -56,7 +56,7 @@ public class BeanErrorHandler implements BeanReaderErrorHandler {
         }
 
         if (e.getRecordCount() == 0) {
-            Logger.getLogger(BeanIoReader.class.getName()).log(Level.SEVERE, e.getMessage());
+            Logger.getLogger(BeanIO.class.getName()).log(Level.SEVERE, e.getMessage());
         }
     }
 

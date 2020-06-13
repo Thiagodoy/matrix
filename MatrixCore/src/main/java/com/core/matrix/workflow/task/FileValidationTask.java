@@ -9,7 +9,7 @@ import static com.core.matrix.utils.Constants.*;
 
 import com.core.matrix.dto.FileDetailDTO;
 import com.core.matrix.dto.FileParsedDTO;
-import com.core.matrix.io.BeanIoReader;
+import com.core.matrix.io.BeanIO;
 import com.core.matrix.model.ContractCompInformation;
 import com.core.matrix.model.ContractProInfa;
 import com.core.matrix.model.Log;
@@ -111,7 +111,7 @@ public class FileValidationTask implements JavaDelegate {
                         fileName = taskService.getAttachment(attachmentId).getName();
                     }
 
-                    BeanIoReader reader = new BeanIoReader();
+                    BeanIO reader = new BeanIO();
                     Optional<FileParsedDTO> opt = reader.<FileParsedDTO>parse(stream);
 
                     if (opt.isPresent()) {

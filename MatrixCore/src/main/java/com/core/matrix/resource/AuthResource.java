@@ -5,6 +5,7 @@
  */
 package com.core.matrix.resource;
 
+import com.core.matrix.factory.EmailFactory;
 import com.core.matrix.model.Email;
 import com.core.matrix.model.Template;
 import com.core.matrix.request.AuthRequest;
@@ -12,13 +13,10 @@ import com.core.matrix.request.ChangePassword;
 import com.core.matrix.request.ForgotPasswordRequest;
 import com.core.matrix.response.AuthResponse;
 import com.core.matrix.service.AuthService;
-import com.core.matrix.service.TemplateService;
-import com.core.matrix.specifications.TemplateSpecification;
 import com.core.matrix.utils.Constants;
 import com.core.matrix.utils.JwtTokenUtil;
 import com.core.matrix.utils.ThreadPoolEmail;
 import static com.core.matrix.utils.Url.URL_API_AUTH;
-import com.core.matrix.utils.Utils;
 import com.core.matrix.workflow.model.AbilityActiviti;
 import com.core.matrix.workflow.model.UserActiviti;
 import com.core.matrix.workflow.model.UserInfoActiviti;
@@ -26,17 +24,13 @@ import com.core.matrix.workflow.repository.UserInfoRepository;
 import com.core.matrix.workflow.service.AbilityService;
 import com.core.matrix.workflow.service.UserActivitiService;
 import java.security.Principal;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 import java.util.Optional;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import java.util.stream.Collectors;
 import javax.servlet.http.HttpServletRequest;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.data.domain.Pageable;
-import org.springframework.data.jpa.domain.Specification;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.AuthenticationManager;
@@ -72,9 +66,7 @@ public class AuthResource {
 
     @Autowired
     private UserActivitiService userActivitiService;
-
-    @Autowired
-    private TemplateService templateService;
+   
 
     @Autowired
     private AbilityService abilityService;
@@ -84,6 +76,9 @@ public class AuthResource {
 
     @Autowired
     private ThreadPoolEmail threadPoolEmail;
+    
+    @Autowired
+    private EmailFactory emailFactory;
 
     @RequestMapping(method = RequestMethod.POST)
     public ResponseEntity auth(@RequestBody AuthRequest request) {
@@ -237,23 +232,11 @@ public class AuthResource {
             if (userDetails.isEnabled() || (!userDetails.isEnabled() && userDetails.isBlockedForAttemps())) {
 
                 final String token = jwtTokenUtil.generateToken(userDetails);
-                final String userName = userDetails.getFirstName();
-
-                Specification spc = TemplateSpecification.filter(null, null, null, Template.TemplateBusiness.FORGOT_PASSWORD);
-                Template template = (Template) templateService.find(spc, Pageable.unpaged()).getContent().get(0);
-
-                Map<String, String> data = new HashMap<String, String>();
-
-                data.put(Constants.TEMPLATE_PARAM_LINK, urlPortal + "?token=" + token);
-                data.put(Constants.TEMPLATE_PARAM_USER_EMAIL, request.getEmail());
-                data.put(Constants.TEMPLATE_PARAM_USER_NAME, userName);
-
-                String emailData = Utils.mapToString(data);
-
-                Email email = new Email();
-                email.setTemplate(template);
-                email.setData(emailData);
-
+                final String userName = userDetails.getFirstName();                
+                Email email = emailFactory.createEmailTemplate(Template.TemplateBusiness.FORGOT_PASSWORD);
+                email.setParameter(Constants.TEMPLATE_PARAM_LINK, urlPortal + "?token=" + token);
+                email.setParameter(Constants.TEMPLATE_PARAM_USER_EMAIL, request.getEmail());
+                email.setParameter(Constants.TEMPLATE_PARAM_USER_NAME, userName);                
                 threadPoolEmail.submit(email);
             }else{
                 new Exception("USER_DISABLED");

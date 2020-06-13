@@ -5,15 +5,13 @@
  */
 package com.core.matrix.workflow.listener;
 
+import com.core.matrix.factory.EmailFactory;
 import com.core.matrix.model.Email;
 import com.core.matrix.model.Notification;
 import com.core.matrix.model.Template;
 import com.core.matrix.service.NotificationService;
-import com.core.matrix.service.TemplateService;
-import com.core.matrix.specifications.TemplateSpecification;
 import com.core.matrix.utils.Constants;
 import com.core.matrix.utils.ThreadPoolEmail;
-import com.core.matrix.utils.Utils;
 import com.core.matrix.workflow.model.GroupActiviti;
 import com.core.matrix.workflow.model.UserActiviti;
 import com.core.matrix.workflow.service.GroupActivitiService;
@@ -22,9 +20,7 @@ import com.core.matrix.workflow.service.UserActivitiService;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 import java.util.Optional;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -35,8 +31,6 @@ import org.activiti.engine.delegate.event.ActivitiEvent;
 import org.activiti.engine.delegate.event.ActivitiEventListener;
 import org.activiti.engine.task.Task;
 import org.springframework.context.ApplicationContext;
-import org.springframework.data.domain.Pageable;
-import org.springframework.data.jpa.domain.Specification;
 
 /**
  *
@@ -44,24 +38,25 @@ import org.springframework.data.jpa.domain.Specification;
  */
 public class RuntimeListener implements ActivitiEventListener {
 
-    private final TemplateService templateService;
+    
     private final UserActivitiService userActivitiService;
     private final ThreadPoolEmail threadPoolEmail;
     private final IdentityService identityService;
     private final RepositoryActivitiService repositoryActivitiService;
     private final GroupActivitiService groupActivitiService;
     private final NotificationService notificationService;
+    private final EmailFactory emailFactory;
 
     public RuntimeListener(ApplicationContext context, IdentityService identityService) {
 
-        synchronized (context) {
-            this.templateService = context.getBean(TemplateService.class);
+        synchronized (context) {            
             this.userActivitiService = context.getBean(UserActivitiService.class);
             this.threadPoolEmail = context.getBean(ThreadPoolEmail.class);
             this.identityService = identityService;
             this.repositoryActivitiService = context.getBean(RepositoryActivitiService.class);
             this.groupActivitiService = context.getBean(GroupActivitiService.class);
             this.notificationService = context.getBean(NotificationService.class);
+            this.emailFactory = context.getBean(EmailFactory.class);
         }
 
     }
@@ -172,8 +167,8 @@ public class RuntimeListener implements ActivitiEventListener {
         List<Email> emails = new ArrayList<>();
 
         try {
-            Specification spc = TemplateSpecification.filter(null, null, null, type);
-            Template template = (Template) templateService.find(spc, Pageable.unpaged()).getContent().get(0);
+            
+            
 
             SimpleDateFormat dateFormat = new SimpleDateFormat("dd/MM/yyyy hh:mm");
 
@@ -183,20 +178,15 @@ public class RuntimeListener implements ActivitiEventListener {
 
                 if (u.isReceiveEmail()) {
 
-                    Map<String, String> data = new HashMap<String, String>();
-                    data.put(Constants.TEMPLATE_PARAM_USER_EMAIL, u.getEmail());
-                    data.put(Constants.TEMPLATE_PARAM_USER_NAME, u.getFirstName());
-                    data.put(Constants.TEMPLATE_PARAM_TASK_NAME, task.getName());
-                    data.put(Constants.TEMPLATE_PARAM_PROCESS_NAME, this.getProcessDefinitionName(task.getProcessDefinitionId()));
-                    data.put(Constants.TEMPLATE_PARAM_NUMBER_PROCESS, task.getProcessInstanceId());
-                    data.put(Constants.TEMPLATE_PARAM_TASK_CREATE_DATE, taskDateCreation);
-                    data.put(Constants.TEMPLATE_PARAM_GROUP_NAME, this.getGroupsName(u));
+                    Email email = emailFactory.createEmailTemplate(type);
 
-                    String emailData = Utils.mapToString(data);
-
-                    Email email = new Email();
-                    email.setTemplate(template);
-                    email.setData(emailData);
+                    email.setParameter(Constants.TEMPLATE_PARAM_USER_EMAIL, u.getEmail());
+                    email.setParameter(Constants.TEMPLATE_PARAM_USER_NAME, u.getFirstName());
+                    email.setParameter(Constants.TEMPLATE_PARAM_TASK_NAME, task.getName());
+                    email.setParameter(Constants.TEMPLATE_PARAM_PROCESS_NAME, this.getProcessDefinitionName(task.getProcessDefinitionId()));
+                    email.setParameter(Constants.TEMPLATE_PARAM_NUMBER_PROCESS, task.getProcessInstanceId());
+                    email.setParameter(Constants.TEMPLATE_PARAM_TASK_CREATE_DATE, taskDateCreation);
+                    email.setParameter(Constants.TEMPLATE_PARAM_GROUP_NAME, this.getGroupsName(u));
 
                     emails.add(email);
                 }
@@ -250,11 +240,11 @@ public class RuntimeListener implements ActivitiEventListener {
         identityService.createNativeUserQuery().sql("SELECT \n"
                 + "    u.*\n"
                 + "FROM\n"
-                + "    activiti.act_ru_identitylink ari\n"
+                + "    activiti.ACT_RU_IDENTITYLINK ari\n"
                 + "        LEFT JOIN\n"
-                + "    activiti.act_id_membership aim ON ari.GROUP_ID_ = aim.GROUP_ID_\n"
+                + "    activiti.ACT_ID_MEMBERSHIP aim ON ari.GROUP_ID_ = aim.GROUP_ID_\n"
                 + "        LEFT JOIN\n"
-                + "    activiti.act_id_user u ON aim.USER_ID_ = u.ID_\n"
+                + "    activiti.ACT_ID_USER u ON aim.USER_ID_ = u.ID_\n"
                 + "WHERE\n"
                 + "    ari.TYPE_ = 'candidate'\n"
                 + "        AND (ari.TASK_ID_ = '" + task + "'\n"

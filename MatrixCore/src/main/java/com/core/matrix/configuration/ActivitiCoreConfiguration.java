@@ -17,6 +17,7 @@ import com.core.matrix.workflow.task.CleanFiles;
 import com.core.matrix.workflow.task.DataValidationTask;
 import com.core.matrix.workflow.task.DeleteProcessInstanceTask;
 import com.core.matrix.workflow.task.FileValidationTask;
+import com.core.matrix.workflow.task.ProcessFilesInLoteTask;
 import com.zaxxer.hikari.HikariConfig;
 import com.zaxxer.hikari.HikariDataSource;
 import java.util.HashMap;
@@ -243,6 +244,11 @@ public class ActivitiCoreConfiguration implements EnvironmentAware {
     @Bean
     public CheckTake checkTake(ApplicationContext context) {
         return new CheckTake(context);
+    }
+    
+    @Bean
+    public ProcessFilesInLoteTask processFilesInLoteTask(ApplicationContext context){
+        return new ProcessFilesInLoteTask(context);
     }
 
 }

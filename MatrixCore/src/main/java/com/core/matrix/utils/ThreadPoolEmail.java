@@ -57,6 +57,7 @@ public class ThreadPoolEmail {
     public synchronized void submit(Email email){
 
         email.setStatus(Email.EmailStatus.QUEUE);
+        email.normalizeData();
 
         if (!this.map.containsKey(email.generateKey())) {
             Long idEmail;
@@ -117,7 +118,7 @@ public class ThreadPoolEmail {
             this.finalize(email);
 
         } catch (Exception ex) {
-            Logger.getLogger(ThreadPoolEmail.class.getName()).log(Level.SEVERE, ex.getMessage());
+            Logger.getLogger(ThreadPoolEmail.class.getName()).log(Level.SEVERE, "[send]", ex);
             this.error(email, ex);
 
         }

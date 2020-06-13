@@ -44,6 +44,7 @@ public class Template implements Model<Template>{
         USER_TASK_PENDING,
         WELCOME_USER,
         PROCESS_ERROR,
+        FINISHED_UPLOAD_LOTE_FILE,
         GROUP_TASK_PENDING;
     }
     

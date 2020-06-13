@@ -161,7 +161,7 @@ public class Utils {
         return targetFile;
     }
 
-    public static String mapToString(Map ma) {
+    public synchronized static String mapToString(Map ma) {
         try {
             return new ObjectMapper().writeValueAsString(ma);
         } catch (JsonProcessingException ex) {

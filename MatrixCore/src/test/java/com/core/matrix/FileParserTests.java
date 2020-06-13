@@ -1,7 +1,7 @@
 package com.core.matrix;
 
 import com.core.matrix.dto.FileParsedDTO;
-import com.core.matrix.io.BeanIoReader;
+import com.core.matrix.io.BeanIO;
 import com.core.matrix.utils.Constants;
 import com.core.matrix.utils.Utils;
 import java.io.File;
@@ -19,7 +19,7 @@ class FileParserTests {
 
        
 
-        BeanIoReader reader = new BeanIoReader();
+        BeanIO reader = new BeanIO();
 
         FileInputStream inputStream = new FileInputStream(new File("TIPO C.csv"));
         

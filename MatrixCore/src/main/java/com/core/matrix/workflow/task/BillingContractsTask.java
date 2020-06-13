@@ -5,6 +5,7 @@
  */
 package com.core.matrix.workflow.task;
 
+import com.core.matrix.factory.EmailFactory;
 import com.core.matrix.model.ContractCompInformation;
 import com.core.matrix.model.Email;
 import com.core.matrix.model.Log;
@@ -13,8 +14,6 @@ import com.core.matrix.model.Template;
 import com.core.matrix.service.ContractCompInformationService;
 import com.core.matrix.service.LogService;
 import com.core.matrix.service.MeansurementFileService;
-import com.core.matrix.service.TemplateService;
-import com.core.matrix.specifications.TemplateSpecification;
 import com.core.matrix.utils.Constants;
 import static com.core.matrix.utils.Constants.GROUP_SUPPORT_TI;
 import static com.core.matrix.utils.Constants.PROCESS_CONTRACTS_RELOAD_BILLING;
@@ -44,10 +43,7 @@ import org.springframework.context.ApplicationContext;
 import static com.core.matrix.utils.Constants.PROCESS_INFORMATION_NICKNAME;
 import static com.core.matrix.utils.Constants.PROCESS_NEW_INSTANCE_ID;
 import com.core.matrix.utils.ThreadPoolEmail;
-import com.core.matrix.utils.Utils;
 import java.util.Objects;
-import org.springframework.data.domain.Pageable;
-import org.springframework.data.jpa.domain.Specification;
 
 /**
  *
@@ -59,7 +55,7 @@ public class BillingContractsTask implements JavaDelegate {
     private MeansurementFileService meansurementFileService;
     private ContractCompInformationService contractCompInformationService;
     private LogService logService;
-    private TemplateService templateService;
+    private EmailFactory emailFactory;
     private ThreadPoolEmail threadPoolEmail;
 
     private static ApplicationContext context;
@@ -70,7 +66,7 @@ public class BillingContractsTask implements JavaDelegate {
             this.meansurementFileService = context.getBean(MeansurementFileService.class);
             this.contractCompInformationService = context.getBean(ContractCompInformationService.class);
             this.logService = context.getBean(LogService.class);
-            this.templateService = context.getBean(TemplateService.class);
+            this.emailFactory = context.getBean(EmailFactory.class);
             this.threadPoolEmail = context.getBean(ThreadPoolEmail.class);
         }
     }
@@ -260,16 +256,14 @@ public class BillingContractsTask implements JavaDelegate {
             variables.put(Constants.PROCESS_INFORMATION_CNPJ, cnpjsString);
             variables.put(PROCESS_INFORMATION_CONTRACT_NUMBERS, contractsNumber);
             variables.put(PROCESS_INFORMATION_PROCESSO_ID, processInstance.getProcessInstanceId());
-            
-            if (execution.hasVariable(PROCESS_CONTRACTS_RELOAD_BILLING)) {                
+
+            if (execution.hasVariable(PROCESS_CONTRACTS_RELOAD_BILLING)) {
                 execution.setVariable(PROCESS_NEW_INSTANCE_ID, processInstance.getProcessInstanceId());
             }
-            
+
             execution.getEngineServices()
                     .getRuntimeService()
                     .setVariables(processInstance.getProcessInstanceId(), variables);
-
-            
 
         } else {
             this.sendEmailError(execution, contracts.stream().findFirst().get().getSNrContrato());
@@ -281,10 +275,8 @@ public class BillingContractsTask implements JavaDelegate {
 
     private void sendEmailError(DelegateExecution execution, String contract) {
         try {
-            Specification spc = TemplateSpecification.filter(null, null, null, Template.TemplateBusiness.PROCESS_ERROR);
-            Template template = (Template) templateService.find(spc, Pageable.unpaged()).getContent().get(0);
 
-            Map<String, String> data = new HashMap<String, String>();
+            Email email = emailFactory.createEmailTemplate(Template.TemplateBusiness.PROCESS_ERROR);
 
             String emails = execution
                     .getEngineServices()
@@ -296,12 +288,9 @@ public class BillingContractsTask implements JavaDelegate {
                     .map(u -> u.getEmail())
                     .collect(Collectors.joining(";"));
 
-            data.put(Constants.TEMPLATE_PARAM_USER_EMAIL, emails);
-            data.put(Constants.TEMPLATE_PARAM_CONTRACT, contract);
-            String emailData = Utils.mapToString(data);
-            Email email = new Email();
-            email.setTemplate(template);
-            email.setData(emailData);
+            email.setParameter(Constants.TEMPLATE_PARAM_USER_EMAIL, emails);
+            email.setParameter(Constants.TEMPLATE_PARAM_CONTRACT, contract);
+
             threadPoolEmail.submit(email);
         } catch (Exception e) {
             Logger.getLogger(BillingContractsTask.class.getName()).log(Level.SEVERE, "[sendEmailError]", e);

@@ -5,13 +5,12 @@
  */
 package com.core.matrix.workflow.service;
 
+import com.core.matrix.factory.EmailFactory;
 import com.core.matrix.model.Email;
 import com.core.matrix.model.Template;
 import com.core.matrix.request.UserDeleteRequest;
 import com.core.matrix.request.UserInfoRequest;
 import com.core.matrix.response.UserInfoResponse;
-import com.core.matrix.service.TemplateService;
-import com.core.matrix.specifications.TemplateSpecification;
 import com.core.matrix.utils.Constants;
 import com.core.matrix.utils.ThreadPoolEmail;
 import com.core.matrix.utils.Utils;
@@ -22,9 +21,7 @@ import com.core.matrix.workflow.model.UserInfoActiviti;
 import com.core.matrix.workflow.repository.UserRepository;
 import com.core.matrix.workflow.specification.UserActivitiSpecification;
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 import java.util.Optional;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -50,7 +47,7 @@ public class UserActivitiService {
     private ThreadPoolEmail threadPoolEmail;
 
     @Autowired
-    private TemplateService templateService;
+    private EmailFactory emailFactory;
 
     @Transactional
     public void save(UserActiviti user) throws Exception {
@@ -77,20 +74,12 @@ public class UserActivitiService {
 
     private void sendEmailWelCome(UserActiviti user) throws Exception {
 
-        Specification spc = TemplateSpecification.filter(null, null, null, Template.TemplateBusiness.WELCOME_USER);
-        Template template = (Template) templateService.find(spc, Pageable.unpaged()).getContent().get(0);
+        
+        Email email = emailFactory.createEmailTemplate(Template.TemplateBusiness.WELCOME_USER);        
 
-        Map<String, String> data = new HashMap<String, String>();
-
-        data.put(Constants.TEMPLATE_PARAM_USER_EMAIL, user.getEmail());
-        data.put(Constants.TEMPLATE_PARAM_USER_NAME, user.getFirstName());
-        data.put(Constants.TEMPLATE_PARAM_USER_PASSWORD, user.getPassword());
-
-        String emailData = Utils.mapToString(data);
-
-        Email email = new Email();
-        email.setTemplate(template);
-        email.setData(emailData);
+        email.setParameter(Constants.TEMPLATE_PARAM_USER_EMAIL, user.getEmail());
+        email.setParameter(Constants.TEMPLATE_PARAM_USER_NAME, user.getFirstName());
+        email.setParameter(Constants.TEMPLATE_PARAM_USER_PASSWORD, user.getPassword());
 
         try {
             threadPoolEmail.submit(email);
@@ -115,7 +104,6 @@ public class UserActivitiService {
             entity.setPassword(Utils.encodePassword(entity.getPassword()));
         }
 
-        
         //workaround
         update.getInfo().forEach(info -> {
             Optional<UserInfoActiviti> optModel = entity.getInfo().stream().filter(mm -> mm.getId().equals(info.getId())).findFirst();
@@ -129,12 +117,11 @@ public class UserActivitiService {
         entity.getInfo().forEach(m -> {
             Optional<UserInfoActiviti> optModel = update.getInfo().stream().filter(mm -> mm.getId().equals(m.getId())).findFirst();
             if (!optModel.isPresent()) {
-                 entity.getInfo().remove(m);
+                entity.getInfo().remove(m);
             }
         });
-        
-        
-         update.getGroups().forEach(group -> {
+
+        update.getGroups().forEach(group -> {
             Optional<GroupMemberActiviti> optModel = entity.getGroups().stream().filter(mm -> mm.getId().equals(group.getId())).findFirst();
             if (optModel.isPresent()) {
                 optModel.get().update(group);
@@ -147,16 +134,15 @@ public class UserActivitiService {
         entity.getGroups().forEach(m -> {
             Optional<GroupMemberActiviti> optModel = update.getGroups().stream().filter(mm -> mm.getId().equals(m.getId())).findFirst();
             if (!optModel.isPresent()) {
-                 temp.add(m);
+                temp.add(m);
             }
         });
 
-        temp.forEach(g->{
-        
+        temp.forEach(g -> {
+
             entity.getGroups().remove(g);
-        
+
         });
-        
 
         repository.save(entity);
 

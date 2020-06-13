@@ -6,7 +6,7 @@
 package com.core.matrix.workflow.task;
 
 import com.core.matrix.dto.DataValidationResultDTO;
-import com.core.matrix.io.BeanIoReader;
+import com.core.matrix.io.BeanIO;
 import com.core.matrix.model.MeansurementFile;
 import com.core.matrix.model.MeansurementFileDetail;
 import com.core.matrix.service.LogService;
@@ -81,7 +81,7 @@ public class DataValidationTask implements Task {
                 .collect(Collectors.toList());
 
         files.forEach(file -> {
-            Logger.getLogger(BeanIoReader.class.getName()).log(Level.INFO, "File id -> " + file.getId());
+            Logger.getLogger(BeanIO.class.getName()).log(Level.INFO, "File id -> " + file.getId());
             file.setStatus(MeansurementFileStatus.SUCCESS);
         });
 
@@ -140,7 +140,7 @@ public class DataValidationTask implements Task {
 
     private void checkCalendar(MeansurementFile file) throws Exception {
 
-        Logger.getLogger(BeanIoReader.class.getName()).log(Level.INFO, "[checkCalendar] File id -> " + file.getId());
+        Logger.getLogger(BeanIO.class.getName()).log(Level.INFO, "[checkCalendar] File id -> " + file.getId());
 
         int daysOnMonth = YearMonth.of(file.getYear().intValue(), Month.of(file.getMonth().intValue())).lengthOfMonth();
         LocalDate init = LocalDate.of(file.getYear().intValue(), file.getMonth().intValue(), 1);
@@ -183,7 +183,7 @@ public class DataValidationTask implements Task {
 
     private void checkHour(MeansurementFile file) throws Exception {
 
-        Logger.getLogger(BeanIoReader.class.getName()).log(Level.INFO, "[checkHour] File id -> " + file.getId());
+        Logger.getLogger(BeanIO.class.getName()).log(Level.INFO, "[checkHour] File id -> " + file.getId());
 
         Map<String, List<MeansurementFileDetail>> lotes = this.getDetails(file, delegateExecution)
                 .stream()
@@ -281,7 +281,7 @@ public class DataValidationTask implements Task {
 
     private void checkDays(MeansurementFile file) throws Exception {
 
-        Logger.getLogger(BeanIoReader.class.getName()).log(Level.INFO, "[checkDays] File id -> " + file.getId());
+        Logger.getLogger(BeanIO.class.getName()).log(Level.INFO, "[checkDays] File id -> " + file.getId());
 
         int daysOnMonth = YearMonth.of(file.getYear().intValue(), Month.of(file.getMonth().intValue())).lengthOfMonth();
 

@@ -5,25 +5,21 @@
  */
 package com.core.matrix.resource;
 
+import com.core.matrix.factory.EmailFactory;
 import com.core.matrix.model.Email;
 import com.core.matrix.model.Template;
 import com.core.matrix.request.UnblockUserRequest;
 import com.core.matrix.request.UserDeleteRequest;
 import com.core.matrix.request.UserInfoRequest;
 import com.core.matrix.response.UserInfoResponse;
-import com.core.matrix.service.TemplateService;
-import com.core.matrix.specifications.TemplateSpecification;
 import com.core.matrix.utils.Constants;
 import com.core.matrix.utils.JwtTokenUtil;
 import com.core.matrix.utils.ThreadPoolEmail;
 import static com.core.matrix.utils.Url.URL_API_USER;
-import com.core.matrix.utils.Utils;
 import com.core.matrix.workflow.model.UserActiviti;
 import com.core.matrix.workflow.service.UserActivitiService;
 import com.core.matrix.workflow.specification.UserActivitiSpecification;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 import java.util.Optional;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -31,7 +27,6 @@ import org.hibernate.exception.ConstraintViolationException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
-import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.http.HttpStatus;
@@ -57,7 +52,7 @@ public class UserResource {
     private JwtTokenUtil jwtTokenUtil;
 
     @Autowired
-    private TemplateService templateService;
+    private EmailFactory emailFactory;
 
     @org.springframework.beans.factory.annotation.Value("${portal.url}")
     private String urlPortal;
@@ -84,15 +79,13 @@ public class UserResource {
             @RequestParam(name = "size", defaultValue = "10") int size) {
         try {
 
-            
             Specification spc = null;
-            
-            if(Optional.ofNullable(id).isPresent()){
+
+            if (Optional.ofNullable(id).isPresent()) {
                 spc = UserActivitiSpecification.id(id);
-            }else{
+            } else {
                 spc = UserActivitiSpecification.filter(searchValue);
             }
-            
 
             Page<UserActiviti> response = this.service.list(spc, PageRequest.of(page, size, Sort.by("firstName")));
             return ResponseEntity.ok(response);
@@ -102,9 +95,8 @@ public class UserResource {
             return ResponseEntity.status(HttpStatus.resolve(500)).build();
         }
     }
-    
-    
-     @RequestMapping(value="/checkEmail",method = RequestMethod.GET)
+
+    @RequestMapping(value = "/checkEmail", method = RequestMethod.GET)
     public ResponseEntity checkEmail(
             @RequestParam(name = "email") String email) {
         try {
@@ -114,7 +106,6 @@ public class UserResource {
             return ResponseEntity.status(HttpStatus.resolve(500)).build();
         }
     }
-    
 
     @RequestMapping(method = RequestMethod.POST)
     public ResponseEntity post(@RequestBody UserActiviti request) {
@@ -156,20 +147,11 @@ public class UserResource {
             final String token = jwtTokenUtil.generateToken(userDetails);
             final String userName = ((UserActiviti) userDetails).getFirstName();
 
-            Specification spc = TemplateSpecification.filter(null, null, null, Template.TemplateBusiness.FORGOT_PASSWORD);
-            Template template = (Template) templateService.find(spc, Pageable.unpaged()).getContent().get(0);
+            Email email = emailFactory.createEmailTemplate(Template.TemplateBusiness.FORGOT_PASSWORD);
 
-            Map<String, String> data = new HashMap<String, String>();
-
-            data.put(Constants.TEMPLATE_PARAM_LINK, urlPortal + "?token=" + token);
-            data.put(Constants.TEMPLATE_PARAM_USER_EMAIL, request.getEmail());
-            data.put(Constants.TEMPLATE_PARAM_USER_NAME, userName);
-
-            String emailData = Utils.mapToString(data);
-
-            Email email = new Email();
-            email.setTemplate(template);
-            email.setData(emailData);
+            email.setParameter(Constants.TEMPLATE_PARAM_LINK, urlPortal + "?token=" + token);
+            email.setParameter(Constants.TEMPLATE_PARAM_USER_EMAIL, request.getEmail());
+            email.setParameter(Constants.TEMPLATE_PARAM_USER_NAME, userName);
 
             threadPoolEmail.submit(email);
 

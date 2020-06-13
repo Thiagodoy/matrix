@@ -7,7 +7,7 @@ package com.core.matrix;
 
 import com.core.matrix.dto.FileDetailDTO;
 import com.core.matrix.dto.FileParsedDTO;
-import com.core.matrix.io.BeanIoReader;
+import com.core.matrix.io.BeanIO;
 import com.core.matrix.model.MeansurementFile;
 import com.core.matrix.model.MeansurementFileDetail;
 import com.core.matrix.service.MeansurementFileService;
@@ -62,7 +62,7 @@ public class FileValidation {
 
              
             InputStream stream = new FileInputStream(new File("exportacao_clacos0g0_235088v1.csv"));
-            BeanIoReader reader = new BeanIoReader();
+            BeanIO reader = new BeanIO();
             Optional<FileParsedDTO> fileParsed = reader.<FileParsedDTO>parse(stream);
             
             if(!reader.getErrors().isEmpty()){

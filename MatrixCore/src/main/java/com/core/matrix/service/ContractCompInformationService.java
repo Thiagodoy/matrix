@@ -7,14 +7,12 @@ package com.core.matrix.service;
 
 import com.core.matrix.dto.ContractInformationDTO;
 import com.core.matrix.model.ContractCompInformation;
-import com.core.matrix.model.MeansurementFile;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import com.core.matrix.repository.ContractCompInformationRepository;
 import static com.core.matrix.utils.Constants.PROCESS_BILLING_CONTRACT_MESSAGE_EVENT;
 import static com.core.matrix.utils.Constants.PROCESS_CONTRACTS_RELOAD_BILLING;
-import com.core.matrix.wbc.dto.ContractDTO;
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.Arrays;
