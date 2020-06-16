@@ -5,12 +5,9 @@
  */
 package com.core.matrix.dto;
 
-import static com.core.matrix.model.MeansurementFile_.details;
-import static io.jsonwebtoken.Jwts.header;
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Optional;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 

@@ -29,6 +29,7 @@ activiti:
             connectionTestQuery: SELECT 1  
  
 matrix:
+    threadPoolSize: 2
     datasource:        
         socketTimeout: 30000
         loginTimeout: 30000

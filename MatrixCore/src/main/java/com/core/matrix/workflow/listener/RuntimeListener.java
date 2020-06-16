@@ -8,8 +8,10 @@ package com.core.matrix.workflow.listener;
 import com.core.matrix.factory.EmailFactory;
 import com.core.matrix.model.Email;
 import com.core.matrix.model.Notification;
+import com.core.matrix.model.Parameters;
 import com.core.matrix.model.Template;
 import com.core.matrix.service.NotificationService;
+import com.core.matrix.service.ParametersService;
 import com.core.matrix.utils.Constants;
 import com.core.matrix.utils.ThreadPoolEmail;
 import com.core.matrix.workflow.model.GroupActiviti;
@@ -38,7 +40,6 @@ import org.springframework.context.ApplicationContext;
  */
 public class RuntimeListener implements ActivitiEventListener {
 
-    
     private final UserActivitiService userActivitiService;
     private final ThreadPoolEmail threadPoolEmail;
     private final IdentityService identityService;
@@ -46,10 +47,11 @@ public class RuntimeListener implements ActivitiEventListener {
     private final GroupActivitiService groupActivitiService;
     private final NotificationService notificationService;
     private final EmailFactory emailFactory;
+    private final ParametersService parametersService;
 
     public RuntimeListener(ApplicationContext context, IdentityService identityService) {
 
-        synchronized (context) {            
+        synchronized (context) {
             this.userActivitiService = context.getBean(UserActivitiService.class);
             this.threadPoolEmail = context.getBean(ThreadPoolEmail.class);
             this.identityService = identityService;
@@ -57,6 +59,7 @@ public class RuntimeListener implements ActivitiEventListener {
             this.groupActivitiService = context.getBean(GroupActivitiService.class);
             this.notificationService = context.getBean(NotificationService.class);
             this.emailFactory = context.getBean(EmailFactory.class);
+            this.parametersService = context.getBean(ParametersService.class);
         }
 
     }
@@ -93,7 +96,7 @@ public class RuntimeListener implements ActivitiEventListener {
                 new Thread(() -> {
 
                     try {
-                        Thread.sleep(5000);
+                        Thread.sleep(10000);
 
                         Task task1 = taskService
                                 .createTaskQuery()
@@ -105,14 +108,26 @@ public class RuntimeListener implements ActivitiEventListener {
                         }
 
                         final String processInstanceID = event.getProcessDefinitionId();
-                        List<UserActiviti> users1 = this.getUsersFromTaskAndProcessDef(task1.getId(), processInstanceID);
-                        List<Email> emails1 = this.prepareEmails(users1, Template.TemplateBusiness.GROUP_TASK_PENDING, task1);
-                        List<Notification> notifications1 = this.prepareNotifications(users1, task1, com.core.matrix.model.Notification.NotificationType.GROUP_TASK_PENDING);
+                        final String parameterKey = task1.getTaskDefinitionKey();
 
-                        this.send(emails1, notifications1);
+                        //getGroupByTaskOrProcessDefId
+                        Optional<Parameters> parameterOpt = parametersService.findByKey(parameterKey);
+                        if (parameterOpt.isPresent()) {
+                            Parameters parameter = parameterOpt.get();
+                            if (parameter.getType().equals(Parameters.ParameterType.BOOLEAN) && (Boolean) parameter.getValue()) {
+                                List<UserActiviti> usersEmails = new ArrayList<>();
+                                this.groupActivitiService.getGroupByTaskOrProcessDefId(task1.getId(), processInstanceID).forEach(group -> {
+                                    usersEmails.addAll(this.groupActivitiService.getUsersByIdGroup(group));
+                                });
+
+                                List<Email> emails1 = this.prepareEmails(usersEmails, Template.TemplateBusiness.GROUP_TASK_PENDING, task1);
+                                List<Notification> notifications1 = this.prepareNotifications(usersEmails, task1, com.core.matrix.model.Notification.NotificationType.GROUP_TASK_PENDING);
+                                this.send(emails1, notifications1);
+                            }
+                        }
 
                     } catch (InterruptedException ex) {
-                        Logger.getLogger(RuntimeListener.class.getName()).log(Level.SEVERE, null, ex);
+                        Logger.getLogger(RuntimeListener.class.getName()).log(Level.SEVERE, "[ TASK_CREATED ] executionId-> " + executionId, ex);
                     }
 
                 }).start();
@@ -167,8 +182,6 @@ public class RuntimeListener implements ActivitiEventListener {
         List<Email> emails = new ArrayList<>();
 
         try {
-            
-            
 
             SimpleDateFormat dateFormat = new SimpleDateFormat("dd/MM/yyyy hh:mm");
 

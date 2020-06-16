@@ -10,7 +10,6 @@ import com.core.matrix.dto.FileLoteErrorDTO;
 import com.core.matrix.dto.FileParsedDTO;
 import com.core.matrix.dto.ProcessFilesInLoteStatusDTO;
 import com.core.matrix.io.BeanIO;
-import com.core.matrix.model.MeansurementFile_;
 import java.io.BufferedReader;
 import java.io.ByteArrayInputStream;
 import java.io.IOException;

@@ -13,14 +13,16 @@ import org.springframework.boot.context.properties.ConfigurationProperties;
  *
  * @author thiag
  */
-
 @ConfigurationProperties(prefix = "matrix", ignoreUnknownFields = true)
 public class MatrixProperties {
-   
-     @Getter
-    private final DataSource datasource = new DataSource();    
 
+    @Getter
+    private final DataSource datasource = new DataSource();
     
+    @Getter
+    @Setter
+    private Long threadPoolSize;
+
     public static class DataSource {
 
         @Getter
@@ -91,7 +93,6 @@ public class MatrixProperties {
 
         }
 
-    }    
-    
-    
+    }
+
 }

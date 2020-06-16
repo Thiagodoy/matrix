@@ -5,13 +5,20 @@
  */
 package com.core.matrix.service;
 
+import com.core.matrix.dto.FileStatusDTO;
+import com.core.matrix.dto.MeansurementFileDTO;
 import com.core.matrix.dto.MeansurementFileStatusDTO;
 import com.core.matrix.model.MeansurementFile;
 import com.core.matrix.repository.MeansurementFileRepository;
+import com.core.matrix.response.FileStatusBillingResponse;
+import com.core.matrix.response.PageResponse;
 import com.core.matrix.utils.MeansurementFileStatus;
 import com.core.matrix.utils.MeansurementFileType;
 import java.util.List;
+import java.util.stream.Collectors;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -39,9 +46,9 @@ public class MeansurementFileService {
     public void delete(Long id) {
         this.repository.deleteById(id);
     }
-    
+
     @Transactional(transactionManager = "matrixTransactionManager")
-    public void deleteByProcessInstance(String id){
+    public void deleteByProcessInstance(String id) {
         this.repository.deleteByProcessInstanceId(id);
     }
 
@@ -49,38 +56,29 @@ public class MeansurementFileService {
     public void updateStatus(MeansurementFileStatus status, Long id) {
         this.repository.updateStatus(status, id);
     }
-    
+
     @Transactional(transactionManager = "matrixTransactionManager")
     public void updateFile(String file, Long id) {
         this.repository.updateFile(file, id);
     }
-    
+
     @Transactional(transactionManager = "matrixTransactionManager")
     public void updateType(MeansurementFileType type, Long id) {
         this.repository.updateType(type, id);
     }
-    
 
     @Transactional(readOnly = true)
     public MeansurementFile findById(Long id) throws Exception {
         return this.repository.findById(id).orElseThrow(() -> new Exception("Arquivo não encontrado"));
     }
-    
-    
+
     @Transactional(readOnly = true)
     public List<MeansurementFile> findByWbcContractAndMeansurementPointAndMonthAndYear(Long contract, String point, Long month, Long year) {
         return this.repository.findByWbcContractAndMeansurementPointAndMonthAndYear(contract, point, month, year);
     }
-    
-    
 
     @Transactional(readOnly = true)
     public List<MeansurementFileStatusDTO> getStatus(Long year, Long month) {
-
-//        LocalDate referenceMonth = LocalDate.of(year, Month.of(month), 1);
-//        LocalDateTime start = referenceMonth.atStartOfDay();
-//        referenceMonth = referenceMonth.plusDays(Utils.getDaysOfMonth(referenceMonth));        
-//        LocalDateTime end = referenceMonth.atStartOfDay();
         return this.repository.getStatus(year, month);
     }
 
@@ -88,16 +86,42 @@ public class MeansurementFileService {
     public List<MeansurementFile> findAllFilesWithErrors(String processInstanceId) {
         return this.repository.findAllFilesWithErrors(processInstanceId);
     }
-    
-    
+
     @Transactional(readOnly = true)
-    public boolean hasFilePending(Long year, Long month){
+    public boolean hasFilePending(Long year, Long month) {
         return !this.repository.hasFilePending(year, month).isEmpty();
     }
 
     @Transactional(readOnly = true)
     public boolean exists(Long contract, String meansurementPoint, Long month, Long year) {
         return this.repository.exists(contract, meansurementPoint, month, year).isPresent();
+    }
+
+    @Transactional(readOnly = true)
+    public FileStatusBillingResponse status(Long month, Long year, boolean loadSummary, Pageable page) {
+
+        FileStatusBillingResponse response = new FileStatusBillingResponse();
+
+        if (loadSummary) {
+            List<FileStatusDTO> statusFile = this.repository.getStatusBilling(month, year);
+            response.setFileStatusDTOs(statusFile);
+        }
+
+        Page<MeansurementFile> pageResponse = this.repository.findByMonthAndYear(month, year, page);
+
+        List<MeansurementFileDTO> result = pageResponse.getContent()
+                .stream()
+                .parallel()
+                .map(file -> {
+                    return new MeansurementFileDTO(file);
+                }).collect(Collectors.toList());
+
+        PageResponse<MeansurementFileDTO> responseInfo = new PageResponse<MeansurementFileDTO>(result, pageResponse.getTotalElements(), (long) pageResponse.getSize(), (long) page.getPageNumber());
+
+        response.setPage(responseInfo);
+
+        return response;
+
     }
 
 }

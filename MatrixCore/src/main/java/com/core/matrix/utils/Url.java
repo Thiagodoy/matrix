@@ -9,8 +9,7 @@ package com.core.matrix.utils;
  *
  * @author thiag
  */
-public class Url {
-    
+public class Url {    
     
     public static final String URL_API_AUTH = "/api/auth";
     public static final String URL_API_TEMPLATE = "/api/template";
@@ -21,6 +20,7 @@ public class Url {
     public static final String URL_API_PRICE = "/api/price";
     public static final String URL_API_REPURCHASE = "/api/repurchase";
     public static final String URL_API_AUTHORITY = "/api/authority";
+    public static final String URL_API_PARAMETERS = "/api/parameters";
     
     
 }

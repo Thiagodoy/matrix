@@ -307,6 +307,8 @@ public class BillingContractsTask implements JavaDelegate {
         MeansurementFile meansurementFile = new MeansurementFile(contract, processInstanceId, contract.getMeansurementPoint());
         meansurementFile.setMonth(month);
         meansurementFile.setYear(year);
+        meansurementFile.setNickname(contract.getSNmApelido());
+        meansurementFile.setCompanyName(contract.getSNmFantasia());
         this.meansurementFileService.saveFile(meansurementFile);
 
     }

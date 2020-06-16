@@ -48,7 +48,7 @@ public class Utils {
     static {
         bcpe = new BCryptPasswordEncoder();
         sdfHour = new SimpleDateFormat("yyyy-MM-dd HH:mm");
-        
+
         entitiesHtml.put("à", "&#224;");
         entitiesHtml.put("è", "&#232;");
         entitiesHtml.put("ì", "&#236;");
@@ -99,7 +99,7 @@ public class Utils {
         entitiesHtml.put("Ö", "&#214;");
         entitiesHtml.put("Ü", "&#220;");
         entitiesHtml.put("ç", "&#231;");
-        
+
     }
 
     public static synchronized double checkDistance(String one, String two) {
@@ -179,10 +179,42 @@ public class Utils {
                 .from(dateToConvert.atZone(ZoneId.systemDefault())
                         .toInstant());
     }
-    
-     public synchronized static LocalDateTime dateToLocalDateTime(Date date) {
+
+    public synchronized static LocalDateTime dateToLocalDateTime(Date date) {
         return Instant.ofEpochMilli(date.getTime())
                 .atZone(ZoneId.systemDefault())
                 .toLocalDateTime();
+    }
+
+    public synchronized static String getStatus(String name) {
+        return getStatus(MeansurementFileStatus.valueOf(name));
+    }
+
+    public synchronized static String getStatus(MeansurementFileStatus status) {
+
+        switch (status) {
+
+            case APPROVED:
+                return "Processado com sucesso";
+            case SUCCESS:
+                return "Em andamento";
+            case DATA_CALENDAR_ERROR:
+                return "Arquivo com calendario Inválido";
+            case DATA_DAY_ERROR:
+                return "Arquivo com dias faltando";
+            case DATA_HOUR_ERROR:
+                return "Arquivo com horas faltando";
+            case FILE_ERROR:
+                return "Arquivo inválido";
+            case POINT_ERROR:
+                return "Arquivo com ponto não cadastrado na base da [Matrix]";
+            case FILE_PENDING:
+                return "Pendente";
+            case LAYOUT_ERROR:
+                return "Arquivo com layout inválido";
+            default:
+                return "Arquivo sem estatus definido";
+        }
+
     }
 }

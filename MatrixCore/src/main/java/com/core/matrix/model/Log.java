@@ -33,7 +33,8 @@ public class Log implements Model<Log>{
     public enum LogType{
         LAYOUT_INVALID,
         DATA_INVALID,
-        DATA_NOT_PERSISTED        
+        DATA_NOT_PERSISTED,
+        ERROR        
     }
     
     

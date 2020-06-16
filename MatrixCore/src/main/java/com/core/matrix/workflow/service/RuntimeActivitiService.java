@@ -334,7 +334,14 @@ public class RuntimeActivitiService {
                 .filter(Objects::nonNull)
                 .collect(Collectors.joining(","));
 
+        
+        
+        long start = System.currentTimeMillis();
+        long end;
+        
         List<String> processInstances = this.listProcessInstances(groupFilter, user.getId(), searchValue, page, size);
+        end = System.currentTimeMillis();
+        Logger.getLogger(RuntimeActivitiService.class.getName()).log(Level.INFO, "[getAssigneAndCandidateTask] Seleciona processo tempo :" + (end - start)/1000 );
 
         long total = Long.parseLong(processInstances.get(0));
 
@@ -344,6 +351,8 @@ public class RuntimeActivitiService {
             return new PageResponse<TaskResponse>(new ArrayList(), 1L, 1L, (long) page);
         }
 
+        start = System.currentTimeMillis();
+        
         List<TaskResponse> response = taskService
                 .createTaskQuery()
                 .includeProcessVariables()
@@ -359,6 +368,9 @@ public class RuntimeActivitiService {
                     return instance;
                 })
                 .collect(Collectors.toList());
+        
+        end = System.currentTimeMillis();
+        Logger.getLogger(RuntimeActivitiService.class.getName()).log(Level.INFO, "[getAssigneAndCandidateTask] Preparando response tarefas tempo :" + (end - start)/1000 );
 
         return new PageResponse<TaskResponse>(response, (long) total, (long) size, (long) page);
     }

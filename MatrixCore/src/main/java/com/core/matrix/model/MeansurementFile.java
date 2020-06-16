@@ -5,6 +5,7 @@
  */
 package com.core.matrix.model;
 
+import com.core.matrix.dto.FileStatusDTO;
 import com.core.matrix.dto.MeansurementFileStatusDTO;
 import com.core.matrix.utils.MeansurementFileStatus;
 import com.core.matrix.utils.MeansurementFileType;
@@ -40,9 +41,17 @@ import lombok.NoArgsConstructor;
         classes = @ConstructorResult(
                 targetClass = MeansurementFileStatusDTO.class,
                 columns = {
-                    @ColumnResult(name = "Status", type = String.class)
-                    ,
-                        @ColumnResult(name = "qtd", type = Long.class),}))
+                    @ColumnResult(name = "Status", type = String.class),
+                    @ColumnResult(name = "qtd", type = Long.class)
+                }))
+
+@SqlResultSetMapping(name = "statusBilling",
+        classes = @ConstructorResult(
+                targetClass = FileStatusDTO.class,
+                columns = {
+                    @ColumnResult(name = "count", type = Long.class),
+                    @ColumnResult(name = "status", type = String.class)
+                }))
 
 @NamedNativeQuery(name = "MeansurementFile.getStatus",
         query = "select 'RECEIVED' as status, count(1) as qtd from matrix.mtx_arquivo_de_medicao a where a.mes = :month and a.ano = :year\n"
@@ -50,14 +59,23 @@ import lombok.NoArgsConstructor;
         + "select status , count(1) from matrix.mtx_arquivo_de_medicao a where a.mes = :month and a.ano = :year group by status ",
         resultSetMapping = "statusDTO")
 
+@NamedNativeQuery(name = "MeansurementFile.getStatusBilling", query = "SELECT \n"
+        + "    status, COUNT(1) AS count\n"
+        + "FROM\n"
+        + "    mtx_arquivo_de_medicao\n"
+        + "WHERE\n"
+        + "    ano = :year AND mes = :month\n"
+        + "GROUP BY status",
+        resultSetMapping = "statusBilling")
+
 @Entity
 @Table(name = "mtx_arquivo_de_medicao")
 @Data
 @NoArgsConstructor
-public class MeansurementFile implements Serializable{
+public class MeansurementFile implements Serializable {
 
     private static final long serialVersionUID = 5548972239473582793L;
-    
+
     @Id
     @Column(name = "id_arquivo_de_medicao")
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -87,6 +105,12 @@ public class MeansurementFile implements Serializable{
 
     @Column(name = "act_id_usuario")
     private String user;
+
+    @Column(name = "empresa_nome")
+    private String companyName;
+
+    @Column(name = "empresa_apelido")
+    private String nickname;
 
     @Column(name = "data_criacao")
     private LocalDateTime createdAt;

@@ -19,7 +19,7 @@ import org.springframework.web.bind.annotation.RestController;
 @RequestMapping(value = "/asset")
 public class AssetResource {
 
-    private String version = "v3.1.5";
+    private String version = "v3.2.1";
 
     @RequestMapping(value = "/versao", method = RequestMethod.GET)
     public ResponseEntity getVersao() throws IOException {

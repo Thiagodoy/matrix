@@ -21,7 +21,6 @@ import com.core.matrix.utils.Constants;
 import static com.core.matrix.utils.Constants.PROCESS_INFORMATION_CLIENT;
 import static com.core.matrix.utils.Constants.PROCESS_INFORMATION_NICKNAME;
 import com.core.matrix.wbc.dto.ContractWbcInformationDTO;
-import com.core.matrix.wbc.dto.CompanyDTO;
 import com.core.matrix.wbc.dto.ContractDTO;
 import com.core.matrix.wbc.service.ContractService;
 import com.core.matrix.wbc.service.EmpresaService;
@@ -36,8 +35,6 @@ import java.util.logging.Logger;
 import java.util.stream.Collectors;
 import org.activiti.engine.delegate.DelegateExecution;
 import org.springframework.context.ApplicationContext;
-import org.springframework.data.domain.PageRequest;
-import org.springframework.data.domain.Pageable;
 
 /**
  *

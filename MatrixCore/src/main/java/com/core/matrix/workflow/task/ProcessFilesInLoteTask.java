@@ -12,12 +12,12 @@ import com.core.matrix.factory.EmailFactory;
 import com.core.matrix.jobs.BindFileToProcessJob;
 import com.core.matrix.jobs.ParseFileJob;
 import com.core.matrix.model.Email;
+import com.core.matrix.model.Log;
 import com.core.matrix.model.MeansurementFile;
 import com.core.matrix.model.Template;
+import com.core.matrix.service.LogService;
 import com.core.matrix.service.MeansurementFileService;
 import static com.core.matrix.utils.Constants.CREATED_BY;
-import static com.core.matrix.utils.Constants.PROCESS_RESULT_FILES_NOK;
-import static com.core.matrix.utils.Constants.PROCESS_RESULT_FILES_OK;
 import static com.core.matrix.utils.Constants.TEMPLATE_PARAM_NUMBER_PROCESS;
 import static com.core.matrix.utils.Constants.TEMPLATE_PARAM_USER_EMAIL;
 import static com.core.matrix.utils.Constants.TEMPLATE_PARAM_USER_NAME;
@@ -59,6 +59,11 @@ public class ProcessFilesInLoteTask implements JavaDelegate, Observer {
     private EmailFactory emailFactory;
     private ThreadPoolEmail threadPoolEmail;
     private MeansurementFileService meansurementFileService;
+    
+    private LogService logService;
+    private Long threadPoolSize;
+    
+    
     private List<Future> executions = new ArrayList<>();
 
     private static ApplicationContext context;
@@ -69,12 +74,15 @@ public class ProcessFilesInLoteTask implements JavaDelegate, Observer {
             this.emailFactory = this.context.getBean(EmailFactory.class);
             this.threadPoolEmail = this.context.getBean(ThreadPoolEmail.class);
             this.meansurementFileService = this.context.getBean(MeansurementFileService.class);
+            this.logService = this.context.getBean(LogService.class);
         }
 
     }
 
-    public ProcessFilesInLoteTask(ApplicationContext context) {
+    public ProcessFilesInLoteTask(ApplicationContext context, Long threadPoolSize) {
         this.context = context;
+        this.threadPoolSize = threadPoolSize;
+        
     }
 
     @Override
@@ -93,18 +101,24 @@ public class ProcessFilesInLoteTask implements JavaDelegate, Observer {
                 this.sendEmail(execution);
 
             } else {
-                FileLoteErrorDTO fledto = new FileLoteErrorDTO();
-                fledto.setFileName("Erro no processo");
-                fledto.setError("Não foi encontrato nenhum processo para associar os arquivos");
-                fileLoteErrorDTOs.add(fledto);
+                
+                Log log = new Log();
+                log.setActivitiName(execution.getCurrentActivityName());
+                log.setMessage("Não foi encontrato nenhum processo para associar os arquivos");
+                log.setProcessInstanceId(processInstanceId);
+                log.setType(Log.LogType.ERROR);
+                logService.save(log);
             }
 
         } catch (Exception e) {
-            Logger.getLogger(ProcessFilesInLoteTask.class.getName()).log(Level.SEVERE, "[execute]", e);
-            FileLoteErrorDTO fledto = new FileLoteErrorDTO();
-            fledto.setFileName("Erro no processo");
-            fledto.setError("Erro no processo, favor encaminhar para a TI.");
-            fileLoteErrorDTOs.add(fledto);
+            
+                Log log = new Log();
+                log.setActivitiName(execution.getCurrentActivityName());
+                log.setMessage("Erro no processo, favor encaminhar para a TI.");
+                log.setMessageErrorApplication(e.getMessage());
+                log.setProcessInstanceId(processInstanceId);
+                log.setType(Log.LogType.ERROR);
+                logService.save(log);            
         }
 
         this.result(execution);
@@ -119,9 +133,20 @@ public class ProcessFilesInLoteTask implements JavaDelegate, Observer {
         this.status.stream().forEach(st -> {
             result.add(new ResultInLoteStatusDTO(st));
         });
-
-        execution.setVariable(PROCESS_RESULT_FILES_OK, result);
-        execution.setVariable(PROCESS_RESULT_FILES_NOK, fileLoteErrorDTOs);
+        
+        
+        fileLoteErrorDTOs.stream().forEach(l->{        
+            l.getErrors().forEach(error->{
+                Log log = new Log();
+                log.setActivitiName(execution.getCurrentActivityName());
+                log.setMessage(l.getFileName() + " -> " + error);                
+                log.setProcessInstanceId(processInstanceId);
+                log.setType(Log.LogType.ERROR);
+                logService.save(log);
+            });
+        });
+        
+        
 
     }
 
@@ -204,7 +229,7 @@ public class ProcessFilesInLoteTask implements JavaDelegate, Observer {
     }
 
     private void initPoolExecutor() {
-        pool = (ThreadPoolExecutor) Executors.newFixedThreadPool(1);
+        pool = (ThreadPoolExecutor) Executors.newFixedThreadPool(threadPoolSize.intValue());
     }
 
     private void startPollExecutor() {

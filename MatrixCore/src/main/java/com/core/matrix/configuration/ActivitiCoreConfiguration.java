@@ -6,6 +6,7 @@
 package com.core.matrix.configuration;
 
 import com.core.matrix.properties.ActivitiProperties;
+import com.core.matrix.properties.MatrixProperties;
 import com.core.matrix.workflow.task.BillingContractsTask;
 import com.core.matrix.workflow.task.CalculateTask;
 import com.core.matrix.workflow.task.ChangeStatusFileTask;
@@ -60,6 +61,9 @@ public class ActivitiCoreConfiguration implements EnvironmentAware {
 
     @Autowired
     private ActivitiProperties activitiProperties;
+    
+    @Autowired
+    private MatrixProperties matrixProperties;
 
     private Environment environment;
 
@@ -248,7 +252,7 @@ public class ActivitiCoreConfiguration implements EnvironmentAware {
     
     @Bean
     public ProcessFilesInLoteTask processFilesInLoteTask(ApplicationContext context){
-        return new ProcessFilesInLoteTask(context);
+        return new ProcessFilesInLoteTask(context,matrixProperties.getThreadPoolSize());
     }
 
 }
