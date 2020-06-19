@@ -21,6 +21,7 @@ activiti:
         validationTimeout: 10000
         idleTimeout: 10000
         connectionTimeout: 30000
+        maxLifetime: 300000
         autoCommit: false
         initializationFailFast: false        
         sqlserver:            
@@ -40,6 +41,7 @@ matrix:
         validationTimeout: 10000
         idleTimeout: 10000
         connectionTimeout: 30000
+        maxLifetime: 300000
         autoCommit: false
         initializationFailFast: false        
         sqlserver:            

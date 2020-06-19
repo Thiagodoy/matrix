@@ -83,6 +83,9 @@ public class Parameters implements Model<Parameters> {
     @JsonDeserialize(using = LocalDateTimeDeserializer.class)
     @Column(name = "data_atualizacao")
     protected LocalDateTime updateAt;
+    
+    @Column(name = "parametro_de_aplicacao")
+    protected boolean isApplication;
 
     @PrePersist
     public void generateCreateAT() {

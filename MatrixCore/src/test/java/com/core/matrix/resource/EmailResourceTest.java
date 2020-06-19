@@ -7,14 +7,12 @@ package com.core.matrix.resource;
 
 import com.core.matrix.model.Email;
 import com.core.matrix.model.Template;
-import com.core.matrix.service.TemplateService;
 import com.core.matrix.utils.Url;
 import static org.junit.Assert.assertEquals;
 import org.junit.jupiter.api.MethodOrderer.OrderAnnotation;
 import org.junit.jupiter.api.Order;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.TestMethodOrder;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MvcResult;
@@ -46,7 +44,7 @@ public class EmailResourceTest extends ResourceAbstractTest {
         notification.setStatus(Email.EmailStatus.READY);
         Template template = new Template();
         template.setId(1L);
-        notification.setTemplate(template);
+        notification.setTemplate(1L);
 
         MvcResult mvcResult = mvc.perform(MockMvcRequestBuilders.post(uri).content(mapToJson(notification))
                 .contentType(MediaType.APPLICATION_JSON)

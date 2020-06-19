@@ -10,6 +10,7 @@ import com.core.matrix.dto.MeansurementFileDTO;
 import com.core.matrix.dto.MeansurementFileStatusDTO;
 import com.core.matrix.model.MeansurementFile;
 import com.core.matrix.repository.MeansurementFileRepository;
+import com.core.matrix.request.FileStatusLoteRequest;
 import com.core.matrix.response.FileStatusBillingResponse;
 import com.core.matrix.response.PageResponse;
 import com.core.matrix.utils.MeansurementFileStatus;
@@ -98,25 +99,36 @@ public class MeansurementFileService {
     }
 
     @Transactional(readOnly = true)
-    public FileStatusBillingResponse status(Long month, Long year, boolean loadSummary, Pageable page) {
+    public FileStatusBillingResponse statusInit(Long month, Long year, Pageable page) {
 
         FileStatusBillingResponse response = new FileStatusBillingResponse();
 
-        if (loadSummary) {
-            List<FileStatusDTO> statusFile = this.repository.getStatusBilling(month, year);
+        Page<MeansurementFile> pageResponse = this.repository.findByMonthAndYear(month, year, page);
+
+        List<MeansurementFileDTO> result = pageResponse.getContent().stream().map(f-> new MeansurementFileDTO(f)).collect(Collectors.toList());
+        
+        
+        PageResponse<MeansurementFileDTO> responseInfo = new PageResponse<MeansurementFileDTO>(result, (long) pageResponse.getTotalElements(), (long) pageResponse.getSize(),(long)pageResponse.getNumber());
+
+        response.setPage(responseInfo);
+
+        return response;
+
+    }
+
+    @Transactional(readOnly = true)
+    public FileStatusBillingResponse statusEnd(FileStatusLoteRequest request) {
+
+        FileStatusBillingResponse response = new FileStatusBillingResponse();
+
+        if (request.isLoadSummary()) {
+            List<FileStatusDTO> statusFile = this.repository.getStatusBilling(request.getProcessInstances());
             response.setFileStatusDTOs(statusFile);
         }
 
-        Page<MeansurementFile> pageResponse = this.repository.findByMonthAndYear(month, year, page);
+        List<MeansurementFileDTO> pageResponse = this.repository.findByProcessInstanceIdIn(request.getProcessInstances());
 
-        List<MeansurementFileDTO> result = pageResponse.getContent()
-                .stream()
-                .parallel()
-                .map(file -> {
-                    return new MeansurementFileDTO(file);
-                }).collect(Collectors.toList());
-
-        PageResponse<MeansurementFileDTO> responseInfo = new PageResponse<MeansurementFileDTO>(result, pageResponse.getTotalElements(), (long) pageResponse.getSize(), (long) page.getPageNumber());
+        PageResponse<MeansurementFileDTO> responseInfo = new PageResponse<MeansurementFileDTO>(pageResponse, (long) pageResponse.size(), (long) pageResponse.size(), 0l);
 
         response.setPage(responseInfo);
 

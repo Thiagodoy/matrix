@@ -19,6 +19,8 @@ import com.core.matrix.workflow.task.DataValidationTask;
 import com.core.matrix.workflow.task.DeleteProcessInstanceTask;
 import com.core.matrix.workflow.task.FileValidationTask;
 import com.core.matrix.workflow.task.ProcessFilesInLoteTask;
+import com.core.matrix.workflow.task.ValidationFileLoteTask;
+import com.core.matrix.workflow.task.listener.ResultFileLoteListener;
 import com.zaxxer.hikari.HikariConfig;
 import com.zaxxer.hikari.HikariDataSource;
 import java.util.HashMap;
@@ -116,7 +118,8 @@ public class ActivitiCoreConfiguration implements EnvironmentAware {
         hikariConfig.setJdbcUrl(activitiProperties.getDatasource().getSqlserver().getDataUrl());
         hikariConfig.setUsername(activitiProperties.getDatasource().getSqlserver().getDataSourceUser());
         hikariConfig.setPassword(activitiProperties.getDatasource().getSqlserver().getDataSourcePassword());
-        hikariConfig.setPoolName("ActivitiPool");
+        hikariConfig.setMaxLifetime(activitiProperties.getDatasource().getMaxLifetime());
+        hikariConfig.setPoolName("ActivitiPool");        
         hikariConfig.setConnectionTestQuery(activitiProperties.getDatasource().getSqlserver().getConnectionTestQuery());
 
         dataSource = new HikariDataSource(hikariConfig);
@@ -143,21 +146,12 @@ public class ActivitiCoreConfiguration implements EnvironmentAware {
 
         ProcessEngineConfiguration s = new StandaloneProcessEngineConfiguration()
                 .setCustomSessionFactories(null)
-                .setDatabaseSchemaUpdate(ProcessEngineConfiguration.DB_SCHEMA_UPDATE_TRUE)
-                //.setPro
-                // .setAsyncExecutorEnabled(true)
+                .setDatabaseSchemaUpdate(ProcessEngineConfiguration.DB_SCHEMA_UPDATE_TRUE)               
 
                 .setDataSource(this.dataSource())
                 .setAsyncFailedJobWaitTime(2147483647)
                 .setDefaultFailedJobWaitTime(2147483647)
-                .setJobExecutorActivate(true)
-                .setMailServerDefaultFrom("portal@matrixenergia.com")
-                .setMailServerHost("smtp.office365.com")
-                .setMailServerPort(587)
-                .setMailServerUsername("portal@matrixenergia.com")
-                .setMailServerPassword("P@ortal2020")
-                .setMailServerUseSSL(false)
-                .setMailServerUseTLS(true);
+                .setJobExecutorActivate(true);
 
         ProcessEngine processEngine = s.buildProcessEngine();
 
@@ -253,6 +247,16 @@ public class ActivitiCoreConfiguration implements EnvironmentAware {
     @Bean
     public ProcessFilesInLoteTask processFilesInLoteTask(ApplicationContext context){
         return new ProcessFilesInLoteTask(context,matrixProperties.getThreadPoolSize());
+    }
+    
+    @Bean
+    public ValidationFileLoteTask validationFileLoteTask(ApplicationContext context){
+        return new ValidationFileLoteTask(context);
+    }
+    
+    @Bean 
+    public ResultFileLoteListener resultFileLoteListener(ApplicationContext context){
+        return new ResultFileLoteListener(context);
     }
 
 }

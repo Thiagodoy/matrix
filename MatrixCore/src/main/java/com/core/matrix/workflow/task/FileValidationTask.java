@@ -133,8 +133,7 @@ public class FileValidationTask implements JavaDelegate {
                         throw new Exception("Não foi possivel aplicar o parse no arquivo!");
                     }
 
-                } catch (Exception e) {
-                    Logger.getLogger(FileValidationTask.class.getName()).log(Level.SEVERE, "[ forEach ]", e);
+                } catch (Exception e) {                    
                     this.generateLog(de, e, "Erro ao processar o arquivo : " + fileName);
                 }
 
@@ -173,8 +172,7 @@ public class FileValidationTask implements JavaDelegate {
 
                 delegateExecution.setVariable(CONTROLE, RESPONSE_LAYOUT_VALID);
             }
-        } catch (Exception e) {
-            Logger.getLogger(FileValidationTask.class.getName()).log(Level.SEVERE, "[execute]", e);
+        } catch (Exception e) {          
             delegateExecution.setVariable(CONTROLE, RESPONSE_LAYOUT_INVALID);
             this.generateLog(de, e, "Erro ao processar o arquivo");
         }

@@ -5,27 +5,24 @@
  */
 package com.core.matrix.dto;
 
-import com.core.matrix.utils.MeansurementFileStatus;
-import com.core.matrix.utils.Utils;
 import lombok.Data;
+import lombok.NoArgsConstructor;
 
 /**
  *
  * @author thiag
  */
 @Data
+@NoArgsConstructor
 public class FileStatusDTO {
 
     private Long count;
     private String status;
+    
+    
 
     public FileStatusDTO(Long count, String status) {
         this.count = count;
-        this.setStatus(status);
-    }
-
-    private void setStatus(String name) {
-        this.status = Utils.getStatus(name);
-    }
-
+        this.status = status;
+    }   
 }

@@ -8,6 +8,7 @@ package com.core.matrix.configuration;
 import com.core.matrix.properties.EmailServiceProperties;
 import com.core.matrix.service.EmailService;
 import com.core.matrix.service.LogService;
+import com.core.matrix.service.TemplateService;
 import com.core.matrix.utils.ThreadPoolEmail;
 import java.util.Properties;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -47,8 +48,8 @@ public class EmailServiceConfiguration {
 
     @Bean
     @Scope("singleton")
-    public ThreadPoolEmail threadPoolEmail (EmailService emailService, LogService logService) {
-        return new ThreadPoolEmail(emailService, logService, getJavaMailSender());
+    public ThreadPoolEmail threadPoolEmail (EmailService emailService, LogService logService, TemplateService templateService) {
+        return new ThreadPoolEmail(emailService, logService, getJavaMailSender(),templateService);
 
     }
 

@@ -6,6 +6,7 @@
 package com.core.matrix.dto;
 
 import java.io.Serializable;
+import java.text.MessageFormat;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
@@ -45,6 +46,7 @@ public class ProcessFilesInLoteStatusDTO extends Observable implements Serializa
     private transient List<InformationDTO> informations = new ArrayList<>();
     private transient List<FileDetailDTO> details = new ArrayList<>(); 
     private String typeFile;
+    private boolean isFinished = false;
 
     
     
@@ -54,6 +56,12 @@ public class ProcessFilesInLoteStatusDTO extends Observable implements Serializa
     
     public void pointChecked(String point, List<InformationDTO> informations, HeaderDTO header, List<FileDetailDTO> details, String type) {
 
+        
+        if(this.isFinished){
+            return;
+        }
+        
+        
         this.pointsChecked.add(point.replaceAll("\\((L|B)\\)", "").trim());
         
         if(details.isEmpty()){
@@ -77,10 +85,11 @@ public class ProcessFilesInLoteStatusDTO extends Observable implements Serializa
 
         if (this.points.size() == pointsChecked.size() && points.containsAll(pointsChecked)) {
 
-            //this.status = Status.ASSOCIATED;
+            this.isFinished = true;
             this.setChanged();
             this.notifyObservers(Boolean.TRUE);
             this.clearChanged();
+            
         }
 
     }
@@ -94,5 +103,12 @@ public class ProcessFilesInLoteStatusDTO extends Observable implements Serializa
 
         return fpdto;
     }
+
+    
+    public String toString() {
+        return MessageFormat.format("Processo status -> Task: {0} -  Instance: {1}", this.taskId, this.processInstanceId );
+    }
+    
+    
 
 }

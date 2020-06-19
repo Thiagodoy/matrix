@@ -6,6 +6,7 @@
 package com.core.matrix.repository;
 
 import com.core.matrix.dto.FileStatusDTO;
+import com.core.matrix.dto.MeansurementFileDTO;
 import com.core.matrix.dto.MeansurementFileStatusDTO;
 import com.core.matrix.model.MeansurementFile;
 import com.core.matrix.utils.MeansurementFileStatus;
@@ -47,9 +48,12 @@ public interface MeansurementFileRepository extends JpaRepository<MeansurementFi
     List<MeansurementFileStatusDTO> getStatus(@Param("year") Long year, @Param("month") Long month);
 
     @Query(nativeQuery = true)
-    List<FileStatusDTO> getStatusBilling(@Param("month") Long month, @Param("year") Long year);
+    List<FileStatusDTO> getStatusBilling(@Param("process") List<String> process);
 
     Page<MeansurementFile> findByMonthAndYear(Long month, Long year, Pageable page);
+
+    @Query( nativeQuery = true)
+    List<MeansurementFileDTO> findByProcessInstanceIdIn(@Param("process") List<String> process);
 
     List<MeansurementFile> findByProcessInstanceId(String id);
 

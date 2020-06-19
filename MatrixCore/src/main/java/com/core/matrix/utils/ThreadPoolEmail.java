@@ -10,6 +10,7 @@ import com.core.matrix.model.Log;
 import com.core.matrix.model.Template;
 import com.core.matrix.service.EmailService;
 import com.core.matrix.service.LogService;
+import com.core.matrix.service.TemplateService;
 import java.io.File;
 import java.util.Date;
 import java.util.HashMap;
@@ -39,12 +40,14 @@ public class ThreadPoolEmail {
     private final EmailService emailService;
     private final LogService logService;
     private final JavaMailSender sender;
+    private final TemplateService templateService;  
 
-    public ThreadPoolEmail(EmailService emailService, LogService logService, JavaMailSender sender) {
+    public ThreadPoolEmail(EmailService emailService, LogService logService, JavaMailSender sender, TemplateService templateService) {
 
         this.emailService = emailService;
         this.logService = logService;
         this.sender = sender;
+        this.templateService = templateService;
     }
 
     
@@ -63,18 +66,16 @@ public class ThreadPoolEmail {
             Long idEmail;
             
             try {
+                
                 idEmail = this.emailService.save(email);
-                email = this.emailService.find(idEmail);
+                email = this.emailService.find(idEmail);                
+                this.map.put(email.generateKey(),email);            
+                this.pool.submit(new SenderEmail(email));                
             } catch (Exception ex) {
                 Logger.getLogger(ThreadPoolEmail.class.getName()).log(Level.SEVERE, "[ submit ] -> Erro ao salvar email", ex);
             }
-            
-            
-            this.map.put(email.generateKey(),email);
-            
-            this.pool.submit(new SenderEmail(email));
         } else {
-            Logger.getLogger(ThreadPoolEmail.class.getName()).log(Level.INFO, "[ submit ] email já esta na fila -> " + email.getData());
+            Logger.getLogger(ThreadPoolEmail.class.getName()).log(Level.INFO, "[ submit ] email já esta na fila de envio -> " + email.getData());
         }
     }
 
@@ -85,7 +86,7 @@ public class ThreadPoolEmail {
             MimeMessageHelper helper = new MimeMessageHelper(message, true);
             Map<String, String> parameters = Utils.toMap(email.getData());
 
-            Template template = email.getTemplate();
+            Template template = this.templateService.find(email.getTemplate());
             String content = template.getTemplate();
 
             helper.setSubject(template.getSubject());

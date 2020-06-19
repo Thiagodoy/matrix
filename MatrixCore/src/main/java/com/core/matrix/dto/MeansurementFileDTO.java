@@ -14,19 +14,29 @@ import lombok.Data;
  * @author thiag
  */
 @Data
-public class MeansurementFileDTO {    
-    private String companyName;    
-    private String processInstance;    
+public class MeansurementFileDTO {
+
+    private String taskName;
     private Long contract;
     private String point;
+    private String nickname;
     private String status;
-    
-    
-    public MeansurementFileDTO(MeansurementFile file){
-        this.companyName = file.getNickname();
-        this.processInstance = file.getProcessInstanceId();
-        this.contract = file.getWbcContract();
-        this.point = file.getMeansurementPoint(); 
-        this.status = Utils.getStatus(file.getStatus());
+    private String processInstanceId;
+
+    public MeansurementFileDTO(String taskName, Long contract, String point, String nickname, String status) {
+        this.taskName = taskName;
+        this.contract = contract;
+        this.point = point;
+        this.nickname = nickname;
+        this.status = status;
     }
+
+    public MeansurementFileDTO(MeansurementFile file) {
+        this.contract = file.getWbcContract();
+        this.processInstanceId = file.getProcessInstanceId();
+        this.point = file.getMeansurementPoint();
+        this.status = Utils.getStatus(file.getStatus());
+        this.nickname = file.getNickname();
+    }
+
 }

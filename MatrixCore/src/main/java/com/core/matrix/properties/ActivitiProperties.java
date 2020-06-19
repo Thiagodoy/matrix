@@ -43,6 +43,11 @@ public class ActivitiProperties {
         @Getter
         @Setter
         private Long validationTimeout;
+        
+        
+        @Getter
+        @Setter
+        private Long maxLifetime;
 
         @Getter
         @Setter

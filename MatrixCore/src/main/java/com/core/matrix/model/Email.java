@@ -12,6 +12,7 @@ import java.io.InputStream;
 import java.text.MessageFormat;
 import java.time.LocalDateTime;
 import java.util.Map;
+import javax.persistence.CascadeType;
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.EnumType;
@@ -64,9 +65,8 @@ public class Email implements Model<Email> {
     @Column(name = "dados")
     protected String data;
 
-    @ManyToOne
-    @JoinColumn(name = "id_template")
-    protected Template template;
+    @Column(name = "id_template")
+    protected Long template;
 
     @Column(name = "data_criacao")
     protected LocalDateTime createdAt;
@@ -81,14 +81,14 @@ public class Email implements Model<Email> {
     }
 
     public String generateKey() {
-        return MessageFormat.format("{0}-{1}-{2}", data, createdAt, template.getSubject());
+        return MessageFormat.format("{0}-{1}-{2}", data, createdAt, template);
 
     }
-    
-    public void setParameter(String key, String value){
+
+    public void setParameter(String key, String value) {
         this.mapData.put(key, value);
     }
-    
+
     public static File loadLogo(String path)
             throws IOException {
         StreamFactory factory = StreamFactory.newInstance();
@@ -99,8 +99,8 @@ public class Email implements Model<Email> {
         FileUtils.copyInputStreamToFile(initialStream, targetFile);
         return targetFile;
     }
-    
-    public void normalizeData(){
+
+    public void normalizeData() {
         this.data = Utils.mapToString(mapData);
     }
 

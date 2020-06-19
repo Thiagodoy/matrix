@@ -21,9 +21,10 @@ import com.core.matrix.workflow.service.RepositoryActivitiService;
 import com.core.matrix.workflow.service.UserActivitiService;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
+import java.util.concurrent.Executors;
+import java.util.concurrent.ThreadPoolExecutor;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import java.util.stream.Collectors;
@@ -48,6 +49,8 @@ public class RuntimeListener implements ActivitiEventListener {
     private final NotificationService notificationService;
     private final EmailFactory emailFactory;
     private final ParametersService parametersService;
+    private TaskService taskService;
+    private final static ThreadPoolExecutor pool = (ThreadPoolExecutor) Executors.newFixedThreadPool(1);
 
     public RuntimeListener(ApplicationContext context, IdentityService identityService) {
 
@@ -68,70 +71,15 @@ public class RuntimeListener implements ActivitiEventListener {
     public void onEvent(ActivitiEvent event) {
 
         final String executionId = event.getExecutionId();
-
-        List<Email> emails = new ArrayList<>();
-        List<Notification> notifications = new ArrayList<>();
-        List<UserActiviti> users = new ArrayList<>();
+        this.taskService = event.getEngineServices().getTaskService();
         Task task = null;
         switch (event.getType()) {
-            case TASK_ASSIGNED:
-
-                task = event.getEngineServices()
-                        .getTaskService()
-                        .createTaskQuery()
-                        .executionId(executionId)
-                        .singleResult();
-
-                String userEmail = task.getAssignee();
-                users = Arrays.asList(this.getUserByEmail(userEmail));
-                emails = this.prepareEmails(users, Template.TemplateBusiness.USER_TASK_PENDING, task);
-                notifications = this.prepareNotifications(users, task, com.core.matrix.model.Notification.NotificationType.USER_TASK_PENDING);
-                this.send(emails, notifications);
-                break;
+//            case TASK_ASSIGNED:
+//                prepareEmails(event, Template.TemplateBusiness.GROUP_TASK_PENDING, Notification.NotificationType.GROUP_TASK_PENDING);
+//                break;
 
             case TASK_CREATED:
-
-                final TaskService taskService = event.getEngineServices().getTaskService();
-
-                new Thread(() -> {
-
-                    try {
-                        Thread.sleep(10000);
-
-                        Task task1 = taskService
-                                .createTaskQuery()
-                                .executionId(executionId)
-                                .singleResult();
-
-                        if (Optional.ofNullable(task1).isPresent() && Optional.ofNullable(task1.getAssignee()).isPresent()) {
-                            return;
-                        }
-
-                        final String processInstanceID = event.getProcessDefinitionId();
-                        final String parameterKey = task1.getTaskDefinitionKey();
-
-                        //getGroupByTaskOrProcessDefId
-                        Optional<Parameters> parameterOpt = parametersService.findByKey(parameterKey);
-                        if (parameterOpt.isPresent()) {
-                            Parameters parameter = parameterOpt.get();
-                            if (parameter.getType().equals(Parameters.ParameterType.BOOLEAN) && (Boolean) parameter.getValue()) {
-                                List<UserActiviti> usersEmails = new ArrayList<>();
-                                this.groupActivitiService.getGroupByTaskOrProcessDefId(task1.getId(), processInstanceID).forEach(group -> {
-                                    usersEmails.addAll(this.groupActivitiService.getUsersByIdGroup(group));
-                                });
-
-                                List<Email> emails1 = this.prepareEmails(usersEmails, Template.TemplateBusiness.GROUP_TASK_PENDING, task1);
-                                List<Notification> notifications1 = this.prepareNotifications(usersEmails, task1, com.core.matrix.model.Notification.NotificationType.GROUP_TASK_PENDING);
-                                this.send(emails1, notifications1);
-                            }
-                        }
-
-                    } catch (InterruptedException ex) {
-                        Logger.getLogger(RuntimeListener.class.getName()).log(Level.SEVERE, "[ TASK_CREATED ] executionId-> " + executionId, ex);
-                    }
-
-                }).start();
-
+                prepareEmails(event, Template.TemplateBusiness.GROUP_TASK_PENDING, Notification.NotificationType.GROUP_TASK_PENDING);
                 break;
 
             case TASK_COMPLETED:
@@ -148,6 +96,59 @@ public class RuntimeListener implements ActivitiEventListener {
 
         }
 
+    }
+
+    private void prepareEmails(ActivitiEvent event, Template.TemplateBusiness template, com.core.matrix.model.Notification.NotificationType notificationType) {
+
+        Logger.getLogger(RuntimeListener.class.getName()).log(Level.INFO, "EVENT-> " + event.getType().toString());
+
+        pool.submit(() -> {
+
+            try {
+                final ActivitiEvent events = event;
+
+                Thread.sleep(10000);
+
+                Task task;
+                try {
+                    task = this.taskService
+                            .createNativeTaskQuery().sql("SELECT \n"
+                                    + "    b.*\n"
+                                    + "FROM\n"
+                                    + "    activiti.ACT_RU_EXECUTION a\n"
+                                    + "        INNER JOIN\n"
+                                    + "    activiti.ACT_RU_TASK b ON a.PROC_INST_ID_ = b.PROC_INST_ID_\n"
+                                    + "        AND a.ID_ = b.EXECUTION_ID_\n"
+                                    + "WHERE\n"
+                                    + "    a.ID_ = " + event.getExecutionId())
+                            .singleResult();
+                } catch (Exception e) {
+                    Logger.getLogger(RuntimeListener.class.getName()).log(Level.SEVERE, "Não localizou a tarefa para o envio de email exeid-> " + events.getExecutionId(), e);
+                    task = null;
+                }
+
+                if (!Optional.ofNullable(task).isPresent()) {
+                    return;
+                }
+
+                Optional<Parameters> parameterOpt1 = parametersService.findByKey(task.getTaskDefinitionKey());
+                if (parameterOpt1.isPresent()) {
+                    Parameters parameter = parameterOpt1.get();
+                    if (parameter.getType().equals(Parameters.ParameterType.BOOLEAN) && (Boolean) parameter.getValue()) {
+                        List<UserActiviti> usersEmails = new ArrayList<>();
+                        this.groupActivitiService.getGroupByTaskOrProcessDefId(task.getId(), events.getProcessDefinitionId()).forEach(group -> {
+                            usersEmails.addAll(this.groupActivitiService.getUsersByIdGroup(group));
+                        });
+
+                        List<Email> emails1 = this.prepareEmails(usersEmails, template, task);
+                        List<Notification> notifications1 = this.prepareNotifications(usersEmails, task, notificationType);
+                        this.send(emails1, notifications1);
+                    }
+                }
+            } catch (Exception e) {
+                Logger.getLogger(RuntimeListener.class.getName()).log(Level.SEVERE, "[Erro ao enviar o email]", e);
+            }
+        });
     }
 
     private synchronized void send(List<Email> emails, List<Notification> notifications) {

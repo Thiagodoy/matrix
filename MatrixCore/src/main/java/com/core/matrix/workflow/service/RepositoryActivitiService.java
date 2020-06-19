@@ -9,6 +9,7 @@ import com.core.matrix.response.ProcessDefinitionResponse;
 import com.core.matrix.workflow.model.UserActiviti;
 import java.io.IOException;
 import java.io.InputStream;
+import java.util.Comparator;
 import java.util.List;
 import java.util.stream.Collectors;
 import org.activiti.bpmn.model.BpmnModel;
@@ -112,6 +113,7 @@ public class RepositoryActivitiService {
                 .list()
                 .parallelStream()
                 .map(p -> new ProcessDefinitionResponse(p))
+                .sorted(Comparator.comparing(ProcessDefinitionResponse::getName))
                 .collect(Collectors.toList());
 
     }

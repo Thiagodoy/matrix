@@ -44,7 +44,7 @@ public class ParametersResource extends Resource<Parameters, ParametersService> 
             @RequestParam(name = "size", defaultValue = "10") int size) {
         try {
 
-            Specification spc = ParametersSpecification.find(key, value, description, type);
+            Specification spc = ParametersSpecification.find(key, value, description, type, Boolean.FALSE);
             Page response = this.getService().find(spc, PageRequest.of(page, size, Sort.by("key").ascending()));
 
             return ResponseEntity.ok(response);

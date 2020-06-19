@@ -6,6 +6,7 @@
 package com.core.matrix.model;
 
 import com.core.matrix.dto.FileStatusDTO;
+import com.core.matrix.dto.MeansurementFileDTO;
 import com.core.matrix.dto.MeansurementFileStatusDTO;
 import com.core.matrix.utils.MeansurementFileStatus;
 import com.core.matrix.utils.MeansurementFileType;
@@ -41,7 +42,8 @@ import lombok.NoArgsConstructor;
         classes = @ConstructorResult(
                 targetClass = MeansurementFileStatusDTO.class,
                 columns = {
-                    @ColumnResult(name = "Status", type = String.class),
+                    @ColumnResult(name = "Status", type = String.class)
+                    ,
                     @ColumnResult(name = "qtd", type = Long.class)
                 }))
 
@@ -49,7 +51,23 @@ import lombok.NoArgsConstructor;
         classes = @ConstructorResult(
                 targetClass = FileStatusDTO.class,
                 columns = {
-                    @ColumnResult(name = "count", type = Long.class),
+                    @ColumnResult(name = "count", type = Long.class)
+                    ,
+                    @ColumnResult(name = "status", type = String.class)
+                }))
+
+@SqlResultSetMapping(name = "statusLote",
+        classes = @ConstructorResult(
+                targetClass = MeansurementFileDTO.class,
+                columns = {
+                    @ColumnResult(name = "taskName", type = String.class)
+                    ,
+                    @ColumnResult(name = "contract", type = Long.class)
+                    ,
+                    @ColumnResult(name = "point", type = String.class)
+                    ,
+                    @ColumnResult(name = "nickname", type = String.class)
+                    ,
                     @ColumnResult(name = "status", type = String.class)
                 }))
 
@@ -60,13 +78,43 @@ import lombok.NoArgsConstructor;
         resultSetMapping = "statusDTO")
 
 @NamedNativeQuery(name = "MeansurementFile.getStatusBilling", query = "SELECT \n"
-        + "    status, COUNT(1) AS count\n"
+        + "    (CASE\n"
+        + "        WHEN (ru.NAME_ = 'RESULTADO DO CÁLCULO DE MEDIÇÃO') THEN 'PROCESSADO COM SUCESSO'\n"
+        + "        WHEN\n"
+        + "            (ru.NAME_ = 'AJUSTAR DADOS DE MEDIÇÃO'\n"
+        + "                OR ru.NAME_ = 'VISUALIZAR ERROS DE VALIDAÇÃO')\n"
+        + "        THEN\n"
+        + "            'PENDENTES'\n"
+        + "        ELSE 'NÃO CARREGADO'\n"
+        + "    END) AS status,\n"
+        + "    COUNT(1) as count\n"
         + "FROM\n"
-        + "    mtx_arquivo_de_medicao\n"
-        + "WHERE\n"
-        + "    ano = :year AND mes = :month\n"
+        + "    activiti.ACT_RU_TASK ru\n"
+        + "    where ru.PROC_INST_ID_ in :process\n"
         + "GROUP BY status",
         resultSetMapping = "statusBilling")
+
+@NamedNativeQuery(name = "MeansurementFile.findByProcessInstanceIdIn",
+        query = "SELECT \n"
+        + "    ru.NAME_ as taskName,\n"
+        + "    a.wbc_contrato as contract,\n"
+        + "    a.wbc_ponto_de_medicao as point,\n"
+        + "    a.empresa_apelido as nickname,\n"
+        + "    (CASE\n"
+        + "        WHEN (ru.NAME_ = 'RESULTADO DO CÁLCULO DE MEDIÇÃO') THEN 'PROCESSADO COM SUCESSO'\n"
+        + "        WHEN\n"
+        + "            (ru.NAME_ = 'AJUSTAR DADOS DE MEDIÇÃO'\n"
+        + "                OR ru.NAME_ = 'VISUALIZAR ERROS DE VALIDAÇÃO')\n"
+        + "        THEN\n"
+        + "            'PENDENTES'\n"
+        + "        ELSE 'NÃO CARREGADO'\n"
+        + "    END) AS status\n"
+        + " FROM\n"
+        + "    mtx_arquivo_de_medicao a\n"
+        + "        LEFT JOIN\n"
+        + "    activiti.ACT_RU_TASK ru ON a.act_id_processo = ru.PROC_INST_ID_\n"
+        + "    where a.act_id_processo in :process",
+        resultSetMapping = "statusLote")
 
 @Entity
 @Table(name = "mtx_arquivo_de_medicao")

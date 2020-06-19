@@ -18,10 +18,15 @@ import org.springframework.data.jpa.domain.Specification;
  */
 public class ParametersSpecification {
 
-    public static Specification<Parameters> find(String key, String value, String description, String type) {
+    public static Specification<Parameters> find(String key, String value, String description, String type, Boolean isApplication) {
 
         List<Specification> predicatives = new ArrayList();
 
+        
+        if (Optional.ofNullable(isApplication).isPresent()) {
+            predicatives.add((root, criteriaQuery, criteriaBuilder) -> criteriaBuilder.equal(root.get(Parameters_.isApplication), isApplication));
+        }        
+        
         if (Optional.ofNullable(key).isPresent()) {
             predicatives.add((root, criteriaQuery, criteriaBuilder) -> criteriaBuilder.equal(criteriaBuilder.upper(root.get(Parameters_.key)), key.toUpperCase()));
         }
@@ -41,11 +46,10 @@ public class ParametersSpecification {
             if (Optional.ofNullable(enumType).isPresent()) {
                 predicatives.add((root, criteriaQuery, criteriaBuilder) -> criteriaBuilder.equal(root.get(Parameters_.type), enumType));
             }
-
         }
 
         Specification<Parameters> spc = predicatives.stream().reduce((a, b) -> a.and(b)).orElse(null);
-
+        
         return spc;
 
     }

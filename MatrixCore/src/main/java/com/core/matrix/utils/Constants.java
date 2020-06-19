@@ -27,8 +27,9 @@ public class Constants {
     public static final String VAR_FILE_NAME = "file_name";
 
     public static final String RESPONSE_LAYOUT_VALID = "Layout Válido";
-    public static final String RESPONSE_SHOW_MODAL = "show-modal";
     public static final String RESPONSE_LAYOUT_INVALID = "Layout Inválido";
+    public static final String RESPONSE_SHOW_MODAL = "show-modal";
+    
 
     public static final String RESPONSE_MEANSUREMENT_POINT_VALID = "Ponto de Medição Válido";
     public static final String RESPONSE_MEANSUREMENT_POINT_INVALID = "Ponto de Medição Inválido";
@@ -85,6 +86,10 @@ public class Constants {
     public static final String PROCESS_INFORMATION_CNPJ = "#Cnpj";
     public static final String PROCESS_INFORMATION_PROCESSO_ID = "#Processo";
     public static final String PROCESS_INFORMATION_CONTRACT_NUMBERS = "#Contracts";
+    
+    
+    public static final String RESPONSE_LIST_PROCESS_ANALIZED = "list_process_analized";
+
 
     public static final String PROCESS_INSTANCE_ID = "process_instance_id";
     public static final String PROCESS_NEW_INSTANCE_ID = "process_new_instance_id";
@@ -123,7 +128,9 @@ public class Constants {
     public static final String TEMPLATE_PARAM_TASK_CREATE_DATE = ":task_create_date";
 
     public static final String TASK_DRAFT = "task_draft";
-
     public static final String GROUP_SUPPORT_TI = "profile-suporte-ti";
+    
+    
+    
 
 }

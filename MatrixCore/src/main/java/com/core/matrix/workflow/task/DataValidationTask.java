@@ -101,9 +101,7 @@ public class DataValidationTask implements Task {
                 log.setProcessInstanceId(de.getProcessInstanceId());
                 log.setProcessName(de.getProcessBusinessKey());
                 log.setActivitiName(de.getCurrentActivityName());
-                this.logService.save(log);
-
-                Logger.getLogger(DataValidationTask.class.getName()).log(Level.SEVERE, "[execute]", e);
+                this.logService.save(log);                
                 de.setVariable(CONTROLE, RESPONSE_INVALID_DATA);
 
             }
@@ -117,11 +115,11 @@ public class DataValidationTask implements Task {
             de.setVariable(CONTROLE, RESPONSE_INVALID_DATA);
             this.writeLogMetrics();
         } else if (hasDataForPersist) {
-            de.setVariable(CONTROLE, RESPONSE_INCONSISTENT_DATA);
+            de.setVariable(CONTROLE, RESPONSE_INCONSISTENT_DATA);            
             this.writeLogMetrics();
+            
             if (de.hasVariable(responseResult)) {
-                de.removeVariable(responseResult);
-                Logger.getLogger(DataValidationTask.class.getName()).log(Level.INFO, "[Removeu a variavel responseResult]");
+                de.removeVariable(responseResult);             
             }
 
             de.setVariable(responseResult, results, true);

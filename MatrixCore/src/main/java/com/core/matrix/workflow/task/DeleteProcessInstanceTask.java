@@ -98,10 +98,8 @@ public class DeleteProcessInstanceTask implements JavaDelegate {
 
             execution.setVariable(PROCESS_CONTRACTS_RELOAD_BILLING, list);
 
-        } catch (Exception e) {
-            
-            Logger.getLogger(DeleteProcessInstanceTask.class.getName()).log(Level.SEVERE, "[sendEmailError]", e);
-            
+        } catch (Exception e) {            
+            Logger.getLogger(DeleteProcessInstanceTask.class.getName()).log(Level.SEVERE, "[sendEmailError]", e);            
             execution.removeVariable(PROCESS_INSTANCE_ID);
             Log log = new Log();
             log.setActivitiName(execution.getCurrentActivityName());

@@ -43,6 +43,8 @@ public class BindFileToProcessJob implements Runnable {
             BeanIO beanIO = new BeanIO();
             file = beanIO.write(processFilesInLoteStatusDTO.getFileParsedDTO(), processFilesInLoteStatusDTO.getTaskId(),processFilesInLoteStatusDTO.getProcessInstanceId());
             InputStream ip = new FileInputStream(file);
+            
+            Logger.getLogger(BindFileToProcessJob.class.getName()).log(Level.INFO, "Processando ->" + processFilesInLoteStatusDTO.toString());
 
             synchronized (taskService) {
                 Attachment attachment = taskService

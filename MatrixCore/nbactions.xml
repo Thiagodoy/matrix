@@ -71,7 +71,7 @@
          <forkMode>once</forkMode>
          <maven.surefire.debug>-Xdebug -Xrunjdwp:transport=dt_socket,server=n,address=${jpda.address}</maven.surefire.debug>
          <jpda.listen>true</jpda.listen>
-         <spring.profiles.active>hml</spring.profiles.active>
+         <spring.profiles.active>test</spring.profiles.active>
       </properties>
    </action>
    <action>
