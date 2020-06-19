@@ -28,6 +28,8 @@ import java.util.Observer;
 import java.util.Optional;
 import java.util.Set;
 import java.util.concurrent.CopyOnWriteArraySet;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import java.util.stream.Collectors;
 import org.activiti.engine.TaskService;
 import org.activiti.engine.delegate.DelegateExecution;
@@ -78,6 +80,9 @@ public class ProcessFilesInLoteTask implements JavaDelegate, Observer {
     public void execute(DelegateExecution execution) throws Exception {
 
         try {
+            
+            this.checkStatusPools();
+            
             processInstanceId = execution.getProcessInstanceId();
             taskService = execution.getEngineServices().getTaskService();
             fileLoteErrorDTOs = Collections.synchronizedList(new ArrayList());
@@ -98,6 +103,7 @@ public class ProcessFilesInLoteTask implements JavaDelegate, Observer {
             }
 
         } catch (Exception e) {
+            Logger.getLogger(ProcessFilesInLoteTask.class.getName()).log(Level.SEVERE, "[execute]", e);
             Log log = new Log();
             log.setActivitiName(execution.getCurrentActivityName());
             log.setMessage("Erro no processo, favor encaminhar para a TI.");
@@ -106,9 +112,12 @@ public class ProcessFilesInLoteTask implements JavaDelegate, Observer {
             log.setType(Log.LogType.ERROR);
             logService.save(log);
         }
-
         this.result(execution);
+    }
 
+    private void checkStatusPools() {
+        this.threadPoolBindFile = this.threadPoolBindFile.isTerminated() ? this.context.getBean(ThreadPoolBindFile.class) : this.threadPoolBindFile;
+        this.threadPoolParseFile = this.threadPoolParseFile.isTerminated() ? this.context.getBean(ThreadPoolParseFile.class) : this.threadPoolParseFile;
     }
 
     private void result(DelegateExecution execution) {
@@ -177,7 +186,7 @@ public class ProcessFilesInLoteTask implements JavaDelegate, Observer {
         });
 
         List<String> process = tasks.stream().map(task -> task.getProcessInstanceId()).collect(Collectors.toList());
-        
+
         execution.setVariable(RESPONSE_LIST_PROCESS_ANALIZED, process);
 
         return listStatus;

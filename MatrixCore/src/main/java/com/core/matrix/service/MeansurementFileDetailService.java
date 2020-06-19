@@ -76,7 +76,6 @@ public class MeansurementFileDetailService {
             switch (file.getType()) {
 
                 case LAYOUT_A:
-
                     detail.setEnergyType(TYPE_ENERGY_LIQUID);
                     detail.setReasonOfSituation(CONST_SITUATION_3);
                     break;

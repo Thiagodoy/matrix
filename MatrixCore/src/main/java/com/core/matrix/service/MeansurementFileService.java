@@ -15,6 +15,7 @@ import com.core.matrix.response.FileStatusBillingResponse;
 import com.core.matrix.response.PageResponse;
 import com.core.matrix.utils.MeansurementFileStatus;
 import com.core.matrix.utils.MeansurementFileType;
+import java.util.Comparator;
 import java.util.List;
 import java.util.stream.Collectors;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -105,10 +106,9 @@ public class MeansurementFileService {
 
         Page<MeansurementFile> pageResponse = this.repository.findByMonthAndYear(month, year, page);
 
-        List<MeansurementFileDTO> result = pageResponse.getContent().stream().map(f-> new MeansurementFileDTO(f)).collect(Collectors.toList());
-        
-        
-        PageResponse<MeansurementFileDTO> responseInfo = new PageResponse<MeansurementFileDTO>(result, (long) pageResponse.getTotalElements(), (long) pageResponse.getSize(),(long)pageResponse.getNumber());
+        List<MeansurementFileDTO> result = pageResponse.getContent().stream().map(f -> new MeansurementFileDTO(f)).collect(Collectors.toList());
+
+        PageResponse<MeansurementFileDTO> responseInfo = new PageResponse<MeansurementFileDTO>(result, (long) pageResponse.getTotalElements(), (long) pageResponse.getSize(), (long) pageResponse.getNumber());
 
         response.setPage(responseInfo);
 
@@ -126,7 +126,11 @@ public class MeansurementFileService {
             response.setFileStatusDTOs(statusFile);
         }
 
-        List<MeansurementFileDTO> pageResponse = this.repository.findByProcessInstanceIdIn(request.getProcessInstances());
+        List<MeansurementFileDTO> pageResponse = this.repository.findByProcessInstanceIdIn(request.getProcessInstances())
+                .stream()
+                .sorted(Comparator.comparing(MeansurementFileDTO::getStatus)
+                        .reversed())
+                .collect(Collectors.toList());
 
         PageResponse<MeansurementFileDTO> responseInfo = new PageResponse<MeansurementFileDTO>(pageResponse, (long) pageResponse.size(), (long) pageResponse.size(), 0l);
 

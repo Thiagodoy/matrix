@@ -24,14 +24,16 @@ import org.springframework.stereotype.Component;
  *
  * @author thiag
  */
-@Component
 public class ThreadPoolBindFile {
 
-    @Autowired
     private TaskService taskService;
     private ThreadPoolExecutor pool = (ThreadPoolExecutor) Executors.newFixedThreadPool(1);
     private Set<ProcessFilesInLoteStatusDTO> set = new HashSet<>();
     private List<Future> future = new ArrayList<>();
+
+    public ThreadPoolBindFile(TaskService taskService) {
+        this.taskService = taskService;
+    }
 
     public void submit(ProcessFilesInLoteStatusDTO statusDTO) {
         if (!set.contains(statusDTO)) {
@@ -58,8 +60,12 @@ public class ThreadPoolBindFile {
         this.pool.shutdown();
     }
 
+    public boolean isTerminated() {
+        return this.pool.isTerminated();
+    }
+
     public void monitor() {
-        while (!this.pool.isTerminated()) {
+        while (!pool.isTerminated()) {
             try {
                 Thread.sleep(5000);
             } catch (Exception e) {

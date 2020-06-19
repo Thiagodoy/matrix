@@ -6,13 +6,18 @@
 package com.core.matrix.configuration;
 
 import com.core.matrix.properties.MatrixProperties;
+import com.core.matrix.utils.ThreadPoolBindFile;
+import com.core.matrix.utils.ThreadPoolParseFile;
 import com.zaxxer.hikari.HikariConfig;
 import com.zaxxer.hikari.HikariDataSource;
 import java.util.HashMap;
 import javax.sql.DataSource;
+import org.activiti.engine.TaskService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.config.ConfigurableBeanFactory;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.context.annotation.Scope;
 import org.springframework.data.jpa.repository.config.EnableJpaRepositories;
 import org.springframework.orm.jpa.JpaTransactionManager;
 import org.springframework.orm.jpa.LocalContainerEntityManagerFactoryBean;
@@ -95,6 +100,16 @@ public class MatrixDataBaseConfiguration {
         return transactionManager;
     }
 
+    @Bean
+    @Scope(value = ConfigurableBeanFactory.SCOPE_PROTOTYPE)
+    public ThreadPoolParseFile threadPoolParseFile(){
+        return  new ThreadPoolParseFile();
+    }
     
+    @Bean 
+    @Scope(value = ConfigurableBeanFactory.SCOPE_PROTOTYPE)
+    public ThreadPoolBindFile threadPoolBindFile(TaskService service){
+        return new ThreadPoolBindFile(service);
+    }
     
 }

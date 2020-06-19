@@ -19,9 +19,8 @@ import org.springframework.stereotype.Component;
  *
  * @author thiag
  */
-@Component
 public class ThreadPoolParseFile {
-    
+
     private ThreadPoolExecutor pool = (ThreadPoolExecutor) Executors.newFixedThreadPool(2);
     private List<Future> future = new ArrayList<>();
 
@@ -43,6 +42,10 @@ public class ThreadPoolParseFile {
 
     public void shutdown() {
         this.pool.shutdown();
+    }
+
+    public boolean isTerminated() {
+        return this.pool.isTerminated();
     }
 
     public void monitor() {

@@ -23,12 +23,13 @@ public class MeansurementFileDTO {
     private String status;
     private String processInstanceId;
 
-    public MeansurementFileDTO(String taskName, Long contract, String point, String nickname, String status) {
+    public MeansurementFileDTO(String taskName, Long contract, String point, String nickname, String status, String processInstance) {
         this.taskName = taskName;
         this.contract = contract;
         this.point = point;
         this.nickname = nickname;
         this.status = status;
+        this.processInstanceId = processInstance;
     }
 
     public MeansurementFileDTO(MeansurementFile file) {

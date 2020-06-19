@@ -19,6 +19,7 @@ import com.core.matrix.service.MeansurementFileResultService;
 import com.core.matrix.service.MeansurementFileService;
 import com.core.matrix.utils.Constants;
 import static com.core.matrix.utils.Constants.PROCESS_INFORMATION_CLIENT;
+import static com.core.matrix.utils.Constants.PROCESS_INFORMATION_MONITOR_CLIENT;
 import static com.core.matrix.utils.Constants.PROCESS_INFORMATION_NICKNAME;
 import com.core.matrix.wbc.dto.ContractWbcInformationDTO;
 import com.core.matrix.wbc.dto.ContractDTO;
@@ -126,7 +127,7 @@ public class CalculateTask implements Task {
             String point = file.getMeansurementPoint().replaceAll("\\((L|B)\\)", "").trim();
 
             String nickname = de.hasVariable(PROCESS_INFORMATION_NICKNAME) ? de.getVariable(PROCESS_INFORMATION_NICKNAME, String.class) : null;
-            String name = de.hasVariable(PROCESS_INFORMATION_CLIENT) ? de.getVariable(PROCESS_INFORMATION_CLIENT, String.class) : null;
+            String name = de.hasVariable(PROCESS_INFORMATION_MONITOR_CLIENT) ? de.getVariable(PROCESS_INFORMATION_MONITOR_CLIENT, String.class) : null;
 
             MeansurementFileResult fileResult = new MeansurementFileResult(contractWbcInformationDTO, de.getProcessInstanceId());
             fileResult.setAmountScde(this.roundValue((sum / 1000), 6));
@@ -241,11 +242,11 @@ public class CalculateTask implements Task {
                     Optional<ContractDTO> contractDTO = this.contractWbcService
                             .findAll(file.getWbcContract(), null)
                             .stream()
-                            .filter(c-> c.getSNrContrato().equals(file.getWbcContract().toString()))
+                            .filter(c -> c.getSNrContrato().equals(file.getWbcContract().toString()))
                             .findFirst();
-                    
+
                     String nickname = contractDTO.isPresent() ? contractDTO.get().getSNmApelido() : null;
-                    String name = contractDTO.isPresent() ? contractDTO.get().getSNmContrato() : null;
+                    String name = contractDTO.isPresent() ? contractDTO.get().getSNmEmpresaEpce() : null;
 
                     MeansurementFileResult fileResult = new MeansurementFileResult(contractWbcInformation, de.getProcessInstanceId());
 
@@ -278,6 +279,50 @@ public class CalculateTask implements Task {
                     logService.save(log);
                 }
             });
+
+            boolean hasUnitConsumer = contractsInformations
+                    .stream()
+                    .anyMatch(c -> Optional.ofNullable(c.getIsConsumerUnit()).isPresent() && c.getIsConsumerUnit().equals("1"));
+
+            if (hasUnitConsumer) {
+
+                MeansurementFile file = files.stream().findFirst().get();
+
+                contractsInformations
+                        .stream()
+                        .filter(c -> Optional.ofNullable(c.getIsConsumerUnit()).isPresent() && c.getIsConsumerUnit().equals("1"))
+                        .forEach(c -> {
+
+                            ContractWbcInformationDTO contractWbcInformation = this.contractWbcService
+                                    .getInformation(file.getYear(), file.getMonth(), c.getCodeWbcContract())
+                                    .orElse(null);
+
+                            Optional<ContractDTO> contractDTO = this.contractWbcService
+                                    .findAll(file.getWbcContract(), null)
+                                    .stream()
+                                    .filter(x -> x.getSNrContrato().equals(c.getWbcContract().toString()))
+                                    .findFirst();
+
+                            String nickname = contractDTO.isPresent() ? contractDTO.get().getSNmApelido() : null;
+                            String name = contractDTO.isPresent() ? contractDTO.get().getSNmEmpresaEpce() : null;
+
+                            MeansurementFileResult fileResult = new MeansurementFileResult(contractWbcInformation, de.getProcessInstanceId());
+
+                            Double amountScde = 0D;
+                            fileResult.setAmountScde(amountScde);
+                            fileResult.setAmountBruto(0D);
+                            fileResult.setAmountLiquido(0D);
+                            fileResult.setWbcContract(Long.valueOf(contractWbcInformation.getNrContract()));
+                            fileResult.setMeansurementPoint(null);
+                            fileResult.setNickNameCompany(nickname);
+                            fileResult.setNameCompany(name);
+                            fileResult.setPercentLoss(c.getPercentOfLoss() / 100);
+                            fileResult.setProinfa(0D);
+                            fileResult.setFactorAtt(c.getFactorAttendanceCharge());
+                            fileResult.setContractParent(0L);
+                            fileResult.setWbcSubmercado(c.getWbcSubmercado());
+                        });
+            }
 
             MeansurementFile file = files.stream().findFirst().orElseThrow(() -> new Exception("Nenhum Arquivo!"));
 

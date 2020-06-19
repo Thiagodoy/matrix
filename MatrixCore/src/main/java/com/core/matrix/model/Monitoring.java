@@ -281,5 +281,10 @@ public class Monitoring implements Serializable {
     @ReportColumn(name = "RESPONSAVEL", position = 0, typeValue = String.class, typeReport = {"FULL"})
     @Column(name = "RESPONSAVEL")
     public String responsavel;
+    
+    
+    @ReportColumn(name = "VALOR_AJUSTADO", position = 0, typeValue = String.class, typeReport = {"FULL"})
+    @Column(name = "VALOR_AJUSTADO")
+    public Double valorAjustado;
 
 }

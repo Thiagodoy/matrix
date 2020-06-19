@@ -175,13 +175,13 @@ public class MeansurementFileResult {
 
     public MeansurementFileResult(ContractWbcInformationDTO informationDTO, String idProcess) {
 
-        this.qtdHiredMin = informationDTO.getQtdHiredMin();
-        this.qtdHiredMax = informationDTO.getQtdHiredMax();
-        this.qtdHired = informationDTO.getQtdHired();
+        this.qtdHiredMin = Optional.fromNullable(informationDTO).isPresent() ? informationDTO.getQtdHiredMin() : 0D ;
+        this.qtdHiredMax = Optional.fromNullable(informationDTO).isPresent() ? informationDTO.getQtdHiredMax() : 0D;
+        this.qtdHired = Optional.fromNullable(informationDTO).isPresent() ? informationDTO.getQtdHired() : 0D;
         this.idProcess = idProcess;
-        this.limitMin = informationDTO.getLimitMin();
-        this.limitMax = informationDTO.getLimitMax();
-        this.price = informationDTO.getPrice();
+        this.limitMin = Optional.fromNullable(informationDTO).isPresent() ? informationDTO.getLimitMin() : 0D;
+        this.limitMax = Optional.fromNullable(informationDTO).isPresent() ? informationDTO.getLimitMax() : 0D;
+        this.price = Optional.fromNullable(informationDTO).isPresent() ? informationDTO.getPrice() : 0D;
 
     }
 
