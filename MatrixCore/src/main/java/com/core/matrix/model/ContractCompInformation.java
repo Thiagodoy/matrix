@@ -118,11 +118,21 @@ public class ContractCompInformation  implements Serializable,Model<ContractComp
             this.codeContractApportionment = 0L;
         }
         
+        if(Optional.ofNullable(this.meansurementPoint).isPresent() && this.meansurementPoint.length() == 0){
+            this.meansurementPoint = null;
+        }
+        
     }
 
     @PreUpdate
     public void generateLastUpdate() {
         this.lastUpdate = LocalDateTime.now();
+        
+        if(Optional.ofNullable(this.meansurementPoint).isPresent() && this.meansurementPoint.length() == 0){
+            this.meansurementPoint = null;
+        }
+        
+        
     }
     
     public Long getId() {

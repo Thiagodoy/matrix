@@ -15,6 +15,7 @@ import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.Table;
 import lombok.Data;
+import lombok.NoArgsConstructor;
 
 /**
  *
@@ -23,7 +24,8 @@ import lombok.Data;
 @Entity
 @Table(name = "mtx_status_processamento_lote")
 @Data
-public class MeansurementFileDTO implements Serializable{
+@NoArgsConstructor
+public class ProcessStatusLote implements Serializable{
 
     private static final long serialVersionUID = 6264517643114257020L;
     
@@ -49,8 +51,11 @@ public class MeansurementFileDTO implements Serializable{
     
     @Column(name = "act_id_processo")
     private String processInstanceId;
+    
+     @Column(name = "act_id_processo_lote")
+    private String processInstanceIdLote;
 
-    public MeansurementFileDTO(String taskName, Long contract, String point, String nickname, String status, String processInstance) {
+    public ProcessStatusLote(String taskName, Long contract, String point, String nickname, String status, String processInstance) {
         this.taskName = taskName;
         this.contract = contract;
         this.point = point;
@@ -59,7 +64,7 @@ public class MeansurementFileDTO implements Serializable{
         this.processInstanceId = processInstance;
     }
 
-    public MeansurementFileDTO(MeansurementFile file) {
+    public ProcessStatusLote(MeansurementFile file) {
         this.contract = file.getWbcContract();
         this.processInstanceId = file.getProcessInstanceId();
         this.point = file.getMeansurementPoint();

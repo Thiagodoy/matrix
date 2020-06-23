@@ -46,10 +46,7 @@ public class ContractCompInformationService {
 
     @Autowired
     private MeansurementFileResultService fileResultService;
-
-    @Autowired
-    private MeansurementFileDetailService fileDetailService;
-
+    
     @Autowired
     private RuntimeService runtimeService;
 
@@ -148,7 +145,7 @@ public class ContractCompInformationService {
     }
 
     public void reloadProcess(Long contractId) throws Exception {
-        
+
         List<ContractCompInformation> list = this.listByContract(contractId);
 
         LocalDate now = LocalDate.now();
@@ -191,8 +188,5 @@ public class ContractCompInformationService {
         runtimeService.startProcessInstanceByMessage(PROCESS_BILLING_CONTRACT_MESSAGE_EVENT, variables);
 
     }
-    
-    
-    
 
 }

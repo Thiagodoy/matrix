@@ -5,37 +5,31 @@
  */
 package com.core.matrix.service;
 
-import com.core.matrix.model.MeansurementFileDTO;
-import com.core.matrix.repository.MeansurementFileDTORepository;
+import com.core.matrix.model.ProcessStatusLote;
 import java.util.List;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import com.core.matrix.repository.ProcessStatusLoteRepository;
 
 /**
  *
  * @author thiag
  */
 @Service
-public class MeansurementFileDTOService {
-    
+public class ProcessStatusLoteService {    
     
     @Autowired
-    private MeansurementFileDTORepository repository;
+    private ProcessStatusLoteRepository repository;
     
     @Transactional
-    public void save(MeansurementFileDTO request){
+    public void save(ProcessStatusLote request){
         this.repository.save(request);
     }
     
     @Transactional
-    public void saveAll(List<MeansurementFileDTO> request){
+    public void saveAll(List<ProcessStatusLote> request){
         this.repository.saveAll(request);
     }
-    
-    
-    
-    
-    
     
 }

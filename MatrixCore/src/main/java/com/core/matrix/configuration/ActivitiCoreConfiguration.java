@@ -35,7 +35,9 @@ import org.activiti.engine.ProcessEngineConfiguration;
 import org.activiti.engine.RepositoryService;
 import org.activiti.engine.RuntimeService;
 import org.activiti.engine.TaskService;
+
 import org.activiti.engine.impl.cfg.StandaloneProcessEngineConfiguration;
+import org.activiti.engine.impl.jobexecutor.JobExecutor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.EnvironmentAware;
@@ -63,7 +65,7 @@ public class ActivitiCoreConfiguration implements EnvironmentAware {
 
     @Autowired
     private ActivitiProperties activitiProperties;
-    
+
     @Autowired
     private MatrixProperties matrixProperties;
 
@@ -92,10 +94,10 @@ public class ActivitiCoreConfiguration implements EnvironmentAware {
         //properties.put("hibernate.hbm2ddl.auto", "update");
         properties.put("hibernate.dialect", "org.hibernate.dialect.MySQL5InnoDBDialect");
         // properties.put("hibernate.tool.hbm2ddl.SchemaUpdate", "true");
-        if(activeProfile.equals("test")){
-            properties.put("hibernate.physical_naming_strategy","com.core.matrix.utils.PhysicalNamingStrategyImpl");
+        if (activeProfile.equals("test")) {
+            properties.put("hibernate.physical_naming_strategy", "com.core.matrix.utils.PhysicalNamingStrategyImpl");
         }
-        
+
         em.setJpaPropertyMap(properties);
 
         return em;
@@ -119,7 +121,7 @@ public class ActivitiCoreConfiguration implements EnvironmentAware {
         hikariConfig.setUsername(activitiProperties.getDatasource().getSqlserver().getDataSourceUser());
         hikariConfig.setPassword(activitiProperties.getDatasource().getSqlserver().getDataSourcePassword());
         hikariConfig.setMaxLifetime(activitiProperties.getDatasource().getMaxLifetime());
-        hikariConfig.setPoolName("ActivitiPool");        
+        hikariConfig.setPoolName("ActivitiPool");
         hikariConfig.setConnectionTestQuery(activitiProperties.getDatasource().getSqlserver().getConnectionTestQuery());
 
         dataSource = new HikariDataSource(hikariConfig);
@@ -146,15 +148,21 @@ public class ActivitiCoreConfiguration implements EnvironmentAware {
 
         ProcessEngineConfiguration s = new StandaloneProcessEngineConfiguration()
                 .setCustomSessionFactories(null)
-                .setDatabaseSchemaUpdate(ProcessEngineConfiguration.DB_SCHEMA_UPDATE_TRUE)               
-
+                .setDatabaseSchemaUpdate(ProcessEngineConfiguration.DB_SCHEMA_UPDATE_TRUE)
                 .setDataSource(this.dataSource())
                 .setAsyncFailedJobWaitTime(2147483647)
                 .setDefaultFailedJobWaitTime(2147483647)
+                .setAsyncExecutorActivate(true)
                 .setJobExecutorActivate(true);
 
         ProcessEngine processEngine = s.buildProcessEngine();
+        
+        JobExecutor jobExecutor = processEngine.getProcessEngineConfiguration().getJobExecutor();
+        jobExecutor.setLockTimeInMillis(15*60000);
+        // jobExecutor.setWaitTimeInMillis(5*60000);
 
+//        AsyncExecutor asyncExecutor = processEngine.getProcessEngineConfiguration().getAsyncExecutor();
+//        asyncExecutor.setDefaultAsyncJobAcquireWaitTimeInMillis(15*60000);
         return processEngine;
 
     }
@@ -213,9 +221,9 @@ public class ActivitiCoreConfiguration implements EnvironmentAware {
     public BillingContractsTask billingContractsTask(ApplicationContext context) {
         return new BillingContractsTask(context);
     }
-    
+
     @Bean
-    public DeleteProcessInstanceTask deleteProcessInstanceTask(ApplicationContext context){
+    public DeleteProcessInstanceTask deleteProcessInstanceTask(ApplicationContext context) {
         return new DeleteProcessInstanceTask(context);
     }
 
@@ -243,19 +251,19 @@ public class ActivitiCoreConfiguration implements EnvironmentAware {
     public CheckTake checkTake(ApplicationContext context) {
         return new CheckTake(context);
     }
-    
+
     @Bean
-    public ProcessFilesInLoteTask processFilesInLoteTask(ApplicationContext context){
-        return new ProcessFilesInLoteTask(context,matrixProperties.getThreadPoolSize());
+    public ProcessFilesInLoteTask processFilesInLoteTask(ApplicationContext context) {
+        return new ProcessFilesInLoteTask(context, matrixProperties.getThreadPoolSize());
     }
-    
+
     @Bean
-    public ValidationFileLoteTask validationFileLoteTask(ApplicationContext context){
+    public ValidationFileLoteTask validationFileLoteTask(ApplicationContext context) {
         return new ValidationFileLoteTask(context);
     }
-    
-    @Bean 
-    public ResultFileLoteListener resultFileLoteListener(ApplicationContext context){
+
+    @Bean
+    public ResultFileLoteListener resultFileLoteListener(ApplicationContext context) {
         return new ResultFileLoteListener(context);
     }
 

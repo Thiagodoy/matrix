@@ -13,12 +13,10 @@ import com.core.matrix.jobs.ParseFileJob;
 import com.core.matrix.model.Log;
 import com.core.matrix.model.MeansurementFile;
 import com.core.matrix.request.FileStatusLoteRequest;
-import com.core.matrix.response.FileStatusBillingResponse;
 import com.core.matrix.service.LogService;
 import com.core.matrix.service.MeansurementFileService;
 import static com.core.matrix.utils.Constants.CONTROLE;
 import static com.core.matrix.utils.Constants.RESPONSE_LIST_PROCESS_ANALIZED;
-import static com.core.matrix.utils.Constants.RESPONSE_RESULT;
 import com.core.matrix.utils.ThreadPoolBindFile;
 import com.core.matrix.utils.ThreadPoolEmail;
 import com.core.matrix.utils.ThreadPoolParseFile;
@@ -67,13 +65,13 @@ public class ProcessFilesInLoteTask implements JavaDelegate, Observer {
 
     public ProcessFilesInLoteTask() {
 
-        synchronized (context) {
-            this.emailFactory = this.context.getBean(EmailFactory.class);
-            this.threadPoolEmail = this.context.getBean(ThreadPoolEmail.class);
-            this.meansurementFileService = this.context.getBean(MeansurementFileService.class);
-            this.logService = this.context.getBean(LogService.class);
-            this.threadPoolBindFile = this.context.getBean(ThreadPoolBindFile.class);
-            this.threadPoolParseFile = this.context.getBean(ThreadPoolParseFile.class);
+        synchronized (ProcessFilesInLoteTask.context) {
+            this.emailFactory = ProcessFilesInLoteTask.context.getBean(EmailFactory.class);
+            this.threadPoolEmail = ProcessFilesInLoteTask.context.getBean(ThreadPoolEmail.class);
+            this.meansurementFileService = ProcessFilesInLoteTask.context.getBean(MeansurementFileService.class);
+            this.logService = ProcessFilesInLoteTask.context.getBean(LogService.class);
+            this.threadPoolBindFile = ProcessFilesInLoteTask.context.getBean(ThreadPoolBindFile.class);
+            this.threadPoolParseFile = ProcessFilesInLoteTask.context.getBean(ThreadPoolParseFile.class);
         }
 
     }
@@ -86,17 +84,17 @@ public class ProcessFilesInLoteTask implements JavaDelegate, Observer {
     public void execute(DelegateExecution execution) throws Exception {
 
         try {
-           
-            this.checkStatusPools();            
-            
-            
+
+            this.checkStatusPools();
+
             processInstanceId = execution.getProcessInstanceId();
             taskService = execution.getEngineServices().getTaskService();
             fileLoteErrorDTOs = Collections.synchronizedList(new ArrayList());
+
+            this.restartProcess();
+
             status = new CopyOnWriteArraySet(getProcessPendingForUploadFile(execution));
 
-             this.restartProcess();
-            
             if (!status.isEmpty()) {
                 this.startPollExecutor();
                 this.checkJobsParseFile();
@@ -152,17 +150,13 @@ public class ProcessFilesInLoteTask implements JavaDelegate, Observer {
         List<String> process = execution.getVariable(RESPONSE_LIST_PROCESS_ANALIZED, List.class);
 
         FileStatusLoteRequest request = new FileStatusLoteRequest();
-        request.setLoadSummary(true);
         request.setProcessInstances(process);
 
-        meansurementFileService.generateStatus(request);
-
-        
+        meansurementFileService.generateStatus(request, execution.getProcessInstanceId());
 
     }
 
-    
-     private void restartProcess() {
+    private void restartProcess() {
 
         LocalDate dateBilling = LocalDate.now().minusMonths(1);
 
@@ -194,15 +188,13 @@ public class ProcessFilesInLoteTask implements JavaDelegate, Observer {
                         taskService.complete(task.getId(), parameters);
 
                     } catch (Exception e) {
-                        Logger.getLogger(ProcessFilesInLoteTask1.class.getName()).log(Level.SEVERE, "[restartProcess] -> Erro ao realizar o completeTask", e);
+                        Logger.getLogger(ProcessFilesInLoteTask.class.getName()).log(Level.SEVERE, "[restartProcess] -> Erro ao realizar o completeTask", e);
                     }
 
                 });
 
     }
 
-    
-    
     private Set<ProcessFilesInLoteStatusDTO> getProcessPendingForUploadFile(DelegateExecution execution) {
 
         LocalDate dateBilling = LocalDate.now().minusMonths(1);
@@ -222,7 +214,7 @@ public class ProcessFilesInLoteTask implements JavaDelegate, Observer {
                         + "    a.status = 'FILE_PENDING' AND a.mes = " + month + "\n"
                         + "        AND a.ano = " + year + "\n"
                         + "        AND a.wbc_ponto_de_medicao IS NOT NULL\n"
-                        + "        AND b.TASK_DEF_KEY_ = 'task-upload-file-meansurement'")
+                        + "        AND b.TASK_DEF_KEY_ in ('task-upload-file-meansurement','task-upload-file-meansurement-1','task-upload-file-meansurement-2')")
                 .list();
 
         Set<ProcessFilesInLoteStatusDTO> listStatus = new HashSet<>();

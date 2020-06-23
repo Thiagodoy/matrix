@@ -68,13 +68,8 @@
             <groupId>org.activiti</groupId>
             <artifactId>activiti-image-generator</artifactId>
             <version>5.22.0</version>
-        </dependency>
-        
-        <!--        <dependency>
-            <groupId>org.activiti</groupId>
-            <artifactId>activiti-spring-boot-starter-basic</artifactId>
-            <version>5.23.0</version>
-        </dependency>-->
+        </dependency>       
+       
         
         <!-- https://mvnrepository.com/artifact/io.jsonwebtoken/jjwt -->
         <dependency>

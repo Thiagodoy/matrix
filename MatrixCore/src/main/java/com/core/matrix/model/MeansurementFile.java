@@ -57,7 +57,7 @@ import lombok.NoArgsConstructor;
 
 @SqlResultSetMapping(name = "statusLote",
         classes = @ConstructorResult(
-                targetClass = MeansurementFileDTO.class,
+                targetClass = ProcessStatusLote.class,
                 columns = {
                     @ColumnResult(name = "taskName", type = String.class)
                     ,

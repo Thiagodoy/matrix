@@ -5,7 +5,7 @@
  */
 package com.core.matrix.repository;
 
-import com.core.matrix.model.MeansurementFileDTO;
+import com.core.matrix.model.ProcessStatusLote;
 import java.util.List;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -17,9 +17,9 @@ import org.springframework.stereotype.Repository;
  * @author thiag
  */
 @Repository
-public interface MeansurementFileDTORepository extends JpaRepository<MeansurementFileDTO, Long> {
+public interface ProcessStatusLoteRepository extends JpaRepository<ProcessStatusLote, Long> {
 
-    Page<MeansurementFileDTO> findByProcessInstanceIdIn(List<String> process, Pageable page);
-    List<MeansurementFileDTO> findByProcessInstanceIdIn(List<String> process);
+    Page<ProcessStatusLote> findByProcessInstanceIdLote(String process, Pageable page);
+    List<ProcessStatusLote> findByProcessInstanceIdLote(String process);
 
 }

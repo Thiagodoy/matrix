@@ -18,7 +18,6 @@ import com.core.matrix.service.LogService;
 import com.core.matrix.service.MeansurementFileResultService;
 import com.core.matrix.service.MeansurementFileService;
 import com.core.matrix.utils.Constants;
-import static com.core.matrix.utils.Constants.PROCESS_INFORMATION_CLIENT;
 import static com.core.matrix.utils.Constants.PROCESS_INFORMATION_MONITOR_CLIENT;
 import static com.core.matrix.utils.Constants.PROCESS_INFORMATION_NICKNAME;
 import com.core.matrix.wbc.dto.ContractWbcInformationDTO;
@@ -46,8 +45,7 @@ public class CalculateTask implements Task {
     private static ApplicationContext context;
 
     private MeansurementFileService fileService;
-    private ContractCompInformationService contractService;
-    private EmpresaService empresaService;
+    private ContractCompInformationService contractService;    
     private LogService logService;
 
     private MeansurementFileResultService resultService;
@@ -57,8 +55,7 @@ public class CalculateTask implements Task {
 
         synchronized (CalculateTask.context) {
             this.fileService = CalculateTask.context.getBean(MeansurementFileService.class);
-            this.contractService = CalculateTask.context.getBean(ContractCompInformationService.class);
-            this.empresaService = CalculateTask.context.getBean(EmpresaService.class);
+            this.contractService = CalculateTask.context.getBean(ContractCompInformationService.class);            
             this.resultService = CalculateTask.context.getBean(MeansurementFileResultService.class);
             this.contractWbcService = CalculateTask.context.getBean(ContractService.class);
             this.logService = CalculateTask.context.getBean(LogService.class);
@@ -124,7 +121,7 @@ public class CalculateTask implements Task {
 
             double consumptionTotal = ((sum / 1000) + ((sum / 1000) * percentLoss) - proinfa) * factorAtt;
 
-            String point = file.getMeansurementPoint().replaceAll("\\((L|B)\\)", "").trim();
+           // String point = file.getMeansurementPoint().replaceAll("\\((L|B)\\)", "").trim();
 
             String nickname = de.hasVariable(PROCESS_INFORMATION_NICKNAME) ? de.getVariable(PROCESS_INFORMATION_NICKNAME, String.class) : null;
             String name = de.hasVariable(PROCESS_INFORMATION_MONITOR_CLIENT) ? de.getVariable(PROCESS_INFORMATION_MONITOR_CLIENT, String.class) : null;
@@ -374,12 +371,7 @@ public class CalculateTask implements Task {
 
     }
 
-    private Double solicitadoLiquido(Double consumptionTotal, ContractWbcInformationDTO contractWbcInformationDTO) {
-
-        Logger.getLogger(CalculateTask.class.getName()).log(Level.INFO, "consumptionTotal -> " + consumptionTotal);
-        Logger.getLogger(CalculateTask.class.getName()).log(Level.INFO, "getNrQtd    ->" + contractWbcInformationDTO.getNrQtd());
-        Logger.getLogger(CalculateTask.class.getName()).log(Level.INFO, "getNrQtdMin ->" + contractWbcInformationDTO.getNrQtdMin());
-        Logger.getLogger(CalculateTask.class.getName()).log(Level.INFO, "getNrQtdMax ->" + contractWbcInformationDTO.getNrQtdMax());
+    private Double solicitadoLiquido(Double consumptionTotal, ContractWbcInformationDTO contractWbcInformationDTO) {     
 
         BigDecimal consumptionTotalArredondado = new BigDecimal(consumptionTotal).setScale(3, RoundingMode.HALF_EVEN);
 

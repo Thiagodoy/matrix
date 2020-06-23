@@ -6,7 +6,7 @@
 package com.core.matrix.response;
 
 import com.core.matrix.dto.FileStatusDTO;
-import com.core.matrix.model.MeansurementFileDTO;
+import com.core.matrix.model.ProcessStatusLote;
 import java.io.Serializable;
 import java.util.List;
 import lombok.Data;
@@ -20,6 +20,6 @@ public class FileStatusBillingResponse implements Serializable {
 
     private static final long serialVersionUID = -1929956763395654015L;
     private List<FileStatusDTO> fileStatusDTOs;
-    private PageResponse<MeansurementFileDTO> page;
+    private PageResponse<ProcessStatusLote> page;
 
 }
