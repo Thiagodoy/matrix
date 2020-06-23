@@ -5,7 +5,7 @@
  */
 package com.core.matrix.dto;
 
-import javax.persistence.Column;
+import java.io.Serializable;
 import lombok.Data;
 
 /**
@@ -13,8 +13,10 @@ import lombok.Data;
  * @author thiag
  */
 @Data
-public class FileDetailDTO {
+public class FileDetailDTO implements Serializable{
 
+    private static final long serialVersionUID = 7705948467256766769L;    
+    
     public long line;
     public String fileName;
     public String agent;

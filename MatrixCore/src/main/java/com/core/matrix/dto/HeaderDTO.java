@@ -5,6 +5,7 @@
  */
 package com.core.matrix.dto;
 
+import java.io.Serializable;
 import java.util.Arrays;
 import java.util.Objects;
 import lombok.Data;
@@ -14,8 +15,10 @@ import lombok.Data;
  * @author thiag
  */
 @Data
-public class HeaderDTO {
+public class HeaderDTO implements Serializable{
 
+    private static final long serialVersionUID = -8660786212320941769L;
+    
     public String headeragent;
     public String headermeansurementPoint;
     public String headerdate;

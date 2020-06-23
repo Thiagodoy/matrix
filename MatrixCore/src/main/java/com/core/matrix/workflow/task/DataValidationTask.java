@@ -80,8 +80,7 @@ public class DataValidationTask implements Task {
                 .filter(f -> !this.contractInformationService.isConsumerUnit(f.getWbcContract()))
                 .collect(Collectors.toList());
 
-        files.forEach(file -> {
-            Logger.getLogger(BeanIO.class.getName()).log(Level.INFO, "File id -> " + file.getId());
+        files.forEach(file -> {            
             file.setStatus(MeansurementFileStatus.SUCCESS);
         });
 
@@ -136,9 +135,7 @@ public class DataValidationTask implements Task {
         this.logService.save(log);
     }
 
-    private void checkCalendar(MeansurementFile file) throws Exception {
-
-        Logger.getLogger(BeanIO.class.getName()).log(Level.INFO, "[checkCalendar] File id -> " + file.getId());
+    private void checkCalendar(MeansurementFile file) throws Exception {        
 
         int daysOnMonth = YearMonth.of(file.getYear().intValue(), Month.of(file.getMonth().intValue())).lengthOfMonth();
         LocalDate init = LocalDate.of(file.getYear().intValue(), file.getMonth().intValue(), 1);
@@ -179,9 +176,7 @@ public class DataValidationTask implements Task {
 
     }
 
-    private void checkHour(MeansurementFile file) throws Exception {
-
-        Logger.getLogger(BeanIO.class.getName()).log(Level.INFO, "[checkHour] File id -> " + file.getId());
+    private void checkHour(MeansurementFile file) throws Exception {        
 
         Map<String, List<MeansurementFileDetail>> lotes = this.getDetails(file, delegateExecution)
                 .stream()
@@ -278,8 +273,6 @@ public class DataValidationTask implements Task {
     }
 
     private void checkDays(MeansurementFile file) throws Exception {
-
-        Logger.getLogger(BeanIO.class.getName()).log(Level.INFO, "[checkDays] File id -> " + file.getId());
 
         int daysOnMonth = YearMonth.of(file.getYear().intValue(), Month.of(file.getMonth().intValue())).lengthOfMonth();
 

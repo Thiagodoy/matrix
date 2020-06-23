@@ -5,6 +5,7 @@
  */
 package com.core.matrix.dto;
 
+import java.io.Serializable;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
@@ -14,15 +15,15 @@ import lombok.NoArgsConstructor;
  */
 @Data
 @NoArgsConstructor
-public class FileStatusDTO {
+public class FileStatusDTO implements Serializable {
+
+    private static final long serialVersionUID = -711844277177553695L;
 
     private Long count;
     private String status;
-    
-    
 
     public FileStatusDTO(Long count, String status) {
         this.count = count;
         this.status = status;
-    }   
+    }
 }

@@ -5,6 +5,7 @@
  */
 package com.core.matrix.dto;
 
+import java.io.Serializable;
 import lombok.Data;
 
 /**
@@ -12,7 +13,10 @@ import lombok.Data;
  * @author thiag
  */
 @Data
-public class InformationDTO {
+public class InformationDTO implements Serializable{
+
+    private static final long serialVersionUID = -3000598630936971562L;
+    
     public String value;    
     
 }

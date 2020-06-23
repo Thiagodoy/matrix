@@ -5,18 +5,11 @@ import static com.core.matrix.utils.Constants.*;
 import com.core.matrix.utils.MeansurementFileType;
 import java.io.BufferedReader;
 import java.io.ByteArrayInputStream;
-import java.io.ByteArrayOutputStream;
 import java.io.File;
-import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
-import java.io.OutputStream;
-import java.io.OutputStreamWriter;
 import java.io.Reader;
-import java.io.Writer;
 import java.text.MessageFormat;
-import java.time.LocalDateTime;
-import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
@@ -40,14 +33,14 @@ public class BeanIO {
 
     public List<String> errors = new ArrayList<>();
 
-    public File write(FileParsedDTO data, String taskId, String process) throws Exception {
+    public File write(FileParsedDTO data, String taskId, String process, long id) throws Exception {
 
         MeansurementFileType type = MeansurementFileType.valueOf(data.getType());
         Stream stream = Stream.getByLayoutFile(type);
         StreamFactory factory = StreamFactory.newInstance();
         InputStream str = factory.getClass().getClassLoader().getResourceAsStream(stream.getStreamFile());
         factory.load(str);        
-        String fileName = MessageFormat.format("chunk-{0}-{1}.csv", taskId,process);
+        String fileName = MessageFormat.format("chunk-t{0}-p{1}-{2}.csv", taskId,process,id);
         File file = new File(fileName);        
         
         BeanWriter out = factory.createWriter(stream.getStreamId(), file);       

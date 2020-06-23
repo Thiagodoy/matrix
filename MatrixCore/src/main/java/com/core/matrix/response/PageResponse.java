@@ -5,6 +5,7 @@
  */
 package com.core.matrix.response;
 
+import java.io.Serializable;
 import java.util.List;
 import lombok.Data;
 
@@ -13,7 +14,9 @@ import lombok.Data;
  * @author thiag
  */
 @Data
-public class PageResponse<T> {
+public class PageResponse<T> implements Serializable {
+
+    private static final long serialVersionUID = -7165766675619516792L;
 
     private List<T> content;
     private Long totalPages;

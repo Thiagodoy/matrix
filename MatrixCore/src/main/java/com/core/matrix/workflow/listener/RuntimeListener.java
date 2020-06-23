@@ -84,14 +84,13 @@ public class RuntimeListener implements ActivitiEventListener {
 
             case TASK_COMPLETED:
 
-                task = event.getEngineServices()
-                        .getTaskService()
-                        .createTaskQuery()
-                        .executionId(executionId)
-                        .singleResult();
-
-                this.notificationService.pushActionRemoveTask(task.getId());
-
+//                task = event.getEngineServices()
+//                        .getTaskService()
+//                        .createTaskQuery()
+//                        .executionId(executionId)
+//                        .singleResult();
+//
+//                this.notificationService.pushActionRemoveTask(task.getId());
                 break;
 
         }
@@ -99,8 +98,6 @@ public class RuntimeListener implements ActivitiEventListener {
     }
 
     private void prepareEmails(ActivitiEvent event, Template.TemplateBusiness template, com.core.matrix.model.Notification.NotificationType notificationType) {
-
-        Logger.getLogger(RuntimeListener.class.getName()).log(Level.INFO, "EVENT-> " + event.getType().toString());
 
         pool.submit(() -> {
 

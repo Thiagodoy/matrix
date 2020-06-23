@@ -6,7 +6,6 @@
 package com.core.matrix.model;
 
 import com.core.matrix.dto.FileStatusDTO;
-import com.core.matrix.dto.MeansurementFileDTO;
 import com.core.matrix.dto.MeansurementFileStatusDTO;
 import com.core.matrix.utils.MeansurementFileStatus;
 import com.core.matrix.utils.MeansurementFileType;

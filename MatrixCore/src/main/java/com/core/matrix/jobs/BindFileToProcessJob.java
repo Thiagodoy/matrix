@@ -10,7 +10,6 @@ import com.core.matrix.io.BeanIO;
 import static com.core.matrix.utils.Constants.LIST_ATTACHMENT_ID;
 import java.io.File;
 import java.io.FileInputStream;
-import java.io.IOException;
 import java.io.InputStream;
 import java.text.MessageFormat;
 import java.util.Arrays;
@@ -31,19 +30,18 @@ import org.apache.commons.io.FileUtils;
 public class BindFileToProcessJob implements Runnable {
 
     private TaskService taskService;
-    private ProcessFilesInLoteStatusDTO processFilesInLoteStatusDTO;  
-    
+    private ProcessFilesInLoteStatusDTO processFilesInLoteStatusDTO;
 
     @Override
     public void run() {
 
-         File file =  null;
-        
+        File file = null;
+
         try {
             BeanIO beanIO = new BeanIO();
-            file = beanIO.write(processFilesInLoteStatusDTO.getFileParsedDTO(), processFilesInLoteStatusDTO.getTaskId(),processFilesInLoteStatusDTO.getProcessInstanceId());
+            file = beanIO.write(processFilesInLoteStatusDTO.getFileParsedDTO(), processFilesInLoteStatusDTO.getTaskId(), processFilesInLoteStatusDTO.getProcessInstanceId(), 1);
             InputStream ip = new FileInputStream(file);
-            
+
             Logger.getLogger(BindFileToProcessJob.class.getName()).log(Level.INFO, "Processando ->" + processFilesInLoteStatusDTO.toString());
 
             synchronized (taskService) {
@@ -61,26 +59,26 @@ public class BindFileToProcessJob implements Runnable {
                 parameters.put(LIST_ATTACHMENT_ID, Arrays.asList(attachment.getId()));
 
                 taskService.complete(processFilesInLoteStatusDTO.getTaskId(), parameters);
-            }            
-            
-            processFilesInLoteStatusDTO.setStatus(ProcessFilesInLoteStatusDTO.Status.ASSOCIATED);            
+            }
+
+            processFilesInLoteStatusDTO.setStatus(ProcessFilesInLoteStatusDTO.Status.ASSOCIATED);
 
         } catch (Exception ex) {
             Logger.getLogger(BindFileToProcessJob.class.getName()).log(Level.SEVERE, "[run]", ex);
             processFilesInLoteStatusDTO.setStatus(ProcessFilesInLoteStatusDTO.Status.ERROR);
-            processFilesInLoteStatusDTO.setError(MessageFormat.format("Erro ao associar o arquivo ao processo [ {1} ]",processFilesInLoteStatusDTO.getProcessInstanceId() ));            
-        }finally{
-             try {
-                 if(file != null){
-                    FileUtils.forceDelete(file);
-                 }                 
-             } catch (IOException ex) {
-                 Logger.getLogger(BindFileToProcessJob.class.getName()).log(Level.SEVERE, "[run]", ex);
-             }
+            processFilesInLoteStatusDTO.setError(MessageFormat.format("Erro ao associar o arquivo ao processo [ {1} ]", processFilesInLoteStatusDTO.getProcessInstanceId()));
+        } finally {
+            deleteFile(file);
         }
-        
-        
+    }
 
+    private void deleteFile(File file) {
+        try {
+            if (file != null) {
+                FileUtils.forceDelete(file);
+            }
+        } catch (Exception e) {
+        }
     }
 
 }

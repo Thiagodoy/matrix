@@ -6,20 +6,24 @@
 package com.core.matrix.service;
 
 import com.core.matrix.dto.FileStatusDTO;
-import com.core.matrix.dto.MeansurementFileDTO;
+import com.core.matrix.model.MeansurementFileDTO;
 import com.core.matrix.dto.MeansurementFileStatusDTO;
 import com.core.matrix.model.MeansurementFile;
+import com.core.matrix.repository.MeansurementFileDTORepository;
 import com.core.matrix.repository.MeansurementFileRepository;
 import com.core.matrix.request.FileStatusLoteRequest;
 import com.core.matrix.response.FileStatusBillingResponse;
 import com.core.matrix.response.PageResponse;
 import com.core.matrix.utils.MeansurementFileStatus;
 import com.core.matrix.utils.MeansurementFileType;
+import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
+import java.util.Map;
 import java.util.stream.Collectors;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -33,6 +37,9 @@ public class MeansurementFileService {
 
     @Autowired
     private MeansurementFileRepository repository;
+
+    @Autowired
+    private MeansurementFileDTORepository tORepository;
 
     @Transactional
     public MeansurementFile saveFile(MeansurementFile file) {
@@ -116,15 +123,8 @@ public class MeansurementFileService {
 
     }
 
-    @Transactional(readOnly = true)
-    public FileStatusBillingResponse statusEnd(FileStatusLoteRequest request) {
-
-        FileStatusBillingResponse response = new FileStatusBillingResponse();
-
-        if (request.isLoadSummary()) {
-            List<FileStatusDTO> statusFile = this.repository.getStatusBilling(request.getProcessInstances());
-            response.setFileStatusDTOs(statusFile);
-        }
+    @Transactional
+    public void generateStatus(FileStatusLoteRequest request) {
 
         List<MeansurementFileDTO> pageResponse = this.repository.findByProcessInstanceIdIn(request.getProcessInstances())
                 .stream()
@@ -132,7 +132,32 @@ public class MeansurementFileService {
                         .reversed())
                 .collect(Collectors.toList());
 
-        PageResponse<MeansurementFileDTO> responseInfo = new PageResponse<MeansurementFileDTO>(pageResponse, (long) pageResponse.size(), (long) pageResponse.size(), 0l);
+        tORepository.saveAll(pageResponse);
+
+    }
+
+    @Transactional(readOnly = true)
+    public FileStatusBillingResponse statusEnd(FileStatusLoteRequest request) {
+
+        FileStatusBillingResponse response = new FileStatusBillingResponse();
+
+        if (request.isLoadSummary()) {
+
+            List<FileStatusDTO> statusFile = new ArrayList<>();
+            List<MeansurementFileDTO> pageResponse1 = tORepository.findByProcessInstanceIdIn(request.getProcessInstances());
+            Map<String, Long> mapSummary = pageResponse1.stream().collect(Collectors.groupingBy(MeansurementFileDTO::getStatus, Collectors.counting()));
+            mapSummary.keySet().stream().forEach(key -> {
+                FileStatusDTO fileStatusDTO = new FileStatusDTO(mapSummary.get(key), key);
+                statusFile.add(fileStatusDTO);
+            });
+
+            response.setFileStatusDTOs(statusFile);
+
+        }
+
+        Page<MeansurementFileDTO> pageResponse = tORepository.findByProcessInstanceIdIn(request.getProcessInstances(), PageRequest.of(request.getPage().intValue(), request.getSize().intValue()));
+
+        PageResponse<MeansurementFileDTO> responseInfo = new PageResponse<MeansurementFileDTO>(pageResponse.getContent(), (long) pageResponse.getTotalElements(), (long) pageResponse.getNumberOfElements(), (long) pageResponse.getNumber());
 
         response.setPage(responseInfo);
 

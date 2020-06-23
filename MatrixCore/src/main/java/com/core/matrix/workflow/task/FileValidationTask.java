@@ -92,8 +92,6 @@ public class FileValidationTask implements JavaDelegate {
             logs = new ArrayList<>();
             final List<String> attachmentIds = (List<String>) de.getVariable(LIST_ATTACHMENT_ID, Object.class);
             
-            Logger.getLogger(FileValidationTask.class.getName()).log(Level.INFO, LIST_ATTACHMENT_ID + " ->" + attachmentIds.toString());
-            
             final String user = de.getVariable(USER_UPLOAD, String.class);
             files = this.service.findByProcessInstanceId(delegateExecution.getProcessInstanceId());
             

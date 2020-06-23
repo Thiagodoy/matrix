@@ -5,16 +5,21 @@
  */
 package com.core.matrix.dto;
 
+import java.io.Serializable;
 import java.util.List;
 import lombok.Data;
+import lombok.EqualsAndHashCode;
 
 /**
  *
  * @author thiag
  */
 @Data
-public class FileParsedDTO {
+@EqualsAndHashCode(of = {"details","type","informations"})
+public class FileParsedDTO implements Serializable{
 
+    private static final long serialVersionUID = 5296134700280186728L;
+    
     public List<InformationDTO> informations;
     public HeaderDTO header;         
     public List<FileDetailDTO> details;
