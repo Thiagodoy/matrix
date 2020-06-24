@@ -6,10 +6,13 @@
 package com.core.matrix.repository;
 
 import com.core.matrix.model.SessionWebsocket;
+import java.time.LocalDateTime;
 import java.util.List;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.JpaSpecificationExecutor;
+import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.stereotype.Repository;
+import org.springframework.transaction.annotation.Transactional;
 
 /**
  *
@@ -18,5 +21,10 @@ import org.springframework.stereotype.Repository;
 @Repository
 public interface SessionWebsocketRepository extends JpaRepository<SessionWebsocket, String>, JpaSpecificationExecutor<SessionWebsocket> {
 
-   List<SessionWebsocket> findByUserId(String user);
+    List<SessionWebsocket> findByUserId(String user);
+
+    @Modifying
+    @Transactional
+    void deleteByCreatedAtBefore(LocalDateTime date);
+
 }

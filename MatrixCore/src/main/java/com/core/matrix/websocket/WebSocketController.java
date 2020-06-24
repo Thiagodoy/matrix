@@ -41,7 +41,7 @@ public class WebSocketController {
 
         repository.save(sessionWebsocket);
 
-        notificationService.push(sessionWebsocket.getUserId(), sessionWebsocket.getSessionId());
+        notificationService.pushUserNotifications(sessionWebsocket.getUserId(), sessionWebsocket.getSessionId());
     }
 
     @MessageMapping(value = {"/unregister"})

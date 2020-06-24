@@ -84,17 +84,33 @@ public class RuntimeListener implements ActivitiEventListener {
 
             case TASK_COMPLETED:
 
-//                task = event.getEngineServices()
-//                        .getTaskService()
-//                        .createTaskQuery()
-//                        .executionId(executionId)
-//                        .singleResult();
-//
-//                this.notificationService.pushActionRemoveTask(task.getId());
+                 task = this.getTask(event);
+                 
+                 if(Optional.ofNullable(task).isPresent()){                     
+                     synchronized(this.notificationService){
+                        this.notificationService.deleteNotificationByTaskId(task.getId());
+                        this.notificationService.pushActionRemoveByTaskId(task.getId());
+                     }
+                 }
+
+                
                 break;
 
         }
 
+    }
+
+    private Task getTask(ActivitiEvent event) {
+
+        try {
+            return event.getEngineServices()
+                    .getTaskService()
+                    .createTaskQuery()
+                    .executionId(event.getExecutionId())
+                    .singleResult();
+        } catch (Exception e) {
+            return null;
+        }
     }
 
     private void prepareEmails(ActivitiEvent event, Template.TemplateBusiness template, com.core.matrix.model.Notification.NotificationType notificationType) {
@@ -104,7 +120,7 @@ public class RuntimeListener implements ActivitiEventListener {
             try {
                 final ActivitiEvent events = event;
 
-                Thread.sleep(10000);
+                Thread.sleep(5000);
 
                 Task task;
                 try {

@@ -47,7 +47,7 @@ public class NotificationService {
     }
 
     @Transactional(readOnly = true)
-    public void push(String userId, String sessionId) {
+    public void pushUserNotifications(String userId, String sessionId) {
 
         List<Notification> notifications = repository.findByToAndIsRead(userId, false);
 
@@ -66,38 +66,45 @@ public class NotificationService {
     }
 
     @Transactional
-    public void push(Notification notification) {
+    public Long push(Notification notification) {
 
         boolean canWrite = repository.findByToAndTaskIdAndProcessId(notification.getTo(), notification.getTaskId(), notification.getProcessId()).isEmpty();
+        Long idNotification = null;
 
         if (canWrite) {
             notification = repository.save(notification);
-            List<SessionWebsocket> opt = sessionWebsocketRepository.findByUserId(notification.getTo());
-
-            if (!opt.isEmpty()) {
-                SessionWebsocket session = opt.get(0);
+            Optional<SessionWebsocket> opt = sessionWebsocketRepository.findByUserId(notification.getTo()).stream().findFirst();
+            
+            if (opt.isPresent()) {
+                SessionWebsocket session = opt.get();
                 SimpMessageHeaderAccessor headerAccessor = SimpMessageHeaderAccessor.create(SimpMessageType.MESSAGE);
                 headerAccessor.setSessionId(session.getSessionId());
-
                 messagingTemplate.convertAndSendToUser(session.getSessionId(), URL_SUBSCRIBER_QUEUE, notification, headerAccessor.getMessageHeaders());
             }
+            
+            return notification.getId();
         }
+        
+        return idNotification;
 
     }
 
     @Transactional
-    public void pushActionRemoveTask(String taskId) {
+    public void deleteNotificationByTaskId(String taskId) {
+        this.repository.deleteByTaskId(taskId);
+    }
 
-        List<Notification> notifications = this.repository.findByTaskId(taskId);
+    @Transactional
+    public void pushActionRemoveByTaskId(String taskId) {
+        messagingTemplate.convertAndSend(URL_SUBSCRIBER_TOPIC_ACTION, new Action(taskId, null, Action.ActionType.REMOVE));
+    }
 
-        if (!notifications.isEmpty()) {
+    @Transactional
+    public void pushActionRemoveByNotificationId(List<Long> ids) {
 
-            notifications.forEach(n -> {
-                this.repository.delete(n);
-            });
-
-            messagingTemplate.convertAndSend(URL_SUBSCRIBER_TOPIC_ACTION, new Action(taskId, Action.ActionType.REMOVE));
-        }
+        ids.forEach(id -> {
+            messagingTemplate.convertAndSend(URL_SUBSCRIBER_TOPIC_ACTION, new Action(null, id, Action.ActionType.REMOVE));
+        });
 
     }
 

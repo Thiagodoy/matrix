@@ -23,5 +23,6 @@ public class Action {
     }    
     
     private String taskId;
+    private Long notificationId;
     private ActionType type;
 }

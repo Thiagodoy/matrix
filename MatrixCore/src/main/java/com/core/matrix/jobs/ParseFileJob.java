@@ -43,7 +43,7 @@ public class ParseFileJob implements Runnable {
 
     public void run() {
 
-        try {           
+        try {
 
             synchronized (taskService) {
                 stream = taskService.getAttachmentContent(attachmentId);
@@ -75,21 +75,19 @@ public class ParseFileJob implements Runnable {
                                     .stream()
                                     .parallel()
                                     .filter(detail -> detail
-                                        .getMeansurementPoint()
-                                        .contains(point))
+                                    .getMeansurementPoint()
+                                    .contains(point))
                                     .collect(Collectors.toList());
-                            
-                            synchronized(l){
+
+                            synchronized (l) {
                                 l.pointChecked(point, fileParsedDTO.getInformations(), fileParsedDTO.getHeader(), details, fileParsedDTO.getType());
                             }
-                            
+
                         }
 
                     });
 
                 });
-
-
 
             } else if (!reader.getErrors().isEmpty()) {
                 loteErrorDTO.setErrors(reader.getErrors());

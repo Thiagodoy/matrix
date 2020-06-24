@@ -9,6 +9,7 @@ import com.core.matrix.model.Notification;
 import java.util.List;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.JpaSpecificationExecutor;
+import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.stereotype.Repository;
 
 /**
@@ -21,8 +22,11 @@ public interface NotificationRepository extends JpaRepository<Notification, Long
     
     List<Notification> findByToAndIsRead(String user, boolean isRead);
     
-    List<Notification> findByToAndTaskIdAndProcessId(String user, String task,String process);
+    List<Notification> findByToAndTaskIdAndProcessId(String user, String task,String process);   
     
     List<Notification> findByTaskId(String id);
+    
+    @Modifying
+    void deleteByTaskId(String id);
     
 }

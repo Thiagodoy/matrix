@@ -80,7 +80,7 @@ email:
            
 websocket:
         cors:
-            origin: http://portalhml.eastus2.cloudapp.azure.com        
+            origin: http://localhost:8080      
             
 portal:
         url:  http://portalhml.eastus2.cloudapp.azure.com/troca-senha

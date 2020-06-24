@@ -7,6 +7,7 @@ package com.core.matrix.specifications;
 
 import com.core.matrix.model.Email;
 import com.core.matrix.model.Email_;
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
@@ -37,10 +38,18 @@ public class EmailSpecification {
         if (Optional.ofNullable(status).isPresent()) {
             predicatives.add((root, criteriaQuery, criteriaBuilder) -> criteriaBuilder.equal(root.get(Email_.status), status));
         }
+        
+        if (Optional.ofNullable(status).isPresent()) {
+            predicatives.add((root, criteriaQuery, criteriaBuilder) -> criteriaBuilder.equal(root.get(Email_.status), status));
+        }
 
         Specification<Email> spc = predicatives.stream().reduce((a, b) -> a.and(b)).orElse(null);
 
         return spc;
+    }
+    
+    public static Specification<Email> createAt(LocalDateTime date){
+        return (root, criteriaQuery, criteriaBuilder) -> criteriaBuilder.lessThan(root.get(Email_.createdAt), date);
     }
 
 }
