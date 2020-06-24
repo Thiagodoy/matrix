@@ -45,7 +45,8 @@ public class Template implements Model<Template>{
         WELCOME_USER,
         PROCESS_ERROR,
         FINISHED_UPLOAD_LOTE_FILE,
-        GROUP_TASK_PENDING;
+        GROUP_TASK_PENDING,
+        REPURCHASE;
     }
     
     @Id
@@ -72,7 +73,7 @@ public class Template implements Model<Template>{
     protected LocalDateTime createdAt;
     
     @Column(name = "parametros")
-    protected String parameters;
+    protected String attachments;
     
     @PrePersist
     public void generatedDate(){

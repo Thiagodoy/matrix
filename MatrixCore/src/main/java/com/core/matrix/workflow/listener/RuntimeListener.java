@@ -70,13 +70,9 @@ public class RuntimeListener implements ActivitiEventListener {
     @Override
     public void onEvent(ActivitiEvent event) {
 
-        final String executionId = event.getExecutionId();
         this.taskService = event.getEngineServices().getTaskService();
         Task task = null;
         switch (event.getType()) {
-//            case TASK_ASSIGNED:
-//                prepareEmails(event, Template.TemplateBusiness.GROUP_TASK_PENDING, Notification.NotificationType.GROUP_TASK_PENDING);
-//                break;
 
             case TASK_CREATED:
                 prepareEmails(event, Template.TemplateBusiness.GROUP_TASK_PENDING, Notification.NotificationType.GROUP_TASK_PENDING);
@@ -84,16 +80,15 @@ public class RuntimeListener implements ActivitiEventListener {
 
             case TASK_COMPLETED:
 
-                 task = this.getTask(event);
-                 
-                 if(Optional.ofNullable(task).isPresent()){                     
-                     synchronized(this.notificationService){
+                task = this.getTask(event);
+
+                if (Optional.ofNullable(task).isPresent()) {
+                    synchronized (this.notificationService) {
                         this.notificationService.deleteNotificationByTaskId(task.getId());
                         this.notificationService.pushActionRemoveByTaskId(task.getId());
-                     }
-                 }
+                    }
+                }
 
-                
                 break;
 
         }
@@ -258,41 +253,6 @@ public class RuntimeListener implements ActivitiEventListener {
                 .findFirst()
                 .orElse("");
 
-    }
-
-    private synchronized List<UserActiviti> getUsersFromTaskAndProcessDef(String task, String processDefinitionId) {
-
-        List<UserActiviti> users = new ArrayList<>();
-
-        identityService.createNativeUserQuery().sql("SELECT \n"
-                + "    u.*\n"
-                + "FROM\n"
-                + "    activiti.ACT_RU_IDENTITYLINK ari\n"
-                + "        LEFT JOIN\n"
-                + "    activiti.ACT_ID_MEMBERSHIP aim ON ari.GROUP_ID_ = aim.GROUP_ID_\n"
-                + "        LEFT JOIN\n"
-                + "    activiti.ACT_ID_USER u ON aim.USER_ID_ = u.ID_\n"
-                + "WHERE\n"
-                + "    ari.TYPE_ = 'candidate'\n"
-                + "        AND (ari.TASK_ID_ = '" + task + "'\n"
-                + "        OR ari.PROC_DEF_ID_ = '" + processDefinitionId + "')").list().stream().forEach(u -> {
-                    UserActiviti user = this.getUserByEmail(u.getId());
-                    if (Optional.ofNullable(user).isPresent()) {
-                        users.add(user);
-                    }
-                });
-
-        return users;
-
-    }
-
-    private UserActiviti getUserByEmail(String email) {
-        try {
-            return userActivitiService.findById(email);
-        } catch (Exception e) {
-            Logger.getLogger(RuntimeListener.class.getName()).log(Level.SEVERE, "[getUserByEmail]", e);
-            return null;
-        }
     }
 
     @Override
