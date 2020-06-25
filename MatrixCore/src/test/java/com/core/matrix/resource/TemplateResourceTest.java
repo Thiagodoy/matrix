@@ -36,7 +36,7 @@ public class TemplateResourceTest extends ResourceAbstractTest {
         String uri = Url.URL_API_TEMPLATE;
 
         Template request = new Template();
-        request.setParameters(":name,:email");
+        request.setAttachments(":name,:email");
         request.setSubject("Esqueci a senha");
         request.setTemplate("<html>");
 
@@ -80,7 +80,7 @@ public class TemplateResourceTest extends ResourceAbstractTest {
         String uri = Url.URL_API_TEMPLATE ;
         
         Template request = new Template();
-        request.setParameters(":update,:update");
+        request.setAttachments(":update,:update");
         request.setSubject("Esqueci a senha (UPdata)");
         request.setTemplate("<update>");
         request.setId(idTemplate);

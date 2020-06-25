@@ -115,6 +115,8 @@ public class Constants {
     public static final String CONST_APPROVED = "APROVADO";
 
     public static final String IMAGE_LOGO_MATRIX = "static/logo-matrix.png";
+    public static final String IMAGE_LOGO_MATRIX_HEADER = "static/matrix-cinza-header.png";
+    public static final String IMAGE_LOGO_MATRIX_FOOTER = "static/matrix-cinza-footer.png";
 
     public static final String USER_INFO_ATTEMPTS = "tentativas";
 

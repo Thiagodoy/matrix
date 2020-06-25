@@ -34,13 +34,15 @@ public class SendEmailTest{
     @Test    
     public void teste() throws Exception {
         
-        Email email = emailFactory.createEmailTemplate(Template.TemplateBusiness.FINISHED_UPLOAD_LOTE_FILE);
+        Email email = emailFactory.createEmailTemplate(Template.TemplateBusiness.REPURCHASE_WHITOUT_RATEIO);
         email.setParameter(TEMPLATE_PARAM_USER_NAME, "Thiago");
         email.setParameter(TEMPLATE_PARAM_NUMBER_PROCESS, "XXXXX");
         email.setParameter(TEMPLATE_PARAM_USER_EMAIL, "thiagodoy@hotmail.com");
 
         threadPoolEmail.submit(email);
         
+        
+        Thread.sleep(10000);
         
     }
 

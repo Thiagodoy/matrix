@@ -10,6 +10,7 @@ import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import com.fasterxml.jackson.datatype.jsr310.deser.LocalDateTimeDeserializer;
 import com.fasterxml.jackson.datatype.jsr310.ser.LocalDateTimeSerializer;
 import java.time.LocalDateTime;
+import java.util.Optional;
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.EnumType;
@@ -46,7 +47,7 @@ public class Template implements Model<Template>{
         PROCESS_ERROR,
         FINISHED_UPLOAD_LOTE_FILE,
         GROUP_TASK_PENDING,
-        REPURCHASE;
+        REPURCHASE_WHITOUT_RATEIO;
     }
     
     @Id
@@ -77,7 +78,11 @@ public class Template implements Model<Template>{
     
     @PrePersist
     public void generatedDate(){
-        this.createdAt = LocalDateTime.now();
+        this.createdAt = LocalDateTime.now();        
+        
+        if(!Optional.ofNullable(this.attachments).isPresent()){
+            this.attachments = "";
+        }
     }
     
     

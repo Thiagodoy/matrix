@@ -156,7 +156,7 @@ public class Utils {
         InputStream initialStream = factory.getClass().getClassLoader().getResourceAsStream(path);
 
         File targetFile = File.createTempFile("logo", ".png");
-
+        targetFile.deleteOnExit();
         FileUtils.copyInputStreamToFile(initialStream, targetFile);
         return targetFile;
     }
