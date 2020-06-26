@@ -239,7 +239,7 @@ public class RuntimeListener implements ActivitiEventListener {
             }
         });
 
-        return names.stream().collect(Collectors.joining("#"));
+        return names.stream().collect(Collectors.toList()).get(0);
 
     }
 

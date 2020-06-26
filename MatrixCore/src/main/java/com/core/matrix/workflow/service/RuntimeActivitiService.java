@@ -15,6 +15,7 @@ import com.core.matrix.response.AttachmentResponse;
 import com.core.matrix.response.PageResponse;
 import com.core.matrix.response.ProcessDefinitionResponse;
 import com.core.matrix.response.ProcessDetailResponse;
+import com.core.matrix.response.ProcessInstanceStatusResponse;
 import com.core.matrix.response.TaskResponse;
 import com.core.matrix.utils.Constants;
 import static com.core.matrix.utils.Constants.PROCESS_INFORMATION_PROCESSO_ID;
@@ -28,6 +29,7 @@ import java.text.MessageFormat;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Comparator;
 import java.util.HashMap;
 import java.util.List;
@@ -115,9 +117,9 @@ public class RuntimeActivitiService {
         request.getVariables().put(Constants.CREATED_AT, Utils.dateTimeNowFormated());
         //request.getVariables().put("taskSe", taskService);
         ProcessInstance processInstance = this.runtimeService.startProcessInstanceByKey(request.getKey(), request.getVariables());
-        
+
         request.getVariables().put(PROCESS_INFORMATION_PROCESSO_ID, processInstance.getProcessInstanceId());
-        
+
         this.runtimeService.setVariables(processInstance.getProcessInstanceId(), request.getVariables());
 
         Task task = this.getNextUserTaskByProcessInstanceId(processInstance.getId(), userId, true);
@@ -283,9 +285,9 @@ public class RuntimeActivitiService {
 
         int min = page * size;
 
-        LocalDateTime now = LocalDateTime.now();        
+        LocalDateTime now = LocalDateTime.now();
         int daysOfMonth = Utils.getDaysOfMonth(now.toLocalDate());
-        
+
         String start = LocalDateTime.of(now.getYear(), now.getMonth(), 1, 0, 1).format(DateTimeFormatter.ISO_LOCAL_DATE_TIME).replace("T", " ");
         String end = LocalDateTime.of(now.getYear(), now.getMonth(), daysOfMonth, 23, 59).format(DateTimeFormatter.ISO_LOCAL_DATE_TIME).replace("T", " ");
 
@@ -324,6 +326,41 @@ public class RuntimeActivitiService {
 
     }
 
+    public PageResponse<ProcessInstanceStatusResponse> findProcess(String searchValue) {
+
+        LocalDateTime now = LocalDateTime.now();
+        int daysOfMonth = Utils.getDaysOfMonth(now.toLocalDate());
+
+        String start = LocalDateTime.of(now.getYear(), now.getMonth(), 1, 0, 1).format(DateTimeFormatter.ISO_LOCAL_DATE_TIME).replace("T", " ");
+        String end = LocalDateTime.of(now.getYear(), now.getMonth(), daysOfMonth, 23, 59).format(DateTimeFormatter.ISO_LOCAL_DATE_TIME).replace("T", " ");
+
+        HistoricProcessInstance process = historyService.createNativeHistoricProcessInstanceQuery()
+                .sql("SELECT DISTINCT\n"
+                        + "    a.PROC_INST_ID_ as ID_, a.PROC_DEF_ID_, a.START_TIME_, a.END_TIME_\n"
+                        + "FROM\n"
+                        + "    activiti.act_hi_procinst a\n"
+                        + "        LEFT JOIN\n"
+                        + "    activiti.act_ru_variable b ON a.PROC_INST_ID_ = b.PROC_INST_ID_\n"
+                        + "        LEFT JOIN\n"
+                        + "    activiti.act_hi_varinst c ON a.PROC_INST_ID_ = c.PROC_INST_ID_\n"
+                        + "WHERE\n"
+                        + "    ((UPPER(b.TEXT_) LIKE '%" + searchValue.toUpperCase() + "%')\n"
+                        + "        OR (UPPER(c.TEXT_) LIKE '%" + searchValue.toUpperCase() + "%'))\n"
+                        + "        AND ((SUBSTRING(c.NAME_, 1, 1) = '#')\n"
+                        + "        OR (SUBSTRING(b.NAME_, 1, 1) = '#'))\n"
+                        + " AND a.START_TIME_ between '" + start + "' and '" + end + "'\n"
+                        + " ORDER by a.START_TIME_ DESC")
+                .listPage(0, 1)
+                .get(0);
+
+        ProcessInstanceStatusResponse status = new ProcessInstanceStatusResponse();
+
+        status.setId(process.getId());
+        status.setProcessName(this.getProcessDefinitionName(process.getProcessDefinitionId()));
+        status.setStatus(Optional.ofNullable(process.getEndTime()).isPresent() ? "Encerrado" : "Em aberto");
+        return new PageResponse<ProcessInstanceStatusResponse>(Arrays.asList(status), (long) 1, (long) 1, (long) 0);
+    }
+
     public PageResponse<TaskResponse> getAssigneAndCandidateTask(UserActiviti user, String searchValue, int page, int size) {
 
         String groupFilter = user.getGroups()
@@ -332,14 +369,12 @@ public class RuntimeActivitiService {
                 .filter(Objects::nonNull)
                 .collect(Collectors.joining(","));
 
-        
-        
         long start = System.currentTimeMillis();
         long end;
-        
+
         List<String> processInstances = this.listProcessInstances(groupFilter, user.getId(), searchValue, page, size);
         end = System.currentTimeMillis();
-        Logger.getLogger(RuntimeActivitiService.class.getName()).log(Level.INFO, "[getAssigneAndCandidateTask] Seleciona processo tempo :" + (end - start)/1000 );
+        Logger.getLogger(RuntimeActivitiService.class.getName()).log(Level.INFO, "[getAssigneAndCandidateTask] Seleciona processo tempo :" + (end - start) / 1000);
 
         long total = Long.parseLong(processInstances.get(0));
 
@@ -350,7 +385,7 @@ public class RuntimeActivitiService {
         }
 
         start = System.currentTimeMillis();
-        
+
         List<TaskResponse> response = taskService
                 .createTaskQuery()
                 .includeProcessVariables()
@@ -366,9 +401,9 @@ public class RuntimeActivitiService {
                     return instance;
                 })
                 .collect(Collectors.toList());
-        
+
         end = System.currentTimeMillis();
-        Logger.getLogger(RuntimeActivitiService.class.getName()).log(Level.INFO, "[getAssigneAndCandidateTask] Preparando response tarefas tempo :" + (end - start)/1000 );
+        Logger.getLogger(RuntimeActivitiService.class.getName()).log(Level.INFO, "[getAssigneAndCandidateTask] Preparando response tarefas tempo :" + (end - start) / 1000);
 
         return new PageResponse<TaskResponse>(response, (long) total, (long) size, (long) page);
     }

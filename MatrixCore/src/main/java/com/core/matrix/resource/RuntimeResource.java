@@ -14,6 +14,7 @@ import com.core.matrix.request.TaskDraftRequest;
 import com.core.matrix.response.AttachmentResponse;
 import com.core.matrix.response.PageResponse;
 import com.core.matrix.response.ProcessDetailResponse;
+import com.core.matrix.response.ProcessInstanceStatusResponse;
 import com.core.matrix.response.TaskResponse;
 import com.core.matrix.utils.Constants;
 import com.core.matrix.workflow.model.UserActiviti;
@@ -95,12 +96,12 @@ public class RuntimeResource {
         }
     }
 
-    @RequestMapping(value = "/findTask", method = RequestMethod.GET)
-    public ResponseEntity findTask(@RequestParam(value = "searchValue", required = true) String searchValue,
+    @RequestMapping(value = "/findProcess", method = RequestMethod.GET)
+    public ResponseEntity findProcess(@RequestParam(value = "searchValue", required = true) String searchValue,
             @RequestParam(name = "page", required = true, defaultValue = "0") int page,
             @RequestParam(name = "size", required = true, defaultValue = "10") int size) {
         try {
-            PageResponse<TaskResponse> response = this.service.findTask(searchValue, page, size);
+            PageResponse<ProcessInstanceStatusResponse> response = this.service.findProcess(searchValue);
             return ResponseEntity.ok(response);
         } catch (Exception e) {
             Logger.getLogger(RuntimeResource.class.getName()).log(Level.SEVERE, "[findTask]", e);

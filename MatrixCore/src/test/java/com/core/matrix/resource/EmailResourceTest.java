@@ -36,7 +36,7 @@ public class EmailResourceTest extends ResourceAbstractTest {
 
         super.setUp();
 
-        String uri = Url.URL_API_NOTIFICATION;
+        String uri = Url.URL_API_EMAIL;
 
         Email notification = new Email();
         
@@ -66,7 +66,7 @@ public class EmailResourceTest extends ResourceAbstractTest {
 
         super.setUp();
 
-        String uri = Url.URL_API_NOTIFICATION + "/" + idNotification;
+        String uri = Url.URL_API_EMAIL + "/" + idNotification;
 
         MvcResult mvcResult = mvc.perform(MockMvcRequestBuilders.get(uri)
                 .contentType(MediaType.APPLICATION_JSON)
@@ -83,7 +83,7 @@ public class EmailResourceTest extends ResourceAbstractTest {
 
         super.setUp();
 
-        String uri = Url.URL_API_NOTIFICATION ;
+        String uri = Url.URL_API_EMAIL ;
         
          Email notification = new Email();
         
@@ -109,7 +109,7 @@ public class EmailResourceTest extends ResourceAbstractTest {
 
         super.setUp();
 
-        String uri = Url.URL_API_NOTIFICATION + "/" + idNotification;
+        String uri = Url.URL_API_EMAIL + "/" + idNotification;
 
         MvcResult mvcResult = mvc.perform(MockMvcRequestBuilders.delete(uri)
                 .contentType(MediaType.APPLICATION_JSON)

@@ -47,7 +47,8 @@ public class Template implements Model<Template>{
         PROCESS_ERROR,
         FINISHED_UPLOAD_LOTE_FILE,
         GROUP_TASK_PENDING,
-        REPURCHASE_WHITOUT_RATEIO;
+        BILLING_WHITOUT_REPURCHASE,
+        BILLING_WITH_REPURCHASE;
     }
     
     @Id

@@ -99,6 +99,7 @@ public class Utils {
         entitiesHtml.put("Ö", "&#214;");
         entitiesHtml.put("Ü", "&#220;");
         entitiesHtml.put("ç", "&#231;");
+        entitiesHtml.put("Ç", "&#199;");
 
     }
 

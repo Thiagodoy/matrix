@@ -45,7 +45,7 @@ public class CalculateTask implements Task {
     private static ApplicationContext context;
 
     private MeansurementFileService fileService;
-    private ContractCompInformationService contractService;    
+    private ContractCompInformationService contractService;
     private LogService logService;
 
     private MeansurementFileResultService resultService;
@@ -55,7 +55,7 @@ public class CalculateTask implements Task {
 
         synchronized (CalculateTask.context) {
             this.fileService = CalculateTask.context.getBean(MeansurementFileService.class);
-            this.contractService = CalculateTask.context.getBean(ContractCompInformationService.class);            
+            this.contractService = CalculateTask.context.getBean(ContractCompInformationService.class);
             this.resultService = CalculateTask.context.getBean(MeansurementFileResultService.class);
             this.contractWbcService = CalculateTask.context.getBean(ContractService.class);
             this.logService = CalculateTask.context.getBean(LogService.class);
@@ -121,8 +121,7 @@ public class CalculateTask implements Task {
 
             double consumptionTotal = ((sum / 1000) + ((sum / 1000) * percentLoss) - proinfa) * factorAtt;
 
-           // String point = file.getMeansurementPoint().replaceAll("\\((L|B)\\)", "").trim();
-
+            // String point = file.getMeansurementPoint().replaceAll("\\((L|B)\\)", "").trim();
             String nickname = de.hasVariable(PROCESS_INFORMATION_NICKNAME) ? de.getVariable(PROCESS_INFORMATION_NICKNAME, String.class) : null;
             String name = de.hasVariable(PROCESS_INFORMATION_MONITOR_CLIENT) ? de.getVariable(PROCESS_INFORMATION_MONITOR_CLIENT, String.class) : null;
 
@@ -264,6 +263,9 @@ public class CalculateTask implements Task {
                     fileResult.setContractParent(0L);
                     fileResult.setWbcSubmercado(contractInformation.getWbcSubmercado());
 
+                    Long perfil = contractDTO.isPresent() ? contractDTO.get().getNCdPerfilCCEE() : 0;
+                    fileResult.setWbcPerfilCCEE(perfil.intValue());
+
                     results.add(fileResult);
                     resultService.save(fileResult);
 
@@ -318,6 +320,8 @@ public class CalculateTask implements Task {
                             fileResult.setFactorAtt(c.getFactorAttendanceCharge());
                             fileResult.setContractParent(0L);
                             fileResult.setWbcSubmercado(c.getWbcSubmercado());
+                            Long perfil = contractDTO.isPresent() ? contractDTO.get().getNCdPerfilCCEE() : 0;
+                            fileResult.setWbcPerfilCCEE(perfil.intValue());
                         });
             }
 
@@ -371,7 +375,7 @@ public class CalculateTask implements Task {
 
     }
 
-    private Double solicitadoLiquido(Double consumptionTotal, ContractWbcInformationDTO contractWbcInformationDTO) {     
+    private Double solicitadoLiquido(Double consumptionTotal, ContractWbcInformationDTO contractWbcInformationDTO) {
 
         BigDecimal consumptionTotalArredondado = new BigDecimal(consumptionTotal).setScale(3, RoundingMode.HALF_EVEN);
 
