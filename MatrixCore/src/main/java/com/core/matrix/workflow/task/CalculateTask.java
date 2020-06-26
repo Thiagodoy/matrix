@@ -322,6 +322,7 @@ public class CalculateTask implements Task {
                             fileResult.setWbcSubmercado(c.getWbcSubmercado());
                             Long perfil = contractDTO.isPresent() ? contractDTO.get().getNCdPerfilCCEE() : 0;
                             fileResult.setWbcPerfilCCEE(perfil.intValue());
+                            resultService.save(fileResult);
                         });
             }
 
