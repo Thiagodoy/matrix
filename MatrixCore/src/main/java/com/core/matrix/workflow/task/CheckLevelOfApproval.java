@@ -7,7 +7,6 @@ package com.core.matrix.workflow.task;
 
 import com.core.matrix.model.AuthorityApproval;
 import com.core.matrix.model.Log;
-import com.core.matrix.model.MeansurementFileAuthority;
 import com.core.matrix.model.MeansurementFileResult;
 import com.core.matrix.service.AuthorityApprovalService;
 import com.core.matrix.service.LogService;
@@ -35,7 +34,6 @@ public class CheckLevelOfApproval implements JavaDelegate {
     private static ApplicationContext context;
 
     private MeansurementFileResultService resultService;
-    private MeansurementFileAuthorityService fileAuthorityService;
 
     private AuthorityApprovalService approvalService;
     private LogService logService;
@@ -50,7 +48,7 @@ public class CheckLevelOfApproval implements JavaDelegate {
             resultService = CheckLevelOfApproval.context.getBean(MeansurementFileResultService.class);
             logService = CheckLevelOfApproval.context.getBean(LogService.class);
             approvalService = CheckLevelOfApproval.context.getBean(AuthorityApprovalService.class);
-            fileAuthorityService = CheckLevelOfApproval.context.getBean(MeansurementFileAuthorityService.class);
+
         }
     }
 
@@ -70,21 +68,21 @@ public class CheckLevelOfApproval implements JavaDelegate {
                 final Double delta = Math.abs((result.getAmountLiquidoAdjusted() - result.getAmountLiquido()));
                 final AuthorityApproval approval = approvalService.findBetween(delta);
 
-            Logger.getLogger(CheckLevelOfApproval.class.getName()).log(Level.INFO, "delta -> " + delta);
-            Logger.getLogger(CheckLevelOfApproval.class.getName()).log(Level.INFO, "authority ->" + authority);
-            Logger.getLogger(CheckLevelOfApproval.class.getName()).log(Level.INFO, "getAuthority ->" + approval.getAuthority());
-            Logger.getLogger(CheckLevelOfApproval.class.getName()).log(Level.INFO, "getMax ->" + approval.getMax());
-                    
+                Logger.getLogger(CheckLevelOfApproval.class.getName()).log(Level.INFO, "delta -> " + delta);
+                Logger.getLogger(CheckLevelOfApproval.class.getName()).log(Level.INFO, "authority ->" + authority);
+                Logger.getLogger(CheckLevelOfApproval.class.getName()).log(Level.INFO, "getAuthority ->" + approval.getAuthority());
+                Logger.getLogger(CheckLevelOfApproval.class.getName()).log(Level.INFO, "getMax ->" + approval.getMax());
+
                 if (authority.equals(approval.getAuthority())) {
-                
+
                     execution.setVariable(CONTROLE, RESPONSE_SEM_ALCADA);
-                    
+
                 } else {
-                        
+
                     execution.setVariable(CONTROLE, RESPONSE_ENCAMINHAR_APROVACAO);
-                    
+
                 }
-            
+
                 /*
                 if (delta.compareTo(approval.getMax()) <= 0) {
                     execution.setVariable(CONTROLE, RESPONSE_SEM_ALCADA);
@@ -95,7 +93,7 @@ public class CheckLevelOfApproval implements JavaDelegate {
                         execution.setVariable(CONTROLE, RESPONSE_ENCAMINHAR_APROVACAO);
                     }
                 }
-                */
+                 */
             }
         } catch (Exception e) {
             Logger.getLogger(CheckLevelOfApproval.class.getName()).log(Level.SEVERE, "[execute]", e);

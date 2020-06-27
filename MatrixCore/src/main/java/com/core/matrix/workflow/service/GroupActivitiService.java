@@ -68,7 +68,7 @@ public class GroupActivitiService {
     @Transactional(readOnly = true)
     public List<String> getGroupByTaskOrProcessDefId(String taskId, String processDefId) {
         return this.identityService.createNativeGroupQuery().sql("SELECT \n"
-                + "    aim.*\n"
+                + "    aim.GROUP_ID_ AS ID_\n"
                 + "FROM\n"
                 + "    activiti.ACT_RU_IDENTITYLINK ari\n"
                 + "        LEFT JOIN\n"

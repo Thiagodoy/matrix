@@ -16,6 +16,7 @@ import javax.persistence.OneToMany;
 import javax.persistence.PrePersist;
 import javax.persistence.Table;
 import lombok.Data;
+import lombok.EqualsAndHashCode;
 import org.activiti.engine.identity.User;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -28,6 +29,7 @@ import org.springframework.security.core.userdetails.UserDetails;
 @Table(schema = "activiti", name = "act_id_user")
 @Data
 @JsonIgnoreProperties(value = {"authorities"})
+@EqualsAndHashCode(of = "id")
 public class UserActiviti implements UserDetails, User, Model<UserActiviti> {
 
     @Id

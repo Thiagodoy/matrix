@@ -42,7 +42,7 @@ public class Parameters implements Model<Parameters> {
 
         switch (this.type) {
             case BOOLEAN:
-                return Boolean.getBoolean(value);
+                return Boolean.parseBoolean(value);
             case TEXT:
                 return value;
             case DOUBLE:

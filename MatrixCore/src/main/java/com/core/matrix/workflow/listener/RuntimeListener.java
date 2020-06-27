@@ -21,8 +21,10 @@ import com.core.matrix.workflow.service.RepositoryActivitiService;
 import com.core.matrix.workflow.service.UserActivitiService;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Optional;
+import java.util.Set;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ThreadPoolExecutor;
 import java.util.logging.Level;
@@ -119,17 +121,7 @@ public class RuntimeListener implements ActivitiEventListener {
 
                 Task task;
                 try {
-                    task = this.taskService
-                            .createNativeTaskQuery().sql("SELECT \n"
-                                    + "    b.*\n"
-                                    + "FROM\n"
-                                    + "    activiti.ACT_RU_EXECUTION a\n"
-                                    + "        INNER JOIN\n"
-                                    + "    activiti.ACT_RU_TASK b ON a.PROC_INST_ID_ = b.PROC_INST_ID_\n"
-                                    + "        AND a.ID_ = b.EXECUTION_ID_\n"
-                                    + "WHERE\n"
-                                    + "    a.ID_ = " + event.getExecutionId())
-                            .singleResult();
+                    task = this.taskService.createTaskQuery().executionId(events.getExecutionId()).singleResult();
                 } catch (Exception e) {
                     Logger.getLogger(RuntimeListener.class.getName()).log(Level.SEVERE, "Não localizou a tarefa para o envio de email exeid-> " + events.getExecutionId(), e);
                     task = null;
@@ -143,13 +135,15 @@ public class RuntimeListener implements ActivitiEventListener {
                 if (parameterOpt1.isPresent()) {
                     Parameters parameter = parameterOpt1.get();
                     if (parameter.getType().equals(Parameters.ParameterType.BOOLEAN) && (Boolean) parameter.getValue()) {
-                        List<UserActiviti> usersEmails = new ArrayList<>();
+                        Set<UserActiviti> usersEmails = new HashSet<>();
                         this.groupActivitiService.getGroupByTaskOrProcessDefId(task.getId(), events.getProcessDefinitionId()).forEach(group -> {
                             usersEmails.addAll(this.groupActivitiService.getUsersByIdGroup(group));
                         });
 
-                        List<Email> emails1 = this.prepareEmails(usersEmails, template, task);
-                        List<Notification> notifications1 = this.prepareNotifications(usersEmails, task, notificationType);
+                        List<UserActiviti>users = usersEmails.stream().collect(Collectors.toList());
+                        List<Email> emails1 = this.prepareEmails(users, template, task);
+                        
+                        List<Notification> notifications1 = this.prepareNotifications(users, task, notificationType);
                         this.send(emails1, notifications1);
                     }
                 }
