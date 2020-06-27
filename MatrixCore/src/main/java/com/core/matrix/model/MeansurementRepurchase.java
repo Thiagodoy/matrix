@@ -75,6 +75,9 @@ public class MeansurementRepurchase implements Serializable, Model<MeansurementR
     protected Double pld;
         
     @Column(name = "spread")
-    protected Double spread;           
+    protected Double spread; 
+    
+    @Column(name = "wbc_contrato")
+    protected Long wbcContract;
     
 }
