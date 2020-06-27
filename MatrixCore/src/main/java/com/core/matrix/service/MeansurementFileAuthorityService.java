@@ -22,32 +22,32 @@ import org.springframework.transaction.annotation.Transactional;
  * @author thiag
  */
 @Service
-public class MeansurementFileAuthorityService extends com.core.matrix.service.Service<MeansurementFileAuthority, MeansurementFileAuthorityRepository>{    
+public class MeansurementFileAuthorityService extends com.core.matrix.service.Service<MeansurementFileAuthority, MeansurementFileAuthorityRepository> {
 
     public MeansurementFileAuthorityService(MeansurementFileAuthorityRepository repositoy) {
         super(repositoy);
-    }    
-    
+    }
+
     @Transactional(readOnly = true)
-    public List<MeansurementFileAuthority> findByProcess(String processInstanceId){
+    public List<MeansurementFileAuthority> findByProcess(String processInstanceId) {
         return this.repository.findByProcessInstanceId(processInstanceId);
     }
-    
+
     @Transactional(readOnly = true)
     public List<MeansurementFileAuthority> find(Long idMeansurementFile, String processIntanceId, String authority, String user, String userName) {
 
         if (Optional.ofNullable(idMeansurementFile).isPresent()) {
             MeansurementFileAuthority mfa = this.repository.findByIdMeansurementFile(idMeansurementFile);
-            if(Optional.ofNullable(mfa).isPresent()){
+            if (Optional.ofNullable(mfa).isPresent()) {
                 return Arrays.asList(mfa);
-            }else{
+            } else {
                 return Collections.emptyList();
             }
-            
+
         }
 
         List<Specification> specifications = new ArrayList();
-        
+
         if (Optional.ofNullable(processIntanceId).isPresent()) {
             specifications.add(MeansurementFileAuthoritySpecification.processIntanceId(processIntanceId));
         }
@@ -68,6 +68,11 @@ public class MeansurementFileAuthorityService extends com.core.matrix.service.Se
 
         return this.repository.findAll(spc);
 
-    }  
+    }
+
+    @Transactional
+    public void deleteByProcessInstanceId(String id) {
+        this.repository.deleteByProcessInstanceId(id);
+    }
 
 }

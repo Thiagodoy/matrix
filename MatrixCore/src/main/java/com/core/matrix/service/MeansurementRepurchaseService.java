@@ -51,9 +51,13 @@ public class MeansurementRepurchaseService extends com.core.matrix.service.Servi
         
         Specification<MeansurementRepurchase> spc = predicative.stream().reduce((a,b)-> a.and(b)).orElse(null);
         
-        return this.repository.findAll(spc, page);
-        
+        return this.repository.findAll(spc, page);       
         
     }  
+    
+    @Transactional
+    public void deleteByProcessInstanceId(String processInstanceId){
+        this.repository.deleteByProcessInstanceId(processInstanceId);
+    }
 
 }
