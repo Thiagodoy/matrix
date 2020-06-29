@@ -85,7 +85,15 @@ public class CheckTake implements JavaDelegate {
             } else if (value.compareTo(result.getQtdHiredMax()) > 0) {
                 execution.setVariable(CONTROLE, RESPONSE_CURTOPRAZO);
             } else if (value.compareTo(result.getQtdHiredMin()) >= 0 && value.compareTo(result.getQtdHiredMax()) <= 0) {
-                execution.setVariable(CONTROLE, RESPONSE_FATURAMENTO);
+                
+                boolean exists  = execution.hasVariable(PARAMETER_WISH_MAKE_REPURCHASE);
+                String parameterValue = execution.getVariable(PARAMETER_WISH_MAKE_REPURCHASE, String.class);
+                
+                if(exists && parameterValue.equals("yes")){
+                    execution.setVariable(CONTROLE, RESPONSE_RECOMPRA);
+                }else{
+                    execution.setVariable(CONTROLE, RESPONSE_FATURAMENTO);
+                }
             }
 
         } catch (Exception e) {

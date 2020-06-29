@@ -34,4 +34,7 @@ public interface MeansurementFileResultRepository extends JpaRepository<Meansure
     void updateToExported(@Param("id")Long id);
     
     
+    
+    
+    
 }

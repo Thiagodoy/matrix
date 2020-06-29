@@ -6,7 +6,6 @@
 package com.core.matrix.resource;
 
 import com.core.matrix.model.MeansurementFile;
-import com.core.matrix.request.FileStatusLoteRequest;
 import com.core.matrix.response.FileStatusBillingResponse;
 import com.core.matrix.service.MeansurementFileService;
 import java.util.List;
@@ -18,8 +17,6 @@ import org.springframework.data.domain.Sort;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RequestAttribute;
-import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;

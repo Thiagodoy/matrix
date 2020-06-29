@@ -135,6 +135,8 @@ public class Constants {
     public static final String TASK_DRAFT = "task_draft";
     public static final String GROUP_SUPPORT_TI = "profile-suporte-ti";
     
+    public static final String PARAMETER_WISH_MAKE_REPURCHASE = "wish_make_repurchase";
+    
     
     
 

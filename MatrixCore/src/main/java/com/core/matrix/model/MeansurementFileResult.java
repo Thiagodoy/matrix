@@ -53,11 +53,14 @@ import lombok.NoArgsConstructor;
                     @ColumnResult(name = "responsavel", type = String.class)
                     ,
                     @ColumnResult(name = "rateio", type = String.class)
+                    ,
+                    @ColumnResult(name = "act_id_processo", type = String.class)
                 }))
 
 @NamedNativeQuery(name = "MeansurementFileResult.getStatusBilling",
         query = "SELECT distinct \n"
         + "    a.id_arquivo_de_medicao,\n"
+        + "    a.act_id_processo,\n"
         + "    a.ano,\n"
         + "    a.mes,\n"
         + "    case b.contrato_pai when 1 then c.wbc_contrato else a.wbc_contrato end as wbc_contrato,\n"
@@ -175,7 +178,7 @@ public class MeansurementFileResult {
 
     public MeansurementFileResult(ContractWbcInformationDTO informationDTO, String idProcess) {
 
-        this.qtdHiredMin = Optional.fromNullable(informationDTO).isPresent() ? informationDTO.getQtdHiredMin() : 0D ;
+        this.qtdHiredMin = Optional.fromNullable(informationDTO).isPresent() ? informationDTO.getQtdHiredMin() : 0D;
         this.qtdHiredMax = Optional.fromNullable(informationDTO).isPresent() ? informationDTO.getQtdHiredMax() : 0D;
         this.qtdHired = Optional.fromNullable(informationDTO).isPresent() ? informationDTO.getQtdHired() : 0D;
         this.idProcess = idProcess;

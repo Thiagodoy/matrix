@@ -19,6 +19,7 @@ import com.core.matrix.workflow.task.DataValidationTask;
 import com.core.matrix.workflow.task.DeleteProcessInstanceTask;
 import com.core.matrix.workflow.task.FileValidationTask;
 import com.core.matrix.workflow.task.ProcessFilesInLoteTask;
+import com.core.matrix.workflow.task.ResetResultTask;
 import com.core.matrix.workflow.task.ValidationFileLoteTask;
 import com.core.matrix.workflow.task.listener.ResultFileLoteListener;
 import com.zaxxer.hikari.HikariConfig;
@@ -265,6 +266,11 @@ public class ActivitiCoreConfiguration implements EnvironmentAware {
     @Bean
     public ResultFileLoteListener resultFileLoteListener(ApplicationContext context) {
         return new ResultFileLoteListener(context);
+    }
+    
+    @Bean
+    public ResetResultTask resetResultTask(ApplicationContext context){
+        return new ResetResultTask(context);
     }
 
 }

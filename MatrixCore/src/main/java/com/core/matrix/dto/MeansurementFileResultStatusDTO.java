@@ -44,6 +44,8 @@ public class MeansurementFileResultStatusDTO {
 
     @ReportColumn(name = "CÓD. CCEE", position = 2, typeValue = String.class, typeReport = {"FULL", "SHORT"})
     public String scde;
+    
+    public String processInstanceId;
 
     public Date createdAt;
 
@@ -55,7 +57,7 @@ public class MeansurementFileResultStatusDTO {
     
     public String rateio;
 
-    public MeansurementFileResultStatusDTO(Long id, Long year, Long month, Long wbcContract, String wbcMeansurementPoint, Double mount, String status, Date dataCriacao, Boolean isExported,String empresa, String responsavel, String rateio) {
+    public MeansurementFileResultStatusDTO(Long id, Long year, Long month, Long wbcContract, String wbcMeansurementPoint, Double mount, String status, Date dataCriacao, Boolean isExported,String empresa, String responsavel, String rateio,String processInstanceId) {
         this.id = id;
         this.year = year;
         this.month = month;
@@ -69,6 +71,7 @@ public class MeansurementFileResultStatusDTO {
         this.company = empresa;
         this.responsible = responsavel;
         this.rateio = rateio;
+        this.processInstanceId = processInstanceId;
 
     }
 

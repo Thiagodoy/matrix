@@ -74,4 +74,8 @@ public class MeansurementFileResultService {
         this.repository.updateToExported(id);
     }
 
+    public List<MeansurementFileResult> findByIdProcess(String id) {
+        return this.findByIdProcess(id);
+    }
+
 }
