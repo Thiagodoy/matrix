@@ -21,6 +21,7 @@ public class Url {
     public static final String URL_API_REPURCHASE = "/api/repurchase";
     public static final String URL_API_AUTHORITY = "/api/authority";
     public static final String URL_API_PARAMETERS = "/api/parameters";
+    public static final String URL_API_MONITORING_POINT = "/api/monitoring/point";
     
     
 }

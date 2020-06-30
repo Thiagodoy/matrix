@@ -56,7 +56,8 @@ public abstract class Service<T extends Model, R extends JpaRepository<T, Long> 
     @Transactional(readOnly = false)
     public Page find(Specification<T> spc, Pageable page) throws Exception {
         return this.repository.findAll(spc, page);
-    }
+    }   
+    
 
     @Transactional(readOnly = true)
     public T find(Long id) throws Exception {
