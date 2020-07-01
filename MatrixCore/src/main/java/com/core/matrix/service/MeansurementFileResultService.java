@@ -75,7 +75,7 @@ public class MeansurementFileResultService {
     }
 
     public List<MeansurementFileResult> findByIdProcess(String id) {
-        return this.findByIdProcess(id);
+        return this.repository.findByIdProcess(id);
     }
 
 }

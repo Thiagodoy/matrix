@@ -84,20 +84,22 @@ public class MonitoringPointResource extends Resource<MonitoringPoint, Monitorin
                             .filter(c -> c.getRateio().equals(parent.getRateio()) && !c.getContract().equals(parent.getContract()))
                             .collect(Collectors.groupingBy(MonitoringContractDTO::getStatus, Collectors.counting()));
 
-                   Optional<MonitoringContractDTO> opt = responseSummary
+                    Optional<MonitoringContractDTO> opt = responseSummary
                             .stream()
                             .filter(c -> c.getRateio().equals(parent.getRateio()) && !c.getContract().equals(parent.getContract()))
                             .findFirst();
-                    
-                    parent.setTaskId(opt.get().getTaskId());
-                    parent.setTemplate(opt.get().getTemplate());
-                    parent.setTaskName(opt.get().getTaskName());
-                    
+
+                    if (opt.isPresent()) {
+                        parent.setTaskId(opt.get().getTaskId());
+                        parent.setTemplate(opt.get().getTemplate());
+                        parent.setTaskName(opt.get().getTaskName());
+                    }
+
                     if (status.size() == 1) {
                         status.keySet().forEach(key -> {
                             parent.setStatus(key);
                         });
-                    } else {
+                    } else if(status.size() > 1) {
                         OptionalLong value = status.values().stream().mapToLong(v -> v).max();
 
                         Optional<Entry<String, Long>> optional = status.entrySet().stream().filter(entry -> {
@@ -107,6 +109,8 @@ public class MonitoringPointResource extends Resource<MonitoringPoint, Monitorin
                         }).findFirst();
 
                         parent.setStatus(optional.get().getKey());
+                    }else{
+                        parent.setStatus("Com pendência");
                     }
                 }
 
