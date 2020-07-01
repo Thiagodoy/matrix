@@ -16,6 +16,9 @@ import org.springframework.web.bind.annotation.RestController;
 import static com.core.matrix.utils.Url.URL_API_MONITORING_POINT;
 import java.util.List;
 import java.util.Map;
+import java.util.Map.Entry;
+import java.util.Optional;
+import java.util.OptionalLong;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import java.util.stream.Collectors;
@@ -40,7 +43,7 @@ public class MonitoringPointResource extends Resource<MonitoringPoint, Monitorin
     }
 
     @RequestMapping(method = RequestMethod.GET)
-    public ResponseEntity status(            
+    public ResponseEntity status(
             @RequestParam(name = "month") long month,
             @RequestParam(name = "year") long year,
             @RequestParam(name = "status", required = false) String status
@@ -50,7 +53,7 @@ public class MonitoringPointResource extends Resource<MonitoringPoint, Monitorin
             Specification spc = MonitoringPointSpecification.find(month, year, status);
             Page<MonitoringPoint> responseSummary = this.getService().find(spc, Pageable.unpaged());
 
-            Map<String, Long> sumary = responseSummary.getContent().stream().collect(Collectors.groupingBy(MonitoringPoint::getStatus, Collectors.counting()));           
+            Map<String, Long> sumary = responseSummary.getContent().stream().collect(Collectors.groupingBy(MonitoringPoint::getStatus, Collectors.counting()));
 
             MonitoringPointResponse resp = new MonitoringPointResponse(responseSummary.getContent(), sumary);
 
@@ -61,18 +64,54 @@ public class MonitoringPointResource extends Resource<MonitoringPoint, Monitorin
             return ResponseEntity.status(HttpStatus.resolve(500)).body(e.getMessage());
         }
     }
-    
+
     @RequestMapping(value = "/contract", method = RequestMethod.GET)
-    public ResponseEntity statusContract(            
+    public ResponseEntity statusContract(
             @RequestParam(name = "month") long month,
-            @RequestParam(name = "year") long year            
+            @RequestParam(name = "year") long year
     ) {
         try {
 
-            
             List<MonitoringContractDTO> responseSummary = this.getService().getStatusByContract(month, year);
 
-            Map<String, Long> sumary = responseSummary.stream().collect(Collectors.groupingBy(MonitoringContractDTO::getStatus, Collectors.counting()));           
+            List<MonitoringContractDTO> contractsParent = responseSummary.parallelStream().filter(c -> c.getHours().equals(-1L)).collect(Collectors.toList());
+
+            contractsParent.parallelStream().forEach(parent -> {
+
+                synchronized (responseSummary) {
+                    Map<String, Long> status = responseSummary
+                            .stream()
+                            .filter(c -> c.getRateio().equals(parent.getRateio()) && !c.getContract().equals(parent.getContract()))
+                            .collect(Collectors.groupingBy(MonitoringContractDTO::getStatus, Collectors.counting()));
+
+                   Optional<MonitoringContractDTO> opt = responseSummary
+                            .stream()
+                            .filter(c -> c.getRateio().equals(parent.getRateio()) && !c.getContract().equals(parent.getContract()))
+                            .findFirst();
+                    
+                    parent.setTaskId(opt.get().getTaskId());
+                    parent.setTemplate(opt.get().getTemplate());
+                    
+                    if (status.size() == 1) {
+                        status.keySet().forEach(key -> {
+                            parent.setStatus(key);
+                        });
+                    } else {
+                        OptionalLong value = status.values().stream().mapToLong(v -> v).max();
+
+                        Optional<Entry<String, Long>> optional = status.entrySet().stream().filter(entry -> {
+                            long v1 = value.getAsLong();
+                            long v2 = entry.getValue().longValue();
+                            return v1 == v2;
+                        }).findFirst();
+
+                        parent.setStatus(optional.get().getKey());
+                    }
+                }
+
+            });
+
+            Map<String, Long> sumary = responseSummary.stream().collect(Collectors.groupingBy(MonitoringContractDTO::getStatus, Collectors.counting()));
 
             MonitoringContractResponse resp = new MonitoringContractResponse(responseSummary, sumary);
 

@@ -28,6 +28,10 @@ import lombok.Data;
                     ,
                     @ColumnResult(name = "nome", type = String.class)
                     ,
+                    @ColumnResult(name = "id_tarefa", type = String.class)
+                    ,
+                    @ColumnResult(name = "template", type = String.class)
+                    ,
                     @ColumnResult(name = "tarefa", type = String.class)
                     ,
                     @ColumnResult(name = "horas_faltantes", type = Long.class)
@@ -46,6 +50,8 @@ import lombok.Data;
         + "    (SELECT \n"
         + "        f.wbc_contrato,\n"
         + "            f.nome_fantasia as nome,\n"
+        + "            '' AS id_tarefa,\n"
+        + "            '' AS template,\n"
         + "            '' AS tarefa,\n"
         + "            (- 1) AS horas_faltantes,\n"
         + "            (- 1) AS consumo,\n"
@@ -64,6 +70,8 @@ import lombok.Data;
         + "                AND IFNULL(x.wbc_codigo_contrato_rateio, 0) > 0) UNION ALL SELECT \n"
         + "        a.wbc_contrato,\n"
         + "            a.empresa_apelido as nome,\n"
+        + "            c.ID_ AS id_tarefa,\n"
+        + "            c.FORM_KEY_ AS template,\n"
         + "            c.NAME_ AS tarefa,\n"
         + "            SUM(IF(b.status != 'SUCCESS', 1, 0)) AS horas_faltantes,\n"
         + "            SUM(IFNULL(b.reativa_consumo, 0)) AS consumo,\n"
@@ -127,5 +135,11 @@ public class MonitoringPoint implements Model<MonitoringPoint> {
 
     @Column(name = "ano")
     private Long year;
+
+    @Column(name = "id_tarefa")
+    private String taskId;
+
+    @Column(name = "template")
+    private String template;
 
 }

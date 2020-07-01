@@ -20,6 +20,8 @@ public class MonitoringContractDTO {
     
     private Long contract;
     private String companyName;
+    private String taskId;
+    private String template;
     private String taskName;
     private Long hours;
     private Double comsumption;
