@@ -107,6 +107,7 @@ public class ActivitiCoreConfiguration implements EnvironmentAware {
     @Primary
     @Bean
     public DataSource dataSource() {
+        
 
         DataSource dataSource;
 
@@ -123,7 +124,8 @@ public class ActivitiCoreConfiguration implements EnvironmentAware {
         hikariConfig.setPassword(activitiProperties.getDatasource().getSqlserver().getDataSourcePassword());
         hikariConfig.setMaxLifetime(activitiProperties.getDatasource().getMaxLifetime());
         hikariConfig.setPoolName("ActivitiPool");
-        hikariConfig.setConnectionTestQuery(activitiProperties.getDatasource().getSqlserver().getConnectionTestQuery());
+        
+        //hikariConfig.setConnectionTestQuery(activitiProperties.getDatasource().getSqlserver().getConnectionTestQuery());
 
         dataSource = new HikariDataSource(hikariConfig);
 
@@ -151,6 +153,7 @@ public class ActivitiCoreConfiguration implements EnvironmentAware {
                 .setCustomSessionFactories(null)
                 .setDatabaseSchemaUpdate(ProcessEngineConfiguration.DB_SCHEMA_UPDATE_TRUE)
                 .setDataSource(this.dataSource())
+                
                 .setAsyncFailedJobWaitTime(2147483647)
                 .setDefaultFailedJobWaitTime(2147483647)
                 .setAsyncExecutorActivate(true)
@@ -159,7 +162,8 @@ public class ActivitiCoreConfiguration implements EnvironmentAware {
         ProcessEngine processEngine = s.buildProcessEngine();
         
         JobExecutor jobExecutor = processEngine.getProcessEngineConfiguration().getJobExecutor();
-        jobExecutor.setLockTimeInMillis(15*60000);
+        jobExecutor.setLockTimeInMillis(30*60000);
+        
         // jobExecutor.setWaitTimeInMillis(5*60000);
 
 //        AsyncExecutor asyncExecutor = processEngine.getProcessEngineConfiguration().getAsyncExecutor();

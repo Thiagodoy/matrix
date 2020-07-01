@@ -16,10 +16,10 @@ activiti:
         loginTimeout: 30000
         minimumIdle: 5
         maximumPoolSize: 300
-        validationTimeout: 10000
-        idleTimeout: 30000
+        validationTimeout: 60000
+        idleTimeout: 60000
         connectionTimeout: 30000
-        maxLifetime: 300000 
+        maxLifetime: 100000 
         autoCommit: false
         initializationFailFast: false        
         sqlserver:            
@@ -35,13 +35,13 @@ matrix:
         socketTimeout: 30000
         loginTimeout: 30000
         minimumIdle: 5
-        maximumPoolSize: 50
-        validationTimeout: 10000
-        idleTimeout: 30000
+        maximumPoolSize: 300
+        validationTimeout: 60000
+        idleTimeout: 60000
         connectionTimeout: 30000
-        maxLifetime: 300000
+        maxLifetime: 100000 
         autoCommit: false
-        initializationFailFast: false        
+        initializationFailFast: false       
         sqlserver:            
             dataUrl: jdbc:mysql://bd-hml-portal-atendimento-matrix.mysql.database.azure.com:3306/matrix?rewriteBatchedStatements=true&useTimezone=true&serverTimezone=America/Cuiaba&useLegacyDatetimeCode=false&autoReconnect=true            
             dataSourceUser: bd_hml_admin@bd-hml-portal-atendimento-matrix

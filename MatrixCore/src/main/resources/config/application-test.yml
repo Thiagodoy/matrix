@@ -19,7 +19,7 @@ activiti:
         validationTimeout: 10000
         idleTimeout: 30000
         connectionTimeout: 30000
-        maxLifetime: 300000 
+        maxLifetime: 1800000 
         autoCommit: false
         initializationFailFast: false        
         sqlserver:            
@@ -36,10 +36,10 @@ matrix:
         loginTimeout: 30000
         minimumIdle: 5
         maximumPoolSize: 50
-        validationTimeout: 10000
-        idleTimeout: 30000
-        connectionTimeout: 30000
-        maxLifetime: 300000 
+        validationTimeout: 300000
+        idleTimeout: 300000
+        connectionTimeout: 300000
+        maxLifetime: 600000 
         autoCommit: false
         initializationFailFast: false        
         sqlserver:            
@@ -56,7 +56,7 @@ wbc:
         minimumIdle: 5
         maximumPoolSize: 50
         validationTimeout: 10000
-        idleTimeout: 30000
+        idleTimeout: 600000
         connectionTimeout: 30000
         autoCommit: false
         initializationFailFast: false        

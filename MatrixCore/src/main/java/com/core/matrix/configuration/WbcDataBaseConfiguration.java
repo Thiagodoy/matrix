@@ -75,7 +75,7 @@ public class WbcDataBaseConfiguration {
         hikariConfig.setPassword(wbcProperties.getDatasource().getSqlserver().getDataSourcePassword());
         hikariConfig.setPoolName(NAME_POOL);
         
-        hikariConfig.setConnectionTestQuery(wbcProperties.getDatasource().getSqlserver().getConnectionTestQuery());
+        //hikariConfig.setConnectionTestQuery(wbcProperties.getDatasource().getSqlserver().getConnectionTestQuery());
 
         dataSource = new HikariDataSource(hikariConfig);       
 

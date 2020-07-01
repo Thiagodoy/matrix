@@ -25,7 +25,7 @@ import org.activiti.engine.TaskService;
 public class ThreadPoolBindFile {
 
     private TaskService taskService;
-    private ThreadPoolExecutor pool = (ThreadPoolExecutor) Executors.newFixedThreadPool(1);
+    private ThreadPoolExecutor pool = (ThreadPoolExecutor) Executors.newFixedThreadPool(2);
     private Set<ProcessFilesInLoteStatusDTO> set = new HashSet<>();
     private List<Future> future = new ArrayList<>();
 
