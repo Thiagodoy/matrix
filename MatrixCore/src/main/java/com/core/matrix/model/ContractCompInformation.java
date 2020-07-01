@@ -109,6 +109,18 @@ public class ContractCompInformation  implements Serializable,Model<ContractComp
     
     @Column(name = "unidade_consumidora")
     protected String isConsumerUnit;
+    
+    @Column(name = "nome_empresa")
+    protected String nameCompany;
+    
+    @Column(name = "nome_fantasia")
+    protected String nickname;
+    
+    @Column(name = "cnpj")
+    protected String cnpj;
+    
+    @Column(name = "apelido")
+    protected String nickname1;
 
     @PrePersist
     public void generateCreatedAt() {

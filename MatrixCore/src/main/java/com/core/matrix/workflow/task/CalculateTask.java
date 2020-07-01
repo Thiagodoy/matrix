@@ -122,8 +122,8 @@ public class CalculateTask implements Task {
             double consumptionTotal = ((sum / 1000) + ((sum / 1000) * percentLoss) - proinfa) * factorAtt;
 
             // String point = file.getMeansurementPoint().replaceAll("\\((L|B)\\)", "").trim();
-            String nickname = de.hasVariable(PROCESS_INFORMATION_NICKNAME) ? de.getVariable(PROCESS_INFORMATION_NICKNAME, String.class) : null;
-            String name = de.hasVariable(PROCESS_INFORMATION_MONITOR_CLIENT) ? de.getVariable(PROCESS_INFORMATION_MONITOR_CLIENT, String.class) : null;
+            String nickname = compInformation.getNickname();
+            String name = compInformation.getNameCompany();
 
             MeansurementFileResult fileResult = new MeansurementFileResult(contractWbcInformationDTO, de.getProcessInstanceId());
             fileResult.setAmountScde(this.roundValue((sum / 1000), 6));
@@ -241,8 +241,8 @@ public class CalculateTask implements Task {
                             .filter(c -> c.getSNrContrato().equals(file.getWbcContract().toString()))
                             .findFirst();
 
-                    String nickname = contractDTO.isPresent() ? contractDTO.get().getSNmApelido() : null;
-                    String name = contractDTO.isPresent() ? contractDTO.get().getSNmEmpresaEpce() : null;
+                    String nickname = contractInformation.getNickname();
+                    String name = contractInformation.getNameCompany();
 
                     MeansurementFileResult fileResult = new MeansurementFileResult(contractWbcInformation, de.getProcessInstanceId());
 
@@ -302,8 +302,8 @@ public class CalculateTask implements Task {
                                     .filter(x -> x.getSNrContrato().equals(c.getWbcContract().toString()))
                                     .findFirst();
 
-                            String nickname = contractDTO.isPresent() ? contractDTO.get().getSNmApelido() : null;
-                            String name = contractDTO.isPresent() ? contractDTO.get().getSNmEmpresaEpce() : null;
+                            String nickname = c.getNickname();
+                            String name = c.getNameCompany();
 
                             MeansurementFileResult fileResult = new MeansurementFileResult(contractWbcInformation, de.getProcessInstanceId());
 

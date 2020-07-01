@@ -91,6 +91,7 @@ public class MonitoringPointResource extends Resource<MonitoringPoint, Monitorin
                     
                     parent.setTaskId(opt.get().getTaskId());
                     parent.setTemplate(opt.get().getTemplate());
+                    parent.setTaskName(opt.get().getTaskName());
                     
                     if (status.size() == 1) {
                         status.keySet().forEach(key -> {
