@@ -49,9 +49,14 @@ public class MeansurementFileDetailService {
         return this.repository.findByIdMeansurementFile(fileId);
     }
 
-    @Transactional
+    @Transactional(transactionManager = "matrixTransactionManager")
     public void deleteAll(List<MeansurementFileDetail> details) {
         this.repository.deleteAll(details);
+    }
+    
+    @Transactional(transactionManager = "matrixTransactionManager")
+    public void deleteByMeansurementFileId(Long id) {
+        this.repository.deleteByIdMeansurementFile(id);
     }
 
     @Transactional

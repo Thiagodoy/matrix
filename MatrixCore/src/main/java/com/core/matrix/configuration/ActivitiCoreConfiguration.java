@@ -153,6 +153,8 @@ public class ActivitiCoreConfiguration implements EnvironmentAware {
                 .setCustomSessionFactories(null)
                 .setDatabaseSchemaUpdate(ProcessEngineConfiguration.DB_SCHEMA_UPDATE_TRUE)
                 .setDataSource(this.dataSource())
+                //.setTransactionsExternallyManaged(true)
+                .setJpaHandleTransaction(true)
                 
                 .setAsyncFailedJobWaitTime(2147483647)
                 .setDefaultFailedJobWaitTime(2147483647)
@@ -162,7 +164,7 @@ public class ActivitiCoreConfiguration implements EnvironmentAware {
         ProcessEngine processEngine = s.buildProcessEngine();
         
         JobExecutor jobExecutor = processEngine.getProcessEngineConfiguration().getJobExecutor();
-        jobExecutor.setLockTimeInMillis(30*60000);
+        jobExecutor.setLockTimeInMillis(15*60000);
         
         // jobExecutor.setWaitTimeInMillis(5*60000);
 

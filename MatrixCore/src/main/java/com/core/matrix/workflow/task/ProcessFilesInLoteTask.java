@@ -15,7 +15,6 @@ import com.core.matrix.model.MeansurementFile;
 import com.core.matrix.request.FileStatusLoteRequest;
 import com.core.matrix.service.LogService;
 import com.core.matrix.service.MeansurementFileService;
-import static com.core.matrix.utils.Constants.CONTROLE;
 import static com.core.matrix.utils.Constants.RESPONSE_LIST_PROCESS_ANALIZED;
 import com.core.matrix.utils.ThreadPoolBindFile;
 import com.core.matrix.utils.ThreadPoolEmail;
@@ -23,10 +22,8 @@ import com.core.matrix.utils.ThreadPoolParseFile;
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.Collections;
-import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
-import java.util.Map;
 import java.util.Observable;
 import java.util.Observer;
 import java.util.Optional;
@@ -84,16 +81,14 @@ public class ProcessFilesInLoteTask implements JavaDelegate, Observer {
     public void execute(DelegateExecution execution) throws Exception {
 
         try {
-
+            
             this.checkStatusPools();
 
             processInstanceId = execution.getProcessInstanceId();
             taskService = execution.getEngineServices().getTaskService();
-            fileLoteErrorDTOs = Collections.synchronizedList(new ArrayList());
+            fileLoteErrorDTOs = Collections.synchronizedList(new ArrayList());           
 
-            this.restartProcess();
-
-            status = new CopyOnWriteArraySet(getProcessPendingForUploadFile(execution));
+            status = new CopyOnWriteArraySet(this.getProcessPendingForUploadFile(execution));
 
             if (!status.isEmpty()) {
                 this.startPollExecutor();
@@ -154,46 +149,7 @@ public class ProcessFilesInLoteTask implements JavaDelegate, Observer {
 
         meansurementFileService.generateStatus(request, execution.getProcessInstanceId());
 
-    }
-
-    private void restartProcess() {
-
-        LocalDate dateBilling = LocalDate.now().minusMonths(1);
-
-        int month = dateBilling.getMonthValue();
-        int year = dateBilling.getYear();
-
-        this.taskService
-                .createNativeTaskQuery()
-                .sql("SELECT \n"
-                        + "   distinct b.*\n"
-                        + "FROM\n"
-                        + "    matrix.mtx_arquivo_de_medicao a\n"
-                        + "        INNER JOIN\n"
-                        + "    activiti.ACT_RU_TASK b ON a.act_id_processo = b.proc_inst_id_\n"
-                        + "WHERE\n"
-                        + "        a.mes = " + month + "\n"
-                        + "        AND a.ano = " + year + "\n"
-                        + "        AND a.wbc_ponto_de_medicao IS NOT NULL\n"
-                        + "        AND b.TASK_DEF_KEY_ in('task-show-error-1','task-show-error-2','task-show-error-ajustament')")
-                .list().stream().forEach(task -> {
-
-                    try {
-
-                        Map<String, Object> parameters = new HashMap<>();
-
-                        if (task.getTaskDefinitionKey().equals("task-show-error-ajustament")) {
-                            parameters.put(CONTROLE, "REALIZAR NOVO UPLOAD");
-                        }
-                        taskService.complete(task.getId(), parameters);
-
-                    } catch (Exception e) {
-                        Logger.getLogger(ProcessFilesInLoteTask.class.getName()).log(Level.SEVERE, "[restartProcess] -> Erro ao realizar o completeTask", e);
-                    }
-
-                });
-
-    }
+    }   
 
     private Set<ProcessFilesInLoteStatusDTO> getProcessPendingForUploadFile(DelegateExecution execution) {
 
