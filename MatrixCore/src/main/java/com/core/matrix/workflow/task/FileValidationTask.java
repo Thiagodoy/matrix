@@ -11,7 +11,6 @@ import com.core.matrix.dto.FileDetailDTO;
 import com.core.matrix.dto.FileParsedDTO;
 import com.core.matrix.io.BeanIO;
 import com.core.matrix.model.ContractCompInformation;
-import com.core.matrix.model.ContractProInfa;
 import com.core.matrix.model.Log;
 import com.core.matrix.model.MeansurementFile;
 import com.core.matrix.model.MeansurementFileDetail;
@@ -36,6 +35,7 @@ import java.util.ArrayList;
 import java.util.Collections;
 
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -91,12 +91,12 @@ public class FileValidationTask implements JavaDelegate {
             delegateExecution = de;
             logs = new ArrayList<>();
             final List<String> attachmentIds = (List<String>) de.getVariable(LIST_ATTACHMENT_ID, Object.class);
-            
+
             final String user = de.getVariable(USER_UPLOAD, String.class);
             files = this.service.findByProcessInstanceId(delegateExecution.getProcessInstanceId());
-            
+
             this.checkProinfaOfContracts();
-            
+
             attachmentIds.stream().forEach(attachmentId -> {
 
                 InputStream stream = null;
@@ -121,6 +121,8 @@ public class FileValidationTask implements JavaDelegate {
                         fileDto.setDetails(result);
 
                         MeansurementFileType type = MeansurementFileType.valueOf(fileDto.getType());
+                            
+                        this.checkDuplicity(result, type, fileName);
                         this.validate(result, type, fileName);
 
                         if (this.logs.isEmpty()) {
@@ -131,7 +133,7 @@ public class FileValidationTask implements JavaDelegate {
                         throw new Exception("Não foi possivel aplicar o parse no arquivo!");
                     }
 
-                } catch (Exception e) {                    
+                } catch (Exception e) {
                     this.generateLog(de, e, "Erro ao processar o arquivo : " + fileName);
                 }
 
@@ -147,15 +149,14 @@ public class FileValidationTask implements JavaDelegate {
                             this.generateLog(de, null, message);
                         });
             }
-            
-            
+
             if (!this.logs.isEmpty()) {
-                
+
                 Log log = new Log();
                 log.setType(Log.LogType.LAYOUT_INVALID);
-                log.setProcessInstanceId(delegateExecution.getProcessInstanceId());             
+                log.setProcessInstanceId(delegateExecution.getProcessInstanceId());
                 logs.add(log);
-                
+
                 this.logService.save(logs);
                 delegateExecution.setVariable(CONTROLE, RESPONSE_LAYOUT_INVALID);
             } else {
@@ -170,9 +171,37 @@ public class FileValidationTask implements JavaDelegate {
 
                 delegateExecution.setVariable(CONTROLE, RESPONSE_LAYOUT_VALID);
             }
-        } catch (Exception e) {          
+        } catch (Exception e) {
             delegateExecution.setVariable(CONTROLE, RESPONSE_LAYOUT_INVALID);
             this.generateLog(de, e, "Erro ao processar o arquivo");
+        }
+
+    }
+
+    private void checkDuplicity(List<FileDetailDTO> detail, MeansurementFileType type, String fileName) {
+
+        Map<String, Long> checkDuplicity = detail
+                .parallelStream()
+                .collect(Collectors.groupingBy(FileDetailDTO::generateKey, Collectors.counting()));
+
+        List<String> errors = Collections.synchronizedList(new ArrayList<String>());
+
+        checkDuplicity
+                .entrySet()
+                .parallelStream()
+                .forEach(keyValue -> {
+                    if (keyValue.getValue().compareTo(1L) > 0) {
+                        String[] values = keyValue.getKey().split("-");
+                        String message = MessageFormat.format("Registro duplicado [ ponto -> {0} data -> {1} hora -> {2} ]", values[2],values[0],values[1]);
+                        errors.add(message);
+                    }
+                });
+
+        if (!errors.isEmpty()) {
+            this.generateLog(delegateExecution, null, MessageFormat.format("Arquivo [ {0} ] possui registros em duplicidade", fileName));
+            errors.forEach(m -> {
+                this.generateLog(delegateExecution, null, m);
+            });
         }
 
     }
@@ -188,12 +217,10 @@ public class FileValidationTask implements JavaDelegate {
                         .findByWbcContractAndMeansurementPoint(file.getWbcContract(), file.getMeansurementPoint())
                         .orElseThrow(() -> new Exception("[Matrix] -> Não foi possivel encontrar as informações complementares do contrato!"));
 
-                
-                if(!Optional.ofNullable(information.getProinfas()).isPresent() || information.getProinfas().isEmpty()){
-                   throw new Exception("O contrato [" + file.getWbcContract() + "] não possui nenhum cadastro de proinfa!");
+                if (!Optional.ofNullable(information.getProinfas()).isPresent() || information.getProinfas().isEmpty()) {
+                    throw new Exception("O contrato [" + file.getWbcContract() + "] não possui nenhum cadastro de proinfa!");
                 }
-                
-                
+
                 information.getProinfas()
                         .stream()
                         .filter(infa -> file.getMonth().equals(infa.getMonth()) && file.getYear().equals(infa.getYear()))
@@ -204,18 +231,15 @@ public class FileValidationTask implements JavaDelegate {
                 execExceptions.add(ex);
             }
         });
-        
-        
-        if(!execExceptions.isEmpty()){
-            execExceptions.forEach(ex->{
+
+        if (!execExceptions.isEmpty()) {
+            execExceptions.forEach(ex -> {
                 this.generateLog(delegateExecution, ex, ex.getMessage());
-            });    
-            
-            this.logService.save(logs);            
-            throw new Exception("Processo encerrado devido a ausência de informações!");            
+            });
+
+            this.logService.save(logs);
+            throw new Exception("Processo encerrado devido a ausência de informações!");
         }
-        
-        
 
     }
 
@@ -234,17 +258,16 @@ public class FileValidationTask implements JavaDelegate {
 
         if (type.equals(MeansurementFileType.LAYOUT_C) || type.equals(MeansurementFileType.LAYOUT_C_1)) {
 
-            
             boolean has_L = Validator.validateContentIfContains(detail);
             if (!has_L) {
                 errors.add(MessageFormat.format("Os registros do layout C ou C.1, não apresenta em sua composição a palavra [ (L) ] nos pontos de medições. Arquivo [ {0} ]", fileName));
             }
-            
+
             detail.removeIf(d -> Optional.ofNullable(d.getOrigem()).isPresent() && d.getOrigem().equals("DADOS FALTANTES"));
 
-            if(detail.isEmpty()){
-                errors.add(MessageFormat.format("O arquivo [ {0} ] não apresenta registros que possam ser processados de acordo com as regras estabelecidas para o layout [ {1} ].\n Favor analisar o arquivo.", fileName, type.toString() ));
-            } 
+            if (detail.isEmpty()) {
+                errors.add(MessageFormat.format("O arquivo [ {0} ] não apresenta registros que possam ser processados de acordo com as regras estabelecidas para o layout [ {1} ].\n Favor analisar o arquivo.", fileName, type.toString()));
+            }
 
         }
 

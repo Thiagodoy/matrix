@@ -6,6 +6,7 @@
 package com.core.matrix.dto;
 
 import java.io.Serializable;
+import java.text.MessageFormat;
 import lombok.Data;
 
 /**
@@ -35,4 +36,13 @@ public class FileDetailDTO implements Serializable{
     public String notificationCollection;   
     public String quality;
     public String origem;
+    
+    
+    
+    
+    public String generateKey(){
+        return MessageFormat.format("{0}-{1}-{2}", this.date,this.hour,this.meansurementPoint);
+    }
+    
+    
 }
