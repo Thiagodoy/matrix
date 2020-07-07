@@ -21,7 +21,7 @@ public interface MeansurementFileDetailRepository extends JpaRepository<Meansure
 
     List<MeansurementFileDetail> findByIdMeansurementFile(Long id);
     
-    List<MeansurementFileDetail> findByIdMeansurementFileAndStatus(Long id, MeansurementFileDetailStatus status );
+    List<MeansurementFileDetail> findByIdMeansurementFileAndStatusIn(Long id, List<MeansurementFileDetailStatus> status );
     
     @Modifying
     void deleteByIdMeansurementFile(Long id);

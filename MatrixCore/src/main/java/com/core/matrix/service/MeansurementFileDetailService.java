@@ -14,7 +14,9 @@ import static com.core.matrix.utils.Constants.CONST_QUALITY_COMPLETE;
 import static com.core.matrix.utils.Constants.CONST_SITUATION_3;
 import static com.core.matrix.utils.Constants.TYPE_ENERGY_LIQUID;
 import com.core.matrix.utils.MeansurementFileDetailStatus;
+import com.core.matrix.utils.MeansurementFileStatus;
 import com.core.matrix.utils.MeansurementFileType;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -62,17 +64,15 @@ public class MeansurementFileDetailService {
     @Transactional
     public void fixFile(DataValidationResultDTO request) throws Exception {
 
-        MeansurementFileDetailStatus status = Optional.ofNullable(request.getHours()).isPresent()
-                ? MeansurementFileDetailStatus.HOUR_ERROR
-                : MeansurementFileDetailStatus.DAY_ERROR;
+      
+        
+        List<MeansurementFileDetailStatus> status = Arrays.asList(MeansurementFileDetailStatus.HOUR_ERROR,MeansurementFileDetailStatus.DAY_ERROR);
 
-        List<MeansurementFileDetail> result = this.repository.findByIdMeansurementFileAndStatus(request.getIdFile(), status);
+        List<MeansurementFileDetail> result = this.repository.findByIdMeansurementFileAndStatusIn(request.getIdFile(), status);
 
-        MeansurementFile file = fileService.findById(request.getIdFile());
+        MeansurementFile file = fileService.findById(request.getIdFile());        
 
-        Long dividedBy = status.equals(MeansurementFileDetailStatus.HOUR_ERROR) ? request.getHours() : request.getDays();
-
-        Double value = (request.getInputManual() - request.getTotalScde()) / dividedBy;
+        Double value = request.getInputManual() / request.getHours();
 
         // Normalizing data for billing
         result.stream().forEach(detail -> {
@@ -99,6 +99,8 @@ public class MeansurementFileDetailService {
         });
 
         this.repository.saveAll(result);
+        
+        fileService.updateStatus(MeansurementFileStatus.SUCCESS, file.getId()); 
 
     }
 
