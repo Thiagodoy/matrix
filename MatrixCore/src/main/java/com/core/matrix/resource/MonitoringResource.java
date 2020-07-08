@@ -9,7 +9,6 @@ import com.core.matrix.dto.ContractUnBillingDTO;
 import com.core.matrix.dto.MonitoringFilterDTO;
 import com.core.matrix.dto.MonitoringStatusDTO;
 import com.core.matrix.dto.UnbilledContractDTO;
-import com.core.matrix.model.MeansurementFile;
 import com.core.matrix.model.Monitoring;
 import com.core.matrix.repository.MonitoringRepository;
 import com.core.matrix.response.MonitoringResponse;
@@ -18,7 +17,7 @@ import com.core.matrix.service.ReportService;
 import com.core.matrix.specifications.MonitoringSpecification;
 import com.core.matrix.utils.ReportConstants;
 import com.core.matrix.wbc.service.ContractService;
-import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Optional;
 import java.util.logging.Level;
@@ -129,13 +128,14 @@ public class MonitoringResource {
 
                 Optional<UnbilledContractDTO> opt = contracts.stream().filter(c -> c.getContract().equals(rateio.getContractRateio())).findAny();
 
-                if (opt.isPresent()) {
+                if (opt.isPresent() && !contractsSons.contains(opt.get())) {
                     contractsSons.add(opt.get());
                 }
-
             });
+            
+            
 
-            return ResponseEntity.ok(contractsSons);
+            return ResponseEntity.ok(new HashSet(contractsSons));
         } catch (Exception e) {
             Logger.getLogger(MonitoringResource.class.getName()).log(Level.SEVERE, "[unbilledContract]", e);
             return ResponseEntity.status(HttpStatus.resolve(500)).body(e.getMessage());

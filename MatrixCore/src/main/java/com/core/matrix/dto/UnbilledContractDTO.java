@@ -8,12 +8,14 @@ package com.core.matrix.dto;
 import com.core.matrix.wbc.dto.ContractDTO;
 import java.util.Optional;
 import lombok.Data;
+import lombok.EqualsAndHashCode;
 
 /**
  *
  * @author thiag
  */
 @Data
+@EqualsAndHashCode(of = {"contractWbc"})
 public class UnbilledContractDTO {
     
     private String name;
