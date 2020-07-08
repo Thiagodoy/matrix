@@ -144,46 +144,16 @@ public class ContractCompInformationService {
         return this.repository.findByMeansurementPoint(point);
     }
 
+    @Transactional
     public void reloadProcess(Long contractId) throws Exception {
 
         List<ContractCompInformation> list = this.listByContract(contractId);
-
-        LocalDate now = LocalDate.now();
-        Map<String, Object> variables = new HashMap<>();
-
-        list.stream().forEach(contract -> {
-
-            meansurementFileService
-                    .findByWbcContractAndMeansurementPointAndMonthAndYear(
-                            contract.getWbcContract(),
-                            contract.getMeansurementPoint(),
-                            Integer.valueOf(now.getMonthValue()).longValue() - 1,
-                            Integer.valueOf(now.getYear()).longValue()
-                    ).forEach(file -> {
-
-                        final String processInstanceId = file.getProcessInstanceId();
-
-                        List<Attachment> attachments = taskService.getProcessInstanceAttachments(file.getProcessInstanceId());
-                        List<Comment> comments = taskService.getProcessInstanceComments(file.getProcessInstanceId());
-
-                        attachments.forEach(att -> {
-                            taskService.deleteAttachment(att.getId());
-                        });
-
-                        comments.forEach(com -> {
-                            taskService.deleteComment(com.getId());
-                        });
-
-                        meansurementFileService.delete(file.getId());
-
-                        logService.deleteLogsByProcessInstance(file.getProcessInstanceId());
-                        fileResultService.deleteByProcess(file.getProcessInstanceId());
-                        runtimeService.deleteProcessInstance(processInstanceId, "Contract was updated!");
-
-                    });
-
-        });
-
+        
+        if(list.isEmpty()){
+            throw new Exception("Contrato sem informação complementar!");            
+        }
+        
+        Map<String, Object> variables = new HashMap<>();  
         variables.put(PROCESS_CONTRACTS_RELOAD_BILLING, list);
         runtimeService.startProcessInstanceByMessage(PROCESS_BILLING_CONTRACT_MESSAGE_EVENT, variables);
 
