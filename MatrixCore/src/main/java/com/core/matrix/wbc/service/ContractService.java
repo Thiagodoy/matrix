@@ -6,7 +6,6 @@
 package com.core.matrix.wbc.service;
 
 import com.core.matrix.model.ContractCompInformation;
-import com.core.matrix.model.MeansurementFile;
 import com.core.matrix.service.ContractCompInformationService;
 import com.core.matrix.service.LogService;
 import com.core.matrix.service.MeansurementFileResultService;
@@ -87,7 +86,7 @@ public class ContractService {
     @Transactional(readOnly = true)
     public List<ContractDTO> listForBilling(List<ContractCompInformation> filter) {
 
-        List<ContractDTO> contracts = this.repository.listForBilling();
+        List<ContractDTO> contracts = this.repository.listForBilling().stream().distinct().collect(Collectors.toList());
 
         if (Optional.ofNullable(filter).isPresent()) {
 

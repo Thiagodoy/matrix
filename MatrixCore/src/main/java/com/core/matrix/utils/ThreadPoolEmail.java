@@ -18,6 +18,7 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ThreadPoolExecutor;
 import java.util.logging.Level;
@@ -85,10 +86,15 @@ public class ThreadPoolEmail {
         
     }
     
-    public synchronized void submit(Email email) {
+    public synchronized void submit(Email email) {       
+        
+        
+        if(!Optional.ofNullable(email.getStatus()).isPresent()){
+            email.normalizeData();        
+        }
         
         email.setStatus(Email.EmailStatus.QUEUE);
-        email.normalizeData();
+        
         
         if (!this.map.containsKey(email.generateKey())) {
             Long idEmail;

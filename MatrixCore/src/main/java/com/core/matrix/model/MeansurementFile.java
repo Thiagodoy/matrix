@@ -5,6 +5,7 @@
  */
 package com.core.matrix.model;
 
+import com.core.matrix.dto.ContractUnBillingDTO;
 import com.core.matrix.dto.FileStatusDTO;
 import com.core.matrix.dto.MeansurementFileStatusDTO;
 import com.core.matrix.utils.MeansurementFileStatus;
@@ -71,6 +72,10 @@ import lombok.NoArgsConstructor;
                     ,
                     @ColumnResult(name = "processInstance", type = String.class)
                 }))
+@SqlResultSetMapping(name = "contractUnbillingResult",
+        classes = @ConstructorResult(targetClass = ContractUnBillingDTO.class, columns = {
+    @ColumnResult(name = "wbc_contrato", type = Long.class)
+}))
 
 @NamedNativeQuery(name = "MeansurementFile.getStatus",
         query = "select 'RECEIVED' as status, count(1) as qtd from matrix.mtx_arquivo_de_medicao a where a.mes = :month and a.ano = :year\n"
@@ -121,6 +126,10 @@ import lombok.NoArgsConstructor;
         + "    activiti.ACT_RU_TASK ru ON a.act_id_processo = ru.PROC_INST_ID_\n"
         + "    where a.act_id_processo in :process",
         resultSetMapping = "statusLote")
+
+@NamedNativeQuery(name = "MeansurementFile.contractUnbilling",
+        query = "select distinct wbc_contrato from mtx_arquivo_de_medicao where wbc_contrato in :contracts and mes = :month and ano = :year",
+        resultSetMapping = "contractUnbillingResult")
 
 @Entity
 @Table(name = "mtx_arquivo_de_medicao")

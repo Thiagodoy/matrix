@@ -11,6 +11,7 @@ import java.io.Serializable;
 import java.text.MessageFormat;
 import java.time.LocalDateTime;
 import lombok.Data;
+import lombok.EqualsAndHashCode;
 
 /**
  *
@@ -19,6 +20,7 @@ import lombok.Data;
 @Data
 //@AllArgsConstructor
 @JsonIgnoreProperties(value = {"tddTermino","tddInicio"})
+@EqualsAndHashCode(of = {"sNrContrato"})
 public class ContractDTO implements Serializable{
 
     private static final long serialVersionUID = 3749064926674036404L;

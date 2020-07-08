@@ -30,7 +30,7 @@ public class SendEmailTest {
     @Autowired
     private ThreadPoolEmail threadPoolEmail;
 
-    @Test
+    // @Test
     public void teste() throws Exception {
 
         Email email = emailFactory.createEmailTemplate(Template.TemplateBusiness.BILLING_WHITOUT_REPURCHASE);
@@ -75,9 +75,23 @@ public class SendEmailTest {
 
         email = emailFactory.createEmailTemplate(Template.TemplateBusiness.FORGOT_PASSWORD);
 
-        email.setParameter(Constants.TEMPLATE_PARAM_LINK, "?token=" );
+        email.setParameter(Constants.TEMPLATE_PARAM_LINK, "?token=");
         email.setParameter(TEMPLATE_PARAM_USER_EMAIL, "thiagodoy@hotmail.com;luis.maisnet@gmail.com;mauricelio.lauand@bandtec.com.br;aloysio.carvalho@bandtec.com.br");
         email.setParameter(Constants.TEMPLATE_PARAM_USER_NAME, "Fulano");
+
+        threadPoolEmail.submit(email);
+
+        Thread.sleep(15000);
+
+    }
+
+    @Test
+    public void testUnbillingContract() throws InterruptedException {
+
+        Email email = emailFactory.createEmailTemplate(Template.TemplateBusiness.PROCESS_BILLING_ERROR);
+
+        email.setParameter(Constants.TEMPLATE_PARAM_USER_EMAIL, "thiagodoy@hotmail.com");
+        email.setParameter(Constants.TEMPLATE_PARAM_CONTRACT, "<span>Contrato 9999 - Nestle</span></br><span>Contrato 8888 - BRIDGESTONE DO BRASIL-0001-15</span></br>");
 
         threadPoolEmail.submit(email);
 

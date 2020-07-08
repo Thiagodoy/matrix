@@ -34,7 +34,8 @@ public class Log implements Model<Log>{
         LAYOUT_INVALID,
         DATA_INVALID,
         DATA_NOT_PERSISTED,
-        ERROR        
+        ERROR,
+        PROCESS_BILLING
     }
     
     

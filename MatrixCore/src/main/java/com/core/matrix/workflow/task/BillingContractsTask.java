@@ -10,10 +10,12 @@ import com.core.matrix.model.ContractCompInformation;
 import com.core.matrix.model.Email;
 import com.core.matrix.model.Log;
 import com.core.matrix.model.MeansurementFile;
+import com.core.matrix.model.Parameters;
 import com.core.matrix.model.Template;
 import com.core.matrix.service.ContractCompInformationService;
 import com.core.matrix.service.LogService;
 import com.core.matrix.service.MeansurementFileService;
+import com.core.matrix.service.ParametersService;
 import com.core.matrix.utils.Constants;
 import static com.core.matrix.utils.Constants.GROUP_SUPPORT_TI;
 import static com.core.matrix.utils.Constants.PROCESS_CONTRACTS_RELOAD_BILLING;
@@ -57,6 +59,7 @@ public class BillingContractsTask implements JavaDelegate {
     private LogService logService;
     private EmailFactory emailFactory;
     private ThreadPoolEmail threadPoolEmail;
+    private ParametersService parametersService;
 
     private static ApplicationContext context;
 
@@ -68,6 +71,7 @@ public class BillingContractsTask implements JavaDelegate {
             this.logService = context.getBean(LogService.class);
             this.emailFactory = context.getBean(EmailFactory.class);
             this.threadPoolEmail = context.getBean(ThreadPoolEmail.class);
+            this.parametersService = context.getBean(ParametersService.class);
         }
     }
 
@@ -110,8 +114,9 @@ public class BillingContractsTask implements JavaDelegate {
                                 }
 
                             } else {
-                                String message = MessageFormat.format("Não foi possivel criar processo de medição para o contrato abaixo:\n{0}", contract.toString());
+                                String message = MessageFormat.format("<span>Contrato {0} - {1}</span></br>", contract.getSNrContrato(), contract.getSNmApelido());
                                 Log log = new Log();
+                                log.setType(Log.LogType.PROCESS_BILLING);
                                 log.setMessage(message);
                                 log.setProcessName(execution.getProcessDefinitionId());
                                 logs.add(log);
@@ -126,11 +131,6 @@ public class BillingContractsTask implements JavaDelegate {
                         }
 
                     });
-
-            if (!logs.isEmpty()) {
-                this.logService.save(logs);
-                logs.clear();
-            }
 
             //Contracts with rateio
             contracts
@@ -148,9 +148,10 @@ public class BillingContractsTask implements JavaDelegate {
                                     ContractCompInformation compInformation = opt.get();
                                     cc.setMeansurementPoint(compInformation.getMeansurementPoint());
                                 } else {
-                                    String message = MessageFormat.format("Não foi possivel criar processo de medição para o contrato [rateio] abaixo:\n{0}", cc.toString());
+                                    String message = MessageFormat.format("<span>Contrato {0} - {1}</span></br>", cc.getSNrContrato(), cc.getSNmApelido());
                                     Log log = new Log();
                                     log.setMessage(message);
+                                    log.setType(Log.LogType.PROCESS_BILLING);
                                     log.setProcessName(execution.getProcessDefinitionId());
                                     logs.add(log);
                                 }
@@ -194,12 +195,17 @@ public class BillingContractsTask implements JavaDelegate {
                                 Logger.getLogger(BillingContractsTask.class.getName()).log(Level.SEVERE, "[Search contracts]", ex);
                             }
 
-                        } else {
-                            this.logService.save(logs);
-                            logs.clear();
                         }
 
                     });
+
+            if (!logs.isEmpty()) {
+                List<Log> logsTemp = logs.stream().filter(l -> l.getType().equals(Log.LogType.PROCESS_BILLING)).collect(Collectors.toList());
+                this.logService.save(logsTemp);
+
+                String message = logsTemp.stream().map(Log::getMessage).collect(Collectors.joining(""));
+                this.sendEmailForUnbillingContract(message);
+            }
 
         } catch (Throwable e) {
             Logger.getLogger(BillingContractsTask.class.getName()).log(Level.SEVERE, "[ execute ]", e);
@@ -208,6 +214,20 @@ public class BillingContractsTask implements JavaDelegate {
             log.setProcessName(execution.getProcessDefinitionId());
             this.logService.save(log);
         }
+    }
+
+    private void sendEmailForUnbillingContract(String message) {
+
+        Email email = emailFactory.createEmailTemplate(Template.TemplateBusiness.PROCESS_BILLING_ERROR);
+
+        Optional<Parameters> opt = parametersService.findByKey(Constants.PARAMETER_EMAILS_PROCESS_UNBILLING_CONTRACTS);
+
+        if (opt.isPresent()) {
+            email.setParameter(Constants.TEMPLATE_PARAM_USER_EMAIL, opt.get().getValue().toString());
+            email.setParameter(Constants.TEMPLATE_PARAM_CONTRACT, message);
+            threadPoolEmail.submit(email);
+        }
+
     }
 
     private ProcessInstance createAProcessForBilling(DelegateExecution execution, ContractDTO contract) {
@@ -309,7 +329,12 @@ public class BillingContractsTask implements JavaDelegate {
         meansurementFile.setYear(year);
         meansurementFile.setNickname(contract.getSNmApelido());
         meansurementFile.setCompanyName(contract.getSNmFantasia());
-        this.meansurementFileService.saveFile(meansurementFile);
+
+        try {
+            this.meansurementFileService.saveFile(meansurementFile);
+        } catch (Exception e) {
+            Logger.getLogger(BillingContractsTask.class.getName()).log(Level.SEVERE, "[createMeansurementFile]", e);
+        }
 
     }
 

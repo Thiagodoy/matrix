@@ -5,6 +5,7 @@
  */
 package com.core.matrix.service;
 
+import com.core.matrix.dto.ContractUnBillingDTO;
 import com.core.matrix.dto.FileStatusDTO;
 import com.core.matrix.model.ProcessStatusLote;
 import com.core.matrix.dto.MeansurementFileStatusDTO;
@@ -105,7 +106,17 @@ public class MeansurementFileService {
     public boolean exists(Long contract, String meansurementPoint, Long month, Long year) {
         return this.repository.exists(contract, meansurementPoint, month, year).isPresent();
     }
-
+    
+    @Transactional(readOnly = true)
+    public List<MeansurementFile> exists(List<Long> contract, Long month, Long year) {
+        return this.repository.exists(contract, month, year);
+    }
+    
+    @Transactional(readOnly = true)
+    public List<ContractUnBillingDTO>contractUnbilling(List<Long> contract, Long month, Long year) {
+        return this.repository.contractUnbilling(contract, month, year);
+    }
+    
     @Transactional(readOnly = true)
     public FileStatusBillingResponse statusInit(Long month, Long year, Pageable page) {
 
