@@ -179,7 +179,7 @@ public class BillingContractsTask implements JavaDelegate {
                                 .filter(c -> c.getNCdContrato().equals(contractParent))
                                 .findFirst();
 
-                        if (opt.isPresent() && logs.isEmpty()) {
+                        if (opt.isPresent()) {
 
                             List<ContractDTO> sons = contractsSon.stream().filter(t -> t.getMeansurementPoint() != null).collect(Collectors.toList());
 
