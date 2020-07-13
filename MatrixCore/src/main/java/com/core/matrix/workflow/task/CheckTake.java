@@ -70,7 +70,10 @@ public class CheckTake implements JavaDelegate {
 
             } else {
                 value = result.getAmountBruto();
-            }           
+            }
+
+            boolean exists = execution.hasVariable(PARAMETER_WISH_MAKE_REPURCHASE);
+            String parameterValue = exists ? execution.getVariable(PARAMETER_WISH_MAKE_REPURCHASE, String.class) : null;
 
             if (value.compareTo(result.getQtdHiredMin()) < 0) {
                 //value.compareTo(result.getAmountBruto()) >= 0 && value.compareTo(result.getAmountLiquido()) < 0 
@@ -78,20 +81,22 @@ public class CheckTake implements JavaDelegate {
                         && result.getAmountLiquidoAdjusted().compareTo(result.getAmountBruto()) >= 0
                         && result.getAmountLiquidoAdjusted().compareTo(result.getAmountLiquido()) < 0
                         && isApproved) {
-                    execution.setVariable(CONTROLE, RESPONSE_FATURAMENTO);
+
+                    if (exists && parameterValue.equals("yes")) {
+                        execution.setVariable(CONTROLE, RESPONSE_RECOMPRA);
+                    } else {
+                        execution.setVariable(CONTROLE, RESPONSE_FATURAMENTO);
+                    }
+
                 } else {
                     execution.setVariable(CONTROLE, RESPONSE_RECOMPRA);
                 }
             } else if (value.compareTo(result.getQtdHiredMax()) > 0) {
                 execution.setVariable(CONTROLE, RESPONSE_CURTOPRAZO);
             } else if (value.compareTo(result.getQtdHiredMin()) >= 0 && value.compareTo(result.getQtdHiredMax()) <= 0) {
-                
-                boolean exists  = execution.hasVariable(PARAMETER_WISH_MAKE_REPURCHASE);
-                String parameterValue = execution.getVariable(PARAMETER_WISH_MAKE_REPURCHASE, String.class);
-                
-                if(exists && parameterValue.equals("yes")){
+                if (exists && parameterValue.equals("yes")) {
                     execution.setVariable(CONTROLE, RESPONSE_RECOMPRA);
-                }else{
+                } else {
                     execution.setVariable(CONTROLE, RESPONSE_FATURAMENTO);
                 }
             }
