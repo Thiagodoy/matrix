@@ -21,5 +21,7 @@ public interface ProcessStatusLoteRepository extends JpaRepository<ProcessStatus
 
     Page<ProcessStatusLote> findByProcessInstanceIdLote(String process, Pageable page);
     List<ProcessStatusLote> findByProcessInstanceIdLote(String process);
+    
+    
 
 }

@@ -113,8 +113,13 @@ public class MeansurementFileService {
     }
     
     @Transactional(readOnly = true)
-    public List<ContractUnBillingDTO>contractUnbilling(List<Long> contract, Long month, Long year) {
-        return this.repository.contractUnbilling(contract, month, year);
+    public List<Long>contractsWereBilling(List<Long> contract, Long month, Long year) {
+        return this.repository.contractUnbilling(contract, month, year).parallelStream().mapToLong(ContractUnBillingDTO::getContractWbc).distinct().boxed().collect(Collectors.toList());
+    }
+    
+    @Transactional(readOnly = true)
+    public boolean contractHasBilling(Long contract, Long month, Long year){
+        return this.repository.contractHasBilling(contract, month, year);
     }
     
     @Transactional(readOnly = true)
@@ -177,6 +182,12 @@ public class MeansurementFileService {
 
         return response;
 
+    }
+    
+    
+    @Transactional(readOnly = true)
+    public List<MeansurementFile> listByContractsAndMonthAndYear(List<Long> contracts, Long month, Long year){
+        return this.repository.findByMonthAndYearAndWbcContractIn(month, year, contracts);
     }
 
 }

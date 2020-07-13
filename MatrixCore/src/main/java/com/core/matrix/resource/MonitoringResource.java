@@ -19,6 +19,7 @@ import com.core.matrix.utils.ReportConstants;
 import com.core.matrix.wbc.service.ContractService;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Objects;
 import java.util.Optional;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -109,33 +110,37 @@ public class MonitoringResource {
                     .map(c -> new UnbilledContractDTO(c))
                     .collect(Collectors.toList());
 
-            List<UnbilledContractDTO> contractsSons = contracts
+//            List<UnbilledContractDTO> contractsSons = contracts
+//                    .stream()
+//                    .filter(son -> !son.isRateio() || (son.isRateio() && Optional.ofNullable(son.getContractRateio()).isPresent()))
+//                    .collect(Collectors.toList());
+            List<Long> idContracts = contracts
                     .stream()
-                    .filter(son -> !son.isRateio() || (son.isRateio() && Optional.ofNullable(son.getContractRateio()).isPresent()))
+                    .mapToLong(UnbilledContractDTO::getContractWbc)
+                    .distinct()
+                    .boxed()
                     .collect(Collectors.toList());
 
-            List<Long> idContracts = contractsSons.stream().mapToLong(UnbilledContractDTO::getContractWbc).boxed().collect(Collectors.toList());
+            List<Long> contractsWereBilling = fileService.contractsWereBilling(idContracts, month, year);
 
-            List<ContractUnBillingDTO> contractsWereBilling = fileService.contractUnbilling(idContracts, month, year);
+            contracts.removeIf(contract -> contractsWereBilling.stream().anyMatch(bi -> bi.equals(contract.getContractWbc())));
 
-            contractsSons.removeIf(son -> contractsWereBilling.stream().anyMatch(bi -> bi.getContractWbc().equals(son.getContractWbc())));
+            List<UnbilledContractDTO> contractsRateio = contracts.stream().filter(contract -> contract.isRateio()).collect(Collectors.toList());
 
-            List<UnbilledContractDTO> contractsSonIsRateio = contractsSons.stream().filter(son -> son.isRateio()).collect(Collectors.toList());
+            contracts.removeIf(contract -> contractsRateio.stream().anyMatch(bi -> bi.getContractWbc().equals(contract.getContractWbc())));
 
-            contractsSons.removeAll(contractsSonIsRateio);
+            contractsRateio
+                    .stream()
+                    .parallel()
+                    .filter(contract -> contract.getContractRateio() == null)
+                    .forEach(contract -> {
+                        if (!fileService.contractHasBilling(contract.getContractWbc(), month, year)) {
+                            contracts.add(contract);
+                        }
+                    });
 
-            contractsSonIsRateio.forEach(rateio -> {
-
-                Optional<UnbilledContractDTO> opt = contracts.stream().filter(c -> c.getContract().equals(rateio.getContractRateio())).findAny();
-
-                if (opt.isPresent() && !contractsSons.contains(opt.get())) {
-                    contractsSons.add(opt.get());
-                }
-            });
-            
-            
-
-            return ResponseEntity.ok(new HashSet(contractsSons));
+            // contracts.addAll(contractsParentRateio);
+            return ResponseEntity.ok(new HashSet(contracts));
         } catch (Exception e) {
             Logger.getLogger(MonitoringResource.class.getName()).log(Level.SEVERE, "[unbilledContract]", e);
             return ResponseEntity.status(HttpStatus.resolve(500)).body(e.getMessage());

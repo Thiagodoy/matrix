@@ -111,6 +111,13 @@ public class BillingContractsTask implements JavaDelegate {
                                 if (execution.hasVariable(PROCESS_CONTRACTS_RELOAD_BILLING) || !this.hasMeansurementFile(compInformation)) {
                                     String processInstanceId = this.createAProcessForBilling(execution, contract).getProcessInstanceId();
                                     this.createMeansurementFile(processInstanceId, contract);
+                                } else {
+                                    String message = MessageFormat.format("<span>Contrato {0} - {1}</span> ja possui faturamento</br>", contract.getSNrContrato(), contract.getSNmApelido());
+                                    Log log = new Log();
+                                    log.setType(Log.LogType.PROCESS_BILLING);
+                                    log.setMessage(message);
+                                    log.setProcessName(execution.getProcessDefinitionId());
+                                    logs.add(log);
                                 }
 
                             } else {
@@ -200,9 +207,10 @@ public class BillingContractsTask implements JavaDelegate {
                     });
 
             if (!logs.isEmpty()) {
-                List<Log> logsTemp = logs.stream().filter(l -> l.getType().equals(Log.LogType.PROCESS_BILLING)).collect(Collectors.toList());
-                this.logService.save(logsTemp);
 
+                this.logService.save(logs);
+
+                List<Log> logsTemp = logs.stream().filter(l -> l.getType().equals(Log.LogType.PROCESS_BILLING)).collect(Collectors.toList());
                 String message = logsTemp.stream().map(Log::getMessage).collect(Collectors.joining(""));
                 this.sendEmailForUnbillingContract(message);
             }

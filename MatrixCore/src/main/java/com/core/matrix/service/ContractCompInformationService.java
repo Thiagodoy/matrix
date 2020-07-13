@@ -7,6 +7,7 @@ package com.core.matrix.service;
 
 import com.core.matrix.dto.ContractInformationDTO;
 import com.core.matrix.model.ContractCompInformation;
+import com.core.matrix.model.MeansurementFile;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -20,6 +21,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
+import java.util.stream.Collectors;
 import org.activiti.engine.RuntimeService;
 import org.activiti.engine.TaskService;
 import org.activiti.engine.task.Attachment;
@@ -46,7 +48,7 @@ public class ContractCompInformationService {
 
     @Autowired
     private MeansurementFileResultService fileResultService;
-    
+
     @Autowired
     private RuntimeService runtimeService;
 
@@ -148,12 +150,43 @@ public class ContractCompInformationService {
     public void reloadProcess(Long contractId) throws Exception {
 
         List<ContractCompInformation> list = this.listByContract(contractId);
-        
-        if(list.isEmpty()){
-            throw new Exception("Contrato sem informação complementar!");            
+
+        if (list.isEmpty()) {
+            throw new Exception("Contrato sem informação complementar!");
         }
+
+        LocalDate now = LocalDate.now();
+        Long month = (long) now.minusMonths(1).getMonthValue();
+        Long year = (long) now.getYear();
+        List<Long> contracts = list.stream().mapToLong(ContractCompInformation::getWbcContract).boxed().collect(Collectors.toList());
+
+        List<MeansurementFile> files = meansurementFileService.listByContractsAndMonthAndYear(contracts, month, year);
+        String processInstanceID = null;
+
+        if (!files.isEmpty()) {
+
+            processInstanceID = files.stream().findFirst().get().getProcessInstanceId();
+            
+            fileResultService.deleteByProcess(processInstanceID);
+            meansurementFileService.deleteByProcessInstance(processInstanceID);
+            logService.deleteLogsByProcessInstance(processInstanceID);            
+
+            List<Attachment> attachments = taskService.getProcessInstanceAttachments(processInstanceID);
+            List<Comment> comments = taskService.getProcessInstanceComments(processInstanceID);
+
+            attachments.forEach(att -> {
+                taskService.deleteAttachment(att.getId());
+            });
+
+            comments.forEach(com -> {
+                taskService.deleteComment(com.getId());
+            });
+            
+            runtimeService.deleteProcessInstance(processInstanceID, "Contract was updated!");
+        }          
         
-        Map<String, Object> variables = new HashMap<>();  
+
+        Map<String, Object> variables = new HashMap<>();
         variables.put(PROCESS_CONTRACTS_RELOAD_BILLING, list);
         runtimeService.startProcessInstanceByMessage(PROCESS_BILLING_CONTRACT_MESSAGE_EVENT, variables);
 
