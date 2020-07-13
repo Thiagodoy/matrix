@@ -54,18 +54,18 @@ wbc:
         socketTimeout: 30000
         loginTimeout: 30000
         minimumIdle: 5
-        maximumPoolSize: 50
+        maximumPoolSize: 300
         validationTimeout: 10000
-        idleTimeout: 30000
+        idleTimeout: 10000
         connectionTimeout: 30000
         autoCommit: false
         initializationFailFast: false        
         sqlserver:            
-            dataUrl: jdbc:sqlserver://192.168.0.22\homologacao;databaseName=WBC_ENERGY_DB_HML;user=matrix_portal;password=portal_matrix
+            dataUrl: jdbc:sqlserver://192.168.0.22;databaseName=WBC_ENERGY_DB;user=matrix_portal;password=portal_matrix
             dataSourceUser: matrix_portal
             dataSourcePassword: portal_matrix
             port: 3306            
-            connectionTestQuery: SELECT 1   
+            connectionTestQuery: SELECT 1  
             
 email:
     host: smtp.office365.com
