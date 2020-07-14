@@ -5,6 +5,7 @@
  */
 package com.core.matrix.utils;
 
+import com.core.matrix.annotation.PositionBatchParameter;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import java.io.File;
@@ -13,6 +14,7 @@ import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.lang.reflect.Field;
 import java.text.SimpleDateFormat;
 import java.time.Instant;
 import java.time.LocalDate;
@@ -21,11 +23,19 @@ import java.time.Month;
 import java.time.YearMonth;
 import java.time.ZoneId;
 import java.time.format.DateTimeFormatter;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collections;
 import java.util.Date;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
+import java.util.Optional;
+import java.util.TreeMap;
+import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import java.util.stream.Collectors;
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.text.similarity.JaroWinklerDistance;
 import org.beanio.StreamFactory;
@@ -44,6 +54,9 @@ public class Utils {
     private static SimpleDateFormat sdfHour;
     private static JaroWinklerDistance n = new JaroWinklerDistance();
     private static final Map<String, String> entitiesHtml = new HashMap<String, String>();
+
+    private static DateTimeFormatter dateTimeFormatter;
+    private static SimpleDateFormat formmatDate;
 
     static {
         bcpe = new BCryptPasswordEncoder();
@@ -100,6 +113,9 @@ public class Utils {
         entitiesHtml.put("Ü", "&#220;");
         entitiesHtml.put("ç", "&#231;");
         entitiesHtml.put("Ç", "&#199;");
+
+        dateTimeFormatter = DateTimeFormatter.ofPattern("yyyy-MM-dd hh:mm:ss");
+        formmatDate = new SimpleDateFormat("yyyy-MM-dd hh:mm:ss");
 
     }
 
@@ -215,6 +231,69 @@ public class Utils {
                 return "Arquivo com layout inválido";
             default:
                 return "Arquivo sem estatus definido";
+        }
+
+    }
+
+    public static <T> List<String> mountBatchInsert(List<T> collection) {
+
+        List<String> parameters = new ArrayList<String>();
+        TreeMap<Integer, String> values = new TreeMap<>();
+        
+        List<String> records = new ArrayList<String>();
+        
+
+        Optional<T> entity = collection.stream().findFirst();
+
+        if (entity.isPresent()) {
+
+        } else {
+            return Collections.emptyList();
+        }
+
+        List<Field> fields = new CopyOnWriteArrayList<>(Arrays.asList(entity.get().getClass().getDeclaredFields())
+                .stream()
+                .filter(f -> f.isAnnotationPresent(PositionBatchParameter.class))
+                .collect(Collectors.toList()));
+
+        collection.forEach(element -> {
+            fields.forEach(f -> {
+                try {
+                    Object value = f.get(element);
+                    Integer index = f.getAnnotation(PositionBatchParameter.class).value();
+                    putParameter(values, index, value);
+                } catch (IllegalArgumentException ex) {
+                    Logger.getLogger(Utils.class.getName()).log(Level.SEVERE, null, ex);
+                } catch (IllegalAccessException ex) {
+                    Logger.getLogger(Utils.class.getName()).log(Level.SEVERE, null, ex);
+                }
+            });
+
+            for (Integer key : values.keySet()) {
+                parameters.add(values.get(key));
+            }            
+            String record = "(" + parameters.stream().collect(Collectors.joining(",")) + ")";
+            records.add(record);
+            parameters.clear();
+        });
+     
+        return records;
+    }
+
+    private static void putParameter(TreeMap<Integer, String> parameters, Integer index, Object value) {
+
+        if (value == null) {
+            parameters.put(index, "NULL");
+        } else if (value instanceof String) {
+            parameters.put(index, "'" + value.toString().replace("'", " ") + "'");
+        } else if ((value instanceof Long) || (value instanceof Integer) || (value instanceof Double)) {
+            parameters.put(index, value.toString());
+        } else if (value instanceof LocalDateTime) {
+            parameters.put(index, "'" + ((LocalDateTime) value).format(dateTimeFormatter) + "'");
+        } else if (value instanceof Date) {
+            parameters.put(index, "'" + formmatDate.format(value) + "'");
+        } else {
+            parameters.put(index, "'" + value.toString() + "'");
         }
 
     }

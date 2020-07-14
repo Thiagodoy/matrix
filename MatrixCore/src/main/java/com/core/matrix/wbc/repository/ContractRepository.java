@@ -41,7 +41,7 @@ public interface ContractRepository extends JpaRepository<Contract, Long> {
     Long countContract();
 
     @Query(nativeQuery = true)
-    Optional<ContractWbcInformationDTO> getInformation(@Param("year") Long year, @Param("month") Long month, @Param("contractId") Long contractId);
+    List<ContractWbcInformationDTO> getInformation(@Param("year") Long year, @Param("month") Long month, @Param("contractId") List<Long> contractId);
 
     @Query(nativeQuery = true)
     List<ContractDTO> listForBilling();

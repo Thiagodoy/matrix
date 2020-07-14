@@ -103,30 +103,46 @@ public class FileValidationTask implements JavaDelegate {
                 String fileName = null;
                 try {
 
+                    long start = System.currentTimeMillis();
                     synchronized (taskService) {
                         stream = taskService.getAttachmentContent(attachmentId);
                         stream = removeLinesEmpty(stream);
                         fileName = taskService.getAttachment(attachmentId).getName();
                     }
+                    
+                    loggerPerformance(start, "Carregando arquivo e removendo as linhas em branco");
 
+                    start = System.currentTimeMillis();
                     BeanIO reader = new BeanIO();
                     Optional<FileParsedDTO> opt = reader.<FileParsedDTO>parse(stream);
+                    
+                    loggerPerformance(start, "Parseando o arquivo para a entidade");
 
                     if (opt.isPresent()) {
 
                         FileParsedDTO fileDto = opt.get();
 
+                        start = System.currentTimeMillis();
                         //Filter only points thas is into process
                         List<FileDetailDTO> result = this.filter(fileDto.getDetails(), fileName);
                         fileDto.setDetails(result);
+                        
+                        loggerPerformance(start, "Filtrando os registros pertecente ao processo");
 
                         MeansurementFileType type = MeansurementFileType.valueOf(fileDto.getType());
-                            
+                        
+                        start = System.currentTimeMillis();    
                         this.checkDuplicity(result, type, fileName);
+                        loggerPerformance(start, "Checando a duplicidade");
+                        
+                        start = System.currentTimeMillis();    
                         this.validate(result, type, fileName);
-
+                        loggerPerformance(start, "Validação");
+                        
                         if (this.logs.isEmpty()) {
+                            start = System.currentTimeMillis();    
                             persistFile(fileDto, attachmentId, user, files);
+                            loggerPerformance(start, "Persistência");
                         }
 
                     } else {
@@ -405,7 +421,7 @@ public class FileValidationTask implements JavaDelegate {
 
                     opt.get().setStatus(MeansurementFileStatus.SUCCESS);
                     service.saveFile(opt.get());
-                    detailService.save(fileDetaisl);
+                    detailService.saveAllBatch(fileDetaisl);
                 }
 
             });
@@ -445,4 +461,10 @@ public class FileValidationTask implements JavaDelegate {
 
     }
 
+    
+    private void loggerPerformance(long start, String fase){
+        Logger.getLogger(FileValidationTask.class.getName()).log(Level.INFO,MessageFormat.format("[loggerPerformance] -> etapa: {0} tempo : {1} min", fase, (System.currentTimeMillis() - start)/60000D ));
+    }
+    
+    
 }

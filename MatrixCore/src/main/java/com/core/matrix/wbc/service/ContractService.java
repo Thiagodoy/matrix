@@ -16,6 +16,7 @@ import com.core.matrix.wbc.dto.ContractDTO;
 import com.core.matrix.wbc.dto.ContractWbcInformationDTO;
 import com.core.matrix.wbc.repository.ContractRepository;
 import java.time.LocalDate;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -80,8 +81,15 @@ public class ContractService {
 
     @Transactional(readOnly = true)
     public Optional<ContractWbcInformationDTO> getInformation(Long year, Long month, Long contract) {
+        return this.repository.getInformation(year, month, Arrays.asList(contract)).stream().findFirst();
+    }
+    
+    @Transactional(readOnly = true)
+    public List<ContractWbcInformationDTO> getInformation(Long year, Long month, List<Long> contract) {
         return this.repository.getInformation(year, month, contract);
     }
+    
+    
 
     @Transactional(readOnly = true)
     public List<ContractDTO> listForBilling(List<ContractCompInformation> filter) {

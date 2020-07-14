@@ -15,10 +15,16 @@ import static com.core.matrix.utils.Constants.CONST_SITUATION_3;
 import static com.core.matrix.utils.Constants.TYPE_ENERGY_LIQUID;
 import com.core.matrix.utils.MeansurementFileDetailStatus;
 import com.core.matrix.utils.MeansurementFileStatus;
-import com.core.matrix.utils.MeansurementFileType;
+import com.core.matrix.utils.Utils;
+import java.sql.Connection;
+import java.sql.SQLException;
+import java.sql.Statement;
 import java.util.Arrays;
 import java.util.List;
-import java.util.Optional;
+import java.util.logging.Level;
+import java.util.logging.Logger;
+import java.util.stream.Collectors;
+import javax.sql.DataSource;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -36,6 +42,9 @@ public class MeansurementFileDetailService {
     @Autowired
     private MeansurementFileService fileService;
 
+    @Autowired
+    private DataSource dataSource;
+
     @Transactional
     public void save(MeansurementFileDetail detail) {
         this.repository.save(detail);
@@ -44,6 +53,33 @@ public class MeansurementFileDetailService {
     @Transactional(transactionManager = "matrixTransactionManager")
     public void save(List<MeansurementFileDetail> detail) {
         this.repository.saveAll(detail);
+    }
+
+    public void saveAllBatch(List<MeansurementFileDetail> detail) {
+
+        try {
+            Connection con = dataSource.getConnection();
+            int limit = 3000;
+            
+
+            while (!detail.isEmpty()) {
+
+                int indexEnd = detail.size() > limit ? limit : detail.size();
+                List<String> records = Utils.<MeansurementFileDetail>mountBatchInsert(detail.subList(0, indexEnd));             
+                
+                String query = "INSERT INTO `matrix`.`mtx_arquivo_de_medicao_detalhe` VALUES " + records.stream().collect(Collectors.joining(","));
+                Statement ps = con.createStatement();
+                ps.clearBatch();
+                ps.addBatch(query);
+                ps.executeBatch();
+                con.commit();
+                detail.subList(0, indexEnd).clear();
+           }
+        } catch (SQLException ex) {
+            Logger.getLogger(MeansurementFileDetailService.class.getName()).log(Level.SEVERE, "[saveAllBatch]", ex);
+            throw new RuntimeException(ex.getMessage());
+        }
+
     }
 
     @Transactional(readOnly = true)
@@ -55,7 +91,7 @@ public class MeansurementFileDetailService {
     public void deleteAll(List<MeansurementFileDetail> details) {
         this.repository.deleteAll(details);
     }
-    
+
     @Transactional(transactionManager = "matrixTransactionManager")
     public void deleteByMeansurementFileId(Long id) {
         this.repository.deleteByIdMeansurementFile(id);
@@ -64,13 +100,11 @@ public class MeansurementFileDetailService {
     @Transactional
     public void fixFile(DataValidationResultDTO request) throws Exception {
 
-      
-        
-        List<MeansurementFileDetailStatus> status = Arrays.asList(MeansurementFileDetailStatus.HOUR_ERROR,MeansurementFileDetailStatus.DAY_ERROR);
+        List<MeansurementFileDetailStatus> status = Arrays.asList(MeansurementFileDetailStatus.HOUR_ERROR, MeansurementFileDetailStatus.DAY_ERROR);
 
         List<MeansurementFileDetail> result = this.repository.findByIdMeansurementFileAndStatusIn(request.getIdFile(), status);
 
-        MeansurementFile file = fileService.findById(request.getIdFile());        
+        MeansurementFile file = fileService.findById(request.getIdFile());
 
         Double value = request.getInputManual() / request.getHours();
 
@@ -99,8 +133,8 @@ public class MeansurementFileDetailService {
         });
 
         this.repository.saveAll(result);
-        
-        fileService.updateStatus(MeansurementFileStatus.SUCCESS, file.getId()); 
+
+        fileService.updateStatus(MeansurementFileStatus.SUCCESS, file.getId());
 
     }
 

@@ -29,6 +29,11 @@ public class MeansurementFileResultService {
     public void save(MeansurementFileResult result) {
         this.repository.save(result);
     }
+    
+    @Transactional
+    public void saveAll(List<MeansurementFileResult> result) {
+        this.repository.saveAll(result);
+    }
 
     @Transactional
     public void update(MeansurementFileResult result) throws Exception {

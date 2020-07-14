@@ -5,6 +5,7 @@
  */
 package com.core.matrix.model;
 
+import com.core.matrix.annotation.PositionBatchParameter;
 import com.core.matrix.dto.FileDetailDTO;
 import com.core.matrix.utils.MeansurementFileDetailStatus;
 import com.core.matrix.utils.MeansurementFileType;
@@ -47,63 +48,82 @@ public class MeansurementFileDetail implements Serializable {
     @Id
     @Column(name = "id_arquivo_de_medicao_detalhe")
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long id;
+    @PositionBatchParameter(value = 0)
+    public Long id;
 
     @Column(name = "id_arquivo_de_medicao")
-    private Long idMeansurementFile;
+    @PositionBatchParameter(value = 1)
+    public Long idMeansurementFile;
 
     @Column(name = "ponto_medicao")
-    private String meansurementPoint;
+    @PositionBatchParameter(value = 2)
+    public String meansurementPoint;
 
     @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd")
     @Column(name = "data")
-    private LocalDate date;
+    @PositionBatchParameter(value = 3)
+    public LocalDate date;
 
     @Column(name = "hora")
-    private Long hour;
+    @PositionBatchParameter(value = 4)
+    public Long hour;
 
     @Column(name = "tipo_energia")
-    private String energyType;
+    @PositionBatchParameter(value = 5)
+    public String energyType;
 
     @Column(name = "ativa_geracao")
-    private Double generationActive;
+    @PositionBatchParameter(value = 6)
+    public Double generationActive;
 
     @Column(name = "ativa_consumo")
-    private Double consumptionActive;
+    @PositionBatchParameter(value = 7)
+    public Double consumptionActive;
 
     @Column(name = "reativa_geracao")
-    private Double generationReactivate;
+    @PositionBatchParameter(value = 8)
+    public Double generationReactivate;
 
     @Column(name = "reativa_consumo")
-    private Double consumptionReactivate;
+    @PositionBatchParameter(value = 9)
+    public Double consumptionReactivate;
 
     @Column(name = "situacao_da_medida")
-    private String situation;
+    @PositionBatchParameter(value = 10)
+    public String situation;
 
     @Column(name = "motivo_da_situacao")
-    private String reasonOfSituation;
+    @PositionBatchParameter(value = 11)
+    public String reasonOfSituation;
 
     @Column(name = "intervalo")
-    private Long range;
+    @PositionBatchParameter(value = 12)
+    public Long range;
 
     @Column(name = "origem_coleta")
-    private String sourceCollection;
+    @PositionBatchParameter(value = 13)
+    public String sourceCollection;
 
     @Column(name = "notificacao_coleta")
-    private String notificationCollection;
+    @PositionBatchParameter(value = 14)
+    public String notificationCollection;
 
     @Column(name = "agente")
-    private String agent;
+    @PositionBatchParameter(value = 15)
+    public String agent;
 
     @Column(name = "qualidade")
-    private String quality;
+    @PositionBatchParameter(value = 16)
+    public String quality;
 
     @Column(name = "origem")
-    private String origem;
+    @PositionBatchParameter(value = 17)
+    public String origem;
 
     @Enumerated(EnumType.STRING)
     @Column(name = "status")
-    private MeansurementFileDetailStatus status;
+    @PositionBatchParameter(value = 18)
+    public MeansurementFileDetailStatus status;
 
     @Transient
     private List<String> erros;
