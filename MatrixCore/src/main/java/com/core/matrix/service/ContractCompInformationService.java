@@ -26,6 +26,7 @@ import org.activiti.engine.RuntimeService;
 import org.activiti.engine.TaskService;
 import org.activiti.engine.task.Attachment;
 import org.activiti.engine.task.Comment;
+import org.springframework.transaction.annotation.Propagation;
 
 /**
  *
@@ -52,7 +53,7 @@ public class ContractCompInformationService {
     @Autowired
     private RuntimeService runtimeService;
 
-    @Transactional
+    @Transactional(transactionManager = "matrixTransactionManager")
     public void save(ContractCompInformation information) throws Exception {
 
         Optional<ContractCompInformation> entity = this.repository
@@ -73,7 +74,7 @@ public class ContractCompInformationService {
 
     }
 
-    @Transactional
+    @Transactional(transactionManager = "matrixTransactionManager")
     public void update(ContractCompInformation information) throws Exception {
 
         ContractCompInformation entity = this.repository
@@ -85,7 +86,7 @@ public class ContractCompInformationService {
 
     }
 
-    @Transactional
+    @Transactional(transactionManager = "matrixTransactionManager", propagation = Propagation.REQUIRES_NEW, readOnly = true)
     public List<ContractCompInformation> listByContract(Long contractId) throws Exception {
 
         Optional<ContractCompInformation> opt = this.repository.findByWbcContract(contractId);
@@ -146,7 +147,7 @@ public class ContractCompInformationService {
         return this.repository.findByMeansurementPoint(point);
     }
 
-    @Transactional
+    @Transactional(transactionManager = "matrixTransactionManager")
     public void reloadProcess(Long contractId) throws Exception {
 
         List<ContractCompInformation> list = this.listByContract(contractId);
@@ -182,8 +183,12 @@ public class ContractCompInformationService {
                 taskService.deleteComment(com.getId());
             });
             
-            runtimeService.deleteProcessInstance(processInstanceID, "Contract was updated!");
-        }          
+            try {
+                runtimeService.deleteProcessInstance(processInstanceID, "Contract was updated!");
+            } catch (Exception e) {
+            }
+            
+        }        
         
 
         Map<String, Object> variables = new HashMap<>();

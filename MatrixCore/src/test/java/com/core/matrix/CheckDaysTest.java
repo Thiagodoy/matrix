@@ -30,7 +30,7 @@ import org.springframework.boot.test.context.SpringBootTest;
  * @author thiag
  */
 @SpringBootTest
-public class CheckDaysTest implements Task {
+public class CheckDaysTest extends Task {
 
     @Autowired
     private MeansurementFileService fileService;

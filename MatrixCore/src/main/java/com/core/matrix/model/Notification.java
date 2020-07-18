@@ -5,6 +5,7 @@
  */
 package com.core.matrix.model;
 
+import static com.core.matrix.utils.Constants.TABLE_SEQUENCES;
 import java.time.LocalDateTime;
 import javax.persistence.Column;
 import javax.persistence.Entity;
@@ -32,7 +33,7 @@ public class Notification {
     }
     
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @GeneratedValue(strategy = GenerationType.TABLE, generator = TABLE_SEQUENCES)
     @Column(name = "id_notificacao")
     private Long id;
     

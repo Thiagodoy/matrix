@@ -6,6 +6,7 @@
 package com.core.matrix.model;
 
 import com.core.matrix.request.ContactManagerRequest;
+import static com.core.matrix.utils.Constants.TABLE_SEQUENCES;
 import com.fasterxml.jackson.annotation.JsonFormat;
 import java.time.LocalDateTime;
 import javax.persistence.Column;
@@ -28,7 +29,7 @@ import lombok.Data;
 public class ContactManager {
 
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @GeneratedValue(strategy = GenerationType.TABLE, generator = TABLE_SEQUENCES)
     @Column(name = "id_contato_gestor")
     private Long id;
 

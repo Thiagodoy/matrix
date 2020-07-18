@@ -53,12 +53,12 @@ public class MeansurementFileDetailResource {
     }
 
     @RequestMapping(value = "/fixFile", method = RequestMethod.POST)
-    public ResponseEntity fixFile(@RequestBody DataValidationResultDTO request) {
+    public ResponseEntity fixFile(@RequestBody List<DataValidationResultDTO> request) {
 
         try {
 
             this.service.fixFile(request);
-            return ResponseEntity.ok().build();
+            return ResponseEntity.ok().build(); 
 
         } catch (Exception e) {
             Logger.getLogger(MeansurementFileDetailResource.class.getName()).log(Level.SEVERE, "[post]", e);

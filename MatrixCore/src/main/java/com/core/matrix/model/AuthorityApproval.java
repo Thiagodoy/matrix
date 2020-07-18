@@ -5,6 +5,7 @@
  */
 package com.core.matrix.model;
 
+import static com.core.matrix.utils.Constants.TABLE_SEQUENCES;
 import java.io.Serializable;
 import java.util.Optional;
 import javax.persistence.Column;
@@ -29,7 +30,7 @@ public class AuthorityApproval implements Serializable {
 
     @Id
     @Column(name = "id_alcada_aprovacao")
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @GeneratedValue(strategy = GenerationType.TABLE, generator = TABLE_SEQUENCES)
     private Long id;
 
     @Column(name = "alcada")

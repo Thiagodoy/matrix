@@ -5,33 +5,18 @@
  */
 package com.core.matrix;
 
-import com.core.matrix.dto.FileDetailDTO;
 import com.core.matrix.dto.FileParsedDTO;
 import com.core.matrix.io.BeanIO;
-import com.core.matrix.model.MeansurementFile;
-import com.core.matrix.model.MeansurementFileDetail;
 import com.core.matrix.service.MeansurementFileService;
-import static com.core.matrix.utils.Constants.CONTROLE;
-import static com.core.matrix.utils.Constants.FILE_MEANSUREMENT_ID;
-import static com.core.matrix.utils.Constants.RESPONSE_LAYOUT_VALID;
-import com.core.matrix.utils.MeansurementFileStatus;
-import com.core.matrix.utils.MeansurementFileType;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.InputStream;
-import java.time.LocalDate;
-import java.time.format.DateTimeFormatter;
-import java.util.List;
 import java.util.Optional;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
-import java.util.stream.Collectors;
 import org.activiti.engine.delegate.DelegateExecution;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.context.SpringBootTest;
 
 /**
  *

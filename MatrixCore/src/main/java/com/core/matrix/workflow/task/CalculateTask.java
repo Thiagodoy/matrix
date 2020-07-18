@@ -14,10 +14,12 @@ import com.core.matrix.model.MeansurementFileDetail;
 import com.core.matrix.model.MeansurementFileResult;
 import com.core.matrix.service.ContractCompInformationService;
 import com.core.matrix.service.LogService;
+import com.core.matrix.service.MeansurementFileDetailService;
 
 import com.core.matrix.service.MeansurementFileResultService;
 import com.core.matrix.service.MeansurementFileService;
 import com.core.matrix.utils.Constants;
+import static com.core.matrix.utils.Constants.VAR_FOLLOW_TO_RESULT;
 import com.core.matrix.wbc.dto.ContractWbcInformationDTO;
 import com.core.matrix.wbc.dto.ContractDTO;
 import com.core.matrix.wbc.service.ContractService;
@@ -39,11 +41,12 @@ import org.springframework.context.ApplicationContext;
  *
  * @author thiag
  */
-public class CalculateTask implements Task {
+public class CalculateTask extends Task {
 
     private static ApplicationContext context;
 
     private MeansurementFileService fileService;
+    private MeansurementFileDetailService detailService;
     private ContractCompInformationService contractService;
     private LogService logService;
 
@@ -60,25 +63,33 @@ public class CalculateTask implements Task {
             this.resultService = CalculateTask.context.getBean(MeansurementFileResultService.class);
             this.contractWbcService = CalculateTask.context.getBean(ContractService.class);
             this.logService = CalculateTask.context.getBean(LogService.class);
-
+            this.detailService = CalculateTask.context.getBean(MeansurementFileDetailService.class);
         }
 
     }
 
     public CalculateTask(ApplicationContext context) {
         CalculateTask.context = context;
-    }
+    }   
 
     @Override
     public void execute(DelegateExecution de) {
 
+        this.loadVariables(de);
+        
         long start = System.currentTimeMillis();
-        List<MeansurementFile> files = fileService.findByProcessInstanceId(de.getProcessInstanceId());
-
+        List<MeansurementFile> files = this.getFiles(de);          
+        if(de.hasVariable(VAR_FOLLOW_TO_RESULT)){            
+            return;
+        }       
+        
+        
         loggerPerformance(start, "Carregando os arquivos");
 
         try {
 
+            
+            
             final List<ContractDTO> contracts = (List<ContractDTO>) de.getVariable(Constants.LIST_CONTRACTS_FOR_BILLING, Object.class);
 
             if (contracts.get(0).getBFlRateio().equals(1L)) {
@@ -86,6 +97,8 @@ public class CalculateTask implements Task {
             } else {
                 this.calculateWithoutRateio(de, files.get(0), contracts);
             }
+            
+            
 
         } catch (Exception e) {
             Logger.getLogger(CalculateTask.class.getName()).log(Level.SEVERE, "[ execute ]", e);
@@ -95,6 +108,8 @@ public class CalculateTask implements Task {
             log.setMessageErrorApplication(e.getMessage());
             logService.save(log);
         }
+        
+        this.writeVariables(de);
     }
 
     public void calculateWithoutRateio(DelegateExecution de, MeansurementFile file, List<ContractDTO> contracts) {
@@ -171,20 +186,21 @@ public class CalculateTask implements Task {
 
             long start = System.currentTimeMillis();
             //Join all datas
-            files.stream().forEach(file -> {
+
+            for (MeansurementFile file : files) {
+
                 try {
                     details.addAll(this.getDetails(file, de));
-                } catch (Exception ex) {
-                    Logger.getLogger(CalculateTask.class.getName()).log(Level.SEVERE, "[ calculateWithRateio ]", ex);
+                } catch (Exception e) {
                 }
-            });
 
+            }
             loggerPerformance(start, "Unindo os detalhes");
 
             MeansurementFile fileM = files.stream().findFirst().orElseThrow(() -> new Exception("Não existe nenhum arquivo para ser processado"));
 
             start = System.currentTimeMillis();
-            final List<ContractCompInformation> contractsInformations = new CopyOnWriteArrayList<ContractCompInformation>(contractService.listByContract(files.get(0).getWbcContract()));
+            final List<ContractCompInformation> contractsInformations = new CopyOnWriteArrayList<ContractCompInformation>(contractService.listByContract(fileM.getWbcContract()));
             loggerPerformance(start, "Carregando as informações complementares");
 
             List<Long> contractsId = contractsInformations.stream().mapToLong(ContractCompInformation::getWbcContract).boxed().collect(Collectors.toList());
@@ -193,6 +209,7 @@ public class CalculateTask implements Task {
             start = System.currentTimeMillis();
             contractDTOs = new CopyOnWriteArrayList<ContractDTO>(this.contractWbcService.findAll(fileM.getWbcContract(), null));
             loggerPerformance(start, "Carregando contratos WBC");
+            
             final List<MeansurementFileResult> results = Collections.synchronizedList(new ArrayList<>());
 
             Long fileId = fileM.getId();
@@ -227,7 +244,7 @@ public class CalculateTask implements Task {
 
                     final ContractWbcInformationDTO contractWbcInformation = contractWbcInformationDTOs
                             .stream()
-                            .filter(c-> c.getNrContract().equals(String.valueOf(file.getWbcContract())))
+                            .filter(c -> c.getNrContract().equals(String.valueOf(file.getWbcContract())))
                             .findFirst()
                             .orElseThrow(() -> new Exception("[WBC] -> Não foi possivel carregar as informações complementares!\n Referente as informações de [CE_SAZONALIZACAO] e [CE_REGRA_OPCIONALIDADE] "));
 
@@ -357,15 +374,13 @@ public class CalculateTask implements Task {
 
     private void mountResultParent(DelegateExecution de, ContractCompInformation contractInformationParent, Long fileId, List<MeansurementFileResult> results, List<ContractDTO> contracts) throws Exception {
 
-        ContractWbcInformationDTO contractWbcInformation =  contractWbcInformationDTOs
-                            .stream()
-                            .filter(c-> c.getNrContract().equals(String.valueOf(contractInformationParent.getWbcContract())))
-                            .findFirst()
-                            .orElseThrow(() -> new Exception("[WBC] -> Não foi possivel carregar as informações complementares!\n Referente as informações de [CE_SAZONALIZACAO] e [CE_REGRA_OPCIONALIDADE] "));
-                
-                
-                //this.getWbcInformation(fileM.getYear(), fileM.getMonth(), contractInformationParent.getWbcContract());
+        ContractWbcInformationDTO contractWbcInformation = contractWbcInformationDTOs
+                .stream()
+                .filter(c -> c.getNrContract().equals(String.valueOf(contractInformationParent.getWbcContract())))
+                .findFirst()
+                .orElseThrow(() -> new Exception("[WBC] -> Não foi possivel carregar as informações complementares!\n Referente as informações de [CE_SAZONALIZACAO] e [CE_REGRA_OPCIONALIDADE] "));
 
+        //this.getWbcInformation(fileM.getYear(), fileM.getMonth(), contractInformationParent.getWbcContract());
         /**
          * Set result to zero when the contract is consumer unit
          */
@@ -416,7 +431,7 @@ public class CalculateTask implements Task {
 
                     ContractWbcInformationDTO contractWbcInformation = contractWbcInformationDTOs
                             .stream()
-                            .filter( cc-> cc.getNrContract().equals(String.valueOf(c.getCodeWbcContract())))
+                            .filter(cc -> cc.getNrContract().equals(String.valueOf(c.getCodeWbcContract())))
                             .findFirst()
                             .orElse(null);
 
@@ -526,8 +541,6 @@ public class CalculateTask implements Task {
 
     }
 
-    private void loggerPerformance(long start, String fase) {
-        Logger.getLogger(FileValidationTask.class.getName()).log(Level.INFO, MessageFormat.format("[loggerPerformance] -> etapa: {0} tempo : {1} min", fase, (System.currentTimeMillis() - start) / 60000D));
-    }
+    
 
 }

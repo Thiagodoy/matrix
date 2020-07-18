@@ -24,6 +24,7 @@ public class DataValidationResultDTO implements Serializable{
     private Long hours;
     private Long days;
     private Double inputManual;
+    private String processInstanceId;
     
     
 }

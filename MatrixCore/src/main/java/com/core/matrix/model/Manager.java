@@ -6,6 +6,7 @@
 package com.core.matrix.model;
 
 import com.core.matrix.request.ManagerRequest;
+import static com.core.matrix.utils.Constants.TABLE_SEQUENCES;
 import com.fasterxml.jackson.annotation.JsonFormat;
 import java.time.LocalDateTime;
 import java.util.List;
@@ -34,7 +35,7 @@ import lombok.Data;
 public class Manager {
 
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @GeneratedValue(strategy = GenerationType.TABLE, generator = TABLE_SEQUENCES)
     @Column(name = "id_gestor")
     private Long id;
 

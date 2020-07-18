@@ -5,11 +5,13 @@
  */
 package com.core.matrix.utils;
 
+import java.io.Serializable;
+
 /**
  *
  * @author thiag
  */
-public enum MeansurementFileType {
+public enum MeansurementFileType implements Serializable{
 
     LAYOUT_A,
     LAYOUT_B,

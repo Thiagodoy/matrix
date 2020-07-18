@@ -18,6 +18,7 @@ import com.core.matrix.workflow.task.CleanFiles;
 import com.core.matrix.workflow.task.DataValidationTask;
 import com.core.matrix.workflow.task.DeleteProcessInstanceTask;
 import com.core.matrix.workflow.task.FileValidationTask;
+import com.core.matrix.workflow.task.PersistInformationTask;
 import com.core.matrix.workflow.task.ProcessFilesInLoteTask;
 import com.core.matrix.workflow.task.ResetResultTask;
 import com.core.matrix.workflow.task.ValidationFileLoteTask;
@@ -44,7 +45,6 @@ import org.springframework.context.ApplicationContext;
 import org.springframework.context.EnvironmentAware;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.context.annotation.Primary;
 import org.springframework.context.annotation.Scope;
 import org.springframework.core.env.Environment;
 import org.springframework.data.jpa.repository.config.EnableJpaRepositories;
@@ -80,7 +80,7 @@ public class ActivitiCoreConfiguration implements EnvironmentAware {
         this.environment = e;
     }
 
-    @Primary
+    
     @Bean
     public LocalContainerEntityManagerFactoryBean entityManagerFactory() {
         LocalContainerEntityManagerFactoryBean em
@@ -104,7 +104,7 @@ public class ActivitiCoreConfiguration implements EnvironmentAware {
         return em;
     }
 
-    @Primary
+    
     @Bean
     public DataSource dataSource() {
         
@@ -134,7 +134,7 @@ public class ActivitiCoreConfiguration implements EnvironmentAware {
         return dataSource;
     }
 
-    @Primary
+    
     @Bean
     public PlatformTransactionManager transactionManager() {
 
@@ -155,7 +155,6 @@ public class ActivitiCoreConfiguration implements EnvironmentAware {
                 .setDataSource(this.dataSource())
                 //.setTransactionsExternallyManaged(true)
                 .setJpaHandleTransaction(true)
-                
                 .setAsyncFailedJobWaitTime(2147483647)
                 .setDefaultFailedJobWaitTime(2147483647)
                 .setAsyncExecutorActivate(true)
@@ -163,13 +162,10 @@ public class ActivitiCoreConfiguration implements EnvironmentAware {
 
         ProcessEngine processEngine = s.buildProcessEngine();
         
-        JobExecutor jobExecutor = processEngine.getProcessEngineConfiguration().getJobExecutor();
-        jobExecutor.setLockTimeInMillis(15*60000);
         
-        // jobExecutor.setWaitTimeInMillis(5*60000);
+        JobExecutor jobExecutor = processEngine.getProcessEngineConfiguration().getJobExecutor();
+        jobExecutor.setLockTimeInMillis(15*60000);        
 
-//        AsyncExecutor asyncExecutor = processEngine.getProcessEngineConfiguration().getAsyncExecutor();
-//        asyncExecutor.setDefaultAsyncJobAcquireWaitTimeInMillis(15*60000);
         return processEngine;
 
     }
@@ -277,6 +273,11 @@ public class ActivitiCoreConfiguration implements EnvironmentAware {
     @Bean
     public ResetResultTask resetResultTask(ApplicationContext context){
         return new ResetResultTask(context);
+    }
+    
+    @Bean
+    public PersistInformationTask persistInformationTask(ApplicationContext context){
+        return new PersistInformationTask(context);
     }
 
 }

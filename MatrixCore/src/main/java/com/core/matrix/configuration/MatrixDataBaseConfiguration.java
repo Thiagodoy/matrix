@@ -6,17 +6,21 @@
 package com.core.matrix.configuration;
 
 import com.core.matrix.properties.MatrixProperties;
+import static com.core.matrix.utils.Constants.TABLE_SEQUENCES;
 import com.core.matrix.utils.ThreadPoolBindFile;
+import com.core.matrix.utils.ThreadPoolDetail;
 import com.core.matrix.utils.ThreadPoolParseFile;
 import com.zaxxer.hikari.HikariConfig;
 import com.zaxxer.hikari.HikariDataSource;
 import java.util.HashMap;
+import javax.persistence.TableGenerator;
 import javax.sql.DataSource;
 import org.activiti.engine.TaskService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.config.ConfigurableBeanFactory;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.context.annotation.Primary;
 import org.springframework.context.annotation.Scope;
 import org.springframework.data.jpa.repository.config.EnableJpaRepositories;
 import org.springframework.orm.jpa.JpaTransactionManager;
@@ -34,6 +38,7 @@ import org.springframework.transaction.PlatformTransactionManager;
         transactionManagerRef = "matrixTransactionManager") 
 
 @Configuration
+@TableGenerator(name = TABLE_SEQUENCES, allocationSize = 1000)
 public class MatrixDataBaseConfiguration {
     
     
@@ -42,6 +47,7 @@ public class MatrixDataBaseConfiguration {
     
     private static final String NAME_POOL = "MatrixPool";    
     
+    @Primary
     @Bean
     public LocalContainerEntityManagerFactoryBean matrixEntityManagerFactory() {
         LocalContainerEntityManagerFactoryBean em
@@ -54,14 +60,18 @@ public class MatrixDataBaseConfiguration {
         em.setJpaVendorAdapter(vendorAdapter);
         HashMap<String, Object> properties = new HashMap<>();
         properties.put("hibernate.hbm2ddl.auto", "update");
-        properties.put("hibernate.dialect", "org.hibernate.dialect.MySQL5InnoDBDialect");
-       // properties.put("hibernate.tool.hbm2ddl.SchemaUpdate", "true");
+        properties.put("hibernate.dialect", "org.hibernate.dialect.MySQL5InnoDBDialect");           
+        properties.put("hibernate.jdbc.batch_size", "3000");   
+        properties.put("hibernate.order_inserts", "true");   
+        //properties.put("hibernate.generate_statistics", "true");   
         em.setJpaPropertyMap(properties);
 
+        
+        
         return em;
     }
 
-    
+    @Primary
     @Bean
     public DataSource matrixDataSource() {
 
@@ -82,14 +92,12 @@ public class MatrixDataBaseConfiguration {
         
         hikariConfig.setConnectionTestQuery(matrixProperties.getDatasource().getSqlserver().getConnectionTestQuery());
 
-        dataSource = new HikariDataSource(hikariConfig);       
-        
-        
+        dataSource = new HikariDataSource(hikariConfig);        
         
         return dataSource;
     }
 
-    
+    @Primary
     @Bean
     public PlatformTransactionManager matrixTransactionManager() {
 
@@ -110,6 +118,12 @@ public class MatrixDataBaseConfiguration {
     @Scope(value = ConfigurableBeanFactory.SCOPE_PROTOTYPE)
     public ThreadPoolBindFile threadPoolBindFile(TaskService service){
         return new ThreadPoolBindFile(service);
+    }
+    
+    @Bean 
+    @Scope(value = ConfigurableBeanFactory.SCOPE_SINGLETON)
+    public ThreadPoolDetail detail(){
+        return new ThreadPoolDetail();
     }
     
 }

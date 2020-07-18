@@ -5,11 +5,13 @@
  */
 package com.core.matrix.utils;
 
+import java.io.Serializable;
+
 /**
  *
  * @author thiag
  */
-public enum MeansurementFileStatus {
+public enum MeansurementFileStatus implements Serializable{
     FILE_PENDING,
     FILE_ERROR,
     POINT_ERROR,

@@ -14,17 +14,15 @@ import static com.core.matrix.utils.Constants.CONST_QUALITY_COMPLETE;
 import static com.core.matrix.utils.Constants.CONST_SITUATION_3;
 import static com.core.matrix.utils.Constants.TYPE_ENERGY_LIQUID;
 import com.core.matrix.utils.MeansurementFileDetailStatus;
-import com.core.matrix.utils.MeansurementFileStatus;
 import com.core.matrix.utils.Utils;
 import java.sql.Connection;
-import java.sql.SQLException;
 import java.sql.Statement;
-import java.util.Arrays;
 import java.util.List;
-import java.util.logging.Level;
-import java.util.logging.Logger;
+import java.util.Map;
 import java.util.stream.Collectors;
 import javax.sql.DataSource;
+
+import org.activiti.engine.RuntimeService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -41,9 +39,15 @@ public class MeansurementFileDetailService {
 
     @Autowired
     private MeansurementFileService fileService;
-
+    
     @Autowired
     private DataSource dataSource;
+
+    @Autowired
+    private RuntimeService runtimeService;
+    
+    @Autowired
+    private TableSequenceService sequenceService;
 
     @Transactional
     public void save(MeansurementFileDetail detail) {
@@ -51,35 +55,8 @@ public class MeansurementFileDetailService {
     }
 
     @Transactional(transactionManager = "matrixTransactionManager")
-    public void save(List<MeansurementFileDetail> detail) {
-        this.repository.saveAll(detail);
-    }
-
-    public void saveAllBatch(List<MeansurementFileDetail> detail) {
-
-        try {
-            Connection con = dataSource.getConnection();
-            int limit = 3000;
-            
-
-            while (!detail.isEmpty()) {
-
-                int indexEnd = detail.size() > limit ? limit : detail.size();
-                List<String> records = Utils.<MeansurementFileDetail>mountBatchInsert(detail.subList(0, indexEnd));             
-                
-                String query = "INSERT INTO `matrix`.`mtx_arquivo_de_medicao_detalhe` VALUES " + records.stream().collect(Collectors.joining(","));
-                Statement ps = con.createStatement();
-                ps.clearBatch();
-                ps.addBatch(query);
-                ps.executeBatch();
-                con.commit();
-                detail.subList(0, indexEnd).clear();
-           }
-        } catch (SQLException ex) {
-            Logger.getLogger(MeansurementFileDetailService.class.getName()).log(Level.SEVERE, "[saveAllBatch]", ex);
-            throw new RuntimeException(ex.getMessage());
-        }
-
+    public List<MeansurementFileDetail> save(List<MeansurementFileDetail> detail) {
+        return this.repository.saveAll(detail);
     }
 
     @Transactional(readOnly = true)
@@ -98,44 +75,88 @@ public class MeansurementFileDetailService {
     }
 
     @Transactional
-    public void fixFile(DataValidationResultDTO request) throws Exception {
+    public List<MeansurementFileDetail> getDetails(Long id) {
+        return this.repository.findByIdMeansurementFile(id);
+    }
 
-        List<MeansurementFileDetailStatus> status = Arrays.asList(MeansurementFileDetailStatus.HOUR_ERROR, MeansurementFileDetailStatus.DAY_ERROR);
+    public void saveAllBatch(List<MeansurementFileDetail> detail) {
 
-        List<MeansurementFileDetail> result = this.repository.findByIdMeansurementFileAndStatusIn(request.getIdFile(), status);
+        try {
 
-        MeansurementFile file = fileService.findById(request.getIdFile());
+            int limit = 3000;
 
-        Double value = request.getInputManual() / request.getHours();
-
-        // Normalizing data for billing
-        result.stream().forEach(detail -> {
-            detail.setConsumptionActive(value);
-            detail.setStatus(MeansurementFileDetailStatus.INPUT_MANUAL);
-            switch (file.getType()) {
-
-                case LAYOUT_A:
-                    detail.setEnergyType(TYPE_ENERGY_LIQUID);
-                    detail.setReasonOfSituation(CONST_SITUATION_3);
-                    break;
-
-                case LAYOUT_B:
-                    detail.setEnergyType(TYPE_ENERGY_LIQUID);
-                    detail.setSourceCollection(Constants.CONST_SOURCE_COLLECTION_3);
-                    break;
-
-                case LAYOUT_C:
-                case LAYOUT_C_1:
-                    detail.setQuality(CONST_QUALITY_COMPLETE);
-                    detail.setOrigem(CONST_SITUATION_3);
-                    break;
+            
+            long  init  = sequenceService.getValue("mtx_arquivo_de_medicao_detalhe", detail.size());
+            
+            for (int i = 0; i < detail.size(); i++) {
+                detail.get(i).setId(init++);
             }
-        });
+            
+            
+            while (!detail.isEmpty()) {
+                Connection con = dataSource.getConnection();
 
-        this.repository.saveAll(result);
+                int indexEnd = detail.size() > limit ? limit : detail.size();
+                List<String> records = Utils.<MeansurementFileDetail>mountBatchInsert(detail.subList(0, indexEnd));
 
-        fileService.updateStatus(MeansurementFileStatus.SUCCESS, file.getId());
+                String query = "INSERT INTO `matrix`.`mtx_arquivo_de_medicao_detalhe` VALUES " + records.stream().collect(Collectors.joining(","));
+                Statement ps = con.createStatement();
+                ps.clearBatch();
+                ps.addBatch(query);
+                ps.executeBatch();
+                detail.subList(0, indexEnd).clear();
+                con.commit();
+                con.close();
+            }
+
+        } catch (Exception e) {
+            throw new RuntimeException(e.getMessage());
+        }
 
     }
 
+    @Transactional
+    public void fixFile(List<DataValidationResultDTO> requests) throws Exception {
+
+        String processInstanceId = requests.stream().findFirst().get().getProcessInstanceId();
+
+        Map<String, List<MeansurementFileDetail>> mapDetails = runtimeService.getVariable(processInstanceId, Constants.VAR_MAP_DETAILS, Map.class);
+        List<MeansurementFile> files = runtimeService.getVariable(processInstanceId, Constants.VAR_LIST_FILES, List.class);
+
+        requests.parallelStream().forEach(request -> {
+            final Double value = request.getInputManual() / request.getHours();
+            final MeansurementFile file = files.stream().filter(f -> f.getId().equals(request.getIdFile())).findFirst().get();
+            mapDetails.get(request.getPoint())
+                    .parallelStream()
+                    .filter(d -> d.getStatus().equals(MeansurementFileDetailStatus.HOUR_ERROR) || d.getStatus().equals(MeansurementFileDetailStatus.DAY_ERROR))
+                    .forEach(d -> {
+
+                        d.setConsumptionActive(value);
+                        d.setStatus(MeansurementFileDetailStatus.INPUT_MANUAL);
+                        switch (file.getType()) {
+
+                            case LAYOUT_A:
+                                d.setEnergyType(TYPE_ENERGY_LIQUID);
+                                d.setReasonOfSituation(CONST_SITUATION_3);
+                                break;
+
+                            case LAYOUT_B:
+                                d.setEnergyType(TYPE_ENERGY_LIQUID);
+                                d.setSourceCollection(Constants.CONST_SOURCE_COLLECTION_3);
+                                break;
+
+                            case LAYOUT_C:
+                            case LAYOUT_C_1:
+                                d.setQuality(CONST_QUALITY_COMPLETE);
+                                d.setOrigem(CONST_SITUATION_3);
+                                break;
+                        }
+
+                    });
+
+        });
+
+        runtimeService.setVariable(processInstanceId, Constants.VAR_MAP_DETAILS, mapDetails);
+
+    }
 }

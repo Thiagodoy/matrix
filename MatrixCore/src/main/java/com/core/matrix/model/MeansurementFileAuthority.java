@@ -5,6 +5,7 @@
  */
 package com.core.matrix.model;
 
+import static com.core.matrix.utils.Constants.TABLE_SEQUENCES;
 import com.fasterxml.jackson.annotation.JsonFormat;
 import java.io.Serializable;
 import java.time.LocalDateTime;
@@ -30,7 +31,7 @@ public class MeansurementFileAuthority implements Serializable, Model<Meansureme
     
     @Id
     @Column(name = "id_arquivo_de_medicao_alcada")
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @GeneratedValue(strategy = GenerationType.TABLE, generator = TABLE_SEQUENCES)
     protected Long id;
 
     @Column(name = "id_arquivo_de_medicao")

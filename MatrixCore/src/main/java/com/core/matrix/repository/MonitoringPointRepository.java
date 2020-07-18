@@ -8,8 +8,6 @@ package com.core.matrix.repository;
 import com.core.matrix.dto.MonitoringContractDTO;
 import com.core.matrix.model.MonitoringPoint;
 import java.util.List;
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.JpaSpecificationExecutor;
 import org.springframework.data.jpa.repository.Query;

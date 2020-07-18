@@ -5,15 +5,18 @@
  */
 package com.core.matrix.repository;
 
-import com.core.matrix.model.LevelOfApproval;
+import com.core.matrix.model.TableSequence;
+import java.util.Optional;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 
 /**
  *
- * @author aloysio
+ * @author thiag
  */
 @Repository
-public interface LevelOfApprovalRepository extends JpaRepository<LevelOfApproval, Long>{
-    
+public interface TableSequenceRepository extends JpaRepository<TableSequence, String> {
+
+    Optional<TableSequence> findByName(String name);
+
 }

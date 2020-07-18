@@ -42,14 +42,24 @@ public class MeansurementFileService {
     @Autowired
     private ProcessStatusLoteRepository tORepository;
 
-    @Transactional
+    @Transactional(transactionManager = "matrixTransactionManager")
     public MeansurementFile saveFile(MeansurementFile file) {
         return this.repository.save(file);
     }
-
+    
     @Transactional(transactionManager = "matrixTransactionManager")
+    public void updateAll(List<MeansurementFile> file) {
+        this.repository.saveAll(file);
+    }
+
+    @Transactional(readOnly = true)
     public List<MeansurementFile> findByProcessInstanceId(String id) {
         return this.repository.findByProcessInstanceId(id);
+    }
+    
+    @Transactional(readOnly = true)
+    public List<MeansurementFile> findByProcessInstanceId2(String id) {
+        return this.repository.findByProcessInstanceId2(id);
     }
 
     @Transactional
@@ -65,6 +75,16 @@ public class MeansurementFileService {
     @Transactional(transactionManager = "matrixTransactionManager")
     public void updateStatus(MeansurementFileStatus status, Long id) {
         this.repository.updateStatus(status, id);
+    }
+    
+    @Transactional(transactionManager = "matrixTransactionManager")
+    public void updateStatusByProcessInstanceId(MeansurementFileStatus status, String id) {
+        this.repository.updateStatusByProcessInstanceId(status, id);
+    }
+    
+    @Transactional(readOnly = true)
+    public List<Long> listIdsByProcessInstanceId(String processInstanceId){
+        return this.repository.listIdsByProcessInstanceId(processInstanceId);
     }
 
     @Transactional(transactionManager = "matrixTransactionManager")

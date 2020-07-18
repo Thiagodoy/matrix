@@ -34,6 +34,10 @@ public interface MeansurementFileRepository extends JpaRepository<MeansurementFi
     void updateStatus(@Param("status") MeansurementFileStatus status, @Param("id") Long id);
 
     @Modifying
+    @Query(value = "update MeansurementFile c set c.status = :status where c.processInstanceId = :id")
+    void updateStatusByProcessInstanceId(@Param("status") MeansurementFileStatus status, @Param("id") String id);
+
+    @Modifying
     @Query(value = "update MeansurementFile c set c.file = :file where c.id = :id")
     void updateFile(@Param("file") String file, @Param("id") Long id);
 
@@ -56,7 +60,11 @@ public interface MeansurementFileRepository extends JpaRepository<MeansurementFi
     @Query(nativeQuery = true)
     List<ProcessStatusLote> findByProcessInstanceIdIn(@Param("process") List<String> process);
 
+    
     List<MeansurementFile> findByProcessInstanceId(String id);
+    
+    @Query(value = "select e from MeansurementFile e left join fetch e.details b where e.processInstanceId = :id")
+    List<MeansurementFile> findByProcessInstanceId2(String id);
 
     @Query(value = "select * from mtx_arquivo_de_medicao f where f.act_id_processo = :processo and f.status <> 'SUCCESS' ", nativeQuery = true)
     List<MeansurementFile> findAllFilesWithErrors(@Param("process") String processInstanceId);
@@ -85,7 +93,9 @@ public interface MeansurementFileRepository extends JpaRepository<MeansurementFi
             + "        mtx_arquivo_de_medicao c on b.wbc_contrato = c.wbc_contrato and b.wbc_ponto_de_medicao = c.wbc_ponto_de_medicao and c.ano = :year and c.mes = :month")
     boolean contractHasBilling(@Param("contract") Long contract, @Param("month") Long month, @Param("year") Long year);
 
-    
-    List<MeansurementFile>findByMonthAndYearAndWbcContractIn(Long month,Long year,List<Long>contracts);
-    
+    List<MeansurementFile> findByMonthAndYearAndWbcContractIn(Long month, Long year, List<Long> contracts);
+
+    @Query(nativeQuery = true, value = "select id_arquivo_de_medicao from mtx_arquivo_de_medicao where act_id_processo = :id")
+    List<Long> listIdsByProcessInstanceId(@Param("id") String id);
+
 }

@@ -55,8 +55,7 @@ public class ChangeStatusFileTask implements JavaDelegate {
                         log.setMessage("Not changes status of file");
                         logService.save(log);
                     }
-
-                });;
+                });
 
     }
 

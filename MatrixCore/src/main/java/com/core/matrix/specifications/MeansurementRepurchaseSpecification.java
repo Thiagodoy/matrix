@@ -5,8 +5,6 @@
  */
 package com.core.matrix.specifications;
 
-import com.core.matrix.model.AuthorityApproval;
-import com.core.matrix.model.AuthorityApproval_;
 import com.core.matrix.model.MeansurementRepurchase;
 import com.core.matrix.model.MeansurementRepurchase_;
 import org.springframework.data.jpa.domain.Specification;

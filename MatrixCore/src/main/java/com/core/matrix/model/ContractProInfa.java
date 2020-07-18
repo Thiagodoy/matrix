@@ -5,6 +5,7 @@
  */
 package com.core.matrix.model;
 
+import static com.core.matrix.utils.Constants.TABLE_SEQUENCES;
 import java.io.Serializable;
 import javax.persistence.Column;
 import javax.persistence.Entity;
@@ -28,7 +29,7 @@ public class ContractProInfa implements Serializable, Model<ContractProInfa>{
     protected static final long serialVersionUID = -4258355186535810797L;    
     
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @GeneratedValue(strategy = GenerationType.TABLE, generator = TABLE_SEQUENCES)
     @Column(name = "id_proinfa")
     protected Long id;
     

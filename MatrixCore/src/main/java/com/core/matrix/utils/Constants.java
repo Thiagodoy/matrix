@@ -25,6 +25,11 @@ public class Constants {
     public static final String USER_ID = "";
     public static final String CONTROLE = "_controle";
     public static final String VAR_FILE_NAME = "file_name";
+    
+    
+    public static final String VAR_MAP_DETAILS = "map_details";
+    public static final String VAR_LIST_FILES = "lis_files";
+    public static final String VAR_NO_PERSIST = "no_persist";
 
     public static final String RESPONSE_LAYOUT_VALID = "Layout Válido";
     public static final String RESPONSE_LAYOUT_INVALID = "Layout Inválido";
@@ -111,6 +116,8 @@ public class Constants {
     public static final String RESPONSE_FILES_PARSED = "files_parsed";
 
     public static final String VAR_MAX_PROFILE = "max_profile";
+    
+    public static final String VAR_FOLLOW_TO_RESULT = "follow_to_result";
 
     public static final String CONST_APPROVED = "APROVADO";
 
@@ -139,6 +146,8 @@ public class Constants {
     public static final String PARAMETER_WISH_MAKE_REPURCHASE = "wish_make_repurchase";
     
     public static final String PARAMETER_EMAILS_PROCESS_UNBILLING_CONTRACTS = "process-unbiling-contract";
+    
+    public static final String TABLE_SEQUENCES = "mtx_sequences";
     
     
     

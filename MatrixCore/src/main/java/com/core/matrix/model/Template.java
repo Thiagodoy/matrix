@@ -5,6 +5,7 @@
  */
 package com.core.matrix.model;
 
+import static com.core.matrix.utils.Constants.TABLE_SEQUENCES;
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import com.fasterxml.jackson.datatype.jsr310.deser.LocalDateTimeDeserializer;
@@ -53,7 +54,7 @@ public class Template implements Model<Template>{
     }
     
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @GeneratedValue(strategy = GenerationType.TABLE, generator = TABLE_SEQUENCES)
     @Column(name = "id_template")
     protected Long id;
     

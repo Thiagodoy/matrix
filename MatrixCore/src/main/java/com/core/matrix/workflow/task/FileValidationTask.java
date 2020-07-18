@@ -33,17 +33,18 @@ import java.nio.charset.Charset;
 import java.text.MessageFormat;
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.HashMap;
 
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
+import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import java.util.stream.Collectors;
 import lombok.Data;
 import org.activiti.engine.TaskService;
 import org.activiti.engine.delegate.DelegateExecution;
-import org.activiti.engine.delegate.JavaDelegate;
 import org.apache.commons.io.FileUtils;
 import org.springframework.context.ApplicationContext;
 
@@ -53,7 +54,7 @@ import org.springframework.context.ApplicationContext;
  */
 @Data
 
-public class FileValidationTask implements JavaDelegate {
+public class FileValidationTask extends Task {
 
     private static ApplicationContext context;
 
@@ -89,11 +90,14 @@ public class FileValidationTask implements JavaDelegate {
 
         try {
             delegateExecution = de;
+            
+            this.loadVariables(delegateExecution);
+            
             logs = new ArrayList<>();
             final List<String> attachmentIds = (List<String>) de.getVariable(LIST_ATTACHMENT_ID, Object.class);
 
             final String user = de.getVariable(USER_UPLOAD, String.class);
-            files = this.service.findByProcessInstanceId(delegateExecution.getProcessInstanceId());
+            files = new CopyOnWriteArrayList<>(this.service.findByProcessInstanceId(delegateExecution.getProcessInstanceId()));
 
             this.checkProinfaOfContracts();
 
@@ -109,38 +113,34 @@ public class FileValidationTask implements JavaDelegate {
                         stream = removeLinesEmpty(stream);
                         fileName = taskService.getAttachment(attachmentId).getName();
                     }
-                    
                     loggerPerformance(start, "Carregando arquivo e removendo as linhas em branco");
 
                     start = System.currentTimeMillis();
                     BeanIO reader = new BeanIO();
                     Optional<FileParsedDTO> opt = reader.<FileParsedDTO>parse(stream);
-                    
                     loggerPerformance(start, "Parseando o arquivo para a entidade");
 
                     if (opt.isPresent()) {
 
                         FileParsedDTO fileDto = opt.get();
 
-                        start = System.currentTimeMillis();
-                        //Filter only points thas is into process
+                        start = System.currentTimeMillis();                        
                         List<FileDetailDTO> result = this.filter(fileDto.getDetails(), fileName);
                         fileDto.setDetails(result);
-                        
                         loggerPerformance(start, "Filtrando os registros pertecente ao processo");
 
                         MeansurementFileType type = MeansurementFileType.valueOf(fileDto.getType());
-                        
-                        start = System.currentTimeMillis();    
+
+                        start = System.currentTimeMillis();
                         this.checkDuplicity(result, type, fileName);
                         loggerPerformance(start, "Checando a duplicidade");
-                        
-                        start = System.currentTimeMillis();    
+
+                        start = System.currentTimeMillis();
                         this.validate(result, type, fileName);
                         loggerPerformance(start, "Validação");
-                        
+
                         if (this.logs.isEmpty()) {
-                            start = System.currentTimeMillis();    
+                            start = System.currentTimeMillis();
                             persistFile(fileDto, attachmentId, user, files);
                             loggerPerformance(start, "Persistência");
                         }
@@ -174,23 +174,53 @@ public class FileValidationTask implements JavaDelegate {
                 logs.add(log);
 
                 this.logService.save(logs);
-                delegateExecution.setVariable(CONTROLE, RESPONSE_LAYOUT_INVALID);
+                this.setVariable(CONTROLE, RESPONSE_LAYOUT_INVALID);
             } else {
-
-                //Change status of file that is consumer unit to success      
-                files.stream()
-                        .filter(f -> this.contractInformationService.isConsumerUnit(f.getWbcContract()))
-                        .forEach(f -> {
-                            f.setStatus(MeansurementFileStatus.SUCCESS);
-                            service.saveFile(f);
-                        });
-
-                delegateExecution.setVariable(CONTROLE, RESPONSE_LAYOUT_VALID);
+                this.alterStatusFiles(files);
+                this.setVariable(CONTROLE, RESPONSE_LAYOUT_VALID);
             }
+            
+            this.writeVariables(delegateExecution);
+            
         } catch (Exception e) {
-            delegateExecution.setVariable(CONTROLE, RESPONSE_LAYOUT_INVALID);
+            this.setVariable(CONTROLE, RESPONSE_LAYOUT_INVALID);
             this.generateLog(de, e, "Erro ao processar o arquivo");
         }
+
+    }
+
+    private void alterStatusFiles(List<MeansurementFile> files) {
+
+        files
+                .stream()
+                .forEach(f -> {
+
+                    if (this.contractInformationService.isConsumerUnit(f.getWbcContract())) {
+                        f.setStatus(MeansurementFileStatus.SUCCESS);
+                    }
+                    service.saveFile(f);
+                });
+        
+        
+        
+         List<MeansurementFile> fTemps = new ArrayList<>();
+            files.forEach(ff -> {
+                MeansurementFile fTemp = new MeansurementFile();
+                fTemp.setMeansurementPoint(ff.getMeansurementPoint());
+                fTemp.setWbcContract(ff.getWbcContract());
+                fTemp.setMonth(ff.getMonth());
+                fTemp.setYear(ff.getYear());
+                fTemp.setCompanyName(ff.getCompanyName());
+                fTemp.setFile(ff.getFile());
+                fTemp.setNickname(ff.getNickname());
+                fTemp.setProcessInstanceId(ff.getProcessInstanceId());
+                fTemp.setStatus(ff.getStatus());
+                fTemp.setId(ff.getId());
+                fTemp.setType(ff.getType());
+                fTemps.add(fTemp);
+            });
+
+        this.setFiles(delegateExecution, fTemps);
 
     }
 
@@ -208,7 +238,7 @@ public class FileValidationTask implements JavaDelegate {
                 .forEach(keyValue -> {
                     if (keyValue.getValue().compareTo(1L) > 0) {
                         String[] values = keyValue.getKey().split("-");
-                        String message = MessageFormat.format("Registro duplicado [ ponto -> {0} data -> {1} hora -> {2} ]", values[2],values[0],values[1]);
+                        String message = MessageFormat.format("Registro duplicado [ ponto -> {0} data -> {1} hora -> {2} ]", values[2], values[0], values[1]);
                         errors.add(message);
                     }
                 });
@@ -384,9 +414,9 @@ public class FileValidationTask implements JavaDelegate {
         try {
 
             MeansurementFileType type = MeansurementFileType.valueOf(fileParsedDTO.getType());
+            final List<MeansurementFileDetail> details = new CopyOnWriteArrayList<>(this.mountDetail(fileParsedDTO.getDetails(), type));
 
-            final List<MeansurementFileDetail> details = this.mountDetail(fileParsedDTO.getDetails(), type);
-
+            final Map<String, List<MeansurementFileDetail>> variable = new HashMap<>();
             //set a user for files and type
             files.forEach(file -> {
                 file.setUser(userId);
@@ -399,8 +429,10 @@ public class FileValidationTask implements JavaDelegate {
                     .distinct()
                     .collect(Collectors.toList());
 
+            
+            
             //Verify if point match some files uploaded. And set the attachment id on file             
-            meansuremPoint.forEach(point -> {
+            meansuremPoint.parallelStream().forEach(point -> {
                 Optional<MeansurementFile> opt = files.stream().filter(file -> file.getMeansurementPoint().equals(point)).findFirst();
 
                 if (opt.isPresent()) {
@@ -415,16 +447,16 @@ public class FileValidationTask implements JavaDelegate {
                             .filter(d -> d.getMeansurementPoint().replaceAll("\\((L|B)\\)", "").trim().equals(point))
                             .collect(Collectors.toList());
 
-                    fileDetaisl.forEach(d -> {
+                    fileDetaisl.parallelStream().forEach(d -> {
                         d.setIdMeansurementFile(file.getId());
                     });
 
-                    opt.get().setStatus(MeansurementFileStatus.SUCCESS);
-                    service.saveFile(opt.get());
-                    detailService.saveAllBatch(fileDetaisl);
-                }
+                    file.setStatus(MeansurementFileStatus.SUCCESS);
+                    
+                    this.addDetails(point, fileDetaisl);
 
-            });
+                }
+            });           
 
         } catch (Exception e) {
             Logger.getLogger(FileValidationTask.class.getName()).log(Level.SEVERE, "[ mountFile ]", e);
@@ -460,11 +492,6 @@ public class FileValidationTask implements JavaDelegate {
         return inputStream;
 
     }
+   
 
-    
-    private void loggerPerformance(long start, String fase){
-        Logger.getLogger(FileValidationTask.class.getName()).log(Level.INFO,MessageFormat.format("[loggerPerformance] -> etapa: {0} tempo : {1} min", fase, (System.currentTimeMillis() - start)/60000D ));
-    }
-    
-    
 }

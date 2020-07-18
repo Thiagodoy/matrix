@@ -6,6 +6,7 @@
 package com.core.matrix.model;
 
 import com.core.matrix.dto.MeansurementFileResultStatusDTO;
+import static com.core.matrix.utils.Constants.TABLE_SEQUENCES;
 import com.core.matrix.wbc.dto.ContractWbcInformationDTO;
 import com.google.common.base.Optional;
 import java.util.Date;
@@ -100,7 +101,7 @@ import lombok.NoArgsConstructor;
 public class MeansurementFileResult {
 
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @GeneratedValue(strategy = GenerationType.TABLE, generator = TABLE_SEQUENCES)
     @Column(name = "id_aquivo_de_medicao_resultado")
     private Long id;
 

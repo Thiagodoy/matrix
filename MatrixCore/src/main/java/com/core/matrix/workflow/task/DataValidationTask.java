@@ -6,11 +6,9 @@
 package com.core.matrix.workflow.task;
 
 import com.core.matrix.dto.DataValidationResultDTO;
-import com.core.matrix.io.BeanIO;
 import com.core.matrix.model.MeansurementFile;
 import com.core.matrix.model.MeansurementFileDetail;
 import com.core.matrix.service.LogService;
-import com.core.matrix.service.MeansurementFileDetailService;
 import com.core.matrix.service.MeansurementFileService;
 import static com.core.matrix.utils.Constants.*;
 import com.core.matrix.utils.MeansurementFileDetailStatus;
@@ -22,8 +20,6 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 import java.util.stream.Collectors;
 import org.activiti.engine.delegate.DelegateExecution;
 import org.springframework.context.ApplicationContext;
@@ -31,31 +27,28 @@ import com.core.matrix.model.Log;
 import com.core.matrix.service.ContractCompInformationService;
 import java.text.MessageFormat;
 import java.util.Collections;
+import org.activiti.engine.TaskService;
 import org.activiti.engine.task.Attachment;
 
 /**
  *
  * @author thiag
  */
-public class DataValidationTask implements Task {
+public class DataValidationTask extends Task {
 
     private MeansurementFileService fileService;
-    private MeansurementFileDetailService fileDetailService;
-    private ContractCompInformationService contractInformationService;
 
     private LogService logService;
+    private ContractCompInformationService contractInformationService;
 
     private DelegateExecution delegateExecution;
     private static ApplicationContext context;
-
-    private Attachment attachment;
 
     private List<DataValidationResultDTO> results = null;
 
     public DataValidationTask() {
         synchronized (DataValidationTask.context) {
             this.fileService = DataValidationTask.context.getBean(MeansurementFileService.class);
-            this.fileDetailService = DataValidationTask.context.getBean(MeansurementFileDetailService.class);
             this.logService = DataValidationTask.context.getBean(LogService.class);
             this.contractInformationService = DataValidationTask.context.getBean(ContractCompInformationService.class);
         }
@@ -70,61 +63,66 @@ public class DataValidationTask implements Task {
 
         delegateExecution = de;
 
+        this.loadVariables(delegateExecution);
+        
         final String responseResult = MessageFormat.format("{0}:{1}", RESPONSE_RESULT, de.getProcessInstanceId());
-        this.results = new ArrayList<>();
+        this.results = Collections.synchronizedList(new ArrayList<>());
 
         //REMOVE FILES THAT CONTRACT IS CONSUMER UNIT
-        List<MeansurementFile> files = this.fileService
-                .findByProcessInstanceId(delegateExecution.getProcessInstanceId())
+        List<MeansurementFile> files = this.getFiles(delegateExecution)
                 .stream()
                 .filter(f -> !this.contractInformationService.isConsumerUnit(f.getWbcContract()))
                 .collect(Collectors.toList());
 
-        files.forEach(file -> {            
-            file.setStatus(MeansurementFileStatus.SUCCESS);
-        });
+        TaskService taskService = delegateExecution.getEngineServices().getTaskService();
 
-        files.stream().forEach(file -> {
+        files
+                .parallelStream()
+                .forEach(file -> {
 
-            attachment = delegateExecution.getEngineServices().getTaskService().getAttachment(file.getFile());
+                    Attachment attachment;
 
-            try {
-                this.checkCalendar(file);
-                this.checkDays(file);
-                this.checkHour(file);
+                    synchronized (taskService) {
+                        attachment = taskService.getAttachment(file.getFile());
+                    }
 
-            } catch (Exception e) {
+                    try {
+                        this.checkCalendar(file, attachment);
+                        this.checkDays(file, attachment);
+                        this.checkHour(file, attachment);
 
-                Log log = new Log();
-                log.setMessage(e.getMessage());
-                log.setProcessInstanceId(de.getProcessInstanceId());
-                log.setProcessName(de.getProcessBusinessKey());
-                log.setActivitiName(de.getCurrentActivityName());
-                this.logService.save(log);                
-                de.setVariable(CONTROLE, RESPONSE_INVALID_DATA);
+                    } catch (Exception e) {
 
-            }
+                        Log log = new Log();
+                        log.setMessage(e.getMessage());
+                        log.setProcessInstanceId(de.getProcessInstanceId());
+                        log.setActivitiName(de.getCurrentActivityName());
+                        this.logService.save(log);
+                        this.setVariable(CONTROLE, RESPONSE_INVALID_DATA);
+                    }
 
-        });
+                });
 
-        boolean hasInvalidaData = files.stream().anyMatch(mdf -> mdf.getStatus().equals(MeansurementFileStatus.DATA_CALENDAR_ERROR));
-        boolean hasDataForPersist = files.stream().anyMatch(mdf -> mdf.getStatus().equals(MeansurementFileStatus.DATA_DAY_ERROR) || mdf.getStatus().equals(MeansurementFileStatus.DATA_HOUR_ERROR));
+        boolean hasInvalidCalendar = files.stream().anyMatch(mdf -> mdf.getStatus().equals(MeansurementFileStatus.DATA_CALENDAR_ERROR));
+        boolean hasDetailsInvalid = files.stream().anyMatch(mdf -> mdf.getStatus().equals(MeansurementFileStatus.DATA_DAY_ERROR) || mdf.getStatus().equals(MeansurementFileStatus.DATA_HOUR_ERROR));
 
-        if (hasInvalidaData) {
-            de.setVariable(CONTROLE, RESPONSE_INVALID_DATA);
+        if (hasInvalidCalendar) {
+            this.setVariable(CONTROLE, RESPONSE_INVALID_DATA);
             this.writeLogMetrics();
-        } else if (hasDataForPersist) {
-            de.setVariable(CONTROLE, RESPONSE_INCONSISTENT_DATA);            
+        } else if (hasDetailsInvalid) {
+            this.setVariable(CONTROLE, RESPONSE_INCONSISTENT_DATA);
             this.writeLogMetrics();
-            
+
             if (de.hasVariable(responseResult)) {
-                de.removeVariable(responseResult);             
+                de.removeVariable(responseResult);
             }
 
-            de.setVariable(responseResult, results, true);
+            this.setVariable(responseResult, results);
         } else {
-            de.setVariable(CONTROLE, RESPONSE_DATA_IS_VALID);
+            this.setVariable(CONTROLE, RESPONSE_DATA_IS_VALID);
         }
+        
+        this.writeVariables(delegateExecution);
 
     }
 
@@ -135,54 +133,31 @@ public class DataValidationTask implements Task {
         this.logService.save(log);
     }
 
-    private void checkCalendar(MeansurementFile file) throws Exception {        
+    private synchronized void checkCalendar(MeansurementFile file, final Attachment attachment) throws Exception {
 
         int daysOnMonth = YearMonth.of(file.getYear().intValue(), Month.of(file.getMonth().intValue())).lengthOfMonth();
         LocalDate init = LocalDate.of(file.getYear().intValue(), file.getMonth().intValue(), 1);
         LocalDate end = LocalDate.of(file.getYear().intValue(), file.getMonth().intValue(), daysOnMonth);
 
-        Map<String, List<MeansurementFileDetail>> lotes = this.getDetails(file, delegateExecution)
-                .stream()
-                .collect(Collectors.groupingBy(MeansurementFileDetail::getMeansurementPoint));
+        boolean hasErrorOfCalendar = this.getDetails(file, delegateExecution)
+                .parallelStream()
+                .map(MeansurementFileDetail::getDate)
+                .anyMatch(d -> d.isAfter(end) || d.isBefore(init));
 
-        List<MeansurementFileDetail> details = new ArrayList<>();
-
-        lotes.values().stream().forEach(lote -> {
-
-            List<MeansurementFileDetail> out = lote
-                    .parallelStream()
-                    .filter(d -> d.getDate().isAfter(end) || d.getDate().isBefore(init))
-                    .collect(Collectors.toList());
-
-            if (!out.isEmpty()) {
-
-                out.forEach(mfd -> {
-                    mfd.setStatus(MeansurementFileDetailStatus.CALENDAR_ERROR);
-                });
-
-                details.addAll(out);
-            }
-
-        });
-
-        if (!details.isEmpty()) {
+        if (hasErrorOfCalendar) {
             file.setStatus(MeansurementFileStatus.DATA_CALENDAR_ERROR);
             fileService.updateStatus(MeansurementFileStatus.DATA_CALENDAR_ERROR, file.getId());
-
-            String error = MessageFormat.format("Calendário inválido para o ponto [ {0} ] dentro do arquivo [ {1} ]", file.getMeansurementPoint(), this.attachment.getName());
-
+            String error = MessageFormat.format("Calendário inválido para o ponto [ {0} ] dentro do arquivo [ {1} ]", file.getMeansurementPoint(), attachment.getName());
             throw new Exception(error);
         }
 
     }
 
-    private void checkHour(MeansurementFile file) throws Exception {        
+    private synchronized void checkHour(MeansurementFile file, final Attachment attachment) throws Exception {
 
         Map<String, List<MeansurementFileDetail>> lotes = this.getDetails(file, delegateExecution)
                 .stream()
                 .collect(Collectors.groupingBy(MeansurementFileDetail::getMeansurementPoint));
-
-        List<MeansurementFileDetail> details = new ArrayList<>();
 
         lotes.values().parallelStream().forEach(lote -> {
 
@@ -209,23 +184,12 @@ public class DataValidationTask implements Task {
                 if (!hoursOut.isEmpty()) {
 
                     DataValidationResultDTO result = new DataValidationResultDTO();
-                    result.setIdFile(file.getId());
+                    result.setIdFile(file.getId());                   
 
-                    Optional<Attachment> opta = delegateExecution
-                            .getEngineServices()
-                            .getTaskService()
-                            .getProcessInstanceAttachments(delegateExecution.getProcessInstanceId())
-                            .stream()
-                            .filter(t -> t.getId().equals(file.getFile()))
-                            .findFirst();
-
-                    String name = "";
-                    if (opta.isPresent()) {
-                        name = opta.get().getName();
-                    }
+                    String name = Optional.ofNullable(attachment).isPresent() ? attachment.getName() : "";
 
                     result.setFileName(name);
-                    result.setPoint(point);
+                    result.setPoint(file.getMeansurementPoint());
 
                     Double sum = lote
                             .stream()
@@ -244,19 +208,16 @@ public class DataValidationTask implements Task {
                         d.setStatus(MeansurementFileDetailStatus.HOUR_ERROR);
                     });
 
-                    details.addAll(hoursOut);
-                    file.getDetails().addAll(hoursOut);
-                    this.fileDetailService.save(details);
+                    this.addDetails(file.getMeansurementPoint(), hoursOut);
                 }
             }
 
         });
 
-        if (!details.isEmpty()) {
+        if (this.hasHourError(delegateExecution, file.getMeansurementPoint())) {
             file.setStatus(MeansurementFileStatus.DATA_HOUR_ERROR);
-            //details.forEach(mpd -> mpd.setStatus(MeansurementFileDetailStatus.HOUR_ERROR));
-
-            String error = MessageFormat.format("Arquivo esta com a consolidação diária das hora inválida, para o ponto [ {0} ] dentro do arquivo [ {1} ]", file.getMeansurementPoint(), this.attachment.getName());
+            fileService.updateStatus(MeansurementFileStatus.DATA_HOUR_ERROR, file.getId());
+            String error = MessageFormat.format("Arquivo esta com a consolidação diária das hora inválida, para o ponto [ {0} ] dentro do arquivo [ {1} ]", file.getMeansurementPoint(), attachment.getName());
 
             throw new Exception(error);
         }
@@ -272,7 +233,7 @@ public class DataValidationTask implements Task {
         return !exists.isPresent();
     }
 
-    private void checkDays(MeansurementFile file) throws Exception {
+    private synchronized void checkDays(MeansurementFile file, final Attachment attachment) throws Exception {
 
         int daysOnMonth = YearMonth.of(file.getYear().intValue(), Month.of(file.getMonth().intValue())).lengthOfMonth();
 
@@ -317,23 +278,12 @@ public class DataValidationTask implements Task {
                         if (!detailsOut.isEmpty()) {
 
                             DataValidationResultDTO result = new DataValidationResultDTO();
-                            result.setIdFile(file.getId());
+                            result.setIdFile(file.getId());                            
 
-                            Optional<Attachment> opta = delegateExecution
-                                    .getEngineServices()
-                                    .getTaskService()
-                                    .getProcessInstanceAttachments(delegateExecution.getProcessInstanceId())
-                                    .stream()
-                                    .filter(t -> t.getId().equals(file.getFile()))
-                                    .findFirst();
-
-                            String name = "";
-                            if (opta.isPresent()) {
-                                name = opta.get().getName();
-                            }
+                            String name = Optional.ofNullable(attachment).isPresent() ? attachment.getName() : "";
 
                             result.setFileName(name);
-                            result.setPoint(point);
+                            result.setPoint(file.getMeansurementPoint());
 
                             Double sum = lote
                                     .stream()
@@ -345,26 +295,21 @@ public class DataValidationTask implements Task {
 
                             final Long qtdHours = detailsOut.stream().count();
                             result.setHours(qtdHours);
+
                             results.add(result);
 
-                            file.getDetails().addAll(detailsOut);
+                            this.addDetails( file.getMeansurementPoint(), detailsOut);
 
-                            this.fileDetailService.save(detailsOut);
                         }
 
                     }
                 });
 
-        long hasError = detailsOut
-                .stream()
-                .filter(mfd -> mfd.getStatus().equals(MeansurementFileDetailStatus.DAY_ERROR))
-                .count();
-
-        if (hasError > 1L) {
+        if (this.hasDayError(delegateExecution, file.getMeansurementPoint())) {
 
             file.setStatus(MeansurementFileStatus.DATA_DAY_ERROR);
             fileService.updateStatus(MeansurementFileStatus.DATA_DAY_ERROR, file.getId());
-            String error = MessageFormat.format("Arquivo esta com as horas diárias ausente, para o ponto [ {0} ] dentro do arquivo [ {1} ]", file.getMeansurementPoint(), this.attachment.getName());
+            String error = MessageFormat.format("Arquivo esta com as horas diárias ausente, para o ponto [ {0} ] dentro do arquivo [ {1} ]", file.getMeansurementPoint(), attachment.getName());
             throw new Exception(error);
         }
 

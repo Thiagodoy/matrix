@@ -5,11 +5,13 @@
  */
 package com.core.matrix.utils;
 
+import java.io.Serializable;
+
 /**
  *
  * @author thiag
  */
-public enum MeansurementFileDetailStatus {
+public enum MeansurementFileDetailStatus implements Serializable{
     HOUR_ERROR,
     DAY_ERROR,
     CALENDAR_ERROR,

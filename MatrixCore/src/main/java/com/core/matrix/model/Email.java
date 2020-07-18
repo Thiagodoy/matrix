@@ -5,6 +5,7 @@
  */
 package com.core.matrix.model;
 
+import static com.core.matrix.utils.Constants.TABLE_SEQUENCES;
 import com.core.matrix.utils.Utils;
 import java.io.File;
 import java.io.IOException;
@@ -46,7 +47,7 @@ public class Email implements Model<Email> {
 
     @Id
     @Column(name = "id_email")
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @GeneratedValue(strategy = GenerationType.TABLE, generator = TABLE_SEQUENCES)
     protected Long id;
 
     @Enumerated(EnumType.STRING)

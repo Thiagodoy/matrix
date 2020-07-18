@@ -26,5 +26,10 @@ public interface MeansurementFileDetailRepository extends JpaRepository<Meansure
     @Modifying
     void deleteByIdMeansurementFile(Long id);
     
+    @Modifying
+    void deleteByIdMeansurementFileIn(List<Long> ids);
+    
+    
+    
 
 }

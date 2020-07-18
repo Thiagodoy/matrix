@@ -3,7 +3,9 @@ package com.core.matrix;
 import com.core.matrix.properties.ActivitiProperties;
 import com.core.matrix.properties.EmailServiceProperties;
 import com.core.matrix.properties.MatrixProperties;
+import com.core.matrix.properties.TesteProperties;
 import com.core.matrix.properties.WbcProperties;
+import com.core.matrix.utils.ThreadPoolDetail;
 import com.core.matrix.utils.ThreadPoolEmail;
 import java.util.TimeZone;
 import java.util.logging.Level;
@@ -22,7 +24,7 @@ import org.springframework.web.servlet.config.annotation.EnableWebMvc;
 import springfox.documentation.swagger2.annotations.EnableSwagger2;
 
 @SpringBootApplication(exclude = {DataSourceAutoConfiguration.class})
-@EnableConfigurationProperties({ActivitiProperties.class, MatrixProperties.class, WbcProperties.class, EmailServiceProperties.class})
+@EnableConfigurationProperties({ActivitiProperties.class, MatrixProperties.class, WbcProperties.class, EmailServiceProperties.class, TesteProperties.class})
 
 @EnableAutoConfiguration
 @ComponentScan()
@@ -48,6 +50,7 @@ public class MatrixApplication {
     public void detroy(){       
         Logger.getLogger(MatrixApplication.class.getName()).log(Level.INFO, "Call method destroy");
         ThreadPoolEmail.deleteFiles();
+        ThreadPoolDetail.shutdown();
         
     }
 

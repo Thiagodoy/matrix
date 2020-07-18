@@ -13,7 +13,7 @@ import static com.core.matrix.utils.Constants.PROCESS_YEAR_REFERENCE;
  *
  * @author Aloysio
  */
-public class SetMonthYear implements Task {
+public class SetMonthYear extends Task {
     
     
     @Override

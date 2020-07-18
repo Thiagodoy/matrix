@@ -7,6 +7,7 @@ package com.core.matrix.model;
 
 import com.core.matrix.annotation.PositionBatchParameter;
 import com.core.matrix.dto.FileDetailDTO;
+import static com.core.matrix.utils.Constants.TABLE_SEQUENCES;
 import com.core.matrix.utils.MeansurementFileDetailStatus;
 import com.core.matrix.utils.MeansurementFileType;
 import com.fasterxml.jackson.annotation.JsonFormat;
@@ -47,7 +48,7 @@ public class MeansurementFileDetail implements Serializable {
 
     @Id
     @Column(name = "id_arquivo_de_medicao_detalhe")
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @GeneratedValue(strategy = GenerationType.TABLE, generator = TABLE_SEQUENCES)
     @PositionBatchParameter(value = 0)
     public Long id;
 
