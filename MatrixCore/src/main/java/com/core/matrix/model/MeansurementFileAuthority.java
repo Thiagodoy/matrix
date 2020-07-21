@@ -31,7 +31,7 @@ public class MeansurementFileAuthority implements Serializable, Model<Meansureme
     
     @Id
     @Column(name = "id_arquivo_de_medicao_alcada")
-    @GeneratedValue(strategy = GenerationType.TABLE, generator = TABLE_SEQUENCES)
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     protected Long id;
 
     @Column(name = "id_arquivo_de_medicao")

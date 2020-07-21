@@ -37,11 +37,9 @@ import lombok.NoArgsConstructor;
 @EqualsAndHashCode
 @NoArgsConstructor
 @AllArgsConstructor
-public class Template implements Model<Template>{
-    
-    
-    
-    public enum TemplateBusiness{
+public class Template implements Model<Template> {
+
+    public enum TemplateBusiness {
         FORGOT_PASSWORD,
         USER_TASK_PENDING,
         WELCOME_USER,
@@ -52,41 +50,40 @@ public class Template implements Model<Template>{
         BILLING_WHITOUT_REPURCHASE,
         BILLING_WITH_REPURCHASE;
     }
-    
+
     @Id
-    @GeneratedValue(strategy = GenerationType.TABLE, generator = TABLE_SEQUENCES)
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "id_template")
     protected Long id;
-    
-    @Column(name = "template",columnDefinition = "longtext")
+
+    @Column(name = "template", columnDefinition = "longtext")
     protected String template;
-    
+
     @Column(name = "assunto")
-    protected String subject;    
-    
+    protected String subject;
+
     @Enumerated(EnumType.STRING)
     @Column(name = "logica")
     protected TemplateBusiness business;
-    
+
     @Version
     protected Long version;
-    
+
     @JsonDeserialize(using = LocalDateTimeDeserializer.class)
     @JsonSerialize(using = LocalDateTimeSerializer.class)
     @Column(name = "data_criacao")
     protected LocalDateTime createdAt;
-    
+
     @Column(name = "parametros")
     protected String attachments;
-    
+
     @PrePersist
-    public void generatedDate(){
-        this.createdAt = LocalDateTime.now();        
-        
-        if(!Optional.ofNullable(this.attachments).isPresent()){
+    public void generatedDate() {
+        this.createdAt = LocalDateTime.now();
+
+        if (!Optional.ofNullable(this.attachments).isPresent()) {
             this.attachments = "";
         }
     }
-    
-    
+
 }

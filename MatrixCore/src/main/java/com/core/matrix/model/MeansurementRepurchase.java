@@ -5,7 +5,6 @@
  */
 package com.core.matrix.model;
 
-import static com.core.matrix.utils.Constants.TABLE_SEQUENCES;
 import java.io.Serializable;
 import javax.persistence.Column;
 import javax.persistence.Entity;
@@ -30,7 +29,7 @@ public class MeansurementRepurchase implements Serializable, Model<MeansurementR
 
     @Id
     @Column(name = "id_aqruivo_de_medicao_recompra")
-    @GeneratedValue(strategy = GenerationType.TABLE, generator = TABLE_SEQUENCES)
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     protected Long id;
 
     @Column(name = "id_arquivo_de_medicao")

@@ -5,10 +5,12 @@
  */
 package com.core.matrix.jobs;
 
+import com.core.matrix.factory.EmailFactory;
 import com.core.matrix.model.MeansurementFileDetail;
 import com.core.matrix.service.MeansurementFileDetailService;
 import com.core.matrix.utils.Constants;
 import com.core.matrix.utils.ThreadPoolDetail;
+import com.core.matrix.utils.ThreadPoolEmail;
 import java.text.MessageFormat;
 import java.util.List;
 import java.util.Optional;
@@ -27,10 +29,14 @@ public class PersistDetailsJob implements Runnable {
     private RuntimeService runtimeService;
     private List<MeansurementFileDetail> details;
     private String processInstanceId;
+    private ThreadPoolEmail poolEmail;
+    private EmailFactory emailFactory;
 
     public PersistDetailsJob(ApplicationContext context) {
         detailService = context.getBean(MeansurementFileDetailService.class);
         runtimeService = context.getBean(RuntimeService.class);
+        poolEmail = context.getBean(ThreadPoolEmail.class);
+        emailFactory = context.getBean(EmailFactory.class);
     }
 
     public void setDetais(List<MeansurementFileDetail> details) {
@@ -40,8 +46,8 @@ public class PersistDetailsJob implements Runnable {
     public void setProcessInstanceId(String processInstanceId) {
         this.processInstanceId = processInstanceId;
     }
-    
-    public String getProcessInstanceId(){
+
+    public String getProcessInstanceId() {
         return this.processInstanceId;
     }
 
@@ -51,7 +57,7 @@ public class PersistDetailsJob implements Runnable {
         try {
 
             long start = System.currentTimeMillis();
-            detailService.saveAllBatch(details);            
+            detailService.saveAllBatch(details);
             Logger.getLogger(this.getClass().getName()).log(Level.INFO, MessageFormat.format("[Salvando registros] -> tempo : {0} min", (System.currentTimeMillis() - start) / 60000D));
 
             Optional opt = Optional.ofNullable(this.runtimeService.createProcessInstanceQuery().processDefinitionId(processInstanceId).singleResult());
@@ -62,7 +68,7 @@ public class PersistDetailsJob implements Runnable {
             }
 
         } catch (Exception e) {
-            Logger.getLogger(PersistDetailsJob.class.getName()).log(Level.SEVERE, "Não foi possivel salvar os dados no banco de dados", e);
+            Logger.getLogger(PersistDetailsJob.class.getName()).log(Level.SEVERE, "Não foi possivel salvar os dados no banco de dados processInstanceId -> " + processInstanceId, e);
             
             // TODO Enviar email avisando 
         } finally {

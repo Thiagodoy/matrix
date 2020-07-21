@@ -41,7 +41,7 @@ public class Log implements Model<Log>{
     
     
     @Id
-    @GeneratedValue(strategy = GenerationType.TABLE, generator = TABLE_SEQUENCES)
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "id_log")
     protected Long id;
 

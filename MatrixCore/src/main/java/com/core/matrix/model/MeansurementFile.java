@@ -142,7 +142,7 @@ public class MeansurementFile implements Serializable {
 
     @Id
     @Column(name = "id_arquivo_de_medicao")
-    @GeneratedValue(strategy = GenerationType.TABLE, generator = TABLE_SEQUENCES)
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
     @Column(name = "wbc_contrato")
@@ -186,7 +186,7 @@ public class MeansurementFile implements Serializable {
     @Enumerated(EnumType.STRING)
     private MeansurementFileType type;
 
-    @OneToMany(cascade = {CascadeType.PERSIST,CascadeType.REMOVE}, orphanRemoval = true, fetch = FetchType.EAGER)
+    @OneToMany(cascade = CascadeType.ALL, orphanRemoval = true, fetch = FetchType.EAGER)
     @JoinColumn(name = "id_arquivo_de_medicao")
     private List<MeansurementFileDetail> details;
 

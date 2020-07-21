@@ -33,7 +33,7 @@ public class Notification {
     }
     
     @Id
-    @GeneratedValue(strategy = GenerationType.TABLE, generator = TABLE_SEQUENCES)
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "id_notificacao")
     private Long id;
     

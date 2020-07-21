@@ -7,7 +7,6 @@ package com.core.matrix.model;
 
 import com.core.matrix.annotation.PositionBatchParameter;
 import com.core.matrix.dto.FileDetailDTO;
-import static com.core.matrix.utils.Constants.TABLE_SEQUENCES;
 import com.core.matrix.utils.MeansurementFileDetailStatus;
 import com.core.matrix.utils.MeansurementFileType;
 import com.fasterxml.jackson.annotation.JsonFormat;
@@ -26,8 +25,6 @@ import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.EnumType;
 import javax.persistence.Enumerated;
-import javax.persistence.GeneratedValue;
-import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.Table;
 import javax.persistence.Transient;
@@ -47,8 +44,7 @@ public class MeansurementFileDetail implements Serializable {
     private static final long serialVersionUID = 5486497046886735671L;
 
     @Id
-    @Column(name = "id_arquivo_de_medicao_detalhe")
-    @GeneratedValue(strategy = GenerationType.TABLE, generator = TABLE_SEQUENCES)
+    @Column(name = "id_arquivo_de_medicao_detalhe")    
     @PositionBatchParameter(value = 0)
     public Long id;
 

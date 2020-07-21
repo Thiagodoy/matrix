@@ -8,7 +8,6 @@ package com.core.matrix.service;
 import com.core.matrix.model.Log;
 import com.core.matrix.repository.LogRepository;
 import java.util.List;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 

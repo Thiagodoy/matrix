@@ -6,7 +6,6 @@
 package com.core.matrix.model;
 
 import static com.core.matrix.utils.Constants.TABLE_SEQUENCES;
-import java.io.Serializable;
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
@@ -14,42 +13,31 @@ import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.Table;
 import lombok.Data;
-import lombok.EqualsAndHashCode;
 
 /**
  *
  * @author thiag
  */
 @Entity
-@Table(name = "mtx_contrato_proinfa")
+@Table(name = "mtx_ponto_de_medicao_pro_infa")
 @Data
-@EqualsAndHashCode
-public class ContractProInfa implements Serializable, Model<ContractProInfa>{
-
-    protected static final long serialVersionUID = -4258355186535810797L;    
+public class MeansurementPointProInfa implements Model<MeansurementPointProInfa>{
     
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = "id_proinfa")
     protected Long id;
     
-    
-    @Column(name = "wbc_contrato", nullable = false)
-    protected Long wbcContract;
-
-    
-    @Column(name = "wbc_ponto_de_medicao")
-    protected String meansurementPoint;
-
+    @Column(name = "wbc_ponto_de_medicao", nullable = false)
+    protected String point;
     
     @Column(name = "ano")
     protected Long year;
-
     
     @Column(name = "mes")
     protected Long month;
 
     @Column(name = "proinfa")
-    protected Double proinfa;   
-
+    protected Double proinfa;  
+    
+    
 }

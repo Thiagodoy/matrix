@@ -5,9 +5,7 @@
  */
 package com.core.matrix.model;
 
-import static com.core.matrix.utils.Constants.TABLE_SEQUENCES;
 import java.io.Serializable;
-import java.util.Optional;
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
@@ -29,7 +27,7 @@ public class Price implements Serializable, Model<Price> {
 
     @Id
     @Column(name = "id_preco_base")
-    @GeneratedValue(strategy = GenerationType.TABLE, generator = TABLE_SEQUENCES)
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     protected Long id;
 
     @Column(name = "wbc_submercado")

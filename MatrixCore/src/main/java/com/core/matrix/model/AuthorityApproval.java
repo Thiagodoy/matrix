@@ -30,7 +30,7 @@ public class AuthorityApproval implements Serializable {
 
     @Id
     @Column(name = "id_alcada_aprovacao")
-    @GeneratedValue(strategy = GenerationType.TABLE, generator = TABLE_SEQUENCES)
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
     @Column(name = "alcada")

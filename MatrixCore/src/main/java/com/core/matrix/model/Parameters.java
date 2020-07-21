@@ -59,7 +59,7 @@ public class Parameters implements Model<Parameters> {
 
     @Id
     @Column(name = "id_parametro")
-    @GeneratedValue(strategy = GenerationType.TABLE, generator = TABLE_SEQUENCES)
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     protected Long id;
 
     @Column(name = "chave")

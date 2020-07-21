@@ -7,9 +7,11 @@ package com.core.matrix.workflow.task;
 
 import com.core.matrix.model.ContractCompInformation;
 import com.core.matrix.model.Log;
+import com.core.matrix.model.MeansurementFile;
 import com.core.matrix.service.ContractCompInformationService;
 import com.core.matrix.service.LogService;
 import com.core.matrix.service.MeansurementFileAuthorityService;
+import com.core.matrix.service.MeansurementFileDetailService;
 import com.core.matrix.service.MeansurementFileService;
 import com.core.matrix.service.MeansurementRepurchaseService;
 import static com.core.matrix.utils.Constants.LIST_CONTRACTS_FOR_BILLING;
@@ -20,6 +22,7 @@ import java.util.List;
 import java.util.Optional;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import java.util.stream.Collectors;
 import org.activiti.engine.HistoryService;
 import org.activiti.engine.RuntimeService;
 import org.activiti.engine.TaskService;
@@ -43,6 +46,8 @@ public class DeleteProcessInstanceTask implements JavaDelegate {
 
     private MeansurementFileService meansurementFileService;
     
+    private MeansurementFileDetailService meansurementFileDetailService;
+    
     private MeansurementRepurchaseService meansurementRepurchaseService;
     
     private MeansurementFileAuthorityService meansurementFileAuthorityService;
@@ -58,6 +63,7 @@ public class DeleteProcessInstanceTask implements JavaDelegate {
             this.meansurementFileService = DeleteProcessInstanceTask.context.getBean(MeansurementFileService.class);
             this.meansurementRepurchaseService = DeleteProcessInstanceTask.context.getBean(MeansurementRepurchaseService.class);
             this.meansurementFileAuthorityService = DeleteProcessInstanceTask.context.getBean(MeansurementFileAuthorityService.class);
+            this.meansurementFileDetailService = DeleteProcessInstanceTask.context.getBean(MeansurementFileDetailService.class);
         }
     }
 
@@ -108,6 +114,15 @@ public class DeleteProcessInstanceTask implements JavaDelegate {
             List<ContractCompInformation> list = this.compInformationService.listByContract(contractId);
 
             this.meansurementRepurchaseService.deleteByProcessInstanceId(processInstanceId);
+            
+            
+            List<Long> ids = this.meansurementFileService.findByProcessInstanceId(processInstanceId)
+                    .parallelStream()
+                    .mapToLong(MeansurementFile::getId)
+                    .boxed()
+                    .collect(Collectors.toList());           
+            
+            this.meansurementFileDetailService.deleteByMeansurementFileId(ids);
             this.meansurementFileService.deleteByProcessInstance(processInstanceId);
             this.meansurementFileAuthorityService.deleteByProcessInstanceId(processInstanceId);
 
@@ -133,11 +148,10 @@ public class DeleteProcessInstanceTask implements JavaDelegate {
             execution.setVariable(PROCESS_CONTRACTS_RELOAD_BILLING, list);
 
         } catch (Exception e) {
-            Logger.getLogger(DeleteProcessInstanceTask.class.getName()).log(Level.SEVERE, "[sendEmailError]", e);
+            Logger.getLogger(DeleteProcessInstanceTask.class.getName()).log(Level.SEVERE, "[execute]", e);
             execution.removeVariable(PROCESS_INSTANCE_ID);
             Log log = new Log();
-            log.setActivitiName(execution.getCurrentActivityName());
-            log.setProcessName(execution.getProcessBusinessKey());
+            log.setActivitiName(execution.getCurrentActivityName());            
             log.setProcessInstanceId(execution.getProcessInstanceId());
             log.setMessage("Erro ao deleter o processo -> " + processInstanceId);
             log.setMessageErrorApplication(e.getMessage());

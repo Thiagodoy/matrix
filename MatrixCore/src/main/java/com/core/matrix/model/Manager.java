@@ -35,7 +35,7 @@ import lombok.Data;
 public class Manager {
 
     @Id
-    @GeneratedValue(strategy = GenerationType.TABLE, generator = TABLE_SEQUENCES)
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "id_gestor")
     private Long id;
 

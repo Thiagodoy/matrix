@@ -47,7 +47,7 @@ public class Email implements Model<Email> {
 
     @Id
     @Column(name = "id_email")
-    @GeneratedValue(strategy = GenerationType.TABLE, generator = TABLE_SEQUENCES)
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     protected Long id;
 
     @Enumerated(EnumType.STRING)

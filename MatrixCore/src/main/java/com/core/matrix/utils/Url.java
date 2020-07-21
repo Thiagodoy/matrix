@@ -23,5 +23,8 @@ public class Url {
     public static final String URL_API_PARAMETERS = "/api/parameters";
     public static final String URL_API_MONITORING_POINT = "/api/monitoring/point";
     
+    public static final String URL_API_MEANSUREMENT_POINT = "/api/meansurement/point";
+    public static final String URL_API_CONTRACT = "/api/contract";
+    
     
 }

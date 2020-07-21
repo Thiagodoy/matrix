@@ -38,7 +38,7 @@ import org.springframework.transaction.PlatformTransactionManager;
         transactionManagerRef = "matrixTransactionManager") 
 
 @Configuration
-@TableGenerator(name = TABLE_SEQUENCES, allocationSize = 1000)
+@TableGenerator(name = TABLE_SEQUENCES)
 public class MatrixDataBaseConfiguration {
     
     

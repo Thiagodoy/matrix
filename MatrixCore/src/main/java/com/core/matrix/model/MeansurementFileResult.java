@@ -101,7 +101,7 @@ import lombok.NoArgsConstructor;
 public class MeansurementFileResult {
 
     @Id
-    @GeneratedValue(strategy = GenerationType.TABLE, generator = TABLE_SEQUENCES)
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "id_aquivo_de_medicao_resultado")
     private Long id;
 

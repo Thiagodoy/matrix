@@ -25,7 +25,7 @@ import org.springframework.web.bind.annotation.RequestMethod;
 @Data
 public abstract class Resource<T extends Model, S extends Service> {
 
-    private S service;
+    protected S service;
 
     public Resource(S service) {
         this.service = service;
@@ -93,6 +93,6 @@ public abstract class Resource<T extends Model, S extends Service> {
             Logger.getLogger(this.getClass().getName()).log(Level.SEVERE, e.getMessage());
             return ResponseEntity.status(HttpStatus.resolve(500)).body(e.getMessage());
         }
-    }
-
+    }   
+    
 }

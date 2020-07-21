@@ -29,7 +29,7 @@ import lombok.Data;
 public class ContactManager {
 
     @Id
-    @GeneratedValue(strategy = GenerationType.TABLE, generator = TABLE_SEQUENCES)
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "id_contato_gestor")
     private Long id;
 

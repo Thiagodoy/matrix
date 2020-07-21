@@ -32,7 +32,7 @@ public class Product implements Serializable, Model<Product> {
     
     @Id
     @Column(name = "id_produtos")
-    @GeneratedValue(strategy = GenerationType.TABLE, generator = TABLE_SEQUENCES)
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     protected Long id;
 
     @Column(name = "wbc_codigo_perfilCCEE")

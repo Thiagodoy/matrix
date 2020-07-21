@@ -5,8 +5,6 @@
  */
 package com.core.matrix.model;
 
-import com.core.matrix.model.MeansurementFile;
-import static com.core.matrix.utils.Constants.TABLE_SEQUENCES;
 import com.core.matrix.utils.Utils;
 import java.io.Serializable;
 import javax.persistence.Column;
@@ -31,7 +29,7 @@ public class ProcessStatusLote implements Serializable{
     private static final long serialVersionUID = 6264517643114257020L;
     
     @Id
-    @GeneratedValue(strategy = GenerationType.TABLE, generator = TABLE_SEQUENCES)
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "id_lote")
     private Long id;
     

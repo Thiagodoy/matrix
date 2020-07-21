@@ -30,7 +30,7 @@ activiti:
         autoCommit: false
         initializationFailFast: false        
         sqlserver:            
-            dataUrl: jdbc:mysql://bd-hml-portal-atendimento-matrix.mysql.database.azure.com:3306/activiti-hml?rewriteBatchedStatements=true&useTimezone=true&serverTimezone=America/Cuiaba&useLegacyDatetimeCode=false&autoReconnect=true            
+            dataUrl: jdbc:mysql://bd-hml-portal-atendimento-matrix.mysql.database.azure.com:3306/activiti?rewriteBatchedStatements=true&useTimezone=true&serverTimezone=America/Cuiaba&useLegacyDatetimeCode=false&autoReconnect=true            
             dataSourceUser: bd_hml_admin@bd-hml-portal-atendimento-matrix
             dataSourcePassword: iP9w5tux*
             port: 3306            
@@ -50,7 +50,7 @@ matrix:
         autoCommit: false
         initializationFailFast: false       
         sqlserver:            
-            dataUrl: jdbc:mysql://bd-hml-portal-atendimento-matrix.mysql.database.azure.com:3306/matrix-hml?useTimezone=true&serverTimezone=America/Cuiaba&useLegacyDatetimeCode=false&autoReconnect=true&rewriteBatchedStatements=true            
+            dataUrl: jdbc:mysql://bd-hml-portal-atendimento-matrix.mysql.database.azure.com:3306/matrix?useTimezone=true&serverTimezone=America/Cuiaba&useLegacyDatetimeCode=false&autoReconnect=true&rewriteBatchedStatements=true            
             dataSourceUser: bd_hml_admin@bd-hml-portal-atendimento-matrix
             dataSourcePassword: iP9w5tux*
             port: 3306            
