@@ -1,0 +1,94 @@
+## YAML Template.
+server:
+    port: 8004
+    
+    
+spring:
+    servlet:
+        multipart:
+            max-file-size: -1
+            max-request-size: -1
+            
+    jpa:
+        properties:
+            hibernate:
+                    jdbc:
+                        batch_size: 700
+                    order_inserts: true
+                    generate_statistics: true
+      
+activiti:
+    datasource:        
+        socketTimeout: 30000
+        loginTimeout: 30000
+        minimumIdle: 5
+        maximumPoolSize: 300
+        validationTimeout: 60000
+        idleTimeout: 60000
+        connectionTimeout: 30000
+        maxLifetime: 100000 
+        autoCommit: false
+        initializationFailFast: false        
+        sqlserver:            
+            dataUrl: jdbc:mysql://bd-hml-portal-atendimento-matrix.mysql.database.azure.com:3306/activiti?rewriteBatchedStatements=true&useTimezone=true&serverTimezone=America/Cuiaba&useLegacyDatetimeCode=false&autoReconnect=true            
+            dataSourceUser: bd_hml_admin@bd-hml-portal-atendimento-matrix
+            dataSourcePassword: iP9w5tux*
+            port: 3306            
+            connectionTestQuery: SELECT 1  
+ 
+matrix:
+    threadPoolSize: 2
+    datasource:        
+        socketTimeout: 30000
+        loginTimeout: 30000
+        minimumIdle: 5
+        maximumPoolSize: 500
+        validationTimeout: 60000
+        idleTimeout: 60000
+        connectionTimeout: 30000
+        maxLifetime: 100000 
+        autoCommit: false
+        initializationFailFast: false       
+        sqlserver:            
+            dataUrl: jdbc:mysql://bd-hml-portal-atendimento-matrix.mysql.database.azure.com:3306/matrix?useTimezone=true&serverTimezone=America/Cuiaba&useLegacyDatetimeCode=false&autoReconnect=true&rewriteBatchedStatements=true            
+            dataSourceUser: bd_hml_admin@bd-hml-portal-atendimento-matrix
+            dataSourcePassword: iP9w5tux*
+            port: 3306            
+            connectionTestQuery: SELECT 1              
+            
+  
+wbc:
+    datasource:        
+        socketTimeout: 30000
+        loginTimeout: 30000
+        minimumIdle: 5
+        maximumPoolSize: 300
+        validationTimeout: 10000
+        idleTimeout: 10000
+        connectionTimeout: 30000
+        autoCommit: false
+        initializationFailFast: false        
+        sqlserver:            
+            dataUrl: jdbc:sqlserver://192.168.0.22;databaseName=WBC_ENERGY_DB;user=matrix_portal;password=portal_matrix
+            dataSourceUser: matrix_portal
+            dataSourcePassword: portal_matrix
+            port: 3306            
+            connectionTestQuery: SELECT 1  
+            
+email:
+    host: smtp.office365.com
+    port: 587
+    username: portal@matrixenergia.com
+    password: M@atrix2@2@
+    auth: true  
+    protocol: smtp
+    starttls:
+           enable: true
+           required: true      
+           
+websocket:
+        cors:
+            origin: http://portalhml.eastus2.cloudapp.azure.com        
+            
+portal:
+        url:  http://portalhml.eastus2.cloudapp.azure.com/troca-senha
