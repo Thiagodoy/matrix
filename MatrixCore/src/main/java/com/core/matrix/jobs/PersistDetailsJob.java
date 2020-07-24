@@ -60,7 +60,7 @@ public class PersistDetailsJob implements Runnable {
         try {
 
             long start = System.currentTimeMillis();
-            detailService.saveAllBatch(details);
+            detailService.saveAllBatch(details,processInstanceId);
             Logger.getLogger(this.getClass().getName()).log(Level.INFO, MessageFormat.format("[Salvando registros] -> tempo : {0} min", (System.currentTimeMillis() - start) / 60000D));
 
             Optional opt = Optional.ofNullable(this.runtimeService.createProcessInstanceQuery().processDefinitionId(processInstanceId).singleResult());

@@ -71,7 +71,7 @@ public class ParseFileJob implements Runnable {
                         .parallelStream()
                         .collect(Collectors.groupingBy(e -> e.getMeansurementPoint().replaceAll("\\((L|B)\\)", "").trim())));
 
-                loteStatusDTOs.parallelStream().forEach(lote -> {
+                loteStatusDTOs.parallelStream().filter(l-> !l.isFinished()).forEach(lote -> {
 
                     lote.getPoints().forEach(point -> {
                         synchronized (map) {

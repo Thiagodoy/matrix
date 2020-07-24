@@ -150,6 +150,9 @@ public class Constants {
     public static final String TABLE_SEQUENCES = "mtx_sequences";
     
     
+    public static final String DIR_FILE_NO_PESIST = "details-no-writed";
+    
+    
     
 
 }
