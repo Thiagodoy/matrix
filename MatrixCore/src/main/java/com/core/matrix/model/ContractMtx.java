@@ -6,7 +6,6 @@
 package com.core.matrix.model;
 
 import com.core.matrix.dto.ContractPointDTO;
-import static com.core.matrix.utils.Constants.TABLE_SEQUENCES;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import java.io.Serializable;
 import java.time.LocalDateTime;
