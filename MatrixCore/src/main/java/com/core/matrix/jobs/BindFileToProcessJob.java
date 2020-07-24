@@ -42,25 +42,19 @@ public class BindFileToProcessJob implements Runnable {
             file = beanIO.write(processFilesInLoteStatusDTO.getFileParsedDTO(), processFilesInLoteStatusDTO.getTaskId(), processFilesInLoteStatusDTO.getProcessInstanceId(), 1);
             InputStream ip = new FileInputStream(file);
 
-            Logger.getLogger(BindFileToProcessJob.class.getName()).log(Level.INFO, "Processando ->" + processFilesInLoteStatusDTO.toString());
+            Attachment attachment = taskService
+                    .createAttachment(
+                            "application/vnd.ms-excel",
+                            null,
+                            processFilesInLoteStatusDTO.getProcessInstanceId(),
+                            file.getName(),
+                            "attachmentDescription",
+                            ip);
 
-            synchronized (taskService) {
-                Attachment attachment = taskService
-                        .createAttachment(
-                                "application/vnd.ms-excel",
-                                null,
-                                processFilesInLoteStatusDTO.getProcessInstanceId(),
-                                file.getName(),
-                                "attachmentDescription",
-                                ip);
+            Map<String, Object> parameters = new HashMap<>();
 
-                Map<String, Object> parameters = new HashMap<>();
-
-                parameters.put(LIST_ATTACHMENT_ID, Arrays.asList(attachment.getId()));
-
-                taskService.complete(processFilesInLoteStatusDTO.getTaskId(), parameters);
-            }
-
+            parameters.put(LIST_ATTACHMENT_ID, Arrays.asList(attachment.getId()));
+            taskService.complete(processFilesInLoteStatusDTO.getTaskId(), parameters);
             processFilesInLoteStatusDTO.setStatus(ProcessFilesInLoteStatusDTO.Status.ASSOCIATED);
 
         } catch (Exception ex) {

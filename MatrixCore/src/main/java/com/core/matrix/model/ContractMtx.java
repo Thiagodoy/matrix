@@ -35,7 +35,15 @@ import lombok.EqualsAndHashCode;
     ,
     @ColumnResult(name = "wbc_ponto_de_medicao", type = String.class)
 }))
-@NamedNativeQuery(query = "select wbc_ponto_de_medicao, wbc_contrato from mtx_ponto_contrato where wbc_contrato in :contracts", name = "ContractMtx.associations", resultSetMapping = "contractPointResult")
+@NamedNativeQuery(query = "SELECT \n"
+        + "    b.wbc_ponto_de_medicao, a.wbc_contrato\n"
+        + "FROM\n"
+        + "    mtx_contrato a\n"
+        + "        INNER JOIN\n"
+        + "    mtx_ponto_contrato c ON a.id_contrato = c.id_contrato\n"
+        + "        INNER JOIN\n"
+        + "    mtx_ponto_de_medicao b ON c.id_ponto_de_medicao = b.id_ponto_de_medicao\n"
+        + "    where a.wbc_contrato in :contracts", name = "ContractMtx.associations", resultSetMapping = "contractPointResult")
 
 @Entity
 @Table(name = "mtx_contrato")

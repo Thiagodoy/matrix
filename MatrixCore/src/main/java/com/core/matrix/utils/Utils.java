@@ -235,7 +235,7 @@ public class Utils {
 
     }
 
-    public static <T> List<String> mountBatchInsert(List<T> collection) {
+    public synchronized static <T> List<String> mountBatchInsert(List<T> collection) {
 
         List<String> parameters = new ArrayList<String>();
         TreeMap<Integer, String> values = new TreeMap<>();

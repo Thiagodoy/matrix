@@ -5,7 +5,8 @@
  */
 package com.core.matrix.model;
 
-import static com.core.matrix.utils.Constants.TABLE_SEQUENCES;
+
+import com.fasterxml.jackson.annotation.JsonFormat;
 import java.io.Serializable;
 import java.time.LocalDateTime;
 import java.util.List;
@@ -43,6 +44,7 @@ public class MeansurementPointMtx implements Model<MeansurementPointMtx>, Serial
     @Column(name = "wbc_ponto_de_medicao", unique = true)
     private String point;
 
+    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss", shape = JsonFormat.Shape.STRING)
     @Column(name = "data_criacao")
     private LocalDateTime createAt;
 
@@ -54,9 +56,9 @@ public class MeansurementPointMtx implements Model<MeansurementPointMtx>, Serial
     @JoinTable(
             name = "mtx_ponto_contrato",
             joinColumns = {
-                @JoinColumn(name = "wbc_ponto_de_medicao")},
+                @JoinColumn(name = "id_ponto_de_medicao")},
             inverseJoinColumns = {
-                @JoinColumn(name = "wbc_contrato")})
+                @JoinColumn(name = "id_contrato")})
     private Set<ContractMtx> contracts;
 
 }

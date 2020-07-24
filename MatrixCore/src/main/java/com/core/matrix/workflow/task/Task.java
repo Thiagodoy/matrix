@@ -27,13 +27,10 @@ import static com.core.matrix.utils.MeansurementFileType.LAYOUT_A;
 import static com.core.matrix.utils.MeansurementFileType.LAYOUT_B;
 import static com.core.matrix.utils.MeansurementFileType.LAYOUT_C;
 import com.core.matrix.utils.Utils;
-import java.text.MessageFormat;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 import java.util.stream.Collectors;
 import org.activiti.engine.delegate.JavaDelegate;
 import org.activiti.engine.delegate.VariableScope;
@@ -212,7 +209,7 @@ public abstract class Task implements JavaDelegate {
     }
 
     public void loggerPerformance(long start, String fase) {
-        Logger.getLogger(this.getClass().getName()).log(Level.INFO, MessageFormat.format("[loggerPerformance] -> etapa: {0} tempo : {1} min", fase, (System.currentTimeMillis() - start) / 60000D));
+//        Logger.getLogger(this.getClass().getName()).log(Level.INFO, MessageFormat.format("[loggerPerformance] -> etapa: {0} tempo : {1} min", fase, (System.currentTimeMillis() - start) / 60000D));
     }
 
 }

@@ -28,7 +28,7 @@ public class TableSequenceService {
         
         TableSequence sequence =  repository.findByName(seq).get();
         Long result = sequence.getValue();
-        sequence.setValue(sequence.getValue() + size + 1);        
+        sequence.setValue(sequence.getValue() + size + 2);        
         repository.save(sequence);
         
         return result;

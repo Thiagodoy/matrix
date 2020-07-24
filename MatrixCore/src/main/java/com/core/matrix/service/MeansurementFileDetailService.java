@@ -15,6 +15,7 @@ import static com.core.matrix.utils.Constants.CONST_SITUATION_3;
 import static com.core.matrix.utils.Constants.TYPE_ENERGY_LIQUID;
 import com.core.matrix.utils.MeansurementFileDetailStatus;
 import com.core.matrix.utils.Utils;
+import java.io.File;
 import java.sql.Connection;
 import java.sql.Statement;
 import java.util.List;
@@ -120,6 +121,22 @@ public class MeansurementFileDetailService {
 
     }
 
+    
+    private void writeFile(){
+     
+        
+        try{
+            
+        }catch(Exception e){
+            
+        }
+        
+        
+        
+        
+        
+    }    
+    
     @Transactional
     public void fixFile(List<DataValidationResultDTO> requests) throws Exception {
 

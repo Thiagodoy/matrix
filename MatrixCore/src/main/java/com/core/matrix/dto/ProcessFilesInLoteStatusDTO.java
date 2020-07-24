@@ -61,19 +61,15 @@ public class ProcessFilesInLoteStatusDTO extends Observable implements Serializa
         return this.pointsChecked.size() == this.points.size();
     }
 
-    public void pointChecked(String point, List<InformationDTO> informations, HeaderDTO header, List<FileDetailDTO> details, String type) {
+    public void pointChecked(List<InformationDTO> informations, HeaderDTO header, String type) {
 
         if (this.isFinished) {
             return;
         }
 
-        this.pointsChecked.add(point.replaceAll("\\((L|B)\\)", "").trim());
-
         if (details.isEmpty()) {
             return;
         }
-
-        this.details.addAll(details);
 
         if (this.informations.isEmpty()) {
             this.informations.addAll(informations);

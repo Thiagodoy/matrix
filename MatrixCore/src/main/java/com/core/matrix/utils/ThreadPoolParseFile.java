@@ -13,7 +13,6 @@ import java.util.concurrent.Future;
 import java.util.concurrent.ThreadPoolExecutor;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-import org.springframework.stereotype.Component;
 
 /**
  *
@@ -21,7 +20,7 @@ import org.springframework.stereotype.Component;
  */
 public class ThreadPoolParseFile {
 
-    private ThreadPoolExecutor pool = (ThreadPoolExecutor) Executors.newFixedThreadPool(2);
+    private ThreadPoolExecutor pool = (ThreadPoolExecutor) Executors.newFixedThreadPool(1);
     private List<Future> future = new ArrayList<>();
 
     public void submit(ParseFileJob job) {

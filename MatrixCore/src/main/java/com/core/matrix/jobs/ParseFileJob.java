@@ -8,6 +8,8 @@ package com.core.matrix.jobs;
 import com.core.matrix.dto.FileDetailDTO;
 import com.core.matrix.dto.FileLoteErrorDTO;
 import com.core.matrix.dto.FileParsedDTO;
+import com.core.matrix.dto.HeaderDTO;
+import com.core.matrix.dto.InformationDTO;
 import com.core.matrix.dto.ProcessFilesInLoteStatusDTO;
 import com.core.matrix.io.BeanIO;
 import java.io.BufferedReader;
@@ -16,6 +18,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.nio.charset.Charset;
+import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
@@ -57,35 +60,37 @@ public class ParseFileJob implements Runnable {
             Optional<FileParsedDTO> opt = reader.<FileParsedDTO>parse(stream);
 
             if (opt.isPresent()) {
-                Map<String, Long> pointsMap = opt.get().getDetails().stream().collect(Collectors.groupingBy(FileDetailDTO::getMeansurementPoint, Collectors.counting()));
-                FileParsedDTO fileParsedDTO = opt.get();
 
-                Set<String> keysSet = pointsMap.keySet();
+                final List<InformationDTO> informations = opt.get().getInformations();
+                final HeaderDTO header = opt.get().getHeader();
+                final String type = opt.get().getType();
 
-                loteStatusDTOs.stream().forEach(l -> {
+                final Map<String, List<FileDetailDTO>> map = Collections.synchronizedMap(opt
+                        .get()
+                        .getDetails()
+                        .parallelStream()
+                        .collect(Collectors.groupingBy(e -> e.getMeansurementPoint().replaceAll("\\((L|B)\\)", "").trim())));
 
-                    l.getPoints().stream().forEach(point -> {
+                loteStatusDTOs.parallelStream().forEach(lote -> {
 
-                        boolean contains = keysSet.stream().anyMatch(key -> key.contains(point));
-
-                        if (contains) {
-
-                            List<FileDetailDTO> details = fileParsedDTO
-                                    .getDetails()
-                                    .stream()
-                                    .parallel()
-                                    .filter(detail -> detail
-                                    .getMeansurementPoint()
-                                    .contains(point))
-                                    .collect(Collectors.toList());
-
-                            synchronized (l) {
-                                l.pointChecked(point, fileParsedDTO.getInformations(), fileParsedDTO.getHeader(), details, fileParsedDTO.getType());
+                    lote.getPoints().forEach(point -> {
+                        synchronized (map) {
+                            if (map.containsKey(point)) {
+                                lote.getDetails().addAll(map.get(point));
                             }
-
                         }
-
                     });
+
+                    Set<String> points = lote
+                            .getDetails()
+                            .parallelStream()
+                            .map(l -> l.getMeansurementPoint().replaceAll("\\((L|B)\\)", "").trim())
+                            .distinct()
+                            .collect(Collectors.toSet());
+
+                    lote.setPointsChecked(points);
+
+                    lote.pointChecked(informations, header, type);
 
                 });
 

@@ -18,7 +18,7 @@ import java.util.concurrent.ThreadPoolExecutor;
  */
 public class ThreadPoolDetail {
 
-    private static ThreadPoolExecutor pool = (ThreadPoolExecutor) Executors.newFixedThreadPool(1);
+    private static ThreadPoolExecutor pool = (ThreadPoolExecutor) Executors.newFixedThreadPool(2);
     private static Map<String, Future> running = new HashMap<>();
 
     public synchronized void submit(PersistDetailsJob job) {

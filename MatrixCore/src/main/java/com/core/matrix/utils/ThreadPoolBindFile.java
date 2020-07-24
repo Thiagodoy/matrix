@@ -25,7 +25,7 @@ import org.activiti.engine.TaskService;
 public class ThreadPoolBindFile {
 
     private TaskService taskService;
-    private ThreadPoolExecutor pool = (ThreadPoolExecutor) Executors.newFixedThreadPool(2);
+    private ThreadPoolExecutor pool = (ThreadPoolExecutor) Executors.newFixedThreadPool(1);
     private Set<ProcessFilesInLoteStatusDTO> set = new HashSet<>();
     private List<Future> future = new ArrayList<>();
 
@@ -34,6 +34,7 @@ public class ThreadPoolBindFile {
     }
 
     public void submit(ProcessFilesInLoteStatusDTO statusDTO) {
+        
         if (!set.contains(statusDTO)) {
             BindFileToProcessJob job = new BindFileToProcessJob();
             job.setProcessFilesInLoteStatusDTO(statusDTO);
@@ -64,7 +65,8 @@ public class ThreadPoolBindFile {
 
     public void monitor() {
         while (!pool.isTerminated()) {
-            try {
+            try {             
+
                 Thread.sleep(5000);
             } catch (Exception e) {
                 Logger.getLogger(ThreadPoolBindFile.class.getName()).log(Level.SEVERE, "Monitor can't sleep the thread!");
