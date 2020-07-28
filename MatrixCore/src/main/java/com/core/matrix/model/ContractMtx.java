@@ -6,9 +6,12 @@
 package com.core.matrix.model;
 
 import com.core.matrix.dto.ContractPointDTO;
+import com.core.matrix.exceptions.ContractNotAssociatedWithPointException;
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import java.io.Serializable;
 import java.time.LocalDateTime;
+import java.util.Optional;
 import javax.persistence.Column;
 import javax.persistence.ColumnResult;
 import javax.persistence.ConstructorResult;
@@ -21,6 +24,7 @@ import javax.persistence.PrePersist;
 import javax.persistence.PreUpdate;
 import javax.persistence.SqlResultSetMapping;
 import javax.persistence.Table;
+import javax.persistence.Transient;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 
@@ -48,6 +52,7 @@ import lombok.EqualsAndHashCode;
 @Table(name = "mtx_contrato")
 @Data
 @EqualsAndHashCode(of = "wbcContract")
+@JsonIgnoreProperties(value = {"point"})
 public class ContractMtx implements Model<ContractMtx>, Serializable {
 
     private static final long serialVersionUID = -5336086836317164272L;
@@ -55,7 +60,7 @@ public class ContractMtx implements Model<ContractMtx>, Serializable {
     @Id
     @Column(name = "id_contrato")
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long id;
+    protected Long id;
 
     @Column(name = "wbc_contrato")
     protected Long wbcContract;
@@ -103,6 +108,18 @@ public class ContractMtx implements Model<ContractMtx>, Serializable {
 
     @Column(name = "apelido")
     protected String nickname1;
+    
+    @Transient
+    protected  String pointAssociated;       
+    
+    public String getPoint()throws ContractNotAssociatedWithPointException{
+        
+        if(Optional.ofNullable(this.pointAssociated).isPresent()){
+            return this.pointAssociated;
+        }else{
+            throw new ContractNotAssociatedWithPointException();
+        }
+    }
 
     @PrePersist
     protected void generateDate() {

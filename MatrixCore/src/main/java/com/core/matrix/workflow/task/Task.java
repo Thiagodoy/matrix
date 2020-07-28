@@ -61,6 +61,11 @@ public abstract class Task implements JavaDelegate {
     public synchronized void loadVariables(VariableScope delegateExecution) {
         variables.putAll(delegateExecution.getVariables());
     }
+    
+    
+    
+    
+    
 
     public List<MeansurementFileDetail> getDetails(MeansurementFile file, VariableScope delegateExecution) throws Exception {
 

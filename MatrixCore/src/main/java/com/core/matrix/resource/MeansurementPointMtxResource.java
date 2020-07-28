@@ -33,7 +33,7 @@ public class MeansurementPointMtxResource extends Resource<MeansurementPointMtx,
     @RequestMapping(value = "/byPoint", method = RequestMethod.GET)
     public ResponseEntity getByPoint(@RequestParam(value = "point", required = true) String point) {
         try {
-            MeansurementPointMtx response = this.service.getByPoint(point);
+            List<MeansurementPointMtx> response = this.service.findByPointContaining(point);
             return ResponseEntity.ok(response);
         } catch (Exception e) {
             Logger.getLogger(this.getClass().getName()).log(Level.SEVERE, e.getMessage());

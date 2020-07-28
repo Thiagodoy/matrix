@@ -5,8 +5,11 @@
  */
 package com.core.matrix.service;
 
+import com.core.matrix.exceptions.EntityNotFoundException;
 import com.core.matrix.model.MeansurementPointProInfa;
 import com.core.matrix.repository.MeansurementPointProInfaRepository;
+import java.time.LocalDate;
+import org.springframework.transaction.annotation.Transactional;
 
 /**
  *
@@ -17,4 +20,18 @@ public class MeansurementPointProInfaService extends Service<MeansurementPointPr
     public MeansurementPointProInfaService(MeansurementPointProInfaRepository repositoy) {
         super(repositoy);
     }    
+    
+    
+    
+    
+    @Transactional(readOnly = true)
+    public synchronized MeansurementPointProInfa getCurrentProInfa(String point) throws EntityNotFoundException{
+        
+        final Long month = (long) LocalDate.now().minusMonths(1).getMonthValue();
+        final Long year = (long)  LocalDate.now().getYear();
+        
+        return this.repository.findByPointAndMonthAndYear(point, month, year).orElseThrow(()-> new EntityNotFoundException());
+    }
+    
+    
 }

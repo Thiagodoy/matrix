@@ -6,6 +6,7 @@
 package com.core.matrix.model;
 
 import java.lang.reflect.Field;
+import java.lang.reflect.Modifier;
 import java.lang.reflect.Type;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -26,7 +27,7 @@ public interface Model<T extends Model> {
     default void update(T entity) {
         List<Field> fields = Arrays.asList(entity.getClass().getDeclaredFields());
 
-        fields.forEach(f -> {
+        fields.stream().filter(f -> Modifier.isPublic(f.getModifiers()) || Modifier.isProtected(f.getModifiers())).forEach(f -> {
 
             Type type = f.getGenericType();
 

@@ -25,6 +25,7 @@ import org.activiti.engine.delegate.DelegateExecution;
 import org.springframework.context.ApplicationContext;
 import com.core.matrix.model.Log;
 import com.core.matrix.service.ContractCompInformationService;
+import com.core.matrix.service.ContractMtxService;
 import java.text.MessageFormat;
 import java.util.Collections;
 import org.activiti.engine.TaskService;
@@ -37,9 +38,8 @@ import org.activiti.engine.task.Attachment;
 public class DataValidationTask extends Task {
 
     private MeansurementFileService fileService;
-
-    private LogService logService;
-    private ContractCompInformationService contractInformationService;
+    private LogService logService;    
+    private ContractMtxService contractMtxService;
 
     private DelegateExecution delegateExecution;
     private static ApplicationContext context;
@@ -49,8 +49,8 @@ public class DataValidationTask extends Task {
     public DataValidationTask() {
         synchronized (DataValidationTask.context) {
             this.fileService = DataValidationTask.context.getBean(MeansurementFileService.class);
-            this.logService = DataValidationTask.context.getBean(LogService.class);
-            this.contractInformationService = DataValidationTask.context.getBean(ContractCompInformationService.class);
+            this.logService = DataValidationTask.context.getBean(LogService.class);            
+            this.contractMtxService = DataValidationTask.context.getBean(ContractMtxService.class);
         }
     }
 
@@ -64,14 +64,14 @@ public class DataValidationTask extends Task {
         delegateExecution = de;
 
         this.loadVariables(delegateExecution);
-        
+
         final String responseResult = MessageFormat.format("{0}:{1}", RESPONSE_RESULT, de.getProcessInstanceId());
         this.results = Collections.synchronizedList(new ArrayList<>());
 
         //REMOVE FILES THAT CONTRACT IS CONSUMER UNIT
         List<MeansurementFile> files = this.getFiles(delegateExecution)
                 .stream()
-                .filter(f -> !this.contractInformationService.isConsumerUnit(f.getWbcContract()))
+                .filter(f -> !this.contractMtxService.isConsumerUnit(f.getWbcContract()))
                 .collect(Collectors.toList());
 
         TaskService taskService = delegateExecution.getEngineServices().getTaskService();
@@ -121,7 +121,7 @@ public class DataValidationTask extends Task {
         } else {
             this.setVariable(CONTROLE, RESPONSE_DATA_IS_VALID);
         }
-        
+
         this.writeVariables(delegateExecution);
 
     }
@@ -184,7 +184,7 @@ public class DataValidationTask extends Task {
                 if (!hoursOut.isEmpty()) {
 
                     DataValidationResultDTO result = new DataValidationResultDTO();
-                    result.setIdFile(file.getId());                   
+                    result.setIdFile(file.getId());
 
                     String name = Optional.ofNullable(attachment).isPresent() ? attachment.getName() : "";
 
@@ -278,7 +278,7 @@ public class DataValidationTask extends Task {
                         if (!detailsOut.isEmpty()) {
 
                             DataValidationResultDTO result = new DataValidationResultDTO();
-                            result.setIdFile(file.getId());                            
+                            result.setIdFile(file.getId());
 
                             String name = Optional.ofNullable(attachment).isPresent() ? attachment.getName() : "";
 
@@ -298,7 +298,7 @@ public class DataValidationTask extends Task {
 
                             results.add(result);
 
-                            this.addDetails( file.getMeansurementPoint(), detailsOut);
+                            this.addDetails(file.getMeansurementPoint(), detailsOut);
 
                         }
 

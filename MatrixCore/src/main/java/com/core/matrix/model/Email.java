@@ -5,13 +5,13 @@
  */
 package com.core.matrix.model;
 
-import static com.core.matrix.utils.Constants.TABLE_SEQUENCES;
 import com.core.matrix.utils.Utils;
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 import java.text.MessageFormat;
 import java.time.LocalDateTime;
+import java.util.HashMap;
 import java.util.Map;
 import javax.persistence.Column;
 import javax.persistence.Entity;
@@ -71,6 +71,9 @@ public class Email implements Model<Email> {
 
     @Transient
     protected Map<String, String> mapData;
+    
+    @Transient
+    protected Map<String, File> attachment = new HashMap<>();
 
     @PrePersist
     public void generateDate() {
