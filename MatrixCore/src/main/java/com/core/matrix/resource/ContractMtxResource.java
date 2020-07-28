@@ -13,7 +13,6 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
@@ -31,7 +30,7 @@ public class ContractMtxResource extends Resource<ContractMtx, ContractMtxServic
         super(service);
     }
 
-    @RequestMapping(value = "/associate/{contract}/{point}", method = RequestMethod.POST)
+    @RequestMapping(value = "/associate", method = RequestMethod.POST)
     public ResponseEntity associate(@RequestParam(name = "contract") Long contract, @RequestParam(name = "point")String point) {
         try {
             this.service.associateContractToPoint(contract, point);
@@ -42,8 +41,8 @@ public class ContractMtxResource extends Resource<ContractMtx, ContractMtxServic
         }
     }
     
-    @RequestMapping(value = "/list/{contract}", method = RequestMethod.GET)
-    public ResponseEntity list(@PathVariable(name = "contract") Long contract) {
+    @RequestMapping(value = "/list", method = RequestMethod.GET)
+    public ResponseEntity list(@RequestParam(name = "contract") Long contract) {
         try {
             ContractMtxResponse response = this.service.findAll(contract);
             return ResponseEntity.ok(response);

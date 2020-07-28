@@ -24,8 +24,6 @@ import java.util.stream.Collectors;
 import org.activiti.engine.delegate.DelegateExecution;
 import org.springframework.context.ApplicationContext;
 import com.core.matrix.model.Log;
-import com.core.matrix.service.ContractCompInformationService;
-import com.core.matrix.service.ContractMtxService;
 import java.text.MessageFormat;
 import java.util.Collections;
 import org.activiti.engine.TaskService;
@@ -38,8 +36,7 @@ import org.activiti.engine.task.Attachment;
 public class DataValidationTask extends Task {
 
     private MeansurementFileService fileService;
-    private LogService logService;    
-    private ContractMtxService contractMtxService;
+    private LogService logService;        
 
     private DelegateExecution delegateExecution;
     private static ApplicationContext context;
@@ -49,8 +46,7 @@ public class DataValidationTask extends Task {
     public DataValidationTask() {
         synchronized (DataValidationTask.context) {
             this.fileService = DataValidationTask.context.getBean(MeansurementFileService.class);
-            this.logService = DataValidationTask.context.getBean(LogService.class);            
-            this.contractMtxService = DataValidationTask.context.getBean(ContractMtxService.class);
+            this.logService = DataValidationTask.context.getBean(LogService.class);                     
         }
     }
 
@@ -67,11 +63,19 @@ public class DataValidationTask extends Task {
 
         final String responseResult = MessageFormat.format("{0}:{1}", RESPONSE_RESULT, de.getProcessInstanceId());
         this.results = Collections.synchronizedList(new ArrayList<>());
+        
+        
+        if(this.isOnlyContractFlat()){
+            this.setVariable(CONTROLE, RESPONSE_DATA_IS_VALID);
+            this.writeVariables(delegateExecution);
+            return;
+        }
+        
 
         //REMOVE FILES THAT CONTRACT IS CONSUMER UNIT
-        List<MeansurementFile> files = this.getFiles(delegateExecution)
+        List<MeansurementFile> files = this.getFiles(true)
                 .stream()
-                .filter(f -> !this.contractMtxService.isConsumerUnit(f.getWbcContract()))
+                .filter(f -> !this.isUnitConsumer(f.getWbcContract()))
                 .collect(Collectors.toList());
 
         TaskService taskService = delegateExecution.getEngineServices().getTaskService();

@@ -14,14 +14,11 @@ import com.core.matrix.model.ContractMtx;
 import com.core.matrix.model.Email;
 import com.core.matrix.model.Log;
 import com.core.matrix.model.MeansurementFile;
-import com.core.matrix.model.MeansurementPointMtx;
 import com.core.matrix.model.Template;
-import com.core.matrix.service.ContractCompInformationService;
 import com.core.matrix.service.ContractMtxService;
 import com.core.matrix.service.LogService;
 import com.core.matrix.service.MeansurementFileService;
 import com.core.matrix.service.MeansurementPointMtxService;
-import com.core.matrix.service.ParametersService;
 import com.core.matrix.utils.Constants;
 import static com.core.matrix.utils.Constants.GROUP_MANAGER_PORTAL;
 import static com.core.matrix.utils.Constants.GROUP_SUPPORT_TI;
@@ -69,11 +66,9 @@ public class BillingContractsTask implements JavaDelegate {
 
     private ContractService contractService;
     private MeansurementFileService meansurementFileService;
-    private ContractCompInformationService contractCompInformationService;
     private LogService logService;
     private EmailFactory emailFactory;
     private ThreadPoolEmail threadPoolEmail;
-    private ParametersService parametersService;
 
     private ContractMtxService contractMtxService;
     private MeansurementPointMtxService meansurementPointMtxService;
@@ -87,11 +82,9 @@ public class BillingContractsTask implements JavaDelegate {
         synchronized (BillingContractsTask.context) {
             this.contractService = context.getBean(ContractService.class);
             this.meansurementFileService = context.getBean(MeansurementFileService.class);
-            this.contractCompInformationService = context.getBean(ContractCompInformationService.class);
             this.logService = context.getBean(LogService.class);
             this.emailFactory = context.getBean(EmailFactory.class);
             this.threadPoolEmail = context.getBean(ThreadPoolEmail.class);
-            this.parametersService = context.getBean(ParametersService.class);
             this.contractMtxService = context.getBean(ContractMtxService.class);
             this.meansurementPointMtxService = context.getBean(MeansurementPointMtxService.class);
         }
@@ -168,7 +161,7 @@ public class BillingContractsTask implements JavaDelegate {
             String header = "Os pontos abaixo, não possui proinfa do mês vigente cadastrado na base da [ Matrix ]\n";
             String body = header + "" + text;
 
-            pointsAreNotAssociatedWithProInfaFile = new File("contratos_sem_pontos_associados.txt");
+            pointsAreNotAssociatedWithProInfaFile = new File("pontos_sem_proinfa.txt");
             this.writeFile(pointsAreNotAssociatedWithProInfaFile, body);
             attachaments.add(pointsAreNotAssociatedWithProInfaFile);
         }
@@ -178,7 +171,7 @@ public class BillingContractsTask implements JavaDelegate {
         }
 
         try {
-            File zip = Utils.zipFiles("informação.zip", attachaments);
+            File zip = Utils.zipFiles("informação", attachaments);
             Email email = emailFactory.createEmailTemplate(Template.TemplateBusiness.PROCESS_BILLING_ERROR);
 
             Map<String, File> att = new HashMap<>();
@@ -241,13 +234,13 @@ public class BillingContractsTask implements JavaDelegate {
                             ContractMtx contractMtx = this.contractMtxService.findByWbcContract(Long.parseLong(contract.getSNrContrato()));
                             point = contractMtx.getPoint();
                             contract.setMeansurementPoint(point);
-                            MeansurementPointMtx pMtx = this.meansurementPointMtxService.getByPoint(point);
-                            pMtx.checkProInfa();
 
-                            if (execution.hasVariable(PROCESS_CONTRACTS_RELOAD_BILLING) || !this.hasMeansurementFile(contractMtx.getWbcContract(), point)) {
-                                String processInstanceId = this.createAProcessForBilling(execution, contract).getProcessInstanceId();
-                                this.createMeansurementFile(processInstanceId, contract);
+                            if ((!contractMtx.isFlat() || !contractMtx.isConsumerUnit()) && Optional.ofNullable(point).isPresent()) {
+                                this.meansurementPointMtxService
+                                        .getByPoint(point)
+                                        .checkProInfa();
                             }
+
                         } catch (EntityNotFoundException e) {
                             contractsNotRegistered.add(contract);
                         } catch (ContractNotAssociatedWithPointException ex) {
@@ -303,11 +296,17 @@ public class BillingContractsTask implements JavaDelegate {
                         ContractMtx contractMtx = this.contractMtxService.findByWbcContract(Long.parseLong(contract.getSNrContrato()));
                         point = contractMtx.getPoint();
                         contract.setMeansurementPoint(point);
-                        MeansurementPointMtx pMtx = this.meansurementPointMtxService.getByPoint(point);
-                        pMtx.checkProInfa();
+
+                        if ((!contractMtx.isFlat() || !contractMtx.isConsumerUnit()) && Optional.ofNullable(point).isPresent()) {
+                            this.meansurementPointMtxService
+                                    .getByPoint(point)
+                                    .checkProInfa();
+                        }
 
                         if (execution.hasVariable(PROCESS_CONTRACTS_RELOAD_BILLING) || !this.hasMeansurementFile(contractMtx.getWbcContract(), point)) {
-                            String processInstanceId = this.createAProcessForBilling(execution, contract).getProcessInstanceId();
+                            Map<String, Object> variables = new HashMap();
+                            variables.put(PROCESS_INFORMATION_CONTRACTS_MATRIX, Arrays.asList(contractMtx));
+                            String processInstanceId = this.createAProcessForBilling(execution, contract, variables).getProcessInstanceId();
                             this.createMeansurementFile(processInstanceId, contract);
                         }
 
@@ -322,7 +321,7 @@ public class BillingContractsTask implements JavaDelegate {
 
     }
 
-    private ProcessInstance createAProcessForBilling(DelegateExecution execution, ContractDTO contract, Map<String, Object> variables) {        
+    private ProcessInstance createAProcessForBilling(DelegateExecution execution, ContractDTO contract, Map<String, Object> variables) {
         variables.put(PROCESS_INFORMATION_MONITOR_CLIENT, contract.getSNmEmpresaEpce().toString());
         return this.createAProcessForBilling(execution, Arrays.asList(contract), variables);
     }

@@ -114,7 +114,7 @@ public class ContractMtx implements Model<ContractMtx>, Serializable {
     
     public String getPoint()throws ContractNotAssociatedWithPointException{
         
-        if(Optional.ofNullable(this.pointAssociated).isPresent()){
+        if(Optional.ofNullable(this.pointAssociated).isPresent() || isFlat || isConsumerUnit){
             return this.pointAssociated;
         }else{
             throw new ContractNotAssociatedWithPointException();
