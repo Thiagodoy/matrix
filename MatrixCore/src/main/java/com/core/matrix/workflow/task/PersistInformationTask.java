@@ -13,6 +13,7 @@ import static com.core.matrix.utils.Constants.VAR_NO_PERSIST;
 import com.core.matrix.utils.MeansurementFileStatus;
 import com.core.matrix.utils.ThreadPoolDetail;
 import java.util.List;
+import java.util.Objects;
 import java.util.stream.Collectors;
 import org.activiti.engine.delegate.DelegateExecution;
 import org.activiti.engine.delegate.ExecutionListener;
@@ -26,7 +27,7 @@ import org.springframework.context.ApplicationContext;
  */
 public class PersistInformationTask extends Task implements ExecutionListener {
 
-    private MeansurementFileService fileService;    
+    private MeansurementFileService fileService;
     private ThreadPoolDetail threadPoolDetail;
     private static ApplicationContext context;
 
@@ -36,7 +37,7 @@ public class PersistInformationTask extends Task implements ExecutionListener {
 
     public PersistInformationTask() {
         synchronized (PersistInformationTask.context) {
-            this.fileService = PersistInformationTask.context.getBean(MeansurementFileService.class);            
+            this.fileService = PersistInformationTask.context.getBean(MeansurementFileService.class);
             this.threadPoolDetail = PersistInformationTask.context.getBean(ThreadPoolDetail.class);
         }
     }
@@ -61,10 +62,11 @@ public class PersistInformationTask extends Task implements ExecutionListener {
         } else {
 
             try {
-                List<MeansurementFile> files = this.getFiles(execution);
+                List<MeansurementFile> files = this.getFiles(true);
 
                 List<MeansurementFileDetail> details = files
                         .stream()
+                        .filter(f -> Objects.nonNull(f.getDetails()))
                         .map(MeansurementFile::getDetails)
                         .flatMap(List::stream)
                         .collect(Collectors.toList());
@@ -73,11 +75,14 @@ public class PersistInformationTask extends Task implements ExecutionListener {
                     this.fileService.updateStatus(MeansurementFileStatus.SUCCESS, file.getId());
                 });
 
-                PersistDetailsJob job = new PersistDetailsJob(context);
-                job.setDetais(details);
-                job.setProcessInstanceId(((DelegateExecution) execution).getProcessInstanceId());
+                if (!details.isEmpty()) {
+                    PersistDetailsJob job = new PersistDetailsJob(context);
+                    job.setDetais(details);
+                    job.setProcessInstanceId(((DelegateExecution) execution).getProcessInstanceId());
 
-                threadPoolDetail.submit(job);
+                    threadPoolDetail.submit(job);
+                }
+
             } catch (Exception e) {
                 Logger.getLogger(PersistInformationTask.class.getName()).log(Logger.Level.FATAL, "[execute]", e);
             }

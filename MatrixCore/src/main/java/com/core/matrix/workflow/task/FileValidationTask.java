@@ -11,13 +11,16 @@ import com.core.matrix.dto.FileDetailDTO;
 import com.core.matrix.dto.FileParsedDTO;
 import com.core.matrix.io.BeanIO;
 import com.core.matrix.model.ContractCompInformation;
+import com.core.matrix.model.ContractMtx;
 import com.core.matrix.model.Log;
 import com.core.matrix.model.MeansurementFile;
 import com.core.matrix.model.MeansurementFileDetail;
+import com.core.matrix.model.MeansurementPointMtx;
 import com.core.matrix.service.ContractCompInformationService;
 import com.core.matrix.service.LogService;
 import com.core.matrix.service.MeansurementFileDetailService;
 import com.core.matrix.service.MeansurementFileService;
+import com.core.matrix.service.MeansurementPointMtxService;
 import com.core.matrix.utils.MeansurementFileStatus;
 import com.core.matrix.utils.MeansurementFileType;
 import com.core.matrix.validator.Validator;
@@ -53,7 +56,6 @@ import org.springframework.context.ApplicationContext;
  * @author thiag
  */
 @Data
-
 public class FileValidationTask extends Task {
 
     private static ApplicationContext context;
@@ -62,8 +64,8 @@ public class FileValidationTask extends Task {
     private MeansurementFileService service;
     private MeansurementFileDetailService detailService;
     private DelegateExecution delegateExecution;
-    private LogService logService;
-    private ContractCompInformationService contractInformationService;
+    private LogService logService;    
+    private MeansurementPointMtxService meansurementPointMtxService;
 
     private List<MeansurementFile> files;
 
@@ -76,7 +78,8 @@ public class FileValidationTask extends Task {
             this.service = FileValidationTask.context.getBean(MeansurementFileService.class);
             this.detailService = FileValidationTask.context.getBean(MeansurementFileDetailService.class);
             this.logService = FileValidationTask.context.getBean(LogService.class);
-            this.contractInformationService = FileValidationTask.context.getBean(ContractCompInformationService.class);
+            
+            this.meansurementPointMtxService = FileValidationTask.context.getBean(MeansurementPointMtxService.class);
         }
 
     }
@@ -90,16 +93,23 @@ public class FileValidationTask extends Task {
 
         try {
             delegateExecution = de;
-            
+
             this.loadVariables(delegateExecution);
-            
+
             logs = new ArrayList<>();
             final List<String> attachmentIds = (List<String>) de.getVariable(LIST_ATTACHMENT_ID, Object.class);
 
             final String user = de.getVariable(USER_UPLOAD, String.class);
             files = new CopyOnWriteArrayList<>(this.service.findByProcessInstanceId(delegateExecution.getProcessInstanceId()));
 
-            this.checkProinfaOfContracts();
+            if (this.isOnlyContractFlat()) {
+                this.alterStatusFiles(files);
+                this.setVariable(CONTROLE, RESPONSE_LAYOUT_VALID);
+                this.writeVariables(delegateExecution);
+                return; 
+            }
+
+            this.checkProinfaOfPoints();
 
             attachmentIds.stream().forEach(attachmentId -> {
 
@@ -107,42 +117,30 @@ public class FileValidationTask extends Task {
                 String fileName = null;
                 try {
 
-                    long start = System.currentTimeMillis();
                     synchronized (taskService) {
                         stream = taskService.getAttachmentContent(attachmentId);
                         stream = removeLinesEmpty(stream);
                         fileName = taskService.getAttachment(attachmentId).getName();
                     }
-                    loggerPerformance(start, "Carregando arquivo e removendo as linhas em branco");
 
-                    start = System.currentTimeMillis();
                     BeanIO reader = new BeanIO();
                     Optional<FileParsedDTO> opt = reader.<FileParsedDTO>parse(stream);
-                    loggerPerformance(start, "Parseando o arquivo para a entidade");
 
                     if (opt.isPresent()) {
 
                         FileParsedDTO fileDto = opt.get();
 
-                        start = System.currentTimeMillis();                        
                         List<FileDetailDTO> result = this.filter(fileDto.getDetails(), fileName);
                         fileDto.setDetails(result);
-                        loggerPerformance(start, "Filtrando os registros pertecente ao processo");
 
                         MeansurementFileType type = MeansurementFileType.valueOf(fileDto.getType());
 
-                        start = System.currentTimeMillis();
                         this.checkDuplicity(result, type, fileName);
-                        loggerPerformance(start, "Checando a duplicidade");
 
-                        start = System.currentTimeMillis();
                         this.validate(result, type, fileName);
-                        loggerPerformance(start, "Validação");
 
                         if (this.logs.isEmpty()) {
-                            start = System.currentTimeMillis();
                             persistFile(fileDto, attachmentId, user, files);
-                            loggerPerformance(start, "Persistência");
                         }
 
                     } else {
@@ -158,7 +156,7 @@ public class FileValidationTask extends Task {
             //Verify if one file not associate with a attachment and not is a consumer unit , so write a log.
             if (this.logs.isEmpty()) {
                 files.stream()
-                        .filter(f -> !this.contractInformationService.isConsumerUnit(f.getWbcContract()))
+                        .filter(f -> !this.isUnitConsumer(f.getWbcContract()) || !this.isFlat(f.getWbcContract()))
                         .filter(f -> f.getFile() == null)
                         .forEach(f -> {
                             String message = MessageFormat.format("Não foi encontrado nenhuma correspondência do ponto de medição, dentro dos arquivos postados.\nInformação:\nContrato: {0}\nPonto de Medição: {1}\n", f.getWbcContract().toString().replace(".", ""), f.getMeansurementPoint());
@@ -179,9 +177,9 @@ public class FileValidationTask extends Task {
                 this.alterStatusFiles(files);
                 this.setVariable(CONTROLE, RESPONSE_LAYOUT_VALID);
             }
-            
+
             this.writeVariables(delegateExecution);
-            
+
         } catch (Exception e) {
             this.setVariable(CONTROLE, RESPONSE_LAYOUT_INVALID);
             this.generateLog(de, e, "Erro ao processar o arquivo");
@@ -195,30 +193,28 @@ public class FileValidationTask extends Task {
                 .stream()
                 .forEach(f -> {
 
-                    if (this.contractInformationService.isConsumerUnit(f.getWbcContract())) {
+                    if (this.isFlat(f.getWbcContract()) || this.isUnitConsumer(f.getWbcContract())) {
                         f.setStatus(MeansurementFileStatus.SUCCESS);
                     }
                     service.saveFile(f);
                 });
-        
-        
-        
-         List<MeansurementFile> fTemps = new ArrayList<>();
-            files.forEach(ff -> {
-                MeansurementFile fTemp = new MeansurementFile();
-                fTemp.setMeansurementPoint(ff.getMeansurementPoint());
-                fTemp.setWbcContract(ff.getWbcContract());
-                fTemp.setMonth(ff.getMonth());
-                fTemp.setYear(ff.getYear());
-                fTemp.setCompanyName(ff.getCompanyName());
-                fTemp.setFile(ff.getFile());
-                fTemp.setNickname(ff.getNickname());
-                fTemp.setProcessInstanceId(ff.getProcessInstanceId());
-                fTemp.setStatus(ff.getStatus());
-                fTemp.setId(ff.getId());
-                fTemp.setType(ff.getType());
-                fTemps.add(fTemp);
-            });
+
+        List<MeansurementFile> fTemps = new ArrayList<>();
+        files.forEach(ff -> {
+            MeansurementFile fTemp = new MeansurementFile();
+            fTemp.setMeansurementPoint(ff.getMeansurementPoint());
+            fTemp.setWbcContract(ff.getWbcContract());
+            fTemp.setMonth(ff.getMonth());
+            fTemp.setYear(ff.getYear());
+            fTemp.setCompanyName(ff.getCompanyName());
+            fTemp.setFile(ff.getFile());
+            fTemp.setNickname(ff.getNickname());
+            fTemp.setProcessInstanceId(ff.getProcessInstanceId());
+            fTemp.setStatus(ff.getStatus());
+            fTemp.setId(ff.getId());
+            fTemp.setType(ff.getType());
+            fTemps.add(fTemp);
+        });
 
         this.setFiles(delegateExecution, fTemps);
 
@@ -252,31 +248,26 @@ public class FileValidationTask extends Task {
 
     }
 
-    private void checkProinfaOfContracts() throws Exception {
+    private void checkProinfaOfPoints() throws Exception {
 
         List<Exception> execExceptions = new ArrayList<>();
 
-        files.forEach(file -> {
+        files
+                .stream()
+                .filter(f -> Optional.ofNullable(f.getMeansurementPoint()).isPresent())
+                .forEach(file -> {
 
-            try {
-                ContractCompInformation information = contractInformationService
-                        .findByWbcContractAndMeansurementPoint(file.getWbcContract(), file.getMeansurementPoint())
-                        .orElseThrow(() -> new Exception("[Matrix] -> Não foi possivel encontrar as informações complementares do contrato!"));
+                    String point = null;
+                    try {
 
-                if (!Optional.ofNullable(information.getProinfas()).isPresent() || information.getProinfas().isEmpty()) {
-                    throw new Exception("O contrato [" + file.getWbcContract() + "] não possui nenhum cadastro de proinfa!");
-                }
-
-                information.getProinfas()
-                        .stream()
-                        .filter(infa -> file.getMonth().equals(infa.getMonth()) && file.getYear().equals(infa.getYear()))
-                        .findFirst()
-                        .orElseThrow(() -> new Exception("Não foi encontrado nenhum proinfa cadastrada para esse contrato [" + file.getWbcContract() + "]!\n Mês/Ano referência: " + file.getMonth() + "/" + file.getYear()));
-
-            } catch (Exception ex) {
-                execExceptions.add(ex);
-            }
-        });
+                        MeansurementPointMtx pointMtx = this.meansurementPointMtxService.getByPoint(file.getMeansurementPoint());
+                        point = pointMtx.getPoint();
+                        pointMtx.checkProInfa();
+                    } catch (Exception ex) {
+                        Exception e = new Exception("Não foi encontrado nenhum proinfa cadastrada para o ponto [" + point + "]!\n Mês/Ano referência: " + file.getMonth() + "/" + file.getYear());
+                        execExceptions.add(e);
+                    }
+                });
 
         if (!execExceptions.isEmpty()) {
             execExceptions.forEach(ex -> {
@@ -429,8 +420,6 @@ public class FileValidationTask extends Task {
                     .distinct()
                     .collect(Collectors.toList());
 
-            
-            
             //Verify if point match some files uploaded. And set the attachment id on file             
             meansuremPoint.parallelStream().forEach(point -> {
                 Optional<MeansurementFile> opt = files.stream().filter(file -> file.getMeansurementPoint().equals(point)).findFirst();
@@ -452,11 +441,11 @@ public class FileValidationTask extends Task {
                     });
 
                     file.setStatus(MeansurementFileStatus.SUCCESS);
-                    
+
                     this.addDetails(point, fileDetaisl);
 
                 }
-            });           
+            });
 
         } catch (Exception e) {
             Logger.getLogger(FileValidationTask.class.getName()).log(Level.SEVERE, "[ mountFile ]", e);
@@ -492,6 +481,5 @@ public class FileValidationTask extends Task {
         return inputStream;
 
     }
-   
 
 }

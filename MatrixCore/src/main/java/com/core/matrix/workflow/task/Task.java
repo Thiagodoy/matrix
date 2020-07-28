@@ -5,6 +5,7 @@
  */
 package com.core.matrix.workflow.task;
 
+import com.core.matrix.model.ContractMtx;
 import com.core.matrix.model.MeansurementFile;
 import com.core.matrix.model.MeansurementFileDetail;
 import static com.core.matrix.utils.Constants.CONST_QUALITY_COMPLETE;
@@ -17,6 +18,8 @@ import static com.core.matrix.utils.Constants.CONST_SOURCE_COLLECTION_2;
 import static com.core.matrix.utils.Constants.CONST_SOURCE_COLLECTION_3;
 import static com.core.matrix.utils.Constants.CONST_SOURCE_COLLECTION_4;
 import static com.core.matrix.utils.Constants.CONTROLE;
+import static com.core.matrix.utils.Constants.LIST_ATTACHMENT_ID;
+import static com.core.matrix.utils.Constants.PROCESS_INFORMATION_CONTRACTS_MATRIX;
 import static com.core.matrix.utils.Constants.RESPONSE_CALENDAR_INVALID;
 import static com.core.matrix.utils.Constants.RESPONSE_RESULT_MESSAGE;
 import static com.core.matrix.utils.Constants.TYPE_ENERGY_LIQUID;
@@ -31,6 +34,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import java.util.stream.Collectors;
 import org.activiti.engine.delegate.JavaDelegate;
 import org.activiti.engine.delegate.VariableScope;
@@ -60,11 +64,15 @@ public abstract class Task implements JavaDelegate {
 
     public synchronized void loadVariables(VariableScope delegateExecution) {
         variables.putAll(delegateExecution.getVariables());
-    }
+    }    
 
     public List<MeansurementFileDetail> getDetails(MeansurementFile file, VariableScope delegateExecution) throws Exception {
 
         List<MeansurementFileDetail> result = new ArrayList<>();
+        
+        if(this.isOnlyContractFlat() && !Optional.ofNullable(this.getMapDetails()).isPresent() ){
+            return result;
+        }
 
         switch (file.getType()) {
             case LAYOUT_A:
@@ -141,18 +149,52 @@ public abstract class Task implements JavaDelegate {
 
     }
 
-    public Map<String, List<MeansurementFileDetail>> getMapDetails(VariableScope delegateExecution) {
+    public Map<String, List<MeansurementFileDetail>> getMapDetails() {
         return (Map) this.variables.get(VAR_MAP_DETAILS);
     }
+    
+    public List<ContractMtx>getContractsMtx(){
+        return (List<ContractMtx>) this.variables.get(PROCESS_INFORMATION_CONTRACTS_MATRIX);
+    }
+    
+    public List<String> getAllFilesUploaded(){
+        return (List<String>) this.variables.get(LIST_ATTACHMENT_ID);
+    } 
+    
+    
+    public boolean isOnlyContractFlat() {
 
-    public List<MeansurementFile> getFiles(VariableScope delegateExecution) {
+        List<ContractMtx> contractMtxs = this.getContractsMtx();
+
+        boolean allFlat = contractMtxs.stream().allMatch(ContractMtx::isFlat);
+        boolean allUnitConsumer = contractMtxs.stream().allMatch(ContractMtx::isConsumerUnit);
+        boolean noFile = this.getAllFilesUploaded().isEmpty();
+        return ((allFlat || allUnitConsumer) && noFile);
+    }
+    
+    
+    public boolean isFlat(Long contract){
+        List<ContractMtx> contractMtxs = this.getContractsMtx();
+        return contractMtxs.stream().filter(c-> c.getWbcContract().equals(contract)).allMatch(ContractMtx::isFlat);
+    }
+    
+    public boolean isUnitConsumer(Long contract){
+        List<ContractMtx> contractMtxs = this.getContractsMtx();        
+        return contractMtxs.stream().filter(c-> c.getWbcContract().equals(contract)).allMatch(ContractMtx::isConsumerUnit);
+    }
+    
+    
+
+    public List<MeansurementFile> getFiles(boolean loadDetail) {
 
         List<MeansurementFile> files = (List) this.variables.get(VAR_LIST_FILES);
 
-        Map<String, List<MeansurementFileDetail>> details = this.getMapDetails(delegateExecution);
+        Map<String, List<MeansurementFileDetail>> details = this.getMapDetails();
 
         files.forEach(f -> {
-            f.setDetails(details.get(f.getMeansurementPoint()));
+            if(loadDetail && Optional.ofNullable(details).isPresent()){
+               f.setDetails(details.get(f.getMeansurementPoint())); 
+            }            
         });
 
         return files;
@@ -189,7 +231,7 @@ public abstract class Task implements JavaDelegate {
 
         synchronized (delegateExecution) {
 
-            boolean result = this.getMapDetails(delegateExecution).get(point)
+            boolean result = this.getMapDetails().get(point)
                     .stream().anyMatch(d -> d.getStatus().equals(MeansurementFileDetailStatus.HOUR_ERROR));
 
             return result;
@@ -201,7 +243,7 @@ public abstract class Task implements JavaDelegate {
 
         synchronized (delegateExecution) {
 
-            boolean result = this.getMapDetails(delegateExecution).get(point)
+            boolean result = this.getMapDetails().get(point)
                     .stream().anyMatch(d -> d.getStatus().equals(MeansurementFileDetailStatus.DAY_ERROR));
 
             return result;

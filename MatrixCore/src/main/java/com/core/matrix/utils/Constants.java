@@ -84,6 +84,8 @@ public class Constants {
 
     public static final String PROCESS_CONTRACTS_RELOAD_BILLING = "contracts_reload_process_billing";
 
+    
+    public static final String PROCESS_INFORMATION_CONTRACTS_MATRIX = "process_informarion_contract_matrix";
     public static final String PROCESS_INFORMATION_MONITOR_CLIENT = "@Cliente";
     public static final String PROCESS_INFORMATION_CLIENT = "#Cliente";
     public static final String PROCESS_INFORMATION_MEANSUREMENT_POINT = "#Ponto";
@@ -140,7 +142,8 @@ public class Constants {
     public static final String TEMPLATE_PARAM_TASK_CREATE_DATE = ":task_create_date";
 
     public static final String TASK_DRAFT = "task_draft";
-    public static final String GROUP_SUPPORT_TI = "profile-suporte-ti"; 
+    public static final String GROUP_SUPPORT_TI = "profile-suporte-ti";
+    public static final String GROUP_MANAGER_PORTAL = "profile-gestor-portal";
     
     
     public static final String PARAMETER_WISH_MAKE_REPURCHASE = "wish_make_repurchase";

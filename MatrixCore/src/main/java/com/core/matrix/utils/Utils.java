@@ -15,6 +15,7 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.lang.reflect.Field;
+import java.text.MessageFormat;
 import java.text.SimpleDateFormat;
 import java.time.Instant;
 import java.time.LocalDate;
@@ -36,6 +37,8 @@ import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import java.util.stream.Collectors;
+import java.util.zip.ZipEntry;
+import java.util.zip.ZipOutputStream;
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.text.similarity.JaroWinklerDistance;
 import org.beanio.StreamFactory;
@@ -297,4 +300,34 @@ public class Utils {
         }
 
     }
+    
+    public static File zipFiles(String name, List<File> files) throws FileNotFoundException, IOException {        
+        
+        
+        String fileName = MessageFormat.format("{0}.zip", name);
+
+        File fileZip = new File(fileName);
+
+        FileOutputStream fos = new FileOutputStream(fileZip);
+        ZipOutputStream zipOut = new ZipOutputStream(fos);
+        for (File fileToZip : files) {
+
+            FileInputStream fis = new FileInputStream(fileToZip);
+            ZipEntry zipEntry = new ZipEntry(fileToZip.getName());
+            zipOut.putNextEntry(zipEntry);
+
+            byte[] bytes = new byte[1024];
+            int length;
+            while ((length = fis.read(bytes)) >= 0) {
+                zipOut.write(bytes, 0, length);
+            }
+            fis.close();
+        }
+        zipOut.close();
+        fos.close();
+
+        return fileZip;
+
+    }
+    
 }

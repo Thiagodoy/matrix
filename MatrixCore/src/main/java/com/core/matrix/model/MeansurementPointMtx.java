@@ -5,9 +5,10 @@
  */
 package com.core.matrix.model;
 
-
+import com.core.matrix.exceptions.PointWithoutProinfaException;
 import com.fasterxml.jackson.annotation.JsonFormat;
 import java.io.Serializable;
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Set;
@@ -49,8 +50,35 @@ public class MeansurementPointMtx implements Model<MeansurementPointMtx>, Serial
     private LocalDateTime createAt;
 
     @OneToMany(fetch = FetchType.EAGER, cascade = CascadeType.ALL)
-    @JoinColumn(name = "wbc_ponto_de_medicao", referencedColumnName ="wbc_ponto_de_medicao" )
+    @JoinColumn(name = "wbc_ponto_de_medicao", referencedColumnName = "wbc_ponto_de_medicao")
     private List<MeansurementPointProInfa> proinfas;
+    
+    
+    
+    public MeansurementPointProInfa getCurrentProinfa() throws PointWithoutProinfaException{
+        
+        
+        long month = LocalDate.now().minusMonths(1).getMonthValue();
+        long year = LocalDate.now().getYear();
+
+       return proinfas.parallelStream()
+                .filter(p -> p.getMonth().equals(month) && p.getYear().equals(year))
+                .findFirst()
+                .orElseThrow(() -> new PointWithoutProinfaException());
+        
+    } 
+
+    public void checkProInfa() throws PointWithoutProinfaException {
+
+        long month = LocalDate.now().minusMonths(1).getMonthValue();
+        long year = LocalDate.now().getYear();
+
+        proinfas.parallelStream()
+                .filter(p -> p.getMonth().equals(month) && p.getYear().equals(year))
+                .findFirst()
+                .orElseThrow(() -> new PointWithoutProinfaException());
+
+    }
 
     @ManyToMany(cascade = CascadeType.ALL)
     @JoinTable(

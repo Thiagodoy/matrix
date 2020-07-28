@@ -5,6 +5,7 @@
  */
 package com.core.matrix.service;
 
+import com.core.matrix.exceptions.EntityNotFoundException;
 import com.core.matrix.model.ContractMtx;
 import com.core.matrix.model.MeansurementPointMtx;
 import com.core.matrix.model.MeansurementPointProInfa;
@@ -66,8 +67,13 @@ public class MeansurementPointMtxService extends Service<MeansurementPointMtx, M
     }
 
     @Transactional(readOnly = true)
-    public MeansurementPointMtx getByPoint(String point) throws Exception {
-        return this.repository.findByPoint(point).orElseThrow(() -> new Exception("Not found entity!"));
+    public MeansurementPointMtx getByPoint(String point) throws EntityNotFoundException {
+        return this.repository.findByPoint(point).orElseThrow(() -> new EntityNotFoundException());
+    }
+    
+    @Transactional(readOnly = true)
+    public List<MeansurementPointMtx> findByPointContaining(String point) {
+        return this.repository.findByPointContaining(point);
     }
 
     @Transactional(readOnly = true)

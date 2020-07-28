@@ -12,6 +12,7 @@ import java.text.MessageFormat;
 import java.time.LocalDateTime;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
+import org.apache.commons.lang3.StringUtils;
 
 /**
  *
@@ -249,7 +250,19 @@ public class ContractDTO implements Serializable{
     
     @Override
     public String toString(){
-        return  MessageFormat.format("Contrato : {0}\nEmpresa Contratada : {1}\nEmpresa Contratante : {2} ", this.sNrContrato,this.sNmEmpresaEpca,this.sNmEmpresaEpca);
+        
+        String epca = this.sNmEmpresaEpca != null && this.sNmEmpresaEpca.length() > 32 ?  this.sNmEmpresaEpca.substring(0, 32) : this.sNmEmpresaEpca ; 
+        String epce = this.sNmEmpresaEpce != null && this.sNmEmpresaEpce.length() > 31 ?  this.sNmEmpresaEpce.substring(0, 31) : this.sNmEmpresaEpce ; 
+        
+        
+        return  MessageFormat.format("##########################################################\n"
+                +                    "# Contrato : {0}#\n"
+                +                    "# Empresa Contratada : {1}#\n"
+                +                    "# Empresa Contratante : {2}#\n"
+                +                    "##########################################################\n", 
+                StringUtils.rightPad(this.sNrContrato, 44, null) ,
+                StringUtils.rightPad(epca,34,null),
+                StringUtils.rightPad(epce,33,null));
     }
 
 }

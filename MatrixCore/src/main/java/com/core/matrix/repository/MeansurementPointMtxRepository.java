@@ -22,6 +22,8 @@ public interface MeansurementPointMtxRepository extends JpaRepository<Meansureme
 
     Optional<MeansurementPointMtx> findByPoint(String point);
     
+    List<MeansurementPointMtx> findByPointContaining(String point);
+    
     @Query(value = "select wbc_ponto_de_medicao from mtx_ponto_de_medicao", nativeQuery = true) 
     List<String> findAllPoints();
 
