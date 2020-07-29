@@ -266,7 +266,8 @@ public class BillingContractsTask implements JavaDelegate {
 
                         try {
 
-                            List<ContractMtx> contractMtxs = this.contractMtxService.findAll(contractParent).getContracts();
+                            Long contractWbc = Long.valueOf(opt.get().getSNrContrato());
+                            List<ContractMtx> contractMtxs = this.contractMtxService.findAll(contractWbc).getContracts();
 
                             Map<String, Object> variables = new HashMap<>();
                             variables.put(PROCESS_INFORMATION_CONTRACTS_MATRIX, contractMtxs);
