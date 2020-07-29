@@ -150,7 +150,7 @@ import lombok.Data;
         resultSetMapping = "statusMonitoringDTO")
 
 @Entity
-@Table(schema = "matrix", name = "monitoramento_view")
+@Table(schema = "matrix", name = "monitoramento_view_1")
 @Data
 @JsonIgnoreProperties(value = {"id"})
 public class Monitoring implements Serializable {

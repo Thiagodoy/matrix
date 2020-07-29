@@ -38,7 +38,7 @@ public abstract class Resource<T extends Model, S extends Service> {
             Long id = service.save(entity);
             return ResponseEntity.ok(id);
         } catch (Exception e) {
-            Logger.getLogger(this.getClass().getName()).log(Level.SEVERE, e.getMessage());
+            Logger.getLogger(this.getClass().getName()).log(Level.SEVERE,"[post]", e);
             return ResponseEntity.status(HttpStatus.resolve(500)).body(e.getMessage());
         }
 
@@ -51,7 +51,7 @@ public abstract class Resource<T extends Model, S extends Service> {
             List<Long> id = service.save(entity);
             return ResponseEntity.ok(id);
         } catch (Exception e) {
-            Logger.getLogger(this.getClass().getName()).log(Level.SEVERE, e.getMessage());
+            Logger.getLogger(this.getClass().getName()).log(Level.SEVERE, "[postALl]",e);
             return ResponseEntity.status(HttpStatus.resolve(500)).body(e.getMessage());
         }
 
@@ -65,7 +65,7 @@ public abstract class Resource<T extends Model, S extends Service> {
 
         } catch (Exception e) {
 
-            Logger.getLogger(this.getClass().getName()).log(Level.SEVERE, e.getMessage());
+            Logger.getLogger(this.getClass().getName()).log(Level.SEVERE, "[put]",e);
             return ResponseEntity.status(HttpStatus.resolve(500)).body(e.getMessage());
         }
     }
@@ -79,7 +79,7 @@ public abstract class Resource<T extends Model, S extends Service> {
             return ResponseEntity.ok().build();
         } catch (Exception e) {
 
-            Logger.getLogger(this.getClass().getName()).log(Level.SEVERE, e.getMessage());
+            Logger.getLogger(this.getClass().getName()).log(Level.SEVERE, "[edelete]", e);
             return ResponseEntity.status(HttpStatus.resolve(500)).body(e.getMessage());
         }
     }
@@ -90,7 +90,7 @@ public abstract class Resource<T extends Model, S extends Service> {
         try {
             return ResponseEntity.ok(this.service.find(id));
         } catch (Exception e) {
-            Logger.getLogger(this.getClass().getName()).log(Level.SEVERE, e.getMessage());
+            Logger.getLogger(this.getClass().getName()).log(Level.SEVERE, "[getById]",e);
             return ResponseEntity.status(HttpStatus.resolve(500)).body(e.getMessage());
         }
     }   

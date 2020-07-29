@@ -39,6 +39,17 @@ public class ContractMtxResource extends Resource<ContractMtx, ContractMtxServic
             Logger.getLogger(this.getClass().getName()).log(Level.SEVERE, "[associate]", e);
             return ResponseEntity.status(HttpStatus.resolve(500)).body(e.getMessage());
         }
+    }   
+    
+    @RequestMapping(value = "/unassociate", method = RequestMethod.POST)
+    public ResponseEntity unAssociate(@RequestParam(name = "contract") Long contract, @RequestParam(name = "point")String point) {
+        try {
+            this.service.unAssociateContractToPoint(contract, point);
+            return ResponseEntity.ok().build();
+        } catch (Exception e) {
+            Logger.getLogger(this.getClass().getName()).log(Level.SEVERE, "[associate]", e);
+            return ResponseEntity.status(HttpStatus.resolve(500)).body(e.getMessage());
+        }
     }
     
     @RequestMapping(value = "/list", method = RequestMethod.GET)

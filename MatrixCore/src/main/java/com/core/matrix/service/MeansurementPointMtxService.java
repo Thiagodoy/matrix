@@ -14,6 +14,10 @@ import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Example;
+import org.springframework.data.domain.ExampleMatcher;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.transaction.annotation.Transactional;
 
 /**
@@ -42,7 +46,7 @@ public class MeansurementPointMtxService extends Service<MeansurementPointMtx, M
                 if (c.getId() != null) {
                     ContractMtx contractMtx = this.contractMtxService.find(c.getId());
                     contractMtx.update(c);
-                    c = contractMtx; 
+                    c = contractMtx;
                 }
 
             } catch (Exception ex) {
@@ -50,14 +54,14 @@ public class MeansurementPointMtxService extends Service<MeansurementPointMtx, M
             }
         });
 
-        entity.getProinfas().forEach( p-> {
-            try {   
-                
-                if(p.getId() != null){
+        entity.getProinfas().forEach(p -> {
+            try {
+
+                if (p.getId() != null) {
                     MeansurementPointProInfa meansurementPointProInfa = meansurementPointProInfaService.find(p.getId());
                     meansurementPointProInfa.update(p);
                     p = meansurementPointProInfa;
-                }                
+                }
             } catch (Exception ex) {
                 Logger.getLogger(MeansurementPointMtxService.class.getName()).log(Level.SEVERE, "[save]", ex);
             }
@@ -70,15 +74,30 @@ public class MeansurementPointMtxService extends Service<MeansurementPointMtx, M
     public MeansurementPointMtx getByPoint(String point) throws EntityNotFoundException {
         return this.repository.findByPoint(point).orElseThrow(() -> new EntityNotFoundException());
     }
-    
+
     @Transactional(readOnly = true)
-    public List<MeansurementPointMtx> findByPointContaining(String point) {
-        return this.repository.findByPointContaining(point);
+    public Page<MeansurementPointMtx> findByPointContaining(String point, Pageable page) {
+        return this.repository.findByPointContaining(point, page);
     }
 
     @Transactional(readOnly = true)
     public List<String> findAllPoints() {
         return this.repository.findAllPoints();
+    }
+
+    @Transactional(readOnly = true)
+    public boolean exists(String point) {
+        
+        ExampleMatcher matcher = ExampleMatcher
+                .matching()
+                .withIgnoreCase("createAt","proinfas","contracts","id")
+                .withMatcher(point, ExampleMatcher.GenericPropertyMatcher.of(ExampleMatcher.StringMatcher.STARTING, true));
+        
+        MeansurementPointMtx pointMtx = new MeansurementPointMtx();
+        pointMtx.setPoint(point);
+        
+        
+        return this.repository.exists(Example.of(pointMtx, matcher)) ;
     }
 
 }

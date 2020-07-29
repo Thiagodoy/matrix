@@ -101,13 +101,13 @@ public class ContractMtx implements Model<ContractMtx>, Serializable {
     protected String nameCompany;
 
     @Column(name = "nome_fantasia")
-    protected String nickname;
+    protected String fantasyName;
 
     @Column(name = "cnpj")
     protected String cnpj;
 
     @Column(name = "apelido")
-    protected String nickname1;
+    protected String nickname;
     
     @Transient
     protected  String pointAssociated;       

@@ -23,6 +23,8 @@ import javax.persistence.JoinColumn;
 import javax.persistence.JoinTable;
 import javax.persistence.ManyToMany;
 import javax.persistence.OneToMany;
+import javax.persistence.PostLoad;
+import javax.persistence.PrePersist;
 import javax.persistence.Table;
 import lombok.Data;
 
@@ -52,21 +54,27 @@ public class MeansurementPointMtx implements Model<MeansurementPointMtx>, Serial
     @OneToMany(fetch = FetchType.EAGER, cascade = CascadeType.ALL)
     @JoinColumn(name = "wbc_ponto_de_medicao", referencedColumnName = "wbc_ponto_de_medicao")
     private List<MeansurementPointProInfa> proinfas;
-    
-    
-    
-    public MeansurementPointProInfa getCurrentProinfa() throws PointWithoutProinfaException{
-        
-        
+
+    @ManyToMany(cascade = CascadeType.ALL)
+    @JoinTable(
+            name = "mtx_ponto_contrato",
+            joinColumns = {
+                @JoinColumn(name = "id_ponto_de_medicao")},
+            inverseJoinColumns = {
+                @JoinColumn(name = "id_contrato")})
+    private Set<ContractMtx> contracts;
+
+    public MeansurementPointProInfa getCurrentProinfa() throws PointWithoutProinfaException {
+
         long month = LocalDate.now().minusMonths(1).getMonthValue();
         long year = LocalDate.now().getYear();
 
-       return proinfas.parallelStream()
+        return proinfas.parallelStream()
                 .filter(p -> p.getMonth().equals(month) && p.getYear().equals(year))
                 .findFirst()
                 .orElseThrow(() -> new PointWithoutProinfaException());
-        
-    } 
+
+    }
 
     public void checkProInfa() throws PointWithoutProinfaException {
 
@@ -80,13 +88,15 @@ public class MeansurementPointMtx implements Model<MeansurementPointMtx>, Serial
 
     }
 
-    @ManyToMany(cascade = CascadeType.ALL)
-    @JoinTable(
-            name = "mtx_ponto_contrato",
-            joinColumns = {
-                @JoinColumn(name = "id_ponto_de_medicao")},
-            inverseJoinColumns = {
-                @JoinColumn(name = "id_contrato")})
-    private Set<ContractMtx> contracts;
+    @PostLoad
+    public void setPointOnContracts() {
+        this.contracts.parallelStream().forEach(contract -> contract.setPointAssociated(point));
+    }
+    
+    @PrePersist
+    public void generateDate(){
+        this.createAt = LocalDateTime.now();
+    }
+    
 
 }

@@ -43,6 +43,17 @@ public class ContractMtxService extends Service<ContractMtx, ContractMtxReposito
         pointMtxService.update(pointMtx);
 
     }
+    
+    @Transactional
+    public void unAssociateContractToPoint(Long contract, String point) throws Exception {
+
+        MeansurementPointMtx pointMtx = this.pointMtxService.getByPoint(point);
+        ContractMtx contractMtx = this.findByWbcContract(contract);
+        pointMtx.getContracts().remove(contractMtx);
+
+        pointMtxService.update(pointMtx);
+
+    }
 
     @Transactional(readOnly = true)
     public ContractMtx findByWbcContract(Long contract) throws EntityNotFoundException {

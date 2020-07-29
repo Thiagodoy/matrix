@@ -5,8 +5,6 @@
  */
 package com.core.matrix.wbc.model;
 
-import com.core.matrix.wbc.dto.ContractWbcInformationDTO;
-import java.lang.annotation.Native;
 import javax.persistence.Column;
 import javax.persistence.ColumnResult;
 import javax.persistence.ConstructorResult;

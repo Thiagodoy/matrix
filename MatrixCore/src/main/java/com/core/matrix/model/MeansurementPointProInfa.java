@@ -5,7 +5,6 @@
  */
 package com.core.matrix.model;
 
-import static com.core.matrix.utils.Constants.TABLE_SEQUENCES;
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
