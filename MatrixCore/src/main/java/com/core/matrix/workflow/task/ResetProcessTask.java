@@ -58,7 +58,7 @@ public class ResetProcessTask implements JavaDelegate {
                         + "        AND a.ano = " + year + "\n"
                         + "        AND a.wbc_ponto_de_medicao IS NOT NULL\n"
                         + "        AND b.TASK_DEF_KEY_ in('task-show-error-1','task-show-error-2','task-show-error-ajustament')")
-                .list().parallelStream().forEach(task -> {
+                .list().forEach(task -> {
 
                     try {
 
