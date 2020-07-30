@@ -45,11 +45,11 @@ public class DeleteProcessInstanceTask implements JavaDelegate {
     private ContractCompInformationService compInformationService;
 
     private MeansurementFileService meansurementFileService;
-    
+
     private MeansurementFileDetailService meansurementFileDetailService;
-    
+
     private MeansurementRepurchaseService meansurementRepurchaseService;
-    
+
     private MeansurementFileAuthorityService meansurementFileAuthorityService;
 
     private static ApplicationContext context;
@@ -82,46 +82,43 @@ public class DeleteProcessInstanceTask implements JavaDelegate {
             final TaskService taskService = execution.getEngineServices().getTaskService();
             final RuntimeService runtimeService = execution.getEngineServices().getRuntimeService();
             final HistoryService historyService = execution.getEngineServices().getHistoryService();
-            
-            Optional<ProcessInstance> opt = Optional.ofNullable(runtimeService.createProcessInstanceQuery().processInstanceId(processInstanceId).singleResult());
-            
-            if(opt.isPresent()){
-                runtimeService
-                    .createProcessInstanceQuery()
-                    .processInstanceId(processInstanceId)
-                    .includeProcessVariables()
-                    .list()
-                    .stream()
-                    .forEach(p -> {
-                        final List<ContractDTO> contractDTOs = (List) p.getProcessVariables().get(LIST_CONTRACTS_FOR_BILLING);
-                        setContract(contractDTOs);
-                    });
-            }else{
-                historyService
-                    .createHistoricProcessInstanceQuery()
-                    .processInstanceId(processInstanceId)
-                    .includeProcessVariables()
-                    .list()
-                    .stream()
-                    .forEach(p -> {
-                        final List<ContractDTO> contractDTOs = (List) p.getProcessVariables().get(LIST_CONTRACTS_FOR_BILLING);
-                        setContract(contractDTOs);
-                    });
-            }
 
-            
+            Optional<ProcessInstance> opt = Optional.ofNullable(runtimeService.createProcessInstanceQuery().processInstanceId(processInstanceId).singleResult());
+
+            if (opt.isPresent()) {
+                runtimeService
+                        .createProcessInstanceQuery()
+                        .processInstanceId(processInstanceId)
+                        .includeProcessVariables()
+                        .list()
+                        .stream()
+                        .forEach(p -> {
+                            final List<ContractDTO> contractDTOs = (List) p.getProcessVariables().get(LIST_CONTRACTS_FOR_BILLING);
+                            setContract(contractDTOs);
+                        });
+            } else {
+                historyService
+                        .createHistoricProcessInstanceQuery()
+                        .processInstanceId(processInstanceId)
+                        .includeProcessVariables()
+                        .list()
+                        .stream()
+                        .forEach(p -> {
+                            final List<ContractDTO> contractDTOs = (List) p.getProcessVariables().get(LIST_CONTRACTS_FOR_BILLING);
+                            setContract(contractDTOs);
+                        });
+            }
 
             List<ContractCompInformation> list = this.compInformationService.listByContract(contractId);
 
             this.meansurementRepurchaseService.deleteByProcessInstanceId(processInstanceId);
-            
-            
+
             List<Long> ids = this.meansurementFileService.findByProcessInstanceId(processInstanceId)
                     .parallelStream()
                     .mapToLong(MeansurementFile::getId)
                     .boxed()
-                    .collect(Collectors.toList());           
-            
+                    .collect(Collectors.toList());
+
             this.meansurementFileDetailService.deleteByMeansurementFileId(ids);
             this.meansurementFileService.deleteByProcessInstance(processInstanceId);
             this.meansurementFileAuthorityService.deleteByProcessInstanceId(processInstanceId);
@@ -151,7 +148,7 @@ public class DeleteProcessInstanceTask implements JavaDelegate {
             Logger.getLogger(DeleteProcessInstanceTask.class.getName()).log(Level.SEVERE, "[execute]", e);
             execution.removeVariable(PROCESS_INSTANCE_ID);
             Log log = new Log();
-            log.setActivitiName(execution.getCurrentActivityName());            
+            log.setActivitiName(execution.getCurrentActivityName());
             log.setProcessInstanceId(execution.getProcessInstanceId());
             log.setMessage("Erro ao deleter o processo -> " + processInstanceId);
             log.setMessageErrorApplication(e.getMessage());

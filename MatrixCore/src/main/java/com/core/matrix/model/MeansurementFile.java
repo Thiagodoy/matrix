@@ -8,7 +8,6 @@ package com.core.matrix.model;
 import com.core.matrix.dto.ContractUnBillingDTO;
 import com.core.matrix.dto.FileStatusDTO;
 import com.core.matrix.dto.MeansurementFileStatusDTO;
-import static com.core.matrix.utils.Constants.TABLE_SEQUENCES;
 import com.core.matrix.utils.MeansurementFileStatus;
 import com.core.matrix.utils.MeansurementFileType;
 import com.core.matrix.wbc.dto.ContractDTO;
@@ -186,7 +185,7 @@ public class MeansurementFile implements Serializable {
     @Enumerated(EnumType.STRING)
     private MeansurementFileType type;
 
-    @OneToMany(cascade = CascadeType.ALL, orphanRemoval = true, fetch = FetchType.EAGER)
+    @OneToMany(cascade = {CascadeType.PERSIST,CascadeType.REMOVE}, orphanRemoval = true, fetch = FetchType.EAGER)
     @JoinColumn(name = "id_arquivo_de_medicao")
     private List<MeansurementFileDetail> details;
 

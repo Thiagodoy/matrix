@@ -133,6 +133,11 @@ public class BillingContractsTask implements JavaDelegate {
         File contractsNotRegisteredFile = null;
         File contractsAreNotAssociatedWithPointFile = null;
         File pointsAreNotAssociatedWithProInfaFile = null;
+        
+        
+        if (execution.hasVariable(PROCESS_CONTRACTS_RELOAD_BILLING)) {
+            return;
+        }
 
         List<File> attachaments = new ArrayList<>();
 

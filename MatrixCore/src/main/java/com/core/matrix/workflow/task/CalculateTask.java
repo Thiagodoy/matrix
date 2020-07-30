@@ -326,7 +326,7 @@ public class CalculateTask extends Task {
                 resultService.saveAll(results);
             }
 
-            this.mountFakeResultToContractIsUnitConsumer(fileM, contractsMtx, de);
+            this.mountFakeResultToContractIsUnitConsumer(fileM, contractsMtx, de,results);
             this.mountResultParent(de, contractMtxParent, fileId, results, contracts);
 
         } catch (Exception e) {
@@ -442,7 +442,7 @@ public class CalculateTask extends Task {
                 });
     }
 
-    private void mountFakeResultToContractIsUnitConsumer(MeansurementFile file, List<ContractMtx> contractsInformations, DelegateExecution de) {
+    private void mountFakeResultToContractIsUnitConsumer(MeansurementFile file, List<ContractMtx> contractsInformations, DelegateExecution de, List<MeansurementFileResult> result) {
 
         contractsInformations
                 .stream()
@@ -484,7 +484,10 @@ public class CalculateTask extends Task {
                     fileResult.setMeansurementFileId(file.getId());
 
                     synchronized (this.resultService) {
-                        resultService.save(fileResult);
+                        if(!result.contains(fileResult)){
+                            resultService.save(fileResult);
+                        }
+                        
                     }
 
                 });

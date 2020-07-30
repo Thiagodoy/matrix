@@ -24,8 +24,10 @@ import java.util.stream.Collectors;
 import org.activiti.engine.delegate.DelegateExecution;
 import org.springframework.context.ApplicationContext;
 import com.core.matrix.model.Log;
+import com.core.matrix.utils.MeansurementFileType;
 import java.text.MessageFormat;
 import java.util.Collections;
+import java.util.stream.Stream;
 import org.activiti.engine.TaskService;
 import org.activiti.engine.task.Attachment;
 
@@ -36,7 +38,7 @@ import org.activiti.engine.task.Attachment;
 public class DataValidationTask extends Task {
 
     private MeansurementFileService fileService;
-    private LogService logService;        
+    private LogService logService;
 
     private DelegateExecution delegateExecution;
     private static ApplicationContext context;
@@ -46,7 +48,7 @@ public class DataValidationTask extends Task {
     public DataValidationTask() {
         synchronized (DataValidationTask.context) {
             this.fileService = DataValidationTask.context.getBean(MeansurementFileService.class);
-            this.logService = DataValidationTask.context.getBean(LogService.class);                     
+            this.logService = DataValidationTask.context.getBean(LogService.class);
         }
     }
 
@@ -63,14 +65,12 @@ public class DataValidationTask extends Task {
 
         final String responseResult = MessageFormat.format("{0}:{1}", RESPONSE_RESULT, de.getProcessInstanceId());
         this.results = Collections.synchronizedList(new ArrayList<>());
-        
-        
-        if(this.isOnlyContractFlat()){
+
+        if (this.isOnlyContractFlat()) {
             this.setVariable(CONTROLE, RESPONSE_DATA_IS_VALID);
             this.writeVariables(delegateExecution);
             return;
         }
-        
 
         //REMOVE FILES THAT CONTRACT IS CONSUMER UNIT
         List<MeansurementFile> files = this.getFiles(true)
@@ -80,8 +80,7 @@ public class DataValidationTask extends Task {
 
         TaskService taskService = delegateExecution.getEngineServices().getTaskService();
 
-        files
-                .parallelStream()
+        files.parallelStream()
                 .forEach(file -> {
 
                     Attachment attachment;
@@ -91,9 +90,14 @@ public class DataValidationTask extends Task {
                     }
 
                     try {
-                        this.checkCalendar(file, attachment);
-                        this.checkDays(file, attachment);
-                        this.checkHour(file, attachment);
+
+                        if (file.getStatus().equals(MeansurementFileStatus.FILE_MISSING_ALL_HOURS)) {
+                            this.fillFileWithHoursMissing(file);
+                        } else {
+                            this.checkCalendar(file, attachment);
+                            this.checkDays(file, attachment);
+                            this.checkHour(file, attachment);
+                        }
 
                     } catch (Exception e) {
 
@@ -101,7 +105,9 @@ public class DataValidationTask extends Task {
                         log.setMessage(e.getMessage());
                         log.setProcessInstanceId(de.getProcessInstanceId());
                         log.setActivitiName(de.getCurrentActivityName());
-                        this.logService.save(log);
+                        synchronized (this.logService) {
+                            this.logService.save(log);
+                        }
                         this.setVariable(CONTROLE, RESPONSE_INVALID_DATA);
                     }
 
@@ -127,6 +133,58 @@ public class DataValidationTask extends Task {
         }
 
         this.writeVariables(delegateExecution);
+
+    }
+
+    private void fillFileWithHoursMissing(MeansurementFile file) {
+
+        int daysOfMonth = YearMonth.of(file.getYear().intValue(), file.getMonth().intValue()).lengthOfMonth();
+
+        List<MeansurementFileDetail> details = Collections.synchronizedList(new ArrayList());
+
+        String point = file.getType().equals(MeansurementFileType.LAYOUT_C) || file.getType().equals(MeansurementFileType.LAYOUT_C_1)
+                ? file.getMeansurementPoint() + " (L)"
+                : file.getMeansurementPoint();
+
+        final int year = file.getYear().intValue();
+        final int month = file.getMonth().intValue();
+
+        Stream.iterate(1, i -> i + 1)
+                .limit(daysOfMonth).parallel().forEach(day -> {
+
+            List<MeansurementFileDetail> hours = new ArrayList<>();
+
+            Stream.iterate(1, i -> i + 1)
+                    .limit(24)
+                    .forEach(hour -> {
+
+                        hours.add(new MeansurementFileDetail(LocalDate.of(year, month, day), hour.longValue(), file.getId(), point));
+                    });
+
+            details.addAll(hours);
+
+        });
+
+        details.parallelStream().forEach(d -> d.setStatus(MeansurementFileDetailStatus.HOUR_ERROR));
+
+        DataValidationResultDTO result = new DataValidationResultDTO();
+        result.setIdFile(file.getId());
+
+        String name = "";
+
+        result.setFileName(name);
+        result.setPoint(file.getMeansurementPoint());
+
+        Double sum = 0d;
+
+        result.setTotalScde(sum);
+
+        final Long qtdHours = details.stream().count();
+        result.setHours(qtdHours);
+
+        results.add(result);
+
+        this.addDetails(file.getMeansurementPoint(), details);
 
     }
 

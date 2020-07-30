@@ -26,6 +26,7 @@ import static com.core.matrix.utils.Constants.TYPE_ENERGY_LIQUID;
 import static com.core.matrix.utils.Constants.VAR_LIST_FILES;
 import static com.core.matrix.utils.Constants.VAR_MAP_DETAILS;
 import com.core.matrix.utils.MeansurementFileDetailStatus;
+import com.core.matrix.utils.MeansurementFileType;
 import static com.core.matrix.utils.MeansurementFileType.LAYOUT_A;
 import static com.core.matrix.utils.MeansurementFileType.LAYOUT_B;
 import static com.core.matrix.utils.MeansurementFileType.LAYOUT_C;
@@ -58,7 +59,7 @@ public abstract class Task implements JavaDelegate {
         }
     }
 
-    public void setVariable(String key, Object value) {
+    public synchronized void setVariable(String key, Object value) {
         this.variables.put(key, value);
     }
 
@@ -66,15 +67,21 @@ public abstract class Task implements JavaDelegate {
         variables.putAll(delegateExecution.getVariables());
     }    
 
-    public List<MeansurementFileDetail> getDetails(MeansurementFile file, VariableScope delegateExecution) throws Exception {
+    public synchronized List<MeansurementFileDetail> getDetails(MeansurementFile file, VariableScope delegateExecution) throws Exception {
 
         List<MeansurementFileDetail> result = new ArrayList<>();
         
+        MeansurementFileType type = file.getType();
+        
         if(this.isOnlyContractFlat() && !Optional.ofNullable(this.getMapDetails()).isPresent() ){
             return result;
+        }        
+        
+        if(this.isUnitConsumer(file.getWbcContract())){            
+           type = this.getFiles(false).stream().map(MeansurementFile::getType).distinct().findFirst().orElse(null);            
         }
 
-        switch (file.getType()) {
+        switch (type) {
             case LAYOUT_A:
                 result = file.getDetails()
                         .parallelStream()

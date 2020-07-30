@@ -5,7 +5,6 @@
  */
 package com.core.matrix.model;
 
-import static com.core.matrix.utils.Constants.TABLE_SEQUENCES;
 import java.io.Serializable;
 import javax.persistence.Column;
 import javax.persistence.Entity;

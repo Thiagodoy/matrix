@@ -34,12 +34,15 @@ import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.nio.charset.Charset;
 import java.text.MessageFormat;
+import java.time.Month;
+import java.time.YearMonth;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
 
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import java.util.Optional;
 import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.logging.Level;
@@ -64,7 +67,7 @@ public class FileValidationTask extends Task {
     private MeansurementFileService service;
     private MeansurementFileDetailService detailService;
     private DelegateExecution delegateExecution;
-    private LogService logService;    
+    private LogService logService;
     private MeansurementPointMtxService meansurementPointMtxService;
 
     private List<MeansurementFile> files;
@@ -78,7 +81,7 @@ public class FileValidationTask extends Task {
             this.service = FileValidationTask.context.getBean(MeansurementFileService.class);
             this.detailService = FileValidationTask.context.getBean(MeansurementFileDetailService.class);
             this.logService = FileValidationTask.context.getBean(LogService.class);
-            
+
             this.meansurementPointMtxService = FileValidationTask.context.getBean(MeansurementPointMtxService.class);
         }
 
@@ -106,7 +109,7 @@ public class FileValidationTask extends Task {
                 this.alterStatusFiles(files);
                 this.setVariable(CONTROLE, RESPONSE_LAYOUT_VALID);
                 this.writeVariables(delegateExecution);
-                return; 
+                return;
             }
 
             this.checkProinfaOfPoints();
@@ -135,6 +138,8 @@ public class FileValidationTask extends Task {
 
                         MeansurementFileType type = MeansurementFileType.valueOf(fileDto.getType());
 
+                        this.checkHoursMissing(result);
+
                         this.checkDuplicity(result, type, fileName);
 
                         this.validate(result, type, fileName);
@@ -156,12 +161,15 @@ public class FileValidationTask extends Task {
             //Verify if one file not associate with a attachment and not is a consumer unit , so write a log.
             if (this.logs.isEmpty()) {
                 files.stream()
-                        .filter(f -> !this.isUnitConsumer(f.getWbcContract()) || !this.isFlat(f.getWbcContract()))
+                        .filter(f -> !this.isUnitConsumer(f.getWbcContract()))
+                        .filter(f -> !this.isFlat(f.getWbcContract()))
                         .filter(f -> f.getFile() == null)
+                        .filter(f -> !f.getStatus().equals(MeansurementFileStatus.FILE_MISSING_ALL_HOURS))
                         .forEach(f -> {
                             String message = MessageFormat.format("Não foi encontrado nenhuma correspondência do ponto de medição, dentro dos arquivos postados.\nInformação:\nContrato: {0}\nPonto de Medição: {1}\n", f.getWbcContract().toString().replace(".", ""), f.getMeansurementPoint());
                             this.generateLog(de, null, message);
                         });
+
             }
 
             if (!this.logs.isEmpty()) {
@@ -189,11 +197,20 @@ public class FileValidationTask extends Task {
 
     private void alterStatusFiles(List<MeansurementFile> files) {
 
-        files
+        MeansurementFileType laFileType = files
                 .stream()
+                .map(MeansurementFile::getType).filter(l -> Objects.nonNull(l))
+                .findFirst()
+                .orElse(MeansurementFileType.LAYOUT_C);
+
+        files.stream().filter(f -> f.getStatus().equals(MeansurementFileStatus.FILE_MISSING_ALL_HOURS)).forEach(c -> {
+            c.setType(laFileType);
+        });
+
+        files.stream()
                 .forEach(f -> {
 
-                    if (this.isFlat(f.getWbcContract()) || this.isUnitConsumer(f.getWbcContract())) {
+                    if ((this.isFlat(f.getWbcContract()) || this.isUnitConsumer(f.getWbcContract())) && !f.getStatus().equals(MeansurementFileStatus.FILE_MISSING_ALL_HOURS)) {
                         f.setStatus(MeansurementFileStatus.SUCCESS);
                     }
                     service.saveFile(f);
@@ -278,6 +295,28 @@ public class FileValidationTask extends Task {
             throw new Exception("Processo encerrado devido a ausência de informações!");
         }
 
+    }
+
+    private void checkHoursMissing(List<FileDetailDTO> detail) {
+
+        MeansurementFile file = files.stream().findFirst().orElse(null);
+
+        long daysOnMonth = YearMonth.of(file.getYear().intValue(), Month.of(file.getMonth().intValue())).lengthOfMonth();
+
+        files.stream()
+                .filter(f -> !f.getStatus().equals(MeansurementFileStatus.FILE_MISSING_ALL_HOURS))
+                .forEach(f -> {
+
+                    long size = detail.parallelStream()
+                            .filter(d -> Optional.ofNullable(d.getOrigem()).isPresent() && d.getOrigem().equals("DADOS FALTANTES"))
+                            .parallel()
+                            .filter(d -> d.getMeansurementPoint().replaceAll("\\((L|B)\\)", "").trim().equals(f.getMeansurementPoint()))
+                            .count();
+
+                    if (size >= (daysOnMonth * 24)) {
+                        f.setStatus(MeansurementFileStatus.FILE_MISSING_ALL_HOURS);
+                    }
+                });
     }
 
     private void validate(List<FileDetailDTO> detail, MeansurementFileType type, String fileName) {

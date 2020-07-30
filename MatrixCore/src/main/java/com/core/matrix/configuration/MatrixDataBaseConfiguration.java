@@ -59,10 +59,10 @@ public class MatrixDataBaseConfiguration {
         HibernateJpaVendorAdapter vendorAdapter = new HibernateJpaVendorAdapter();
         em.setJpaVendorAdapter(vendorAdapter);
         HashMap<String, Object> properties = new HashMap<>();
-        properties.put("hibernate.hbm2ddl.auto", "update");
+        //properties.put("hibernate.hbm2ddl.auto", "update");
         properties.put("hibernate.dialect", "org.hibernate.dialect.MySQL5InnoDBDialect");           
-        properties.put("hibernate.jdbc.batch_size", "3000");   
-        properties.put("hibernate.order_inserts", "true");   
+        //properties.put("hibernate.jdbc.batch_size", "3000");   
+        //properties.put("hibernate.order_inserts", "true");   
         //properties.put("hibernate.generate_statistics", "true");   
         em.setJpaPropertyMap(properties);
 

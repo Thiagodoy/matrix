@@ -6,7 +6,6 @@
 package com.core.matrix.model;
 
 import com.core.matrix.request.ContactManagerRequest;
-import static com.core.matrix.utils.Constants.TABLE_SEQUENCES;
 import com.fasterxml.jackson.annotation.JsonFormat;
 import java.time.LocalDateTime;
 import javax.persistence.Column;

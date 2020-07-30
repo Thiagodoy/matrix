@@ -69,7 +69,7 @@ public class MeansurementFileResource {
             this.service.delete(id);
             return ResponseEntity.ok().build();
         } catch (Exception e) {
-            Logger.getLogger(MeansurementFileResource.class.getName()).log(Level.SEVERE, "[ delete ]", e.getMessage());
+            Logger.getLogger(MeansurementFileResource.class.getName()).log(Level.SEVERE, "[ delete ]", e);
             return ResponseEntity.status(HttpStatus.resolve(500)).body(e);
         }
     }
@@ -80,7 +80,18 @@ public class MeansurementFileResource {
             List<MeansurementFile> response = this.service.findAllFilesWithErrors(processInstanceId);
             return ResponseEntity.ok(response);
         } catch (Exception e) {
-            Logger.getLogger(MeansurementFileResource.class.getName()).log(Level.SEVERE, "[ getByProcessInstanceId ]", e.getMessage());
+            Logger.getLogger(MeansurementFileResource.class.getName()).log(Level.SEVERE, "[ getByProcessInstanceId ]", e);
+            return ResponseEntity.status(HttpStatus.resolve(500)).body(e);
+        }
+    }
+    
+    @RequestMapping(value = "/deleteByProcess", method = RequestMethod.DELETE)
+    public ResponseEntity deleteByProcess(@RequestParam(name = "processInstanceId", required = true) String processInstanceId) {
+        try {
+            this.service.deleteByProcessInstance(processInstanceId);
+            return ResponseEntity.ok().build();
+        } catch (Exception e) {
+            Logger.getLogger(MeansurementFileResource.class.getName()).log(Level.SEVERE, "[ getByProcessInstanceId ]", e);
             return ResponseEntity.status(HttpStatus.resolve(500)).body(e);
         }
     }

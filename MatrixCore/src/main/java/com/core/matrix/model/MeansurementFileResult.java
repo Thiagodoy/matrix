@@ -8,6 +8,7 @@ package com.core.matrix.model;
 import com.core.matrix.dto.MeansurementFileResultStatusDTO;
 import com.core.matrix.wbc.dto.ContractWbcInformationDTO;
 import com.google.common.base.Optional;
+import java.time.LocalDateTime;
 import java.util.Date;
 import javax.persistence.Column;
 import javax.persistence.ColumnResult;
@@ -17,9 +18,11 @@ import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.NamedNativeQuery;
+import javax.persistence.PrePersist;
 import javax.persistence.SqlResultSetMapping;
 import javax.persistence.Table;
 import lombok.Data;
+import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
 
 /**
@@ -79,7 +82,7 @@ import lombok.NoArgsConstructor;
         + "                INNER JOIN\n"
         + "            mtx_arquivo_de_medicao_resultado b ON a.id_arquivo_de_medicao = b.id_arquivo_de_medicao\n"
         + "                LEFT JOIN\n"
-        + "            mtx_contrato_informacao_complementar c ON  b.wbc_contrato = c.wbc_codigo_contrato or b.wbc_contrato = c.wbc_contrato\n"
+        + "            mtx_contrato c ON  b.wbc_contrato = c.wbc_codigo_contrato or b.wbc_contrato = c.wbc_contrato\n"
         + "            LEFT JOIN \n"
         + "			activiti.act_hi_varinst v ON v.PROC_INST_ID_ = a.act_id_processo  \n"
         + "        INNER JOIN\n"
@@ -96,6 +99,7 @@ import lombok.NoArgsConstructor;
 @Entity
 @Table(name = "mtx_arquivo_de_medicao_resultado")
 @Data
+@EqualsAndHashCode(of = {"wbcContract"})
 @NoArgsConstructor
 public class MeansurementFileResult {
 
@@ -175,6 +179,9 @@ public class MeansurementFileResult {
 
     @Column(name = "exportado")
     private boolean isExported;
+    
+    @Column(name = "data_criacao")
+    private LocalDateTime createdAt;
 
     public MeansurementFileResult(ContractWbcInformationDTO informationDTO, String idProcess) {
 
@@ -188,6 +195,13 @@ public class MeansurementFileResult {
 
     }
 
+    
+    @PrePersist
+    public void generateDate(){
+        this.createdAt = LocalDateTime.now();
+    }
+    
+    
     public void update(MeansurementFileResult result) {
 
         if (Optional.fromNullable(result.getAmountLiquidoAdjusted()).isPresent() && !result.getAmountLiquidoAdjusted().equals(this.amountLiquidoAdjusted)) {
