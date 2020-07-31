@@ -21,5 +21,6 @@ public enum MeansurementFileStatus implements Serializable{
     LAYOUT_ERROR,
     APPROVED,
     FILE_MISSING_ALL_HOURS,
+    FILE_CHECKED,
     SUCCESS;    
 }

@@ -36,6 +36,10 @@ public interface MeansurementFileRepository extends JpaRepository<MeansurementFi
     @Modifying
     @Query(value = "update MeansurementFile c set c.status = :status where c.processInstanceId = :id")
     void updateStatusByProcessInstanceId(@Param("status") MeansurementFileStatus status, @Param("id") String id);
+    
+    @Modifying
+    @Query(value = "update MeansurementFile c set c.file = null, c.status = :status where c.processInstanceId = :id")
+    void updateStatusAndFileByProcessInstanceId(@Param("status") MeansurementFileStatus status, @Param("id") String id);
 
     @Modifying
     @Query(value = "update MeansurementFile c set c.file = :file where c.id = :id")

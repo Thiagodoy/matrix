@@ -321,6 +321,11 @@ public class FileValidationTask extends Task {
 
     private void validate(List<FileDetailDTO> detail, MeansurementFileType type, String fileName) {
 
+        
+        if(!detail.isEmpty()){
+            return;
+        }
+        
         List<String> errors = Collections.synchronizedList(new ArrayList<String>());
 
         detail.parallelStream().forEach(d -> {
@@ -335,16 +340,15 @@ public class FileValidationTask extends Task {
         if (type.equals(MeansurementFileType.LAYOUT_C) || type.equals(MeansurementFileType.LAYOUT_C_1)) {
 
             boolean has_L = Validator.validateContentIfContains(detail);
-            if (!has_L) {
+            if (!has_L && !detail.isEmpty()) {
                 errors.add(MessageFormat.format("Os registros do layout C ou C.1, não apresenta em sua composição a palavra [ (L) ] nos pontos de medições. Arquivo [ {0} ]", fileName));
             }
 
-            detail.removeIf(d -> Optional.ofNullable(d.getOrigem()).isPresent() && d.getOrigem().equals("DADOS FALTANTES"));
-
-            if (detail.isEmpty()) {
-                errors.add(MessageFormat.format("O arquivo [ {0} ] não apresenta registros que possam ser processados de acordo com as regras estabelecidas para o layout [ {1} ].\n Favor analisar o arquivo.", fileName, type.toString()));
-            }
-
+//            detail.removeIf(d -> Optional.ofNullable(d.getOrigem()).isPresent() && d.getOrigem().equals("DADOS FALTANTES"));
+//
+//            if (detail.isEmpty()) {
+//                errors.add(MessageFormat.format("O arquivo [ {0} ] não apresenta registros que possam ser processados de acordo com as regras estabelecidas para o layout [ {1} ].\n Favor analisar o arquivo.", fileName, type.toString()));
+//            }
         }
 
         if (!errors.isEmpty()) {
@@ -365,16 +369,20 @@ public class FileValidationTask extends Task {
             ++count;
         }
 
-        this.files.stream().forEach(f -> {
+        this.files.stream()
+                .filter(f -> !f.getStatus().equals(MeansurementFileStatus.FILE_CHECKED))
+                .forEach(f -> {
 
-            List<FileDetailDTO> r = detail
-                    .parallelStream()
-                    .filter(d -> d.getMeansurementPoint().replaceAll("\\((L|B)\\)", "").trim().equals(f.getMeansurementPoint()))
-                    .collect(Collectors.toList());
+                    List<FileDetailDTO> r = detail
+                            .parallelStream()
+                            .filter(d -> d.getMeansurementPoint().replaceAll("\\((L|B)\\)", "").trim().equals(f.getMeansurementPoint()))
+                            .collect(Collectors.toList());
 
-            result.addAll(r);
-
-        });
+                    if (!r.isEmpty()) {
+                        f.setStatus(MeansurementFileStatus.FILE_CHECKED);
+                        result.addAll(r);
+                    }
+                });
 
         return result;
 
@@ -461,7 +469,9 @@ public class FileValidationTask extends Task {
 
             //Verify if point match some files uploaded. And set the attachment id on file             
             meansuremPoint.parallelStream().forEach(point -> {
-                Optional<MeansurementFile> opt = files.stream().filter(file -> file.getMeansurementPoint().equals(point)).findFirst();
+                Optional<MeansurementFile> opt = files.stream()
+                        .filter(f-> f.getStatus().equals(MeansurementFileStatus.FILE_CHECKED))
+                        .filter(file -> file.getMeansurementPoint().equals(point)).findFirst();
 
                 if (opt.isPresent()) {
 

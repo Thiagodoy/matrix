@@ -79,7 +79,14 @@ public class MeansurementFileService {
     
     @Transactional(transactionManager = "matrixTransactionManager")
     public void updateStatusByProcessInstanceId(MeansurementFileStatus status, String id) {
-        this.repository.updateStatusByProcessInstanceId(status, id);
+        
+        if(status.equals(MeansurementFileStatus.FILE_PENDING)){
+            this.repository.updateStatusAndFileByProcessInstanceId(status, id);
+        }else{
+            this.repository.updateStatusByProcessInstanceId(status, id);
+        }
+        
+        
     }
     
     @Transactional(readOnly = true)
