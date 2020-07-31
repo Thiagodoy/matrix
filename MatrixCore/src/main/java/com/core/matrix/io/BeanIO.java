@@ -9,6 +9,8 @@ import java.io.File;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.Reader;
+import java.math.BigDecimal;
+import java.math.RoundingMode;
 import java.text.MessageFormat;
 import java.util.ArrayList;
 import java.util.List;
@@ -39,18 +41,17 @@ public class BeanIO {
         Stream stream = Stream.getByLayoutFile(type);
         StreamFactory factory = StreamFactory.newInstance();
         InputStream str = factory.getClass().getClassLoader().getResourceAsStream(stream.getStreamFile());
-        factory.load(str);        
-        String fileName = MessageFormat.format("chunk-t{0}-p{1}-{2}.csv", taskId,process,id);
-        File file = new File(fileName);        
-        
-        BeanWriter out = factory.createWriter(stream.getStreamId(), file);       
-        
+        factory.load(str);
+        String fileName = MessageFormat.format("chunk-t{0}-p{1}-{2}.csv", taskId, process, id);
+        File file = new File(fileName);
+
+        BeanWriter out = factory.createWriter(stream.getStreamId(), file);
+
         out.write(data);
         out.flush();
         out.close();
-        
+
         return file;
-        
 
     }
 
@@ -124,11 +125,11 @@ public class BeanIO {
             String content = record.getInformations().get(0).getValue();
             JaroWinklerDistance n = new JaroWinklerDistance();
 
-            if (n.apply(CONTENT_ID_LAYOUT_A, content) >= 0.95) {
+            if (this.checkValue(CONTENT_ID_LAYOUT_A, content, 0.95)) {
                 return MeansurementFileType.LAYOUT_A;
-            } else if (n.apply(CONTENT_ID_LAYOUT_B, content) >= 0.95) {
+            } else if (this.checkValue(CONTENT_ID_LAYOUT_B, content,0.95)) {
                 return MeansurementFileType.LAYOUT_B;
-            } else if (n.apply(CONTENT_ID_LAYOUT_C, content) >= 0.95) {
+            } else if (this.checkValue(CONTENT_ID_LAYOUT_C, content,0.95)) {
 
                 Reader targetReader = new InputStreamReader(filec);
                 BufferedReader reasdder = new BufferedReader(targetReader);
@@ -158,6 +159,15 @@ public class BeanIO {
             }
         }
 
+    }
+
+    public boolean checkValue(String content, String contentCheck, Double valueCheck) {
+        JaroWinklerDistance n = new JaroWinklerDistance();
+        Double value = n.apply(content, contentCheck);
+
+        BigDecimal bd = new BigDecimal(Double.toString(value));
+        bd = bd.setScale(2, RoundingMode.HALF_UP);
+        return bd.doubleValue() >= valueCheck;
     }
 
 }

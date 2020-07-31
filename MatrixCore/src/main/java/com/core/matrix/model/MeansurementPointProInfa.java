@@ -11,6 +11,7 @@ import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.Table;
+import javax.persistence.UniqueConstraint;
 import lombok.Data;
 
 /**
@@ -18,7 +19,7 @@ import lombok.Data;
  * @author thiag
  */
 @Entity
-@Table(name = "mtx_ponto_de_medicao_pro_infa")
+@Table(name = "mtx_ponto_de_medicao_pro_infa",uniqueConstraints = {@UniqueConstraint(columnNames = {"wbc_ponto_de_medicao","ano","mes"})})
 @Data
 public class MeansurementPointProInfa implements Model<MeansurementPointProInfa>{
     
