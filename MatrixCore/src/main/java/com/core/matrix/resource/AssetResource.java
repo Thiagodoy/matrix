@@ -20,10 +20,16 @@ import org.springframework.web.bind.annotation.RestController;
 public class AssetResource {
 
     private String version = "v4.0.0";
+    private String versionPortal = "v4.0.0";
 
     @RequestMapping(value = "/versao", method = RequestMethod.GET)
     public ResponseEntity getVersao() throws IOException {
         return ResponseEntity.ok(this.version);
+    }
+    
+    @RequestMapping(value = "/versao/portal", method = RequestMethod.GET)
+    public ResponseEntity getVersaoPortar() throws IOException {
+        return ResponseEntity.ok(this.versionPortal);
     }
 
 }
