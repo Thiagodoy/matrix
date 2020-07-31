@@ -57,7 +57,7 @@ public class CalculateTask extends Task {
     private List<ContractWbcInformationDTO> contractWbcInformationDTOs;
     private List<ContractDTO> contractDTOs;
 
-    private ContractMtxService contractMtxService;
+    
 
     private MeansurementPointMtxService meansurementPointMtxService;
     private MeansurementPointProInfaService meansurementPointProInfaService;
@@ -68,8 +68,7 @@ public class CalculateTask extends Task {
             this.resultService = CalculateTask.context.getBean(MeansurementFileResultService.class);
             this.contractWbcService = CalculateTask.context.getBean(ContractService.class);
             this.logService = CalculateTask.context.getBean(LogService.class);
-            this.meansurementPointMtxService = CalculateTask.context.getBean(MeansurementPointMtxService.class);
-            this.contractMtxService = CalculateTask.context.getBean(ContractMtxService.class);
+            this.meansurementPointMtxService = CalculateTask.context.getBean(MeansurementPointMtxService.class);            
             this.meansurementPointProInfaService = CalculateTask.context.getBean(MeansurementPointProInfaService.class);
         }
 
@@ -157,8 +156,9 @@ public class CalculateTask extends Task {
                 String name = contractMtx.getNameCompany();
 
                 MeansurementFileResult fileResult = new MeansurementFileResult(contractWbcInformationDTO, de.getProcessInstanceId());
-                fileResult.setAmountScde(this.roundValue((sum / 1000), 6));
-
+                fileResult.setAmountScde(this.roundValue((sum / 1000), 6));               
+                
+                
                 fileResult.setMeansurementFileId(file.getId());
                 Double consumptionLiquid = solicitadoLiquido(consumptionTotal, contractWbcInformationDTO);
                 fileResult.setAmountLiquido(this.roundValue(consumptionLiquid, 3));
@@ -188,8 +188,9 @@ public class CalculateTask extends Task {
 
     }
 
-    private synchronized Double roundValue(Double value, int qtd) {
-        return new BigDecimal(value).setScale(qtd, RoundingMode.HALF_EVEN).doubleValue();
+    private synchronized Double roundValue(Double value, int qtd) {        
+        Double result = new BigDecimal(value).setScale(qtd, RoundingMode.HALF_EVEN).doubleValue();        
+        return result.compareTo(0D) > 0 ? result : 0.0D;
     }
 
     public void calculateWithRateio(DelegateExecution de, List<MeansurementFile> files, List<ContractDTO> contracts) {
