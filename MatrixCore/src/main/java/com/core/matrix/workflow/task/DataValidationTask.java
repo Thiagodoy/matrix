@@ -27,6 +27,8 @@ import com.core.matrix.model.Log;
 import com.core.matrix.utils.MeansurementFileType;
 import java.text.MessageFormat;
 import java.util.Collections;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import java.util.stream.Stream;
 import org.activiti.engine.TaskService;
 import org.activiti.engine.task.Attachment;
@@ -100,7 +102,7 @@ public class DataValidationTask extends Task {
                         }
 
                     } catch (Exception e) {
-
+                        Logger.getLogger(DataValidationTask.class.getName()).log(Level.SEVERE, "[ execute ]", e);
                         Log log = new Log();
                         log.setMessage(e.getMessage());
                         log.setProcessInstanceId(de.getProcessInstanceId());
@@ -112,6 +114,12 @@ public class DataValidationTask extends Task {
                     }
 
                 });
+        
+        
+        //update files
+        files.stream().forEach(file->{
+            fileService.updateStatus(file.getStatus(), file.getId());
+        });
 
         boolean hasInvalidCalendar = files.stream().anyMatch(mdf -> mdf.getStatus().equals(MeansurementFileStatus.DATA_CALENDAR_ERROR));
         boolean hasDetailsInvalid = files.stream().anyMatch(mdf -> mdf.getStatus().equals(MeansurementFileStatus.DATA_DAY_ERROR) || mdf.getStatus().equals(MeansurementFileStatus.DATA_HOUR_ERROR));
@@ -207,8 +215,7 @@ public class DataValidationTask extends Task {
                 .anyMatch(d -> d.isAfter(end) || d.isBefore(init));
 
         if (hasErrorOfCalendar) {
-            file.setStatus(MeansurementFileStatus.DATA_CALENDAR_ERROR);
-            fileService.updateStatus(MeansurementFileStatus.DATA_CALENDAR_ERROR, file.getId());
+            file.setStatus(MeansurementFileStatus.DATA_CALENDAR_ERROR);            
             String error = MessageFormat.format("Calendário inválido para o ponto [ {0} ] dentro do arquivo [ {1} ]", file.getMeansurementPoint(), attachment.getName());
             throw new Exception(error);
         }
@@ -277,8 +284,7 @@ public class DataValidationTask extends Task {
         });
 
         if (this.hasHourError(delegateExecution, file.getMeansurementPoint())) {
-            file.setStatus(MeansurementFileStatus.DATA_HOUR_ERROR);
-            fileService.updateStatus(MeansurementFileStatus.DATA_HOUR_ERROR, file.getId());
+            file.setStatus(MeansurementFileStatus.DATA_HOUR_ERROR);            
             String error = MessageFormat.format("Arquivo esta com a consolidação diária das hora inválida, para o ponto [ {0} ] dentro do arquivo [ {1} ]", file.getMeansurementPoint(), attachment.getName());
 
             throw new Exception(error);
@@ -369,8 +375,7 @@ public class DataValidationTask extends Task {
 
         if (this.hasDayError(delegateExecution, file.getMeansurementPoint())) {
 
-            file.setStatus(MeansurementFileStatus.DATA_DAY_ERROR);
-            fileService.updateStatus(MeansurementFileStatus.DATA_DAY_ERROR, file.getId());
+            file.setStatus(MeansurementFileStatus.DATA_DAY_ERROR);           
             String error = MessageFormat.format("Arquivo esta com as horas diárias ausente, para o ponto [ {0} ] dentro do arquivo [ {1} ]", file.getMeansurementPoint(), attachment.getName());
             throw new Exception(error);
         }
