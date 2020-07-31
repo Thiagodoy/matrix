@@ -8,7 +8,6 @@ package com.core.matrix.workflow.service;
 import com.core.matrix.workflow.repository.CommentRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
 
 /**
  *
@@ -22,7 +21,7 @@ public class CommentActivitiService {
     @Autowired
     private CommentRepository repository;
     
-    @Transactional
+     
     public void setUser(String id, String user){
         this.repository.update(id, user);
     }

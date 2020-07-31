@@ -930,8 +930,7 @@ public class RuntimeActivitiService {
     @Transactional
     public CommentDTO addComment(AddComment request, String user) {
 
-        Comment comment = taskService.addComment(null, request.getProcessInstanceId(), request.getMessage());
-
+        Comment comment = taskService.addComment(request.getTaskId(), request.getProcessInstanceId(), request.getMessage());
         commentActivitiService.setUser(comment.getId(), user);
         comment = taskService.getComment(comment.getId());
         return new CommentDTO(comment);

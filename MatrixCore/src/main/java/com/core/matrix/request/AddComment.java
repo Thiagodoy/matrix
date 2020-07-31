@@ -16,5 +16,6 @@ public class AddComment {
 
     private String processInstanceId;
     private String message;
+    private String taskId;
 
 }
