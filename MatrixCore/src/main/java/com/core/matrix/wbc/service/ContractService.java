@@ -17,6 +17,7 @@ import com.core.matrix.wbc.dto.ContractWbcInformationDTO;
 import com.core.matrix.wbc.repository.ContractRepository;
 import java.time.LocalDate;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -85,8 +86,12 @@ public class ContractService {
     }
     
     @Transactional(readOnly = true)
-    public List<ContractWbcInformationDTO> getInformation(Long year, Long month, List<Long> contract) {
-        return this.repository.getInformation(year, month, contract);
+    public List<ContractWbcInformationDTO> getInformation(Long year, Long month, List<Long> contract) {        
+        if(contract.isEmpty()){
+            return Collections.EMPTY_LIST;
+        }else{
+           return this.repository.getInformation(year, month, contract);     
+        }
     }
     
     

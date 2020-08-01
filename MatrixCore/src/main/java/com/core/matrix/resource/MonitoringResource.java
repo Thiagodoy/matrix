@@ -97,12 +97,12 @@ public class MonitoringResource {
                     .collect(Collectors.toList());
 
             contractService.getInformation(Long.parseLong(ano), Long.parseLong(mes), contracts).stream().forEach(i -> {
-                
-                   Optional<Monitoring>opt = data.getContent().stream().filter(cc-> cc.getWbcContrato().equals(i.getNrContract())).findFirst();
-                if(opt.isPresent()){
+
+                Optional<Monitoring> opt = data.getContent().stream().filter(cc -> cc.getWbcContrato().equals(i.getNrContract())).findFirst();
+                if (opt.isPresent()) {
                     opt.get().setValorEsperadoWbc(i.getQtdBillingWbc());
                 }
-                
+
             });
 
             MonitoringResponse response = new MonitoringResponse(data, statusM, filters);
