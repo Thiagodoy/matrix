@@ -30,7 +30,7 @@ public class ReportConstants {
 
         switch (type) {
             case EXPORT_RESULT_FULL_WBC:
-                return new String[]{"Ano", "Mês", "Cód. CCEE", "Número do Contrato", "Ponto de Medição", "Status", "Montantes (MWh)"};
+                return new String[]{"Ano", "Mês", "Cód. CCEE", "Número do Contrato", "Ponto de Medição", "Status", "Montantes (MWh)","Valor Faturado (WBC)"};
             case EXPORT_RESULT_WBC:
                 return new String[]{"Ano", "Mês", "Cód. CCEE", "Número do Contrato", "Montantes (MWh)"};
             default:

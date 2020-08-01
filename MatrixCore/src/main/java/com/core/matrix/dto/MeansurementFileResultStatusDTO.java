@@ -38,6 +38,9 @@ public class MeansurementFileResultStatusDTO {
 
     @ReportColumn(name = "MONTANTE", position = 6, typeValue = String.class, typeReport = {"FULL", "SHORT"})
     public Double mount;
+    
+    @ReportColumn(name = "VALOR FATURADO (WBC)", position = 7, typeValue = String.class, typeReport = {"FULL"})
+    public Double billingWbc;
 
     @ReportColumn(name = "STATUS", position = 5, typeValue = String.class, typeReport = {"FULL"})
     public String status;
@@ -56,6 +59,8 @@ public class MeansurementFileResultStatusDTO {
     public String responsible;
     
     public String rateio;
+    
+    
 
     public MeansurementFileResultStatusDTO(Long id, Long year, Long month, Long wbcContract, String wbcMeansurementPoint, Double mount, String status, Date dataCriacao, Boolean isExported,String empresa, String responsavel, String rateio,String processInstanceId) {
         this.id = id;
@@ -84,7 +89,7 @@ public class MeansurementFileResultStatusDTO {
 
         switch (type) {
             case EXPORT_RESULT_FULL_WBC:
-                return new Object[]{year, this.month, "", contracto, this.wbcMeansurementPoint, this.status, this.mount};
+                return new Object[]{year, this.month, "", contracto, this.wbcMeansurementPoint, this.status, this.mount,this.billingWbc};
             case EXPORT_RESULT_WBC:
                 return new Object[]{year, this.month, "", contracto, this.mount};
             default:

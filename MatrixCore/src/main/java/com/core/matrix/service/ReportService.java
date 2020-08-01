@@ -10,6 +10,7 @@ import com.core.matrix.dto.MeansurementFileResultStatusDTO;
 import com.core.matrix.request.MeansurementResultRequest;
 import com.core.matrix.utils.Report;
 import com.core.matrix.utils.ReportConstants;
+import com.core.matrix.wbc.service.ContractService;
 import java.io.IOException;
 import java.io.OutputStream;
 import java.lang.reflect.Field;
@@ -50,6 +51,9 @@ public class ReportService {
     @Autowired
     private MeansurementFileResultService fileResultService;
 
+    @Autowired
+    private ContractService contractService;
+
     @Deprecated
     public void export(HttpServletResponse response, MeansurementResultRequest request) throws IOException {
 
@@ -60,6 +64,24 @@ public class ReportService {
                 .stream()
                 .filter(t -> request.getIds().stream().anyMatch(tt -> tt.equals(t.getId())))
                 .collect(Collectors.toList());
+
+        List<Long> contractsId = report.stream()
+                .mapToLong(MeansurementFileResultStatusDTO::getWbcContract)
+                .boxed()
+                .collect(Collectors.toList());
+
+        contractService.getInformation(request.getYear(), request.getMonth(), contractsId)
+                .stream().forEach(info -> {
+
+                    Optional<MeansurementFileResultStatusDTO> opt = report
+                            .stream()
+                            .filter(r -> r.getWbcContract().equals(Long.valueOf(info.getNrContract())))
+                            .findFirst();
+
+                    if (opt.isPresent()) {
+                        opt.get().setBillingWbc(info.getQtdBillingWbc());
+                    }
+                });
 
         this.createAndWriteFile(report, type);
 

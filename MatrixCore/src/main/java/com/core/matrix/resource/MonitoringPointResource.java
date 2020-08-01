@@ -17,6 +17,7 @@ import static com.core.matrix.utils.Url.URL_API_MONITORING_POINT;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
+import java.util.Objects;
 import java.util.Optional;
 import java.util.OptionalLong;
 import java.util.logging.Level;
@@ -81,6 +82,8 @@ public class MonitoringPointResource extends Resource<MonitoringPoint, Monitorin
                 synchronized (responseSummary) {
                     Map<String, Long> status = responseSummary
                             .stream()
+                            .filter(c-> Objects.nonNull(c.getRateio()))
+                            .filter(c-> Objects.nonNull(c.getContract()))
                             .filter(c -> c.getRateio().equals(parent.getRateio()) && !c.getContract().equals(parent.getContract()))
                             .collect(Collectors.groupingBy(MonitoringContractDTO::getStatus, Collectors.counting()));
 

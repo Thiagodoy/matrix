@@ -57,8 +57,6 @@ public class CalculateTask extends Task {
     private List<ContractWbcInformationDTO> contractWbcInformationDTOs;
     private List<ContractDTO> contractDTOs;
 
-    
-
     private MeansurementPointMtxService meansurementPointMtxService;
     private MeansurementPointProInfaService meansurementPointProInfaService;
 
@@ -68,7 +66,7 @@ public class CalculateTask extends Task {
             this.resultService = CalculateTask.context.getBean(MeansurementFileResultService.class);
             this.contractWbcService = CalculateTask.context.getBean(ContractService.class);
             this.logService = CalculateTask.context.getBean(LogService.class);
-            this.meansurementPointMtxService = CalculateTask.context.getBean(MeansurementPointMtxService.class);            
+            this.meansurementPointMtxService = CalculateTask.context.getBean(MeansurementPointMtxService.class);
             this.meansurementPointProInfaService = CalculateTask.context.getBean(MeansurementPointProInfaService.class);
         }
 
@@ -83,15 +81,13 @@ public class CalculateTask extends Task {
 
         this.loadVariables(de);
 
-        
         boolean loadDetail = !this.isOnlyContractFlat();
-        
+
         List<MeansurementFile> files = this.getFiles(loadDetail);
-       
+
         if (de.hasVariable(VAR_FOLLOW_TO_RESULT)) {
             return;
         }
-        
 
         try {
 
@@ -125,10 +121,7 @@ public class CalculateTask extends Task {
                     .filter(detail -> detail.getMeansurementPoint().replaceAll("\\((L|B)\\)", "").trim().equals(file.getMeansurementPoint()))
                     .collect(Collectors.toList());
 
-            MeansurementPointMtx pointMtx = this.meansurementPointMtxService.getByPoint(file.getMeansurementPoint());
-            MeansurementPointProInfa pointProInfa = pointMtx.getCurrentProinfa();
-
-            ContractMtx contractMtx = this.getContractsMtx()                    
+            ContractMtx contractMtx = this.getContractsMtx()
                     .stream()
                     .filter(c -> c.getWbcContract().equals(file.getWbcContract()))
                     .findFirst()
@@ -145,6 +138,8 @@ public class CalculateTask extends Task {
 
                 this.mountFakeResultToContractFlat(file, Arrays.asList(contractMtx), de);
             } else {
+                MeansurementPointMtx pointMtx = this.meansurementPointMtxService.getByPoint(file.getMeansurementPoint());
+                MeansurementPointProInfa pointProInfa = pointMtx.getCurrentProinfa();
                 final double factorAtt = contractMtx.getFactorAttendanceCharge() / 100;
                 final double percentLoss = contractMtx.getPercentOfLoss() / 100;
                 final double sum = this.getSumConsumptionActive(details);
@@ -156,9 +151,8 @@ public class CalculateTask extends Task {
                 String name = contractMtx.getNameCompany();
 
                 MeansurementFileResult fileResult = new MeansurementFileResult(contractWbcInformationDTO, de.getProcessInstanceId());
-                fileResult.setAmountScde(this.roundValue((sum / 1000), 6));               
-                
-                
+                fileResult.setAmountScde(this.roundValue((sum / 1000), 6));
+
                 fileResult.setMeansurementFileId(file.getId());
                 Double consumptionLiquid = solicitadoLiquido(consumptionTotal, contractWbcInformationDTO);
                 fileResult.setAmountLiquido(this.roundValue(consumptionLiquid, 3));
@@ -188,8 +182,8 @@ public class CalculateTask extends Task {
 
     }
 
-    private synchronized Double roundValue(Double value, int qtd) {        
-        Double result = new BigDecimal(value).setScale(qtd, RoundingMode.HALF_EVEN).doubleValue();        
+    private synchronized Double roundValue(Double value, int qtd) {
+        Double result = new BigDecimal(value).setScale(qtd, RoundingMode.HALF_EVEN).doubleValue();
         return result.compareTo(0D) > 0 ? result : 0.0D;
     }
 
@@ -210,7 +204,7 @@ public class CalculateTask extends Task {
 
             MeansurementFile fileM = files.stream().findFirst().orElseThrow(() -> new Exception("Não existe nenhum arquivo para ser processado"));
 
-            final List<ContractMtx> contractsMtx = new CopyOnWriteArrayList<ContractMtx>( this.getContractsMtx());
+            final List<ContractMtx> contractsMtx = new CopyOnWriteArrayList<ContractMtx>(this.getContractsMtx());
 
             List<Long> contractsId = contractsMtx.stream().mapToLong(ContractMtx::getWbcContract).boxed().collect(Collectors.toList());
 
@@ -252,8 +246,6 @@ public class CalculateTask extends Task {
                                     .findFirst()
                                     .orElseThrow(() -> new Exception("[WBC] -> Não foi possivel carregar as informações complementares!\n Referente as informações de [CE_SAZONALIZACAO] e [CE_REGRA_OPCIONALIDADE] "));
 
-                            
-
                             if (this.isFlat(file.getWbcContract()) && filteredByPoint.isEmpty()) {
                                 this.mountFakeResultToContractFlat(file, contractsMtx, de);
                             } else {
@@ -262,9 +254,8 @@ public class CalculateTask extends Task {
                                  * Set result to zero when the contract is
                                  * consumer unit
                                  */
-                                
-                                final MeansurementPointProInfa pointProInfa = this.meansurementPointProInfaService.getCurrentProInfa(file.getMeansurementPoint());                               
-                                
+                                final MeansurementPointProInfa pointProInfa = this.meansurementPointProInfaService.getCurrentProInfa(file.getMeansurementPoint());
+
                                 boolean isConsumerUnit = contractMtx.isConsumerUnit();
 
                                 final Double factorAtt = contractMtx.getFactorAttendanceCharge();
@@ -327,7 +318,7 @@ public class CalculateTask extends Task {
                 resultService.saveAll(results);
             }
 
-            this.mountFakeResultToContractIsUnitConsumer(fileM, contractsMtx, de,results);
+            this.mountFakeResultToContractIsUnitConsumer(fileM, contractsMtx, de, results);
             this.mountResultParent(de, contractMtxParent, fileId, results, contracts);
 
         } catch (Exception e) {
@@ -432,7 +423,7 @@ public class CalculateTask extends Task {
                     Long perfil = contractDTO.isPresent() ? contractDTO.get().getNCdPerfilCCEE() : 0;
                     fileResult.setWbcPerfilCCEE(perfil.intValue());
                     fileResult.setMeansurementFileId(file.getId());
-                    
+
                     fileResult.setQtdHiredMax(0D);
                     fileResult.setQtdHiredMin(0D);
 
@@ -485,10 +476,10 @@ public class CalculateTask extends Task {
                     fileResult.setMeansurementFileId(file.getId());
 
                     synchronized (this.resultService) {
-                        if(!result.contains(fileResult)){
+                        if (!result.contains(fileResult)) {
                             resultService.save(fileResult);
                         }
-                        
+
                     }
 
                 });
@@ -536,6 +527,6 @@ public class CalculateTask extends Task {
         return details.stream()
                 .map(d -> new BigDecimal(d.getConsumptionActive()).setScale(6, RoundingMode.HALF_EVEN))
                 .reduce(new BigDecimal(0D), BigDecimal::add).doubleValue();
-    }  
+    }
 
 }

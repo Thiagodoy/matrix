@@ -33,5 +33,6 @@ public class ContractWbcInformationDTO implements Serializable{
     private Double limitMin;
     private Double limitMax;
     private Double price;
+    private Double qtdBillingWbc;
 
 }

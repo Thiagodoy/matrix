@@ -7,6 +7,7 @@ package com.core.matrix.response;
 
 import com.core.matrix.dto.MonitoringFilterDTO;
 import com.core.matrix.dto.MonitoringStatusDTO;
+import com.core.matrix.model.Monitoring;
 import java.util.List;
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -20,7 +21,7 @@ import org.springframework.data.domain.Page;
 @AllArgsConstructor
 public class MonitoringResponse {
 
-    private Page<MonitoringResponse> data;
+    private Page<Monitoring> data;
     private List<MonitoringStatusDTO> status;
     private List<MonitoringFilterDTO> filters;
 }

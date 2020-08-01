@@ -84,9 +84,27 @@ public class MonitoringResource {
                     atividade,
                     usuario);
 
-            Page data = monitoringRepository.findAll(spc, PageRequest.of(page, size));
+            Page<Monitoring> data = monitoringRepository.findAll(spc, PageRequest.of(page, size));
             List<MonitoringStatusDTO> statusM = monitoringRepository.status(Long.parseLong(mes), Long.parseLong(ano));
             List<MonitoringFilterDTO> filters = monitoringRepository.filters();
+
+            List<Long> contracts = data.getContent()
+                    .stream()
+                    .map(Monitoring::getWbcContrato)
+                    .filter(Objects::nonNull)
+                    .mapToLong(Long::valueOf)
+                    .boxed()
+                    .collect(Collectors.toList());
+
+            contractService.getInformation(Long.parseLong(ano), Long.parseLong(mes), contracts).stream().forEach(i -> {
+                
+                   Optional<Monitoring>opt = data.getContent().stream().filter(cc-> cc.getWbcContrato().equals(i.getNrContract())).findFirst();
+                if(opt.isPresent()){
+                    opt.get().setValorEsperadoWbc(i.getQtdBillingWbc());
+                }
+                
+            });
+
             MonitoringResponse response = new MonitoringResponse(data, statusM, filters);
             return ResponseEntity.ok(response);
         } catch (Exception e) {

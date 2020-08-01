@@ -181,7 +181,7 @@ import lombok.Data;
                     ,
                         @ColumnResult(name = "nCdPerfilCCEE", type = Long.class)
                     ,
-                        @ColumnResult(name = "sNrCnpj", type = String.class)    
+                        @ColumnResult(name = "sNrCnpj", type = String.class)
 
                 }))
 
@@ -216,6 +216,8 @@ import lombok.Data;
                         @ColumnResult(name = "limite_maximo", type = Double.class)
                     ,
                         @ColumnResult(name = "preco_contratado", type = Double.class)
+                    ,   
+                        @ColumnResult(name = "valor_faturado_wbc", type = Double.class)
                 }))
 
 @NamedNativeQuery(query = "SELECT DISTINCT\n"
@@ -232,7 +234,8 @@ import lombok.Data;
         + "      ,case when SZ.nQtInformadaTotal is not null then Round((SZ.[nQtInformadaTotal]+(SZ.[nQtInformadaTotal]*RO.[sPcLimMesMax])/100),3) else Round((SZ.[nQtContratadaTotal]+(SZ.[nQtContratadaTotal]*RO.[sPcLimMesMax])/100),3) end as 'quantidade_contratada_maxima'\n"
         + "      ,RO.[sPcLimMesMin] as 'limite_minimo'\n"
         + "      ,RO.[sPcLimMesMax] as 'limite_maximo'\n"
-        + "      ,SZ.[nVlPrecoEnergiaMedio] as 'preco_contratado'"
+        + "      ,SZ.[nVlPrecoEnergiaMedio] as 'preco_contratado'\n"
+        + "      ,SZ.[nQtFaturadaTotal] as 'valor_faturado_wbc'\n"
         + "  FROM [CE_CONTRATO] CT,\n"
         + "       [CE_SAZONALIZACAO] SZ,\n"
         + "       [CE_REGRA_OPCIONALIDADE] RO\n"
