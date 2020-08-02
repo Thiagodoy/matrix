@@ -13,8 +13,10 @@ import com.core.matrix.io.BeanIO;
 import com.core.matrix.model.Log;
 import com.core.matrix.model.MeansurementFile;
 import com.core.matrix.model.MeansurementFileDetail;
+import com.core.matrix.model.MeansurementFileDetailReport;
 import com.core.matrix.model.MeansurementPointMtx;
 import com.core.matrix.service.LogService;
+import com.core.matrix.service.MeansurementFileDetailReportService;
 import com.core.matrix.service.MeansurementFileDetailService;
 import com.core.matrix.service.MeansurementFileService;
 import com.core.matrix.service.MeansurementPointMtxService;
@@ -31,6 +33,7 @@ import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.nio.charset.Charset;
 import java.text.MessageFormat;
+import java.time.LocalDateTime;
 import java.time.Month;
 import java.time.YearMonth;
 import java.util.ArrayList;
@@ -69,7 +72,7 @@ public class FileValidationTask extends Task {
 
     private List<MeansurementFile> files;
 
-    
+    private MeansurementFileDetailReportService meansurementFileDetailReportService;
 
     private List<Log> logs;
 
@@ -81,7 +84,8 @@ public class FileValidationTask extends Task {
             this.detailService = FileValidationTask.context.getBean(MeansurementFileDetailService.class);
             this.logService = FileValidationTask.context.getBean(LogService.class);
             this.meansurementPointMtxService = FileValidationTask.context.getBean(MeansurementPointMtxService.class);
-            
+            this.meansurementFileDetailReportService = FileValidationTask.context.getBean(MeansurementFileDetailReportService.class);
+
         }
 
     }
@@ -131,13 +135,12 @@ public class FileValidationTask extends Task {
                     if (opt.isPresent()) {
 
                         FileParsedDTO fileDto = opt.get();
+                        MeansurementFileType type = MeansurementFileType.valueOf(fileDto.getType());
 
-                        //this.updatePoints(fileDto);
+                        this.saveDetailsReport(fileDto, type);
 
                         List<FileDetailDTO> result = this.filter(fileDto.getDetails(), fileName);
                         fileDto.setDetails(result);
-
-                        MeansurementFileType type = MeansurementFileType.valueOf(fileDto.getType());
 
                         this.checkHoursMissing(result);
 
@@ -185,20 +188,39 @@ public class FileValidationTask extends Task {
             } else {
                 this.alterStatusFiles(files);
                 this.setVariable(CONTROLE, RESPONSE_LAYOUT_VALID);
-            }            
+            }
 
         } catch (Exception e) {
             this.setVariable(CONTROLE, RESPONSE_LAYOUT_INVALID);
             this.generateLog(de, e, "Erro ao processar o arquivo");
-        }finally{
+        } finally {
             this.writeVariables(delegateExecution);
         }
 
-        
-        
     }
 
-   
+    private void saveDetailsReport(FileParsedDTO fileDto, MeansurementFileType type) {
+
+        try {
+            List<MeansurementFileDetailReport> report = fileDto
+                    .getDetails()
+                    .parallelStream()
+                    .map(d -> new MeansurementFileDetailReport(d, type))
+                    .collect(Collectors.toList());
+
+            LocalDateTime dateInsert = LocalDateTime.now();
+
+            report.parallelStream().forEach(r -> {
+                r.setDateInsert(dateInsert);
+            });
+
+            meansurementFileDetailReportService.saveAllJob(report);
+            
+        } catch (Exception e) {
+            Logger.getLogger(FileValidationTask.class.getName()).log(Level.SEVERE, "[saveDetailsReport]",e);
+        }
+
+    }
 
     private void alterStatusFiles(List<MeansurementFile> files) {
 
