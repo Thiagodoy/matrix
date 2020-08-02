@@ -68,7 +68,7 @@ public class BillingContractsTask implements JavaDelegate {
     private MeansurementFileService meansurementFileService;
     private LogService logService;
     private EmailFactory emailFactory;
-    private ThreadPoolEmail threadPoolEmail;
+    private ThreadPoolEmail threadPoolEmail;   
 
     private ContractMtxService contractMtxService;
     private MeansurementPointMtxService meansurementPointMtxService;
@@ -86,7 +86,7 @@ public class BillingContractsTask implements JavaDelegate {
             this.emailFactory = context.getBean(EmailFactory.class);
             this.threadPoolEmail = context.getBean(ThreadPoolEmail.class);
             this.contractMtxService = context.getBean(ContractMtxService.class);
-            this.meansurementPointMtxService = context.getBean(MeansurementPointMtxService.class);
+            this.meansurementPointMtxService = context.getBean(MeansurementPointMtxService.class);            
         }
     }
 
@@ -112,7 +112,7 @@ public class BillingContractsTask implements JavaDelegate {
             List<Log> logs = new ArrayList<>();
 
             this.contractWithoutRateio(contracts, logs, execution);
-            this.contractWithRateio(contracts, logs, execution);
+            this.contractWithRateio(contracts, logs, execution);            
             this.sendEmailWithErrors(execution);
 
             if (!logs.isEmpty()) {
@@ -126,15 +126,14 @@ public class BillingContractsTask implements JavaDelegate {
             log.setProcessName(execution.getProcessDefinitionId());
             this.logService.save(log);
         }
-    }
+    }    
 
     private void sendEmailWithErrors(DelegateExecution execution) {
 
         File contractsNotRegisteredFile = null;
         File contractsAreNotAssociatedWithPointFile = null;
         File pointsAreNotAssociatedWithProInfaFile = null;
-        
-        
+
         if (execution.hasVariable(PROCESS_CONTRACTS_RELOAD_BILLING)) {
             return;
         }
@@ -261,7 +260,7 @@ public class BillingContractsTask implements JavaDelegate {
                             .filter(c -> c.getNCdContrato().equals(contractParent))
                             .findFirst();
 
-                    if (opt.isPresent()) {                        
+                    if (opt.isPresent()) {
 
                         contractsSon.add(opt.get());
                         ContractDTO c = contractsSon.stream().findFirst().get();

@@ -10,13 +10,10 @@ import static com.core.matrix.utils.Constants.*;
 import com.core.matrix.dto.FileDetailDTO;
 import com.core.matrix.dto.FileParsedDTO;
 import com.core.matrix.io.BeanIO;
-import com.core.matrix.model.ContractCompInformation;
-import com.core.matrix.model.ContractMtx;
 import com.core.matrix.model.Log;
 import com.core.matrix.model.MeansurementFile;
 import com.core.matrix.model.MeansurementFileDetail;
 import com.core.matrix.model.MeansurementPointMtx;
-import com.core.matrix.service.ContractCompInformationService;
 import com.core.matrix.service.LogService;
 import com.core.matrix.service.MeansurementFileDetailService;
 import com.core.matrix.service.MeansurementFileService;
@@ -72,6 +69,8 @@ public class FileValidationTask extends Task {
 
     private List<MeansurementFile> files;
 
+    
+
     private List<Log> logs;
 
     public FileValidationTask() {
@@ -81,8 +80,8 @@ public class FileValidationTask extends Task {
             this.service = FileValidationTask.context.getBean(MeansurementFileService.class);
             this.detailService = FileValidationTask.context.getBean(MeansurementFileDetailService.class);
             this.logService = FileValidationTask.context.getBean(LogService.class);
-
             this.meansurementPointMtxService = FileValidationTask.context.getBean(MeansurementPointMtxService.class);
+            
         }
 
     }
@@ -132,6 +131,8 @@ public class FileValidationTask extends Task {
                     if (opt.isPresent()) {
 
                         FileParsedDTO fileDto = opt.get();
+
+                        //this.updatePoints(fileDto);
 
                         List<FileDetailDTO> result = this.filter(fileDto.getDetails(), fileName);
                         fileDto.setDetails(result);
@@ -184,16 +185,20 @@ public class FileValidationTask extends Task {
             } else {
                 this.alterStatusFiles(files);
                 this.setVariable(CONTROLE, RESPONSE_LAYOUT_VALID);
-            }
-
-            this.writeVariables(delegateExecution);
+            }            
 
         } catch (Exception e) {
             this.setVariable(CONTROLE, RESPONSE_LAYOUT_INVALID);
             this.generateLog(de, e, "Erro ao processar o arquivo");
+        }finally{
+            this.writeVariables(delegateExecution);
         }
 
+        
+        
     }
+
+   
 
     private void alterStatusFiles(List<MeansurementFile> files) {
 
@@ -321,11 +326,10 @@ public class FileValidationTask extends Task {
 
     private void validate(List<FileDetailDTO> detail, MeansurementFileType type, String fileName) {
 
-        
-        if(!detail.isEmpty()){
+        if (!detail.isEmpty()) {
             return;
         }
-        
+
         List<String> errors = Collections.synchronizedList(new ArrayList<String>());
 
         detail.parallelStream().forEach(d -> {
@@ -470,7 +474,7 @@ public class FileValidationTask extends Task {
             //Verify if point match some files uploaded. And set the attachment id on file             
             meansuremPoint.parallelStream().forEach(point -> {
                 Optional<MeansurementFile> opt = files.stream()
-                        .filter(f-> f.getStatus().equals(MeansurementFileStatus.FILE_CHECKED))
+                        .filter(f -> f.getStatus().equals(MeansurementFileStatus.FILE_CHECKED))
                         .filter(file -> file.getMeansurementPoint().equals(point)).findFirst();
 
                 if (opt.isPresent()) {

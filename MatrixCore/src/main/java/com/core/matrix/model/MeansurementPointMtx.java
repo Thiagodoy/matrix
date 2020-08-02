@@ -7,6 +7,7 @@ package com.core.matrix.model;
 
 import com.core.matrix.exceptions.PointWithoutProinfaException;
 import com.fasterxml.jackson.annotation.JsonFormat;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import java.io.Serializable;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
@@ -64,6 +65,7 @@ public class MeansurementPointMtx implements Model<MeansurementPointMtx>, Serial
                 @JoinColumn(name = "id_contrato")})
     private Set<ContractMtx> contracts;
 
+    @JsonIgnore
     public MeansurementPointProInfa getCurrentProinfa() throws PointWithoutProinfaException {
 
         long month = LocalDate.now().minusMonths(1).getMonthValue();
@@ -81,6 +83,10 @@ public class MeansurementPointMtx implements Model<MeansurementPointMtx>, Serial
         long month = LocalDate.now().minusMonths(1).getMonthValue();
         long year = LocalDate.now().getYear();
 
+        if (proinfas.isEmpty()) {
+            throw new PointWithoutProinfaException();
+        }
+
         proinfas.parallelStream()
                 .filter(p -> p.getMonth().equals(month) && p.getYear().equals(year))
                 .findFirst()
@@ -92,11 +98,10 @@ public class MeansurementPointMtx implements Model<MeansurementPointMtx>, Serial
     public void setPointOnContracts() {
         this.contracts.parallelStream().forEach(contract -> contract.setPointAssociated(point));
     }
-    
+
     @PrePersist
-    public void generateDate(){
+    public void generateDate() {
         this.createAt = LocalDateTime.now();
     }
-    
 
 }

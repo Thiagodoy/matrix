@@ -42,6 +42,7 @@ import java.util.stream.Collectors;
 import org.activiti.engine.ActivitiTaskAlreadyClaimedException;
 import org.activiti.engine.delegate.Expression;
 import org.activiti.engine.HistoryService;
+import org.activiti.engine.ManagementService;
 import org.activiti.engine.RepositoryService;
 
 import org.activiti.engine.RuntimeService;
@@ -113,6 +114,11 @@ public class RuntimeActivitiService {
             request.setVariables(new HashMap<String, Object>());
         }
 
+        
+        
+        
+        
+        
         request.getVariables().put(Constants.CREATED_BY, userId);
         request.getVariables().put(Constants.CREATED_AT, Utils.dateTimeNowFormated());
         //request.getVariables().put("taskSe", taskService);

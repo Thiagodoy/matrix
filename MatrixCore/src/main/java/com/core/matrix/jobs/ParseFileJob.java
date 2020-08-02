@@ -42,7 +42,7 @@ public class ParseFileJob implements Runnable {
     private String attachmentId;
     private TaskService taskService;
     private Set<ProcessFilesInLoteStatusDTO> loteStatusDTOs;
-    private List<FileLoteErrorDTO> fileLoteErrorDTOs;
+    private List<FileLoteErrorDTO> fileLoteErrorDTOs;    
 
     public void run() {
 
@@ -71,7 +71,9 @@ public class ParseFileJob implements Runnable {
                         .parallelStream()
                         .collect(Collectors.groupingBy(e -> e.getMeansurementPoint().replaceAll("\\((L|B)\\)", "").trim())));
 
-                loteStatusDTOs.parallelStream().filter(l-> !l.isFinished()).forEach(lote -> {
+                
+
+                loteStatusDTOs.parallelStream().filter(l -> !l.isFinished()).forEach(lote -> {
 
                     lote.getPoints().forEach(point -> {
                         synchronized (map) {
@@ -107,7 +109,7 @@ public class ParseFileJob implements Runnable {
             fileLoteErrorDTOs.add(loteErrorDTO);
         }
 
-    }
+    }   
 
     private synchronized InputStream removeLinesEmpty(InputStream stream) throws IOException {
 

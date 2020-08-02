@@ -8,7 +8,6 @@ package com.core.matrix.workflow.task;
 import com.core.matrix.dto.FileLoteErrorDTO;
 import com.core.matrix.dto.ProcessFilesInLoteStatusDTO;
 import com.core.matrix.dto.ResultInLoteStatusDTO;
-import com.core.matrix.factory.EmailFactory;
 import com.core.matrix.jobs.ParseFileJob;
 import com.core.matrix.model.ContractMtx;
 import com.core.matrix.model.Log;
@@ -17,16 +16,15 @@ import com.core.matrix.request.FileStatusLoteRequest;
 import com.core.matrix.service.ContractMtxService;
 import com.core.matrix.service.LogService;
 import com.core.matrix.service.MeansurementFileService;
+import com.core.matrix.service.MeansurementPointMtxService;
 import static com.core.matrix.utils.Constants.RESPONSE_LIST_PROCESS_ANALIZED;
 import com.core.matrix.utils.ThreadPoolBindFile;
-import com.core.matrix.utils.ThreadPoolEmail;
 import com.core.matrix.utils.ThreadPoolParseFile;
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashSet;
 import java.util.List;
-import java.util.Objects;
 import java.util.Observable;
 import java.util.Observer;
 import java.util.Optional;
@@ -51,7 +49,6 @@ public class ProcessFilesInLoteTask implements JavaDelegate, Observer {
     private Set<ProcessFilesInLoteStatusDTO> status;
     private String processInstanceId;
     private List<FileLoteErrorDTO> fileLoteErrorDTOs;
-
     private MeansurementFileService meansurementFileService;
 
     private LogService logService;
@@ -61,7 +58,7 @@ public class ProcessFilesInLoteTask implements JavaDelegate, Observer {
     private ThreadPoolBindFile threadPoolBindFile;
     private ThreadPoolParseFile threadPoolParseFile;
 
-    private ContractMtxService contractMtxService;
+    private ContractMtxService contractMtxService;    
 
     public ProcessFilesInLoteTask() {
 
@@ -70,7 +67,7 @@ public class ProcessFilesInLoteTask implements JavaDelegate, Observer {
             this.logService = ProcessFilesInLoteTask.context.getBean(LogService.class);
             this.threadPoolBindFile = ProcessFilesInLoteTask.context.getBean(ThreadPoolBindFile.class);
             this.threadPoolParseFile = ProcessFilesInLoteTask.context.getBean(ThreadPoolParseFile.class);
-            this.contractMtxService = ProcessFilesInLoteTask.context.getBean(ContractMtxService.class);
+            this.contractMtxService = ProcessFilesInLoteTask.context.getBean(ContractMtxService.class);            
 
         }
 
@@ -89,7 +86,7 @@ public class ProcessFilesInLoteTask implements JavaDelegate, Observer {
 
             processInstanceId = execution.getProcessInstanceId();
             taskService = execution.getEngineServices().getTaskService();
-            fileLoteErrorDTOs = Collections.synchronizedList(new ArrayList());
+            fileLoteErrorDTOs = Collections.synchronizedList(new ArrayList());            
 
             status = new CopyOnWriteArraySet(this.getProcessPendingForUploadFile(execution));
 
@@ -197,8 +194,19 @@ public class ProcessFilesInLoteTask implements JavaDelegate, Observer {
 
                 ProcessFilesInLoteStatusDTO pfilsdto = new ProcessFilesInLoteStatusDTO();
 
-                boolean isOnlyUnitConsumerOrFlat = contractMtxs.stream().map(c -> c.isConsumerUnit() || c.isFlat()).reduce(Boolean.TRUE, Boolean::logicalAnd);
+                boolean unitConsumer = contractMtxs
+                        .stream()
+                        .filter(c -> !c.isFather())                                               
+                        .map(ContractMtx::isConsumerUnit).reduce(Boolean.TRUE, Boolean::logicalAnd);
+                
+                boolean flat = contractMtxs
+                        .stream()
+                        .filter(c -> !c.isFather())                        
+                        .map(ContractMtx::isFlat).reduce(Boolean.TRUE, Boolean::logicalAnd);
 
+                boolean isOnlyUnitConsumerOrFlat = Boolean.logicalOr(flat, unitConsumer);
+                
+                
                 pfilsdto.setStatus(ProcessFilesInLoteStatusDTO.Status.PENDING);
                 pfilsdto.setProcessInstanceId(task.getProcessInstanceId());
                 pfilsdto.setTaskName(task.getName());

@@ -14,10 +14,10 @@ import lombok.Data;
  * @author thiag
  */
 @Data
-public class FileDetailDTO implements Serializable{
+public class FileDetailDTO implements Serializable {
 
-    private static final long serialVersionUID = 7705948467256766769L;    
-    
+    private static final long serialVersionUID = 7705948467256766769L;
+
     public long line;
     public String fileName;
     public String agent;
@@ -33,16 +33,16 @@ public class FileDetailDTO implements Serializable{
     public String situation;
     public String reason;
     public String sourceCollection;
-    public String notificationCollection;   
+    public String notificationCollection;
     public String quality;
     public String origem;
-    
-    
-    
-    
-    public String generateKey(){
-        return MessageFormat.format("{0}-{1}-{2}", this.date,this.hour,this.meansurementPoint);
+
+    public String generateKey() {
+        return MessageFormat.format("{0}-{1}-{2}", this.date, this.hour, this.meansurementPoint);
     }
-    
-    
+
+    public String getMeansurementPointFormated() {
+        return this.meansurementPoint.replaceAll("\\((L|B)\\)", "");
+    }
+
 }

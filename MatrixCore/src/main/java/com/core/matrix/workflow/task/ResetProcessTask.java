@@ -67,11 +67,11 @@ public class ResetProcessTask implements JavaDelegate {
                         if (task.getTaskDefinitionKey().equals("task-show-error-ajustament")) {
                             parameters.put(CONTROLE, "REALIZAR NOVO UPLOAD");
                         }
-                        Logger.getLogger(ProcessFilesInLoteTask.class.getName()).log(Level.INFO, "[restartProcess] -> " + task.getId());
+                        
                         taskService.complete(task.getId(), parameters);
 
                     } catch (Exception e) {
-                        Logger.getLogger(ProcessFilesInLoteTask.class.getName()).log(Level.SEVERE, "[restartProcess] -> Erro ao realizar o completeTask", e);
+                        Logger.getLogger(ResetProcessTask.class.getName()).log(Level.SEVERE, "[restartProcess] -> Erro ao realizar o completeTask", e);
                     }
                 });
 
