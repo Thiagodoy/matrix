@@ -8,15 +8,12 @@ package com.core.matrix.workflow.task;
 import com.core.matrix.dto.ConsumptionResult;
 import com.core.matrix.exceptions.EntityNotFoundException;
 import com.core.matrix.model.ContractMtx;
-import com.core.matrix.model.ContractProInfa;
 import com.core.matrix.model.Log;
 import com.core.matrix.model.MeansurementFile;
 import com.core.matrix.model.MeansurementFileDetail;
 import com.core.matrix.model.MeansurementFileResult;
 import com.core.matrix.model.MeansurementPointMtx;
 import com.core.matrix.model.MeansurementPointProInfa;
-import com.core.matrix.service.ContractCompInformationService;
-import com.core.matrix.service.ContractMtxService;
 import com.core.matrix.service.LogService;
 
 import com.core.matrix.service.MeansurementFileResultService;
@@ -81,7 +78,7 @@ public class CalculateTask extends Task {
 
         this.loadVariables(de);
 
-        boolean loadDetail = !this.isOnlyContractFlat();
+        boolean loadDetail = !this.isOnlyContractFlatOrUnitConsumer();
 
         List<MeansurementFile> files = this.getFiles(loadDetail);
 
@@ -131,12 +128,13 @@ public class CalculateTask extends Task {
                     .getInformation(file.getYear(), file.getMonth(), file.getWbcContract())
                     .orElseThrow(() -> new Exception("[WBC] -> Não foi possivel carregar as informações complementares!\n Referente as informações de [CE_SAZONALIZACAO] e [CE_REGRA_OPCIONALIDADE] "));
 
-            if (this.isOnlyContractFlat() && details.isEmpty()) {
+            if (this.isOnlyContractFlatOrUnitConsumer() && details.isEmpty()) {
 
                 contractWbcInformationDTOs = this.getWbcInformation(file.getYear(), file.getMonth(), Arrays.asList(file.getWbcContract()));
                 contractDTOs = this.contractWbcService.findAll(file.getWbcContract(), null);
 
                 this.mountFakeResultToContractFlat(file, Arrays.asList(contractMtx), de);
+                this.mountFakeResultToContractIsUnitConsumer(file, Arrays.asList(contractMtx), de, new ArrayList<>());
             } else {
                 MeansurementPointMtx pointMtx = this.meansurementPointMtxService.getByPoint(file.getMeansurementPoint());
                 MeansurementPointProInfa pointProInfa = pointMtx.getCurrentProinfa();
@@ -477,6 +475,7 @@ public class CalculateTask extends Task {
 
                     synchronized (this.resultService) {
                         if (!result.contains(fileResult)) {
+                            result.add(fileResult);
                             resultService.save(fileResult);
                         }
 

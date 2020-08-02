@@ -10,9 +10,11 @@ import com.core.matrix.dto.ProcessFilesInLoteStatusDTO;
 import com.core.matrix.dto.ResultInLoteStatusDTO;
 import com.core.matrix.factory.EmailFactory;
 import com.core.matrix.jobs.ParseFileJob;
+import com.core.matrix.model.ContractMtx;
 import com.core.matrix.model.Log;
 import com.core.matrix.model.MeansurementFile;
 import com.core.matrix.request.FileStatusLoteRequest;
+import com.core.matrix.service.ContractMtxService;
 import com.core.matrix.service.LogService;
 import com.core.matrix.service.MeansurementFileService;
 import static com.core.matrix.utils.Constants.RESPONSE_LIST_PROCESS_ANALIZED;
@@ -24,6 +26,7 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Objects;
 import java.util.Observable;
 import java.util.Observer;
 import java.util.Optional;
@@ -49,8 +52,6 @@ public class ProcessFilesInLoteTask implements JavaDelegate, Observer {
     private String processInstanceId;
     private List<FileLoteErrorDTO> fileLoteErrorDTOs;
 
-    private EmailFactory emailFactory;
-    private ThreadPoolEmail threadPoolEmail;
     private MeansurementFileService meansurementFileService;
 
     private LogService logService;
@@ -60,15 +61,17 @@ public class ProcessFilesInLoteTask implements JavaDelegate, Observer {
     private ThreadPoolBindFile threadPoolBindFile;
     private ThreadPoolParseFile threadPoolParseFile;
 
+    private ContractMtxService contractMtxService;
+
     public ProcessFilesInLoteTask() {
 
         synchronized (ProcessFilesInLoteTask.context) {
-            this.emailFactory = ProcessFilesInLoteTask.context.getBean(EmailFactory.class);
-            this.threadPoolEmail = ProcessFilesInLoteTask.context.getBean(ThreadPoolEmail.class);
             this.meansurementFileService = ProcessFilesInLoteTask.context.getBean(MeansurementFileService.class);
             this.logService = ProcessFilesInLoteTask.context.getBean(LogService.class);
             this.threadPoolBindFile = ProcessFilesInLoteTask.context.getBean(ThreadPoolBindFile.class);
             this.threadPoolParseFile = ProcessFilesInLoteTask.context.getBean(ThreadPoolParseFile.class);
+            this.contractMtxService = ProcessFilesInLoteTask.context.getBean(ContractMtxService.class);
+
         }
 
     }
@@ -81,12 +84,12 @@ public class ProcessFilesInLoteTask implements JavaDelegate, Observer {
     public void execute(DelegateExecution execution) throws Exception {
 
         try {
-            
+
             this.checkStatusPools();
 
             processInstanceId = execution.getProcessInstanceId();
             taskService = execution.getEngineServices().getTaskService();
-            fileLoteErrorDTOs = Collections.synchronizedList(new ArrayList());           
+            fileLoteErrorDTOs = Collections.synchronizedList(new ArrayList());
 
             status = new CopyOnWriteArraySet(this.getProcessPendingForUploadFile(execution));
 
@@ -149,7 +152,7 @@ public class ProcessFilesInLoteTask implements JavaDelegate, Observer {
 
         meansurementFileService.generateStatus(request, execution.getProcessInstanceId());
 
-    }   
+    }
 
     private Set<ProcessFilesInLoteStatusDTO> getProcessPendingForUploadFile(DelegateExecution execution) {
 
@@ -169,7 +172,7 @@ public class ProcessFilesInLoteTask implements JavaDelegate, Observer {
                         + "WHERE\n"
                         + "    a.status = 'FILE_PENDING' AND a.mes = " + month + "\n"
                         + "        AND a.ano = " + year + "\n"
-                        + "        AND a.wbc_ponto_de_medicao IS NOT NULL\n"
+                        //+ "        AND a.wbc_ponto_de_medicao IS NOT NULL\n"
                         + "        AND b.TASK_DEF_KEY_ in ('task-upload-file-meansurement','task-upload-file-meansurement-1','task-upload-file-meansurement-2')")
                 .list();
 
@@ -177,21 +180,42 @@ public class ProcessFilesInLoteTask implements JavaDelegate, Observer {
 
         tasks.forEach(task -> {
 
-            List<MeansurementFile> files = meansurementFileService.findByProcessInstanceId(task.getProcessInstanceId());
-            ProcessFilesInLoteStatusDTO pfilsdto = new ProcessFilesInLoteStatusDTO();
-            pfilsdto.setStatus(ProcessFilesInLoteStatusDTO.Status.PENDING);
-            pfilsdto.setProcessInstanceId(task.getProcessInstanceId());
-            pfilsdto.setTaskName(task.getName());
-            pfilsdto.setTaskId(task.getId());
-            List<String> points = files
-                    .stream()
-                    .map(MeansurementFile::getMeansurementPoint)
-                    .collect(Collectors.toList());
+            try {
+                List<MeansurementFile> files = meansurementFileService.findByProcessInstanceId(task.getProcessInstanceId());
+                MeansurementFile file = files.stream().findFirst().get();
 
-            pfilsdto.setPoints(points);
-            pfilsdto.addObserver(this);
+                List<ContractMtx> contractMtxs = this.contractMtxService
+                        .findAll(file.getWbcContract())
+                        .getContracts();
 
-            listStatus.add(pfilsdto);
+                List<String> points = contractMtxs
+                        .stream()
+                        .filter(c -> !c.isFlat())
+                        .filter(c -> !c.isConsumerUnit())
+                        .filter(c -> !c.isFather())
+                        .map(ContractMtx::getPointAssociated).collect(Collectors.toList());
+
+                ProcessFilesInLoteStatusDTO pfilsdto = new ProcessFilesInLoteStatusDTO();
+
+                boolean isOnlyUnitConsumerOrFlat = contractMtxs.stream().map(c -> c.isConsumerUnit() || c.isFlat()).reduce(Boolean.TRUE, Boolean::logicalAnd);
+
+                pfilsdto.setStatus(ProcessFilesInLoteStatusDTO.Status.PENDING);
+                pfilsdto.setProcessInstanceId(task.getProcessInstanceId());
+                pfilsdto.setTaskName(task.getName());
+                pfilsdto.setTaskId(task.getId());
+                pfilsdto.setPoints(points);
+                pfilsdto.addObserver(this);
+
+                if (isOnlyUnitConsumerOrFlat) {
+                    pfilsdto.isOnlyUnitConsumerOrIsFlat();
+                } else {
+                    listStatus.add(pfilsdto);
+                }
+
+            } catch (Exception ex) {
+                Logger.getLogger(ProcessFilesInLoteTask.class.getName()).log(Level.SEVERE, "[getProcessPendingForUploadFile]", ex);
+            }
+
         });
 
         List<String> process = tasks.stream().map(task -> task.getProcessInstanceId()).collect(Collectors.toList());

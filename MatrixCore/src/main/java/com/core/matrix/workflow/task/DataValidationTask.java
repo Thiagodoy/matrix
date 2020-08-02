@@ -68,7 +68,7 @@ public class DataValidationTask extends Task {
         final String responseResult = MessageFormat.format("{0}:{1}", RESPONSE_RESULT, de.getProcessInstanceId());
         this.results = Collections.synchronizedList(new ArrayList<>());
 
-        if (this.isOnlyContractFlat()) {
+        if (this.isOnlyContractFlatOrUnitConsumer()) {
             this.setVariable(CONTROLE, RESPONSE_DATA_IS_VALID);
             this.writeVariables(delegateExecution);
             return;

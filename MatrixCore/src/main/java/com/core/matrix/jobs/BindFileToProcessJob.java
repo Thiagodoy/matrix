@@ -13,6 +13,7 @@ import java.io.FileInputStream;
 import java.io.InputStream;
 import java.text.MessageFormat;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.logging.Level;
@@ -38,24 +39,31 @@ public class BindFileToProcessJob implements Runnable {
         File file = null;
 
         try {
-            BeanIO beanIO = new BeanIO();
-            file = beanIO.write(processFilesInLoteStatusDTO.getFileParsedDTO(), processFilesInLoteStatusDTO.getTaskId(), processFilesInLoteStatusDTO.getProcessInstanceId(), 1);
-            InputStream ip = new FileInputStream(file);
-
-            Attachment attachment = taskService
-                    .createAttachment(
-                            "application/vnd.ms-excel",
-                            null,
-                            processFilesInLoteStatusDTO.getProcessInstanceId(),
-                            file.getName(),
-                            "attachmentDescription",
-                            ip);
 
             Map<String, Object> parameters = new HashMap<>();
 
-            parameters.put(LIST_ATTACHMENT_ID, Arrays.asList(attachment.getId()));
-            taskService.complete(processFilesInLoteStatusDTO.getTaskId(), parameters);
-            processFilesInLoteStatusDTO.setStatus(ProcessFilesInLoteStatusDTO.Status.ASSOCIATED);
+            if (this.processFilesInLoteStatusDTO.isUnitConsumerOrFlat()) {
+                parameters.put(LIST_ATTACHMENT_ID, Collections.EMPTY_LIST);
+                taskService.complete(processFilesInLoteStatusDTO.getTaskId(), parameters);
+            } else {
+
+                BeanIO beanIO = new BeanIO();
+                file = beanIO.write(processFilesInLoteStatusDTO.getFileParsedDTO(), processFilesInLoteStatusDTO.getTaskId(), processFilesInLoteStatusDTO.getProcessInstanceId(), 1);
+                InputStream ip = new FileInputStream(file);
+
+                Attachment attachment = taskService
+                        .createAttachment(
+                                "application/vnd.ms-excel",
+                                null,
+                                processFilesInLoteStatusDTO.getProcessInstanceId(),
+                                file.getName(),
+                                "attachmentDescription",
+                                ip);
+
+                parameters.put(LIST_ATTACHMENT_ID, Arrays.asList(attachment.getId()));
+                taskService.complete(processFilesInLoteStatusDTO.getTaskId(), parameters);
+                processFilesInLoteStatusDTO.setStatus(ProcessFilesInLoteStatusDTO.Status.ASSOCIATED);
+            }
 
         } catch (Exception ex) {
             Logger.getLogger(BindFileToProcessJob.class.getName()).log(Level.SEVERE, "[run]", ex);

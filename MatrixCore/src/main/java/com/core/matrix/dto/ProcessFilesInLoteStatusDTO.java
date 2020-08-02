@@ -52,6 +52,8 @@ public class ProcessFilesInLoteStatusDTO extends Observable implements Serializa
     private transient List<FileDetailDTO> details = new ArrayList<>();
     private String typeFile;
     private boolean isFinished = false;
+    
+    private boolean isUnitConsumerOrFlat;
 
     public void setError(String message) {
         this.errors.add(message);
@@ -59,6 +61,14 @@ public class ProcessFilesInLoteStatusDTO extends Observable implements Serializa
 
     public boolean isCompletedSearch() {
         return this.pointsChecked.size() == this.points.size();
+    }
+
+    public void isOnlyUnitConsumerOrIsFlat() {
+        this.isUnitConsumerOrFlat = true;
+        this.isFinished = true;
+        this.setChanged();
+        this.notifyObservers(Boolean.TRUE);
+        this.clearChanged();
     }
 
     public void pointChecked(List<InformationDTO> informations, HeaderDTO header, String type) {

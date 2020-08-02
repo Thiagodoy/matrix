@@ -261,13 +261,10 @@ public class BillingContractsTask implements JavaDelegate {
                             .filter(c -> c.getNCdContrato().equals(contractParent))
                             .findFirst();
 
-                    if (opt.isPresent()) {
+                    if (opt.isPresent()) {                        
 
-                        List<ContractDTO> sons = contractsSon.stream().filter(t -> t.getMeansurementPoint() != null).collect(Collectors.toList());
-
-                        sons.add(opt.get());
-
-                        ContractDTO c = sons.stream().findFirst().get();
+                        contractsSon.add(opt.get());
+                        ContractDTO c = contractsSon.stream().findFirst().get();
 
                         try {
 
@@ -276,11 +273,11 @@ public class BillingContractsTask implements JavaDelegate {
 
                             Map<String, Object> variables = new HashMap<>();
                             variables.put(PROCESS_INFORMATION_CONTRACTS_MATRIX, contractMtxs);
-                            variables.put(PROCESS_INFORMATION_MONITOR_CLIENT, sons.stream().findFirst().get().getSNmEmpresaEpce());
-                            variables.put(PROCESS_INFORMATION_CLIENT, sons.stream().findFirst().get().getSNmEmpresaEpce());
+                            variables.put(PROCESS_INFORMATION_MONITOR_CLIENT, contractsSon.stream().findFirst().get().getSNmEmpresaEpce());
+                            variables.put(PROCESS_INFORMATION_CLIENT, contractsSon.stream().findFirst().get().getSNmEmpresaEpce());
 
-                            String processInstanceId = this.createAProcessForBilling(execution, sons, variables).getProcessInstanceId();
-                            this.createMeansurementFile(processInstanceId, sons);
+                            String processInstanceId = this.createAProcessForBilling(execution, contractsSon, variables).getProcessInstanceId();
+                            this.createMeansurementFile(processInstanceId, contractsSon);
                         } catch (Exception ex) {
                             Logger.getLogger(BillingContractsTask.class.getName()).log(Level.SEVERE, "[Search contracts] -> contrato :" + c.getSNrContrato(), ex);
                         }

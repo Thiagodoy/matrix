@@ -105,7 +105,7 @@ public class FileValidationTask extends Task {
             final String user = de.getVariable(USER_UPLOAD, String.class);
             files = new CopyOnWriteArrayList<>(this.service.findByProcessInstanceId(delegateExecution.getProcessInstanceId()));
 
-            if (this.isOnlyContractFlat()) {
+            if (this.isOnlyContractFlatOrUnitConsumer()) {
                 this.alterStatusFiles(files);
                 this.setVariable(CONTROLE, RESPONSE_LAYOUT_VALID);
                 this.writeVariables(delegateExecution);

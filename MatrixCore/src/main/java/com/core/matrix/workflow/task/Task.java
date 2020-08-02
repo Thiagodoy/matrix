@@ -73,7 +73,7 @@ public abstract class Task implements JavaDelegate {
         
         MeansurementFileType type = file.getType();
         
-        if(this.isOnlyContractFlat() && !Optional.ofNullable(this.getMapDetails()).isPresent() ){
+        if(this.isOnlyContractFlatOrUnitConsumer() && !Optional.ofNullable(this.getMapDetails()).isPresent() ){
             return result;
         }        
         
@@ -169,7 +169,7 @@ public abstract class Task implements JavaDelegate {
     } 
     
     
-    public boolean isOnlyContractFlat() {
+    public boolean isOnlyContractFlatOrUnitConsumer() {
 
         List<ContractMtx> contractMtxs = this.getContractsMtx();
 

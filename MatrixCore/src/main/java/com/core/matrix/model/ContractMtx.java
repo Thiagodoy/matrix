@@ -108,17 +108,28 @@ public class ContractMtx implements Model<ContractMtx>, Serializable {
 
     @Column(name = "apelido")
     protected String nickname;
-    
+
     @Transient
-    protected  String pointAssociated;       
-    
-    public String getPoint()throws ContractNotAssociatedWithPointException{
-        
-        if(Optional.ofNullable(this.pointAssociated).isPresent() || isFlat || isConsumerUnit){
+    protected String pointAssociated;
+
+    @JsonIgnore
+    public String getPoint() throws ContractNotAssociatedWithPointException {
+
+        if (Optional.ofNullable(this.pointAssociated).isPresent() || isFlat || isConsumerUnit) {
             return this.pointAssociated;
-        }else{
+        } else {
             throw new ContractNotAssociatedWithPointException();
         }
+    }
+
+    @JsonIgnore
+    public boolean isFather() {
+        
+        if(this.isApportionment){
+            return !Optional.ofNullable(this.codeContractApportionment).isPresent() || (Optional.ofNullable(codeContractApportionment).isPresent() && codeContractApportionment.equals(0L) );
+        }else{
+            return false;
+        }     
     }
 
     @PrePersist
