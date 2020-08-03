@@ -91,6 +91,7 @@ public class BillingContractsTask implements JavaDelegate {
             this.contractMtxService = context.getBean(ContractMtxService.class);
             this.meansurementPointMtxService = context.getBean(MeansurementPointMtxService.class);
             this.pointStatusService = context.getBean(MeansurementPointStatusService.class);
+
         }
     }
 
@@ -286,8 +287,14 @@ public class BillingContractsTask implements JavaDelegate {
                             variables.put(PROCESS_INFORMATION_MONITOR_CLIENT, contractsSon.stream().findFirst().get().getSNmEmpresaEpce());
                             variables.put(PROCESS_INFORMATION_CLIENT, contractsSon.stream().findFirst().get().getSNmEmpresaEpce());
 
-                            String processInstanceId = this.createAProcessForBilling(execution, contractsSon, variables).getProcessInstanceId();
-                            this.createMeansurementFile(processInstanceId, contractsSon);
+                            ContractMtx contractMtx = contractMtxs.stream().filter(cc -> !cc.isFather()).findFirst().get();
+                            boolean exists = !this.hasMeansurementFile(contractMtx.getWbcContract(), contractMtx.getPointAssociated());
+
+                            if (exists) {
+                                String processInstanceId = this.createAProcessForBilling(execution, contractsSon, variables).getProcessInstanceId();
+                                this.createMeansurementFile(processInstanceId, contractsSon);
+                            }
+
                         } catch (Exception ex) {
                             Logger.getLogger(BillingContractsTask.class.getName()).log(Level.SEVERE, "[Search contracts] -> contrato :" + c.getSNrContrato(), ex);
                         }
