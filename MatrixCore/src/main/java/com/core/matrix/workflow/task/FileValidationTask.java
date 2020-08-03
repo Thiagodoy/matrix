@@ -215,9 +215,9 @@ public class FileValidationTask extends Task {
             });
 
             meansurementFileDetailReportService.saveAllJob(report);
-            
+
         } catch (Exception e) {
-            Logger.getLogger(FileValidationTask.class.getName()).log(Level.SEVERE, "[saveDetailsReport]",e);
+            Logger.getLogger(FileValidationTask.class.getName()).log(Level.SEVERE, "[saveDetailsReport]", e);
         }
 
     }
@@ -326,10 +326,7 @@ public class FileValidationTask extends Task {
 
     private void checkHoursMissing(List<FileDetailDTO> detail) {
 
-        MeansurementFile file = files.stream().findFirst().orElse(null);
-
-        long daysOnMonth = YearMonth.of(file.getYear().intValue(), Month.of(file.getMonth().intValue())).lengthOfMonth();
-
+        // long daysOnMonth = YearMonth.of(file.getYear().intValue(), Month.of(file.getMonth().intValue())).lengthOfMonth();
         files.stream()
                 .filter(f -> !f.getStatus().equals(MeansurementFileStatus.FILE_MISSING_ALL_HOURS))
                 .forEach(f -> {
@@ -340,7 +337,10 @@ public class FileValidationTask extends Task {
                             .filter(d -> d.getMeansurementPoint().replaceAll("\\((L|B)\\)", "").trim().equals(f.getMeansurementPoint()))
                             .count();
 
-                    if (size >= (daysOnMonth * 24)) {
+                    if (size >= 1) {
+                        detail.removeIf(d -> d.getMeansurementPointFormated().equals(f.getMeansurementPoint())
+                                && Optional.ofNullable(d.getOrigem()).isPresent()
+                                && d.getOrigem().equals("DADOS FALTANTES"));
                         f.setStatus(MeansurementFileStatus.FILE_MISSING_ALL_HOURS);
                     }
                 });
@@ -496,7 +496,7 @@ public class FileValidationTask extends Task {
             //Verify if point match some files uploaded. And set the attachment id on file             
             meansuremPoint.parallelStream().forEach(point -> {
                 Optional<MeansurementFile> opt = files.stream()
-                        .filter(f -> f.getStatus().equals(MeansurementFileStatus.FILE_CHECKED))
+                        //.filter(f -> f.getStatus().equals(MeansurementFileStatus.FILE_CHECKED))
                         .filter(file -> file.getMeansurementPoint().equals(point)).findFirst();
 
                 if (opt.isPresent()) {
@@ -515,7 +515,9 @@ public class FileValidationTask extends Task {
                         d.setIdMeansurementFile(file.getId());
                     });
 
-                    file.setStatus(MeansurementFileStatus.SUCCESS);
+                    if (!file.getStatus().equals(MeansurementFileStatus.FILE_MISSING_ALL_HOURS)) {
+                        file.setStatus(MeansurementFileStatus.SUCCESS);
+                    }
 
                     this.addDetails(point, fileDetaisl);
 
