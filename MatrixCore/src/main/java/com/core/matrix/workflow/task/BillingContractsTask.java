@@ -68,7 +68,7 @@ public class BillingContractsTask implements JavaDelegate {
     private MeansurementFileService meansurementFileService;
     private LogService logService;
     private EmailFactory emailFactory;
-    private ThreadPoolEmail threadPoolEmail;   
+    private ThreadPoolEmail threadPoolEmail;
 
     private ContractMtxService contractMtxService;
     private MeansurementPointMtxService meansurementPointMtxService;
@@ -86,7 +86,7 @@ public class BillingContractsTask implements JavaDelegate {
             this.emailFactory = context.getBean(EmailFactory.class);
             this.threadPoolEmail = context.getBean(ThreadPoolEmail.class);
             this.contractMtxService = context.getBean(ContractMtxService.class);
-            this.meansurementPointMtxService = context.getBean(MeansurementPointMtxService.class);            
+            this.meansurementPointMtxService = context.getBean(MeansurementPointMtxService.class);
         }
     }
 
@@ -112,7 +112,7 @@ public class BillingContractsTask implements JavaDelegate {
             List<Log> logs = new ArrayList<>();
 
             this.contractWithoutRateio(contracts, logs, execution);
-            this.contractWithRateio(contracts, logs, execution);            
+            this.contractWithRateio(contracts, logs, execution);
             this.sendEmailWithErrors(execution);
 
             if (!logs.isEmpty()) {
@@ -126,7 +126,7 @@ public class BillingContractsTask implements JavaDelegate {
             log.setProcessName(execution.getProcessDefinitionId());
             this.logService.save(log);
         }
-    }    
+    }
 
     private void sendEmailWithErrors(DelegateExecution execution) {
 
@@ -275,8 +275,14 @@ public class BillingContractsTask implements JavaDelegate {
                             variables.put(PROCESS_INFORMATION_MONITOR_CLIENT, contractsSon.stream().findFirst().get().getSNmEmpresaEpce());
                             variables.put(PROCESS_INFORMATION_CLIENT, contractsSon.stream().findFirst().get().getSNmEmpresaEpce());
 
-                            String processInstanceId = this.createAProcessForBilling(execution, contractsSon, variables).getProcessInstanceId();
-                            this.createMeansurementFile(processInstanceId, contractsSon);
+                            ContractMtx contractMtx = contractMtxs.stream().filter(cc -> !cc.isFather()).findFirst().get();
+                            boolean exists = !this.hasMeansurementFile(contractMtx.getWbcContract(), contractMtx.getPointAssociated());
+
+                            if (exists) {
+                                String processInstanceId = this.createAProcessForBilling(execution, contractsSon, variables).getProcessInstanceId();
+                                this.createMeansurementFile(processInstanceId, contractsSon);
+                            }
+
                         } catch (Exception ex) {
                             Logger.getLogger(BillingContractsTask.class.getName()).log(Level.SEVERE, "[Search contracts] -> contrato :" + c.getSNrContrato(), ex);
                         }
