@@ -16,4 +16,7 @@ import org.springframework.stereotype.Repository;
 @Repository
 public interface MeansurementPointStatusRepository extends JpaRepository<MeansurementPointStatus, Long>{
     
+    
+    
+    
 }

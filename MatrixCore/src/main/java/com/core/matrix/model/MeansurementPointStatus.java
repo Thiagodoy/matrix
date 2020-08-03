@@ -6,7 +6,6 @@
 package com.core.matrix.model;
 
 import com.core.matrix.utils.PointStatus;
-import java.time.LocalDate;
 import java.util.Observable;
 import javax.persistence.Column;
 import javax.persistence.Entity;
@@ -47,6 +46,9 @@ public class MeansurementPointStatus extends Observable implements Model<Meansur
 
     @Column(name = "empresa")
     protected String company;
+    
+    @Column(name = "nome_tarefa")
+    protected String taskName;
 
     @Enumerated(EnumType.STRING)
     @Column(name = "status")

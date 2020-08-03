@@ -19,6 +19,7 @@ import com.core.matrix.service.ContractMtxService;
 import com.core.matrix.service.LogService;
 import com.core.matrix.service.MeansurementFileService;
 import com.core.matrix.service.MeansurementPointMtxService;
+import com.core.matrix.service.MeansurementPointStatusService;
 import com.core.matrix.utils.Constants;
 import static com.core.matrix.utils.Constants.GROUP_MANAGER_PORTAL;
 import static com.core.matrix.utils.Constants.GROUP_SUPPORT_TI;
@@ -68,13 +69,15 @@ public class BillingContractsTask implements JavaDelegate {
     private MeansurementFileService meansurementFileService;
     private LogService logService;
     private EmailFactory emailFactory;
-    private ThreadPoolEmail threadPoolEmail;   
+    private ThreadPoolEmail threadPoolEmail;
 
     private ContractMtxService contractMtxService;
     private MeansurementPointMtxService meansurementPointMtxService;
     private Set<ContractDTO> contractsNotRegistered = new HashSet<>();
     private Set<ContractDTO> contractsAreNotAssociatedWithPoint = new HashSet<>();
     private Set<String> pointsAreNotAssociatedWithProInfa = new HashSet<>();
+
+    private MeansurementPointStatusService pointStatusService;
 
     private static ApplicationContext context;
 
@@ -86,7 +89,8 @@ public class BillingContractsTask implements JavaDelegate {
             this.emailFactory = context.getBean(EmailFactory.class);
             this.threadPoolEmail = context.getBean(ThreadPoolEmail.class);
             this.contractMtxService = context.getBean(ContractMtxService.class);
-            this.meansurementPointMtxService = context.getBean(MeansurementPointMtxService.class);            
+            this.meansurementPointMtxService = context.getBean(MeansurementPointMtxService.class);
+            this.pointStatusService = context.getBean(MeansurementPointStatusService.class);
         }
     }
 
@@ -109,10 +113,12 @@ public class BillingContractsTask implements JavaDelegate {
                 contracts = Collections.synchronizedList(this.contractService.listForBilling(null));
             }
 
+            this.loadAllPoints();
+
             List<Log> logs = new ArrayList<>();
 
             this.contractWithoutRateio(contracts, logs, execution);
-            this.contractWithRateio(contracts, logs, execution);            
+            this.contractWithRateio(contracts, logs, execution);
             this.sendEmailWithErrors(execution);
 
             if (!logs.isEmpty()) {
@@ -126,7 +132,12 @@ public class BillingContractsTask implements JavaDelegate {
             log.setProcessName(execution.getProcessDefinitionId());
             this.logService.save(log);
         }
-    }    
+    }
+
+    private void loadAllPoints() {
+        LocalDate now = LocalDate.now();
+        this.pointStatusService.createPointStatus((long) now.getMonthValue(), (long) now.getYear());
+    }
 
     private void sendEmailWithErrors(DelegateExecution execution) {
 
