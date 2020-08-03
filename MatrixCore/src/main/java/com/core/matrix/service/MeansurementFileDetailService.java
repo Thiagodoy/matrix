@@ -137,7 +137,7 @@ public class MeansurementFileDetailService {
                     detail.subList(0, indexEnd).clear();
                     con.commit();
                 } catch (Exception e) {
-                    writeFile(query, process, e.getLocalizedMessage(), count++);
+                    Logger.getLogger(BindFileToProcessJob.class.getName()).log(Level.SEVERE, "[saveAllBatch]", e);
                 }
 
             }

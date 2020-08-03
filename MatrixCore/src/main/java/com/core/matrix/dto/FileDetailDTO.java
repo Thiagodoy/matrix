@@ -42,7 +42,7 @@ public class FileDetailDTO implements Serializable {
     }
 
     public String getMeansurementPointFormated() {
-        return this.meansurementPoint.replaceAll("\\((L|B)\\)", "");
+        return this.meansurementPoint.replaceAll("\\((L|B)\\)", "").trim();
     }
 
 }
