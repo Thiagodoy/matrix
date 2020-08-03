@@ -16,7 +16,6 @@ import com.core.matrix.request.FileStatusLoteRequest;
 import com.core.matrix.service.ContractMtxService;
 import com.core.matrix.service.LogService;
 import com.core.matrix.service.MeansurementFileService;
-import com.core.matrix.service.MeansurementPointMtxService;
 import static com.core.matrix.utils.Constants.RESPONSE_LIST_PROCESS_ANALIZED;
 import com.core.matrix.utils.ThreadPoolBindFile;
 import com.core.matrix.utils.ThreadPoolParseFile;
