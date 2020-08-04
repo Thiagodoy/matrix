@@ -473,14 +473,11 @@ public class BillingContractsTask implements JavaDelegate {
 
         boolean isFlatOrUnit = Boolean.logicalOr(contract.isFlat(), contract.isConsumerUnit());
         
-        if(isFlatOrUnit){
+        if(isFlatOrUnit || !Optional.ofNullable(point).isPresent()){
             return this.meansurementFileService.exists(contract.getWbcContract(), month, year);
         }else{
             return this.meansurementFileService.exists(contract.getWbcContract(), point, month, year);
         }
-        
-        
-
     }
 
 }
