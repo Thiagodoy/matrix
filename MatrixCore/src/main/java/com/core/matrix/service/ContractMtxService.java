@@ -7,15 +7,26 @@ package com.core.matrix.service;
 
 import com.core.matrix.dto.ContractPointDTO;
 import com.core.matrix.exceptions.EntityNotFoundException;
+import com.core.matrix.model.ContractCompInformation;
 import com.core.matrix.model.ContractMtx;
+import com.core.matrix.model.MeansurementFile;
 import com.core.matrix.model.MeansurementPointMtx;
 import com.core.matrix.repository.ContractMtxRepository;
 import com.core.matrix.response.ContractMtxResponse;
+import static com.core.matrix.utils.Constants.PROCESS_BILLING_CONTRACT_MESSAGE_EVENT;
+import static com.core.matrix.utils.Constants.PROCESS_CONTRACTS_RELOAD_BILLING;
+import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 import java.util.stream.Collectors;
+import org.activiti.engine.RuntimeService;
+import org.activiti.engine.TaskService;
+import org.activiti.engine.task.Attachment;
+import org.activiti.engine.task.Comment;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -28,6 +39,22 @@ public class ContractMtxService extends Service<ContractMtx, ContractMtxReposito
 
     @Autowired
     private MeansurementPointMtxService pointMtxService;
+    
+    @Autowired
+    private MeansurementFileService meansurementFileService;
+    
+    @Autowired
+    private MeansurementFileResultService fileResultService;
+    
+    @Autowired
+    private LogService logService;
+    
+    @Autowired
+    private TaskService taskService;
+    
+    @Autowired
+    private RuntimeService runtimeService;
+    
 
     public ContractMtxService(ContractMtxRepository repositoy) {
         super(repositoy);
@@ -124,5 +151,57 @@ public class ContractMtxService extends Service<ContractMtx, ContractMtxReposito
             return false;
         }
     }
+    
+    
+     @Transactional(transactionManager = "matrixTransactionManager")
+    public void reloadProcess(Long contractId) throws Exception {
+
+        List<ContractMtx> list = this.findAll(contractId).getContracts();
+
+        if (list.isEmpty()) {
+            throw new Exception("Contrato sem informação complementar!");
+        }
+
+        LocalDate now = LocalDate.now();
+        Long month = (long) now.minusMonths(1).getMonthValue();
+        Long year = (long) now.getYear();
+        List<Long> contracts = list.stream().mapToLong(ContractMtx::getWbcContract).boxed().collect(Collectors.toList());
+
+        List<MeansurementFile> files = meansurementFileService.listByContractsAndMonthAndYear(contracts, month, year);
+        String processInstanceID = null;
+
+        if (!files.isEmpty()) {
+
+            processInstanceID = files.stream().findFirst().get().getProcessInstanceId();
+            
+            fileResultService.deleteByProcess(processInstanceID);
+            meansurementFileService.deleteByProcessInstance(processInstanceID);
+            logService.deleteLogsByProcessInstance(processInstanceID);            
+
+            List<Attachment> attachments = taskService.getProcessInstanceAttachments(processInstanceID);
+            List<Comment> comments = taskService.getProcessInstanceComments(processInstanceID);
+
+            attachments.forEach(att -> {
+                taskService.deleteAttachment(att.getId());
+            });
+
+            comments.forEach(com -> {
+                taskService.deleteComment(com.getId());
+            });
+            
+            try {
+                runtimeService.deleteProcessInstance(processInstanceID, "Contract was updated!");
+            } catch (Exception e) {
+            }
+            
+        }        
+        
+
+        Map<String, Object> variables = new HashMap<>();
+        variables.put(PROCESS_CONTRACTS_RELOAD_BILLING, list);
+        runtimeService.startProcessInstanceByMessage(PROCESS_BILLING_CONTRACT_MESSAGE_EVENT, variables);
+
+    }
+    
 
 }

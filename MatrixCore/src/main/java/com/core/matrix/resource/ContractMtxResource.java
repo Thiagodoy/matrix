@@ -62,5 +62,17 @@ public class ContractMtxResource extends Resource<ContractMtx, ContractMtxServic
             return ResponseEntity.status(HttpStatus.resolve(500)).body(e.getMessage());
         }
     }
+    
+    @RequestMapping(value = "/reloadProcess", method = RequestMethod.POST)
+    public ResponseEntity reloadProcess(@RequestParam(required = true, name = "contractId") Long contractId) {
+        try {
+            this.service.reloadProcess(contractId);
+            return ResponseEntity.ok().build();
+
+        } catch (Exception e) {
+            Logger.getLogger(ContractCompInformationResource.class.getName()).log(Level.SEVERE, "[post]", e);
+            return ResponseEntity.status(HttpStatus.resolve(500)).body(e.getMessage());
+        }
+    }
 
 }
