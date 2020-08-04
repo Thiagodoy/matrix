@@ -5,8 +5,10 @@
  */
 package com.core.matrix.workflow.task;
 
+import com.core.matrix.model.ContractMtx;
 import com.core.matrix.model.MeansurementFile;
 import com.core.matrix.model.MeansurementFileDetail;
+import com.core.matrix.service.ContractMtxService;
 import com.core.matrix.service.MeansurementFileResultService;
 import com.core.matrix.service.MeansurementFileService;
 import com.core.matrix.utils.Constants;
@@ -30,6 +32,7 @@ public class CleanFileResult extends Task {
     private static ApplicationContext context;
     private MeansurementFileResultService fileResultService;
     private MeansurementFileService meansurementFileService;
+    private ContractMtxService contractMtxService;
 
     public CleanFileResult(ApplicationContext context) {
         CleanFileResult.context = context;
@@ -39,6 +42,7 @@ public class CleanFileResult extends Task {
         synchronized (CleanFileResult.context) {
             this.fileResultService = CleanFileResult.context.getBean(MeansurementFileResultService.class);
             this.meansurementFileService = CleanFileResult.context.getBean(MeansurementFileService.class);
+            this.contractMtxService = CleanFileResult.context.getBean(ContractMtxService.class);
         }
     }
 
@@ -51,8 +55,8 @@ public class CleanFileResult extends Task {
 
             this.fileResultService.deleteByProcess(execution.getProcessInstanceId());
 
-            this.hasPersitencePending(execution.getProcessInstanceId());            
-            
+            this.hasPersitencePending(execution.getProcessInstanceId());
+
             List<MeansurementFile> files = this.meansurementFileService.findByProcessInstanceId(execution.getProcessInstanceId());
 
             Map<String, List<MeansurementFileDetail>> details = files
@@ -60,8 +64,6 @@ public class CleanFileResult extends Task {
                     .map(MeansurementFile::getDetails)
                     .flatMap(List::stream)
                     .collect(Collectors.groupingBy(d -> d.getMeansurementPoint().replaceAll("\\((L|B)\\)", "").trim()));
-
-            
 
             List<MeansurementFile> fTemps = new ArrayList<>();
             files.forEach(ff -> {
@@ -80,6 +82,11 @@ public class CleanFileResult extends Task {
                 fTemps.add(fTemp);
             });
 
+            MeansurementFile file = files.stream().findFirst().get();
+
+            List<ContractMtx> contractMtx = this.contractMtxService.findAll(file.getWbcContract()).getContracts();
+
+            this.setVariable(Constants.PROCESS_INFORMATION_CONTRACTS_MATRIX, contractMtx);
             this.setVariable(Constants.VAR_LIST_FILES, fTemps);
             this.setVariable(Constants.VAR_MAP_DETAILS, details);
 

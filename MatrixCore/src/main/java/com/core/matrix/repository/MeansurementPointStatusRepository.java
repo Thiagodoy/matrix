@@ -23,7 +23,7 @@ public interface MeansurementPointStatusRepository extends JpaRepository<Meansur
     
     
     @Query(nativeQuery = true)
-    List<PointStatusSummaryDTO>summary(@Param("month") Long month, Long year);
+    List<PointStatusSummaryDTO>summary(@Param("month") Long month, @Param("year")Long year);
     
     
 }
