@@ -9,7 +9,6 @@ import com.core.matrix.exceptions.ContractNotAssociatedWithPointException;
 import com.core.matrix.exceptions.EntityNotFoundException;
 import com.core.matrix.exceptions.PointWithoutProinfaException;
 import com.core.matrix.factory.EmailFactory;
-import com.core.matrix.model.ContractCompInformation;
 import com.core.matrix.model.ContractMtx;
 import com.core.matrix.model.Email;
 import com.core.matrix.model.Log;
@@ -106,7 +105,7 @@ public class BillingContractsTask implements JavaDelegate {
             List<ContractDTO> contracts;
 
             if (execution.hasVariable(PROCESS_CONTRACTS_RELOAD_BILLING)) {
-                List<ContractCompInformation> cc = (List<ContractCompInformation>) execution.getVariable(PROCESS_CONTRACTS_RELOAD_BILLING, List.class);
+                List<ContractMtx> cc = (List<ContractMtx>) execution.getVariable(PROCESS_CONTRACTS_RELOAD_BILLING, List.class);
 
                 contracts = Collections.synchronizedList(this.contractService.listForBilling(cc));
 
@@ -287,7 +286,7 @@ public class BillingContractsTask implements JavaDelegate {
                             variables.put(PROCESS_INFORMATION_MONITOR_CLIENT, contractsSon.stream().findFirst().get().getSNmEmpresaEpce());
                             variables.put(PROCESS_INFORMATION_CLIENT, contractsSon.stream().findFirst().get().getSNmEmpresaEpce());
 
-                            ContractMtx contractMtx = contractMtxs.stream().filter(cc -> !cc.isFather()).findFirst().get();                            
+                            ContractMtx contractMtx = contractMtxs.stream().filter(cc -> !cc.isFather()).findFirst().get();
                             boolean exists = !this.hasMeansurementFile(contractMtx, contractMtx.getPointAssociated());
 
                             if (exists) {
@@ -472,10 +471,10 @@ public class BillingContractsTask implements JavaDelegate {
         Long year = Integer.valueOf(monthBilling.getYear()).longValue();
 
         boolean isFlatOrUnit = Boolean.logicalOr(contract.isFlat(), contract.isConsumerUnit());
-        
-        if(isFlatOrUnit || !Optional.ofNullable(point).isPresent()){
+
+        if (isFlatOrUnit || !Optional.ofNullable(point).isPresent()) {
             return this.meansurementFileService.exists(contract.getWbcContract(), month, year);
-        }else{
+        } else {
             return this.meansurementFileService.exists(contract.getWbcContract(), point, month, year);
         }
     }

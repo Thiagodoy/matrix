@@ -5,10 +5,10 @@
  */
 package com.core.matrix.workflow.task;
 
-import com.core.matrix.model.ContractCompInformation;
+import com.core.matrix.model.ContractMtx;
 import com.core.matrix.model.Log;
 import com.core.matrix.model.MeansurementFile;
-import com.core.matrix.service.ContractCompInformationService;
+import com.core.matrix.service.ContractMtxService;
 import com.core.matrix.service.LogService;
 import com.core.matrix.service.MeansurementFileAuthorityService;
 import com.core.matrix.service.MeansurementFileDetailService;
@@ -42,7 +42,7 @@ public class DeleteProcessInstanceTask implements JavaDelegate {
 
     private LogService logService;
 
-    private ContractCompInformationService compInformationService;
+    private ContractMtxService contractMtxService;
 
     private MeansurementFileService meansurementFileService;
 
@@ -59,7 +59,7 @@ public class DeleteProcessInstanceTask implements JavaDelegate {
     public DeleteProcessInstanceTask() {
         synchronized (DeleteProcessInstanceTask.context) {
             this.logService = DeleteProcessInstanceTask.context.getBean(LogService.class);
-            this.compInformationService = DeleteProcessInstanceTask.context.getBean(ContractCompInformationService.class);
+            this.contractMtxService = DeleteProcessInstanceTask.context.getBean(ContractMtxService.class);
             this.meansurementFileService = DeleteProcessInstanceTask.context.getBean(MeansurementFileService.class);
             this.meansurementRepurchaseService = DeleteProcessInstanceTask.context.getBean(MeansurementRepurchaseService.class);
             this.meansurementFileAuthorityService = DeleteProcessInstanceTask.context.getBean(MeansurementFileAuthorityService.class);
@@ -109,7 +109,7 @@ public class DeleteProcessInstanceTask implements JavaDelegate {
                         });
             }
 
-            List<ContractCompInformation> list = this.compInformationService.listByContract(contractId);
+            List<ContractMtx> list = this.contractMtxService.findAll(contractId).getContracts();
 
             this.meansurementRepurchaseService.deleteByProcessInstanceId(processInstanceId);
 
@@ -158,7 +158,10 @@ public class DeleteProcessInstanceTask implements JavaDelegate {
     }
 
     private void setContract(List<ContractDTO> contractDTOs) {
-        contractId = Long.valueOf(contractDTOs.stream().findFirst().get().getSNrContrato());
+
+        if (!Optional.ofNullable(this.contractId).isPresent()) {
+            contractId = Long.valueOf(contractDTOs.stream().findFirst().get().getSNrContrato());
+        }
     }
 
 }
