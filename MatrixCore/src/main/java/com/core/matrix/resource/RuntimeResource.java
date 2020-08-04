@@ -6,6 +6,7 @@
 package com.core.matrix.resource;
 
 import com.core.matrix.dto.CommentDTO;
+import com.core.matrix.exceptions.ProcessIsRunningException;
 import com.core.matrix.request.AddComment;
 import com.core.matrix.request.CompleteTaskRequest;
 import com.core.matrix.request.DeleteProcessRequest;
@@ -68,7 +69,10 @@ public class RuntimeResource {
         try {
             String response = this.service.startProcessByMessage(message);
             return ResponseEntity.ok(response);
-        } catch (Exception e) {
+        }catch(ProcessIsRunningException e){            
+            return ResponseEntity.status(HttpStatus.resolve(501)).body(e.getMessage());
+        } 
+        catch (Exception e) {
             Logger.getLogger(RuntimeResource.class.getName()).log(Level.SEVERE, "[startProcessByMessage]", e);
             return ResponseEntity.status(HttpStatus.resolve(500)).body(e.getMessage());
         }

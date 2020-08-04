@@ -5,19 +5,26 @@
  */
 package com.core.matrix.service;
 
+import com.core.matrix.dto.PointStatusSummaryDTO;
 import com.core.matrix.model.MeansurementPointStatus;
 import com.core.matrix.repository.MeansurementPointStatusRepository;
 import com.core.matrix.utils.PointStatus;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.Observable;
 import java.util.Observer;
+import java.util.Optional;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ThreadPoolExecutor;
+import javax.transaction.Transactional;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Scope;
 import org.springframework.data.domain.Example;
 import org.springframework.data.domain.ExampleMatcher;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Component;
 
 /**
@@ -25,7 +32,7 @@ import org.springframework.stereotype.Component;
  * @author thiag
  */
 @Component
-@Scope("singleton") 
+@Scope("singleton")
 public class MeansurementPointStatusService implements Observer {
 
     @Autowired
@@ -61,6 +68,13 @@ public class MeansurementPointStatusService implements Observer {
                 status.addObserver(this);
                 this.mapPoint.put(point, status);
             });
+        } else {
+            if (this.mapPoint.isEmpty()) {
+                this.repository.findAll().forEach(point -> {
+                    point.addObserver(this);
+                    this.mapPoint.put(point.getPoint(), point);
+                });
+            }
         }
 
     }
@@ -72,24 +86,57 @@ public class MeansurementPointStatusService implements Observer {
 
         synchronized (pool) {
             pool.submit(() -> {
-                MeansurementPointStatus status = this.repository.save(meansurementPointStatus);
-                this.mapPoint.put(status.getPoint(), status);
+                this.updatePOint(meansurementPointStatus);
             });
         }
     }
-    
-    
-    public synchronized MeansurementPointStatus getPoint(String point){
-        
-        if(this.mapPoint.containsKey(point)){
-           return this.mapPoint.get(point);
-        }else{            
-           MeansurementPointStatus status = this.mapPoint.values().stream().findFirst().get();
-           MeansurementPointStatus statusNew = new MeansurementPointStatus(point, status.getMonth(), status.getYear());
-           statusNew = this.repository.save(statusNew);
-           statusNew.addObserver(this);
-           this.mapPoint.put(point, statusNew);
-           return statusNew;            
+
+    @Transactional
+    private void updatePOint(MeansurementPointStatus status) {
+        MeansurementPointStatus up = this.repository.save(status);
+        up.addObserver(this);
+        this.mapPoint.put(status.getPoint(), up);
+    }
+
+    public void resetPoint(String point) {
+
+        if (this.mapPoint.containsKey(point)) {
+            MeansurementPointStatus pointStatus = this.mapPoint.get(point);
+            pointStatus.setHours(0L);
+            pointStatus.setStatus(PointStatus.NO_READ);
+            pointStatus.setMountScde(0D);
+            pointStatus.setCompany("");
+            pointStatus.setAmountGross(0D);
+            pointStatus.setAmountLiquid(0D);
+            pointStatus.forceUpdate();
         }
-    } 
+    }
+
+    @Transactional
+    public synchronized MeansurementPointStatus getPoint(String point) {
+
+        if (this.mapPoint.containsKey(point)) {
+            return this.mapPoint.get(point);
+        } else if (Optional.ofNullable(point).isPresent()) {
+            MeansurementPointStatus status = this.mapPoint.values().stream().findFirst().get();
+            MeansurementPointStatus statusNew = new MeansurementPointStatus(point, status.getMonth(), status.getYear());
+            statusNew = this.repository.save(statusNew);
+            statusNew.addObserver(this);
+            this.mapPoint.put(point, statusNew);
+            return statusNew;
+        } else {
+            throw new RuntimeException("Not found point null for update!");
+        }
+    }
+
+    @Transactional
+    public Page<MeansurementPointStatus> find(Specification specification, Pageable page) {
+        return this.repository.findAll(specification, page);
+    }
+
+    @Transactional
+    public List<PointStatusSummaryDTO> summary(Long month, Long year) {
+        return this.repository.summary(month, year);
+    }
+
 }

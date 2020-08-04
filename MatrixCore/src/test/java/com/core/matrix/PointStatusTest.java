@@ -5,8 +5,9 @@
  */
 package com.core.matrix;
 
-
+import com.core.matrix.model.MeansurementPointStatus;
 import com.core.matrix.service.MeansurementPointStatusService;
+import com.core.matrix.utils.PointStatus;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -18,15 +19,21 @@ import org.springframework.boot.test.context.SpringBootTest;
 @SpringBootTest
 public class PointStatusTest {
 
-    
     @Autowired
     private MeansurementPointStatusService pointStatusService;
 
     @Test
     public void generateAllPoints() {
-        
+
         pointStatusService.createPointStatus(7L, 2020L);
-    
+
+        MeansurementPointStatus status = pointStatusService.getPoint("ALFKFRENTR101");
+        status.setStatus(PointStatus.READ);
+        status.forceUpdate();
+
+        
+        status = pointStatusService.getPoint("THIAGO");
+        
 
     }
 }

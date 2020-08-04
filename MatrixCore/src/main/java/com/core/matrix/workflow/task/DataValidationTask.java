@@ -24,10 +24,12 @@ import java.util.stream.Collectors;
 import org.activiti.engine.delegate.DelegateExecution;
 import org.springframework.context.ApplicationContext;
 import com.core.matrix.model.Log;
+import com.core.matrix.model.MeansurementPointStatus;
+import com.core.matrix.service.MeansurementPointStatusService;
 import com.core.matrix.utils.MeansurementFileType;
+import com.core.matrix.utils.PointStatus;
 import java.text.MessageFormat;
 import java.util.Collections;
-import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import java.util.stream.Stream;
@@ -47,11 +49,13 @@ public class DataValidationTask extends Task {
     private static ApplicationContext context;
 
     private List<DataValidationResultDTO> results = null;
+    private MeansurementPointStatusService pointStatusService;
 
     public DataValidationTask() {
         synchronized (DataValidationTask.context) {
             this.fileService = DataValidationTask.context.getBean(MeansurementFileService.class);
             this.logService = DataValidationTask.context.getBean(LogService.class);
+            this.pointStatusService = DataValidationTask.context.getBean(MeansurementPointStatusService.class);
         }
     }
 
@@ -140,7 +144,40 @@ public class DataValidationTask extends Task {
             this.setVariable(CONTROLE, RESPONSE_DATA_IS_VALID);
         }
 
+        this.alterStatusPoint(files);
         this.writeVariables(delegateExecution);
+
+    }
+
+    private void alterStatusPoint(List<MeansurementFile> files) {
+
+        try {
+            this.getPointsRead().forEach(point -> {
+                MeansurementPointStatus pointStatus = this.pointStatusService.getPoint(point);
+                MeansurementFile file = files.stream().filter(f -> f.getMeansurementPoint().equals(point)).findFirst().get();
+
+                switch (file.getStatus()) {
+                    case DATA_CALENDAR_ERROR:
+                        pointStatus.setStatus(PointStatus.PENDING);
+                        break;
+                    case DATA_DAY_ERROR:
+                    case DATA_HOUR_ERROR:
+                    case FILE_MISSING_ALL_HOURS:
+                        pointStatus.setStatus(PointStatus.PENDING);
+                        DataValidationResultDTO resultDTO = this.results.stream().filter(result -> result.getPoint().equals(point)).findFirst().get();
+                        pointStatus.setHours(resultDTO.getHours());
+                        pointStatus.setMountScde(resultDTO.getTotalScde());
+                        break;
+                    default:                        
+                        Double mount = this.getMapDetails().get(point).stream().mapToDouble(MeansurementFileDetail::getConsumptionActive).sum();
+                        pointStatus.setMountScde(mount);
+                }
+                
+                pointStatus.forceUpdate();
+            });
+        } catch (Exception e) {
+            Logger.getLogger(FileValidationTask.class.getName()).log(Level.SEVERE, "[alterStatusPoint]", e);
+        }
 
     }
 
@@ -192,10 +229,10 @@ public class DataValidationTask extends Task {
         result.setPoint(file.getMeansurementPoint());
 
         Double sum = file.getDetails()
-                            .stream()
-                            .mapToDouble(MeansurementFileDetail::getConsumptionActive)
-                            .reduce(Double::sum)
-                            .getAsDouble();
+                .stream()
+                .mapToDouble(MeansurementFileDetail::getConsumptionActive)
+                .reduce(Double::sum)
+                .getAsDouble();
 
         result.setTotalScde(sum);
 
@@ -206,7 +243,6 @@ public class DataValidationTask extends Task {
 
         this.addDetails(file.getMeansurementPoint(), detailsTemp);
         file.setStatus(MeansurementFileStatus.DATA_HOUR_ERROR);
-        
 
     }
 

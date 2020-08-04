@@ -15,13 +15,16 @@ import com.core.matrix.model.MeansurementFile;
 import com.core.matrix.model.MeansurementFileDetail;
 import com.core.matrix.model.MeansurementFileDetailReport;
 import com.core.matrix.model.MeansurementPointMtx;
+import com.core.matrix.model.MeansurementPointStatus;
 import com.core.matrix.service.LogService;
 import com.core.matrix.service.MeansurementFileDetailReportService;
 import com.core.matrix.service.MeansurementFileDetailService;
 import com.core.matrix.service.MeansurementFileService;
 import com.core.matrix.service.MeansurementPointMtxService;
+import com.core.matrix.service.MeansurementPointStatusService;
 import com.core.matrix.utils.MeansurementFileStatus;
 import com.core.matrix.utils.MeansurementFileType;
+import com.core.matrix.utils.PointStatus;
 import com.core.matrix.validator.Validator;
 import java.io.BufferedReader;
 import java.io.ByteArrayInputStream;
@@ -34,8 +37,6 @@ import java.io.InputStreamReader;
 import java.nio.charset.Charset;
 import java.text.MessageFormat;
 import java.time.LocalDateTime;
-import java.time.Month;
-import java.time.YearMonth;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
@@ -69,10 +70,9 @@ public class FileValidationTask extends Task {
     private DelegateExecution delegateExecution;
     private LogService logService;
     private MeansurementPointMtxService meansurementPointMtxService;
-
     private List<MeansurementFile> files;
-
     private MeansurementFileDetailReportService meansurementFileDetailReportService;
+    private MeansurementPointStatusService pointStatusService;
 
     private List<Log> logs;
 
@@ -85,6 +85,7 @@ public class FileValidationTask extends Task {
             this.logService = FileValidationTask.context.getBean(LogService.class);
             this.meansurementPointMtxService = FileValidationTask.context.getBean(MeansurementPointMtxService.class);
             this.meansurementFileDetailReportService = FileValidationTask.context.getBean(MeansurementFileDetailReportService.class);
+            this.pointStatusService = FileValidationTask.context.getBean(MeansurementPointStatusService.class);
 
         }
 
@@ -187,6 +188,7 @@ public class FileValidationTask extends Task {
                 this.setVariable(CONTROLE, RESPONSE_LAYOUT_INVALID);
             } else {
                 this.alterStatusFiles(files);
+                this.alterStatusPoint();
                 this.setVariable(CONTROLE, RESPONSE_LAYOUT_VALID);
             }
 
@@ -195,6 +197,22 @@ public class FileValidationTask extends Task {
             this.generateLog(de, e, "Erro ao processar o arquivo");
         } finally {
             this.writeVariables(delegateExecution);
+        }
+
+    }
+
+    private void alterStatusPoint() {
+
+        try {
+            this.getPointsRead().forEach(point -> {
+                MeansurementPointStatus pointStatus = this.pointStatusService.getPoint(point);
+                pointStatus.setStatus(PointStatus.READ);
+                MeansurementFile file = this.getFileByPoint(point);
+                pointStatus.setCompany(file.getNickname());                                
+                pointStatus.forceUpdate();
+            });
+        } catch (Exception e) {
+            Logger.getLogger(FileValidationTask.class.getName()).log(Level.SEVERE, "[alterStatusPoint]", e);
         }
 
     }

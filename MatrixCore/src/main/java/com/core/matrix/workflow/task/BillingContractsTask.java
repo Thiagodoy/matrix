@@ -136,7 +136,7 @@ public class BillingContractsTask implements JavaDelegate {
     }
 
     private void loadAllPoints() {
-        LocalDate now = LocalDate.now();
+        LocalDate now = LocalDate.now().minusMonths(1);
         this.pointStatusService.createPointStatus((long) now.getMonthValue(), (long) now.getYear());
     }
 
@@ -287,8 +287,8 @@ public class BillingContractsTask implements JavaDelegate {
                             variables.put(PROCESS_INFORMATION_MONITOR_CLIENT, contractsSon.stream().findFirst().get().getSNmEmpresaEpce());
                             variables.put(PROCESS_INFORMATION_CLIENT, contractsSon.stream().findFirst().get().getSNmEmpresaEpce());
 
-                            ContractMtx contractMtx = contractMtxs.stream().filter(cc -> !cc.isFather()).findFirst().get();
-                            boolean exists = !this.hasMeansurementFile(contractMtx.getWbcContract(), contractMtx.getPointAssociated());
+                            ContractMtx contractMtx = contractMtxs.stream().filter(cc -> !cc.isFather()).findFirst().get();                            
+                            boolean exists = !this.hasMeansurementFile(contractMtx, contractMtx.getPointAssociated());
 
                             if (exists) {
                                 String processInstanceId = this.createAProcessForBilling(execution, contractsSon, variables).getProcessInstanceId();
@@ -323,7 +323,7 @@ public class BillingContractsTask implements JavaDelegate {
                                     .checkProInfa();
                         }
 
-                        if (execution.hasVariable(PROCESS_CONTRACTS_RELOAD_BILLING) || !this.hasMeansurementFile(contractMtx.getWbcContract(), point)) {
+                        if (execution.hasVariable(PROCESS_CONTRACTS_RELOAD_BILLING) || !this.hasMeansurementFile(contractMtx, point)) {
                             Map<String, Object> variables = new HashMap();
                             variables.put(PROCESS_INFORMATION_CONTRACTS_MATRIX, Arrays.asList(contractMtx));
                             String processInstanceId = this.createAProcessForBilling(execution, contract, variables).getProcessInstanceId();
@@ -458,20 +458,28 @@ public class BillingContractsTask implements JavaDelegate {
         contracts
                 .stream()
                 .filter(c -> c.getNCdContratoRateioControlador() != null)
-                .filter(c -> !this.hasMeansurementFile(Long.parseLong(c.getSNrContrato()), c.getMeansurementPoint()))
+                //.filter(c -> !this.hasMeansurementFile(Long.parseLong(c.getSNrContrato()), c.getMeansurementPoint()))
                 .forEach(contract -> {
                     this.createMeansurementFile(processInstanceId, contract);
                 });
     }
 
-    private boolean hasMeansurementFile(Long contract, String point) {
+    private boolean hasMeansurementFile(ContractMtx contract, String point) {
 
         LocalDate monthBilling = LocalDate.now().minusMonths(1);
 
         Long month = Integer.valueOf(monthBilling.getMonth().getValue()).longValue();
         Long year = Integer.valueOf(monthBilling.getYear()).longValue();
 
-        return this.meansurementFileService.exists(contract, point, month, year);
+        boolean isFlatOrUnit = Boolean.logicalOr(contract.isFlat(), contract.isConsumerUnit());
+        
+        if(isFlatOrUnit){
+            return this.meansurementFileService.exists(contract.getWbcContract(), month, year);
+        }else{
+            return this.meansurementFileService.exists(contract.getWbcContract(), point, month, year);
+        }
+        
+        
 
     }
 

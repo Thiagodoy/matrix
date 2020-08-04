@@ -131,7 +131,12 @@ public class MeansurementFileService {
 
     @Transactional(readOnly = true)
     public boolean exists(Long contract, String meansurementPoint, Long month, Long year) {
-        return this.repository.exists(contract, meansurementPoint, month, year).isPresent();
+        return !this.repository.exists(contract, meansurementPoint, month, year).isEmpty();
+    }
+    
+    @Transactional(readOnly = true)
+    public boolean exists(Long contract, Long month, Long year) {
+        return !this.repository.exists(contract, month, year).isEmpty();
     }
     
     @Transactional(readOnly = true)

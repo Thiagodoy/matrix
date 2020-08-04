@@ -36,6 +36,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
+import java.util.Set;
 import java.util.stream.Collectors;
 import org.activiti.engine.delegate.JavaDelegate;
 import org.activiti.engine.delegate.VariableScope;
@@ -65,20 +66,20 @@ public abstract class Task implements JavaDelegate {
 
     public synchronized void loadVariables(VariableScope delegateExecution) {
         variables.putAll(delegateExecution.getVariables());
-    }    
+    }
 
     public synchronized List<MeansurementFileDetail> getDetails(MeansurementFile file, VariableScope delegateExecution) throws Exception {
 
         List<MeansurementFileDetail> result = new ArrayList<>();
-        
+
         MeansurementFileType type = file.getType();
-        
-        if(this.isOnlyContractFlatOrUnitConsumer() && !Optional.ofNullable(this.getMapDetails()).isPresent() ){
+
+        if (this.isOnlyContractFlatOrUnitConsumer() && !Optional.ofNullable(this.getMapDetails()).isPresent()) {
             return result;
-        }        
-        
-        if(this.isUnitConsumer(file.getWbcContract())){            
-           type = this.getFiles(false).stream().map(MeansurementFile::getType).distinct().findFirst().orElse(null);            
+        }
+
+        if (this.isUnitConsumer(file.getWbcContract())) {
+            type = this.getFiles(false).stream().map(MeansurementFile::getType).distinct().findFirst().orElse(null);
         }
 
         switch (type) {
@@ -159,16 +160,19 @@ public abstract class Task implements JavaDelegate {
     public Map<String, List<MeansurementFileDetail>> getMapDetails() {
         return (Map) this.variables.get(VAR_MAP_DETAILS);
     }
-    
-    public List<ContractMtx>getContractsMtx(){
+
+    public Set<String> getPointsRead() {
+        return this.getMapDetails().keySet();
+    }
+
+    public List<ContractMtx> getContractsMtx() {
         return (List<ContractMtx>) this.variables.get(PROCESS_INFORMATION_CONTRACTS_MATRIX);
     }
-    
-    public List<String> getAllFilesUploaded(){
+
+    public List<String> getAllFilesUploaded() {
         return (List<String>) this.variables.get(LIST_ATTACHMENT_ID);
-    } 
-    
-    
+    }
+
     public boolean isOnlyContractFlatOrUnitConsumer() {
 
         List<ContractMtx> contractMtxs = this.getContractsMtx();
@@ -178,19 +182,20 @@ public abstract class Task implements JavaDelegate {
         boolean noFile = this.getAllFilesUploaded().isEmpty();
         return ((allFlat || allUnitConsumer) && noFile);
     }
-    
-    
-    public boolean isFlat(Long contract){
+
+    public boolean isFlat(Long contract) {
         List<ContractMtx> contractMtxs = this.getContractsMtx();
-        return contractMtxs.stream().filter(c-> c.getWbcContract().equals(contract)).allMatch(ContractMtx::isFlat);
+        return contractMtxs.stream().filter(c -> c.getWbcContract().equals(contract)).allMatch(ContractMtx::isFlat);
     }
-    
-    public boolean isUnitConsumer(Long contract){
-        List<ContractMtx> contractMtxs = this.getContractsMtx();        
-        return contractMtxs.stream().filter(c-> c.getWbcContract().equals(contract)).allMatch(ContractMtx::isConsumerUnit);
+
+    public boolean isUnitConsumer(Long contract) {
+        List<ContractMtx> contractMtxs = this.getContractsMtx();
+        return contractMtxs.stream().filter(c -> c.getWbcContract().equals(contract)).allMatch(ContractMtx::isConsumerUnit);
     }
-    
-    
+
+    public MeansurementFile getFileByPoint(String point) {
+        return this.getFiles(false).stream().filter(f -> f.getMeansurementPoint().equals(point)).findFirst().get();
+    }
 
     public List<MeansurementFile> getFiles(boolean loadDetail) {
 
@@ -199,9 +204,9 @@ public abstract class Task implements JavaDelegate {
         Map<String, List<MeansurementFileDetail>> details = this.getMapDetails();
 
         files.forEach(f -> {
-            if(loadDetail && Optional.ofNullable(details).isPresent()){
-               f.setDetails(details.get(f.getMeansurementPoint())); 
-            }            
+            if (loadDetail && Optional.ofNullable(details).isPresent()) {
+                f.setDetails(details.get(f.getMeansurementPoint()));
+            }
         });
 
         return files;

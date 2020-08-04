@@ -77,7 +77,10 @@ public interface MeansurementFileRepository extends JpaRepository<MeansurementFi
     List<MeansurementFile> hasFilePending(@Param("year") Long year, @Param("month") Long month);
 
     @Query(value = "select c from MeansurementFile c where c.wbcContract = :contract and c.meansurementPoint = :point and c.year = :year and c.month = :month")
-    Optional<MeansurementFile> exists(@Param("contract") Long contract, @Param("point") String meansurementPoint, @Param("month") Long month, @Param("year") Long year);
+    List<MeansurementFile> exists(@Param("contract") Long contract, @Param("point") String meansurementPoint, @Param("month") Long month, @Param("year") Long year);
+    
+    @Query(value = "select c from MeansurementFile c where c.wbcContract = :contract and c.year = :year and c.month = :month")
+    List<MeansurementFile> exists(@Param("contract") Long contract, @Param("month") Long month, @Param("year") Long year);
 
     @Query(value = "select c from MeansurementFile c where c.wbcContract in :contract and c.year = :year and c.month = :month")
     List<MeansurementFile> exists(@Param("contract") List<Long> contract, @Param("month") Long month, @Param("year") Long year);

@@ -9,6 +9,7 @@ import com.core.matrix.service.LogService;
 import com.core.matrix.service.MeansurementFileDetailService;
 import com.core.matrix.service.MeansurementFileResultService;
 import com.core.matrix.service.MeansurementFileService;
+import com.core.matrix.service.MeansurementPointStatusService;
 import static com.core.matrix.utils.Constants.VAR_NO_PERSIST;
 import com.core.matrix.utils.MeansurementFileStatus;
 import java.text.MessageFormat;
@@ -32,6 +33,7 @@ public class CleanFiles implements JavaDelegate {
     private MeansurementFileDetailService fileDetailService;
     private MeansurementFileResultService fileResultService;
     private LogService logService;
+    private MeansurementPointStatusService pointStatusService;
 
     public CleanFiles(ApplicationContext context) {
         CleanFiles.context = context;
@@ -43,6 +45,7 @@ public class CleanFiles implements JavaDelegate {
             this.fileDetailService = CleanFiles.context.getBean(MeansurementFileDetailService.class);
             this.logService = CleanFiles.context.getBean(LogService.class);
             this.fileResultService = CleanFiles.context.getBean(MeansurementFileResultService.class);
+            this.pointStatusService = CleanFiles.context.getBean(MeansurementPointStatusService.class);
         }
     }
 
@@ -59,25 +62,13 @@ public class CleanFiles implements JavaDelegate {
                 execution.getEngineServices().getTaskService().deleteAttachment(attachment.getId());
             }
 
-            
             for (Comment comment : comments) {
                 execution.getEngineServices().getTaskService().deleteComment(comment.getId());
-            }           
+            }
 
-            
-//            this.fileService.findByProcessInstanceId(execution.getProcessInstanceId()).forEach(file -> {
-//
-//                if (!file.getDetails().isEmpty()) {
-//                    try {
-//                        this.fileDetailService.deleteByMeansurementFileId(file.getId());
-//                    } catch (Exception e) {
-//                        Logger.getLogger(CleanFiles.class.getName()).log(Level.SEVERE, "[ deleteByMeansurementFileId ]", e);
-//                    }
-//                }
-//
-//                this.fileService.updateStatus(MeansurementFileStatus.FILE_PENDING, file.getId());
-//                this.fileService.updateFile(null, file.getId());
-//            });
+            this.fileService.findByProcessInstanceId(execution.getProcessInstanceId()).forEach(file -> {
+                pointStatusService.resetPoint(file.getMeansurementPoint());
+            });
 
             this.fileService.updateStatusByProcessInstanceId(MeansurementFileStatus.FILE_PENDING, execution.getProcessInstanceId());
             List<Long> filesIds = this.fileService.listIdsByProcessInstanceId(execution.getProcessInstanceId());
@@ -85,10 +76,10 @@ public class CleanFiles implements JavaDelegate {
             filesIds.stream().forEach(l -> {
                 this.fileDetailService.deleteByMeansurementFileId(l);
             });
-            
+
             logService.deleteLogsByProcessInstance(execution.getProcessInstanceId());
-            
-            fileResultService.deleteByProcess(execution.getProcessInstanceId());           
+
+            fileResultService.deleteByProcess(execution.getProcessInstanceId());
 
             execution.removeVariable(VAR_NO_PERSIST);
 

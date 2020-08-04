@@ -5,13 +5,16 @@ import com.core.matrix.properties.EmailServiceProperties;
 import com.core.matrix.properties.MatrixProperties;
 import com.core.matrix.properties.TesteProperties;
 import com.core.matrix.properties.WbcProperties;
+import com.core.matrix.service.MeansurementPointStatusService;
 import com.core.matrix.utils.ThreadPoolDetail;
 import com.core.matrix.utils.ThreadPoolEmail;
+import java.time.LocalDate;
 import java.util.TimeZone;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.annotation.PostConstruct;
 import javax.annotation.PreDestroy;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.EnableAutoConfiguration;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
@@ -35,7 +38,8 @@ import springfox.documentation.swagger2.annotations.EnableSwagger2;
 public class MatrixApplication {
 
     
-    
+    @Autowired
+    private MeansurementPointStatusService pointStatusService;
     
     public static void main(String[] args) {
         SpringApplication.run(MatrixApplication.class, args);
@@ -44,6 +48,8 @@ public class MatrixApplication {
     @PostConstruct
     public void setTimeZone() {
         TimeZone.setDefault(TimeZone.getTimeZone("America/Cuiaba"));
+        LocalDate now = LocalDate.now().minusMonths(1);
+        pointStatusService.createPointStatus((long)now.getMonthValue(), (long)now.getYear());
     }
     
     @PreDestroy

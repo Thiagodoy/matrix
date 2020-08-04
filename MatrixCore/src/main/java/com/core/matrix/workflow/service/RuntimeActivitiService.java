@@ -6,6 +6,7 @@
 package com.core.matrix.workflow.service;
 
 import com.core.matrix.dto.CommentDTO;
+import com.core.matrix.exceptions.ProcessIsRunningException;
 import com.core.matrix.request.AddComment;
 import com.core.matrix.request.CompleteTaskRequest;
 import com.core.matrix.request.DeleteProcessRequest;
@@ -18,6 +19,7 @@ import com.core.matrix.response.ProcessDetailResponse;
 import com.core.matrix.response.ProcessInstanceStatusResponse;
 import com.core.matrix.response.TaskResponse;
 import com.core.matrix.utils.Constants;
+import static com.core.matrix.utils.Constants.PROCESS_BILLING_CONTRACT_MESSAGE_EVENT;
 import static com.core.matrix.utils.Constants.PROCESS_INFORMATION_PROCESSO_ID;
 import static com.core.matrix.utils.Constants.TASK_DRAFT;
 import com.core.matrix.utils.Utils;
@@ -55,6 +57,7 @@ import org.activiti.engine.impl.persistence.entity.ProcessDefinitionEntity;
 import org.activiti.engine.impl.pvm.PvmTransition;
 import org.activiti.engine.impl.pvm.process.ActivityImpl;
 import org.activiti.engine.impl.task.TaskDefinition;
+import org.activiti.engine.repository.ProcessDefinition;
 
 import org.activiti.engine.runtime.Execution;
 import org.activiti.engine.runtime.ProcessInstance;
@@ -95,6 +98,10 @@ public class RuntimeActivitiService {
 
     @Autowired
     private CommentActivitiService commentActivitiService;
+    
+    @Autowired
+    private ManagementService managementService;
+    
 
     @Transactional
     public void startProcessByMessage(String message, Map<String, Object> variables) {
@@ -102,7 +109,24 @@ public class RuntimeActivitiService {
     }
 
     @Transactional
-    public String startProcessByMessage(String message) {
+    public String startProcessByMessage(String message) throws ProcessIsRunningException {
+
+        if (message.equals(PROCESS_BILLING_CONTRACT_MESSAGE_EVENT)) {
+            ProcessDefinition definition = this.repositoryService
+                    .createProcessDefinitionQuery()
+                    .latestVersion()
+                    .processDefinitionNameLike("AGENDAMENTO DE MEDIÇÃO")
+                    .active()
+                    .singleResult();
+            
+            
+           long count = managementService.createJobQuery().processDefinitionId(definition.getId()).executable().count();
+           
+           if(count > 0){
+               throw new ProcessIsRunningException();
+           }
+        }
+
         return runtimeService.startProcessInstanceByMessage(message).getProcessInstanceId();
 
     }
@@ -114,11 +138,6 @@ public class RuntimeActivitiService {
             request.setVariables(new HashMap<String, Object>());
         }
 
-        
-        
-        
-        
-        
         request.getVariables().put(Constants.CREATED_BY, userId);
         request.getVariables().put(Constants.CREATED_AT, Utils.dateTimeNowFormated());
         //request.getVariables().put("taskSe", taskService);

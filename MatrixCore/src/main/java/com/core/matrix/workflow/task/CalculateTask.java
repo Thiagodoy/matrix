@@ -14,13 +14,16 @@ import com.core.matrix.model.MeansurementFileDetail;
 import com.core.matrix.model.MeansurementFileResult;
 import com.core.matrix.model.MeansurementPointMtx;
 import com.core.matrix.model.MeansurementPointProInfa;
+import com.core.matrix.model.MeansurementPointStatus;
 import com.core.matrix.service.LogService;
 
 import com.core.matrix.service.MeansurementFileResultService;
 import com.core.matrix.service.MeansurementPointMtxService;
 import com.core.matrix.service.MeansurementPointProInfaService;
+import com.core.matrix.service.MeansurementPointStatusService;
 import com.core.matrix.utils.Constants;
 import static com.core.matrix.utils.Constants.VAR_FOLLOW_TO_RESULT;
+import com.core.matrix.utils.PointStatus;
 import com.core.matrix.wbc.dto.ContractWbcInformationDTO;
 import com.core.matrix.wbc.dto.ContractDTO;
 import com.core.matrix.wbc.service.ContractService;
@@ -56,6 +59,7 @@ public class CalculateTask extends Task {
 
     private MeansurementPointMtxService meansurementPointMtxService;
     private MeansurementPointProInfaService meansurementPointProInfaService;
+    private MeansurementPointStatusService pointStatusService;
 
     public CalculateTask() {
 
@@ -65,6 +69,7 @@ public class CalculateTask extends Task {
             this.logService = CalculateTask.context.getBean(LogService.class);
             this.meansurementPointMtxService = CalculateTask.context.getBean(MeansurementPointMtxService.class);
             this.meansurementPointProInfaService = CalculateTask.context.getBean(MeansurementPointProInfaService.class);
+            this.pointStatusService = CalculateTask.context.getBean(MeansurementPointStatusService.class);
         }
 
     }
@@ -166,6 +171,18 @@ public class CalculateTask extends Task {
                 fileResult.setWbcPerfilCCEE(consultaPerfilCCEE(contracts, Long.valueOf(contractWbcInformationDTO.getNrContract())));
 
                 resultService.save(fileResult);
+
+                try {
+                    MeansurementPointStatus pointStatus = this.pointStatusService.getPoint(fileResult.getMeansurementPoint());
+                    pointStatus.setHours(0L);
+                    pointStatus.setStatus(PointStatus.SUCCESS);
+                    pointStatus.setAmountLiquid(fileResult.getAmountLiquido());
+                    pointStatus.setAmountGross(fileResult.getAmountBruto());
+                    pointStatus.forceUpdate();
+                } catch (Exception e) {
+                    Logger.getLogger(CalculateTask.class.getName()).log(Level.SEVERE, "[ Update point status ]", e);
+                }
+
             }
 
         } catch (Exception e) {
@@ -314,6 +331,21 @@ public class CalculateTask extends Task {
 
             if (!results.isEmpty()) {
                 resultService.saveAll(results);
+
+                results.forEach(res -> {
+                    try {
+                        MeansurementPointStatus pointStatus = this.pointStatusService.getPoint(res.getMeansurementPoint());
+                        pointStatus.setHours(0L);
+                        pointStatus.setAmountLiquid(res.getAmountLiquido());
+                        pointStatus.setAmountGross(res.getAmountBruto());
+                        pointStatus.setStatus(PointStatus.SUCCESS);
+                        pointStatus.forceUpdate();
+                    } catch (Exception e) {
+                        Logger.getLogger(CalculateTask.class.getName()).log(Level.SEVERE, "[ Update point status ]", e);
+                    }
+
+                });
+
             }
 
             this.mountFakeResultToContractIsUnitConsumer(fileM, contractsMtx, de, results);
