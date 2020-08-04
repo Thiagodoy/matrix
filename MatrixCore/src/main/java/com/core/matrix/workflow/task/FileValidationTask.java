@@ -13,11 +13,9 @@ import com.core.matrix.io.BeanIO;
 import com.core.matrix.model.Log;
 import com.core.matrix.model.MeansurementFile;
 import com.core.matrix.model.MeansurementFileDetail;
-import com.core.matrix.model.MeansurementFileDetailReport;
 import com.core.matrix.model.MeansurementPointMtx;
 import com.core.matrix.model.MeansurementPointStatus;
 import com.core.matrix.service.LogService;
-import com.core.matrix.service.MeansurementFileDetailReportService;
 import com.core.matrix.service.MeansurementFileDetailService;
 import com.core.matrix.service.MeansurementFileService;
 import com.core.matrix.service.MeansurementPointMtxService;
@@ -71,7 +69,6 @@ public class FileValidationTask extends Task {
     private LogService logService;
     private MeansurementPointMtxService meansurementPointMtxService;
     private List<MeansurementFile> files;
-    private MeansurementFileDetailReportService meansurementFileDetailReportService;
     private MeansurementPointStatusService pointStatusService;
 
     private List<Log> logs;
@@ -84,7 +81,6 @@ public class FileValidationTask extends Task {
             this.detailService = FileValidationTask.context.getBean(MeansurementFileDetailService.class);
             this.logService = FileValidationTask.context.getBean(LogService.class);
             this.meansurementPointMtxService = FileValidationTask.context.getBean(MeansurementPointMtxService.class);
-            this.meansurementFileDetailReportService = FileValidationTask.context.getBean(MeansurementFileDetailReportService.class);
             this.pointStatusService = FileValidationTask.context.getBean(MeansurementPointStatusService.class);
 
         }
@@ -137,8 +133,6 @@ public class FileValidationTask extends Task {
 
                         FileParsedDTO fileDto = opt.get();
                         MeansurementFileType type = MeansurementFileType.valueOf(fileDto.getType());
-
-                        this.saveDetailsReport(fileDto, type);
 
                         List<FileDetailDTO> result = this.filter(fileDto.getDetails(), fileName);
                         fileDto.setDetails(result);
@@ -208,34 +202,11 @@ public class FileValidationTask extends Task {
                 MeansurementPointStatus pointStatus = this.pointStatusService.getPoint(point);
                 pointStatus.setStatus(PointStatus.READ);
                 MeansurementFile file = this.getFileByPoint(point);
-                pointStatus.setCompany(file.getNickname());                                
+                pointStatus.setCompany(file.getNickname());
                 pointStatus.forceUpdate();
             });
         } catch (Exception e) {
             Logger.getLogger(FileValidationTask.class.getName()).log(Level.SEVERE, "[alterStatusPoint]", e);
-        }
-
-    }
-
-    private void saveDetailsReport(FileParsedDTO fileDto, MeansurementFileType type) {
-
-        try {
-            List<MeansurementFileDetailReport> report = fileDto
-                    .getDetails()
-                    .parallelStream()
-                    .map(d -> new MeansurementFileDetailReport(d, type))
-                    .collect(Collectors.toList());
-
-            LocalDateTime dateInsert = LocalDateTime.now();
-
-            report.parallelStream().forEach(r -> {
-                r.setDateInsert(dateInsert);
-            });
-
-            meansurementFileDetailReportService.saveAllJob(report);
-
-        } catch (Exception e) {
-            Logger.getLogger(FileValidationTask.class.getName()).log(Level.SEVERE, "[saveDetailsReport]", e);
         }
 
     }
