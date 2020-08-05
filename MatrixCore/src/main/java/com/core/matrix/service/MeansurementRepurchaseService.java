@@ -54,12 +54,7 @@ public class MeansurementRepurchaseService extends com.core.matrix.service.Servi
     @Transactional(transactionManager = "matrixTransactionManager")
     public void deleteByProcessInstanceId(String processInstanceId) {
 
-        this.find(null, null, processInstanceId, Pageable.unpaged()).getContent().stream().forEach(c -> {
-            
-            MeansurementRepurchase m = (MeansurementRepurchase)c;
-            this.repository.deleteById(m.getId());
-            
-        });        
+        this.repository.deleteByProcessInstanceId(processInstanceId);
     }
 
 }

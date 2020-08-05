@@ -12,7 +12,9 @@ import com.core.matrix.service.ContractMtxService;
 import com.core.matrix.service.LogService;
 import com.core.matrix.service.MeansurementFileAuthorityService;
 import com.core.matrix.service.MeansurementFileDetailService;
+import com.core.matrix.service.MeansurementFileResultService;
 import com.core.matrix.service.MeansurementFileService;
+import com.core.matrix.service.MeansurementPointStatusService;
 import com.core.matrix.service.MeansurementRepurchaseService;
 import static com.core.matrix.utils.Constants.LIST_CONTRACTS_FOR_BILLING;
 import static com.core.matrix.utils.Constants.PROCESS_CONTRACTS_RELOAD_BILLING;
@@ -23,7 +25,6 @@ import java.util.Optional;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import java.util.stream.Collectors;
-import javax.sql.DataSource;
 import org.activiti.engine.HistoryService;
 import org.activiti.engine.RuntimeService;
 import org.activiti.engine.TaskService;
@@ -33,7 +34,6 @@ import org.activiti.engine.runtime.ProcessInstance;
 import org.activiti.engine.task.Attachment;
 import org.activiti.engine.task.Comment;
 import org.springframework.context.ApplicationContext;
-import org.springframework.transaction.annotation.Transactional;
 
 /**
  *
@@ -53,10 +53,11 @@ public class DeleteProcessInstanceTask implements JavaDelegate {
 
     private MeansurementFileAuthorityService meansurementFileAuthorityService;
 
+    private MeansurementFileResultService fileResultService;
+
+    private MeansurementPointStatusService pointStatusService;
+
     private static ApplicationContext context;
-    
-    private DataSource dataSource;
-    
 
     private Long contractId;
 
@@ -68,7 +69,8 @@ public class DeleteProcessInstanceTask implements JavaDelegate {
             this.meansurementRepurchaseService = DeleteProcessInstanceTask.context.getBean(MeansurementRepurchaseService.class);
             this.meansurementFileAuthorityService = DeleteProcessInstanceTask.context.getBean(MeansurementFileAuthorityService.class);
             this.meansurementFileDetailService = DeleteProcessInstanceTask.context.getBean(MeansurementFileDetailService.class);
-            
+            this.fileResultService = DeleteProcessInstanceTask.context.getBean(MeansurementFileResultService.class);
+            this.pointStatusService = DeleteProcessInstanceTask.context.getBean(MeansurementPointStatusService.class);
         }
     }
 
@@ -76,8 +78,6 @@ public class DeleteProcessInstanceTask implements JavaDelegate {
         DeleteProcessInstanceTask.context = context;
     }
 
-    
-    //@Transactional(transactionManager = "matrixTransactionManager")
     @Override
     public void execute(DelegateExecution execution) throws Exception {
 
@@ -117,6 +117,13 @@ public class DeleteProcessInstanceTask implements JavaDelegate {
 
             List<ContractMtx> list = this.contractMtxService.findAll(contractId).getContracts();
 
+            list.stream()
+                    .filter(c -> Optional.ofNullable(c.getPointAssociated()).isPresent())
+                    .forEach(c -> {
+                        this.pointStatusService.resetPoint(c.getPointAssociated());
+                    });
+
+            this.fileResultService.deleteByProcess(processInstanceId);
             this.meansurementRepurchaseService.deleteByProcessInstanceId(processInstanceId);
 
             List<Long> ids = this.meansurementFileService.findByProcessInstanceId(processInstanceId)

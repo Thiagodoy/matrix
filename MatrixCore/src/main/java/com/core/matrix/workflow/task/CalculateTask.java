@@ -138,7 +138,7 @@ public class CalculateTask extends Task {
                 contractWbcInformationDTOs = this.getWbcInformation(file.getYear(), file.getMonth(), Arrays.asList(file.getWbcContract()));
                 contractDTOs = this.contractWbcService.findAll(file.getWbcContract(), null);
 
-                this.mountFakeResultToContractFlat(file, Arrays.asList(contractMtx), de);
+                this.mountFakeResultToContractFlat(Arrays.asList(file), Arrays.asList(contractMtx), de);
                 this.mountFakeResultToContractIsUnitConsumer(file, Arrays.asList(contractMtx), de, new ArrayList<>());
             } else {
                 MeansurementPointMtx pointMtx = this.meansurementPointMtxService.getByPoint(file.getMeansurementPoint());
@@ -211,8 +211,8 @@ public class CalculateTask extends Task {
 
                 try {
                     details.addAll(this.getDetails(file, de));
-                } catch (Exception e) {
-                    Logger.getLogger(CalculateTask.class.getName()).log(Level.SEVERE, "[ getDetails merge ]", e);
+                } catch (Exception e) {                  
+                    //TODO Remover o try catch e não lançar as exceções
                 }
 
             }
@@ -261,10 +261,7 @@ public class CalculateTask extends Task {
                                     .findFirst()
                                     .orElseThrow(() -> new Exception("[WBC] -> Não foi possivel carregar as informações complementares!\n Referente as informações de [CE_SAZONALIZACAO] e [CE_REGRA_OPCIONALIDADE] "));
 
-                            if (this.isFlat(file.getWbcContract()) && filteredByPoint.isEmpty()) {
-                                this.mountFakeResultToContractFlat(file, contractsMtx, de);
-                            } else {
-
+                            if (Optional.ofNullable(point).isPresent()) {
                                 /**
                                  * Set result to zero when the contract is
                                  * consumer unit
@@ -348,6 +345,7 @@ public class CalculateTask extends Task {
 
             }
 
+            this.mountFakeResultToContractFlat(files, contractsMtx, de);
             this.mountFakeResultToContractIsUnitConsumer(fileM, contractsMtx, de, results);
             this.mountResultParent(de, contractMtxParent, fileId, results, contracts);
 
@@ -414,13 +412,18 @@ public class CalculateTask extends Task {
                 .orElseThrow(() -> new Exception("[Matrix] Informação do contrato [ PAI ] do rateio não foi encontrada!"));
     }
 
-    private void mountFakeResultToContractFlat(MeansurementFile file, List<ContractMtx> contractsInformations, DelegateExecution de) {
+    private void mountFakeResultToContractFlat(List<MeansurementFile> files, List<ContractMtx> contractsInformations, DelegateExecution de) {
         contractsInformations
                 .stream()
-                .filter(c -> c.isFlat())
-                .parallel()
+                .filter(c -> c.isFlat())                                
                 .forEach(c -> {
 
+                    Long idFile = files.stream()
+                            .filter(f-> f.getWbcContract().equals(c.getWbcContract()))
+                            .map(MeansurementFile::getId)
+                            .findFirst()
+                            .orElse(null);
+                    
                     ContractWbcInformationDTO contractWbcInformation = contractWbcInformationDTOs
                             .stream()
                             .filter(cc -> cc.getNrContract().equals(String.valueOf(c.getWbcContract())))
@@ -452,7 +455,7 @@ public class CalculateTask extends Task {
                     fileResult.setWbcSubmercado(c.getWbcSubmercado());
                     Long perfil = contractDTO.isPresent() ? contractDTO.get().getNCdPerfilCCEE() : 0;
                     fileResult.setWbcPerfilCCEE(perfil.intValue());
-                    fileResult.setMeansurementFileId(file.getId());
+                    fileResult.setMeansurementFileId(idFile);
 
                     fileResult.setQtdHiredMax(0D);
                     fileResult.setQtdHiredMin(0D);
@@ -468,8 +471,7 @@ public class CalculateTask extends Task {
 
         contractsInformations
                 .stream()
-                .filter(c -> c.isConsumerUnit())
-                .parallel()
+                .filter(c -> c.isConsumerUnit() && c.getWbcContract().equals(file.getWbcContract()))                
                 .forEach(c -> {
 
                     ContractWbcInformationDTO contractWbcInformation = contractWbcInformationDTOs

@@ -65,7 +65,7 @@ public class MatrixDataBaseConfiguration {
         //properties.put("hibernate.order_inserts", "true");   
         //properties.put("hibernate.generate_statistics", "true");   
         em.setJpaPropertyMap(properties);
-
+        
         
         
         return em;
