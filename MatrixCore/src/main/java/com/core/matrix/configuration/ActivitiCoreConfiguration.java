@@ -154,7 +154,7 @@ public class ActivitiCoreConfiguration implements EnvironmentAware {
                 .setDatabaseSchemaUpdate(ProcessEngineConfiguration.DB_SCHEMA_UPDATE_TRUE)
                 .setDataSource(this.dataSource())
                 //.setTransactionsExternallyManaged(true)
-                .setJpaHandleTransaction(true)
+                //.setJpaHandleTransaction(true)
                 .setAsyncFailedJobWaitTime(2147483647)
                 .setDefaultFailedJobWaitTime(2147483647)
                 .setAsyncExecutorActivate(true)

@@ -70,7 +70,7 @@ public class MeansurementFileAuthorityService extends com.core.matrix.service.Se
 
     }
 
-    @Transactional
+    @Transactional(transactionManager = "matrixTransactionManager")
     public void deleteByProcessInstanceId(String id) {
         this.repository.deleteByProcessInstanceId(id);
     }

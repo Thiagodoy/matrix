@@ -18,4 +18,8 @@ public class EntityNotFoundException extends Exception{
         super("Entity did not find in the data base");
     }
     
+    public EntityNotFoundException(String message){
+        super(message);
+    }
+    
 }

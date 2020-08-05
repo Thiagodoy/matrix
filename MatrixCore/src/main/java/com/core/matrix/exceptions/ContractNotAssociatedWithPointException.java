@@ -16,7 +16,7 @@ public class ContractNotAssociatedWithPointException extends Exception{
     
     
     public ContractNotAssociatedWithPointException(){
-        super("Contract isn't associated with a point");
+        super("Contrato não está associado ao ponto");
     } 
     
 }

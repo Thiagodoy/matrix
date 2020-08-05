@@ -5,6 +5,8 @@
  */
 package com.core.matrix.resource;
 
+import com.core.matrix.exceptions.ContractNotAssociatedWithPointException;
+import com.core.matrix.exceptions.EntityNotFoundException;
 import com.core.matrix.model.ContractMtx;
 import com.core.matrix.response.ContractMtxResponse;
 import com.core.matrix.service.ContractMtxService;
@@ -69,7 +71,12 @@ public class ContractMtxResource extends Resource<ContractMtx, ContractMtxServic
             this.service.reloadProcess(contractId);
             return ResponseEntity.ok().build();
 
-        } catch (Exception e) {
+        } catch(ContractNotAssociatedWithPointException e){            
+            return ResponseEntity.status(HttpStatus.resolve(500)).body(e.getMessage());
+        }catch(EntityNotFoundException e){
+            return ResponseEntity.status(HttpStatus.resolve(500)).body(e.getMessage());
+        }
+        catch (Exception e) {
             Logger.getLogger(ContractCompInformationResource.class.getName()).log(Level.SEVERE, "[post]", e);
             return ResponseEntity.status(HttpStatus.resolve(500)).body(e.getMessage());
         }

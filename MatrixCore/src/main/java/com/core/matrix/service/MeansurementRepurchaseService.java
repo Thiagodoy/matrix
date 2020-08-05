@@ -23,41 +23,43 @@ import org.springframework.transaction.annotation.Transactional;
  */
 @Service
 public class MeansurementRepurchaseService extends com.core.matrix.service.Service<MeansurementRepurchase, MeansurementRepurchaseRepository> {
-    
 
     public MeansurementRepurchaseService(MeansurementRepurchaseRepository repositoy) {
         super(repositoy);
-    } 
-
-    
+    }
 
     @Transactional
     public Page find(Long id, Long meansurementFileId, String processIntanceId, Pageable page) {
 
-        
         List<Specification> predicative = new ArrayList<>();
-        
-        if(Optional.ofNullable(id).isPresent()){
+
+        if (Optional.ofNullable(id).isPresent()) {
             predicative.add(MeansurementRepurchaseSpecification.id(id));
         }
-        
-        if(Optional.ofNullable(meansurementFileId).isPresent()){
+
+        if (Optional.ofNullable(meansurementFileId).isPresent()) {
             predicative.add(MeansurementRepurchaseSpecification.meansurementFileId(meansurementFileId));
         }
-        
-        if(Optional.ofNullable(processIntanceId).isPresent()){
+
+        if (Optional.ofNullable(processIntanceId).isPresent()) {
             predicative.add(MeansurementRepurchaseSpecification.processIntanceId(processIntanceId));
         }
-        
-        Specification<MeansurementRepurchase> spc = predicative.stream().reduce((a,b)-> a.and(b)).orElse(null);
-        
-        return this.repository.findAll(spc, page);       
-        
-    }  
-    
-    @Transactional
-    public void deleteByProcessInstanceId(String processInstanceId){
-        this.repository.deleteByProcessInstanceId(processInstanceId);
+
+        Specification<MeansurementRepurchase> spc = predicative.stream().reduce((a, b) -> a.and(b)).orElse(null);
+
+        return this.repository.findAll(spc, page);
+
+    }
+
+    @Transactional(transactionManager = "matrixTransactionManager")
+    public void deleteByProcessInstanceId(String processInstanceId) {
+
+        this.find(null, null, processInstanceId, Pageable.unpaged()).getContent().stream().forEach(c -> {
+            
+            MeansurementRepurchase m = (MeansurementRepurchase)c;
+            this.repository.deleteById(m.getId());
+            
+        });        
     }
 
 }

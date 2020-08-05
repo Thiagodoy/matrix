@@ -128,10 +128,6 @@ public class MonitoringResource {
                     .map(c -> new UnbilledContractDTO(c))
                     .collect(Collectors.toList());
 
-//            List<UnbilledContractDTO> contractsSons = contracts
-//                    .stream()
-//                    .filter(son -> !son.isRateio() || (son.isRateio() && Optional.ofNullable(son.getContractRateio()).isPresent()))
-//                    .collect(Collectors.toList());
             List<Long> idContracts = contracts
                     .stream()
                     .mapToLong(UnbilledContractDTO::getContractWbc)
@@ -157,7 +153,6 @@ public class MonitoringResource {
                         }
                     });
 
-            // contracts.addAll(contractsParentRateio);
             return ResponseEntity.ok(new HashSet(contracts));
         } catch (Exception e) {
             Logger.getLogger(MonitoringResource.class.getName()).log(Level.SEVERE, "[unbilledContract]", e);

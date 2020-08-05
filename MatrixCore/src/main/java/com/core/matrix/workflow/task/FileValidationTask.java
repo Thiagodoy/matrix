@@ -34,7 +34,6 @@ import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.nio.charset.Charset;
 import java.text.MessageFormat;
-import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
@@ -200,7 +199,7 @@ public class FileValidationTask extends Task {
         try {
             this.getPointsRead().forEach(point -> {
                 MeansurementPointStatus pointStatus = this.pointStatusService.getPoint(point);
-                pointStatus.setStatus(PointStatus.READ);
+                pointStatus.setStatus(PointStatus.PENDING);
                 MeansurementFile file = this.getFileByPoint(point);
                 pointStatus.setCompany(file.getNickname());
                 pointStatus.forceUpdate();
@@ -486,7 +485,7 @@ public class FileValidationTask extends Task {
             meansuremPoint.parallelStream().forEach(point -> {
                 Optional<MeansurementFile> opt = files.stream()
                         //.filter(f -> f.getStatus().equals(MeansurementFileStatus.FILE_CHECKED))
-                        .filter(file -> file.getMeansurementPoint().equals(point)).findFirst();
+                        .filter(file -> point.equals(file.getMeansurementPoint())).findFirst();
 
                 if (opt.isPresent()) {
 

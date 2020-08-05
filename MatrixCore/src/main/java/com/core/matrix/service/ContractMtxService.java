@@ -159,7 +159,12 @@ public class ContractMtxService extends Service<ContractMtx, ContractMtxReposito
         List<ContractMtx> list = this.findAll(contractId).getContracts();
 
         if (list.isEmpty()) {
-            throw new Exception("Contrato sem informação complementar!");
+            throw new EntityNotFoundException("Contrato não cadastrado na base da [ Matrix ]");
+        }
+        
+        if(list.size() == 1){
+            ContractMtx contractMtx = list.get(0);            
+            contractMtx.getPoint();
         }
 
         LocalDate now = LocalDate.now();

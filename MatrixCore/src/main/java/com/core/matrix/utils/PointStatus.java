@@ -10,8 +10,7 @@ package com.core.matrix.utils;
  * @author thiag
  */
 public enum PointStatus {
-     NO_READ,
-        READ,
-        SUCCESS,
-        PENDING;
+    NO_READ,
+    SUCCESS,
+    PENDING;
 }
