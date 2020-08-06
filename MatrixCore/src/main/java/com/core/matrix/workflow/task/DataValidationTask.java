@@ -6,6 +6,7 @@
 package com.core.matrix.workflow.task;
 
 import com.core.matrix.dto.DataValidationResultDTO;
+import com.core.matrix.model.ContractMtxStatus;
 import com.core.matrix.model.MeansurementFile;
 import com.core.matrix.model.MeansurementFileDetail;
 import com.core.matrix.service.LogService;
@@ -25,6 +26,7 @@ import org.activiti.engine.delegate.DelegateExecution;
 import org.springframework.context.ApplicationContext;
 import com.core.matrix.model.Log;
 import com.core.matrix.model.MeansurementPointStatus;
+import com.core.matrix.service.ContractMtxStatusService;
 import com.core.matrix.service.MeansurementPointStatusService;
 import com.core.matrix.utils.MeansurementFileType;
 import com.core.matrix.utils.PointStatus;
@@ -50,12 +52,14 @@ public class DataValidationTask extends Task {
 
     private List<DataValidationResultDTO> results = null;
     private MeansurementPointStatusService pointStatusService;
+    private ContractMtxStatusService contractMtxStatusService;
 
     public DataValidationTask() {
         synchronized (DataValidationTask.context) {
             this.fileService = DataValidationTask.context.getBean(MeansurementFileService.class);
             this.logService = DataValidationTask.context.getBean(LogService.class);
             this.pointStatusService = DataValidationTask.context.getBean(MeansurementPointStatusService.class);
+            this.contractMtxStatusService = DataValidationTask.context.getBean(ContractMtxStatusService.class);
         }
     }
 
@@ -151,9 +155,12 @@ public class DataValidationTask extends Task {
 
     private void alterStatusPoint(List<MeansurementFile> files) {
 
-        try {
-            this.getPointsRead().forEach(point -> {
-                MeansurementPointStatus pointStatus = this.pointStatusService.getPoint(point);
+        this.getPointsRead().forEach(point -> {
+            Optional<MeansurementPointStatus> opt = this.pointStatusService.getPoint(point);
+
+            if (opt.isPresent()) {
+
+                MeansurementPointStatus pointStatus = opt.get();
                 MeansurementFile file = files.stream().filter(f -> f.getMeansurementPoint().equals(point)).findFirst().get();
 
                 switch (file.getStatus()) {
@@ -168,16 +175,15 @@ public class DataValidationTask extends Task {
                         pointStatus.setHours(resultDTO.getHours());
                         pointStatus.setMountScde(resultDTO.getTotalScde());
                         break;
-                    default:                        
+                    default:
                         Double mount = this.getMapDetails().get(point).stream().mapToDouble(MeansurementFileDetail::getConsumptionActive).sum();
                         pointStatus.setMountScde(mount);
                 }
-                
+
                 pointStatus.forceUpdate();
-            });
-        } catch (Exception e) {
-            Logger.getLogger(FileValidationTask.class.getName()).log(Level.SEVERE, "[alterStatusPoint]", e);
-        }
+            }
+
+        });
 
     }
 
@@ -265,9 +271,22 @@ public class DataValidationTask extends Task {
                 .anyMatch(d -> d.isAfter(end) || d.isBefore(init));
 
         if (hasErrorOfCalendar) {
+            this.updateContract(file.getWbcContract(), "Registros estão fora do periodo do faturamento.");
             file.setStatus(MeansurementFileStatus.DATA_CALENDAR_ERROR);
             String error = MessageFormat.format("Calendário inválido para o ponto [ {0} ] dentro do arquivo [ {1} ]", file.getMeansurementPoint(), attachment.getName());
             throw new Exception(error);
+        }
+
+    }
+
+    private void updateContract(Long contract, String reason) {
+
+        Optional<ContractMtxStatus> opt = contractMtxStatusService.getContract(contract);
+
+        if (opt.isPresent()) {
+            ContractMtxStatus status = opt.get();
+            status.setReasonStatus(reason);
+            status.forceUpdate();
         }
 
     }
@@ -334,6 +353,7 @@ public class DataValidationTask extends Task {
         });
 
         if (this.hasHourError(delegateExecution, file.getMeansurementPoint())) {
+            this.updateContract(file.getWbcContract(), "Contrato com horas faltantes");
             file.setStatus(MeansurementFileStatus.DATA_HOUR_ERROR);
             String error = MessageFormat.format("Arquivo esta com a consolidação diária das hora inválida, para o ponto [ {0} ] dentro do arquivo [ {1} ]", file.getMeansurementPoint(), attachment.getName());
 
@@ -424,7 +444,7 @@ public class DataValidationTask extends Task {
                 });
 
         if (this.hasDayError(delegateExecution, file.getMeansurementPoint())) {
-
+            this.updateContract(file.getWbcContract(), "Contrato com horas faltantes");
             file.setStatus(MeansurementFileStatus.DATA_DAY_ERROR);
             String error = MessageFormat.format("Arquivo esta com as horas diárias ausente, para o ponto [ {0} ] dentro do arquivo [ {1} ]", file.getMeansurementPoint(), attachment.getName());
             throw new Exception(error);

@@ -5,6 +5,7 @@ import com.core.matrix.properties.EmailServiceProperties;
 import com.core.matrix.properties.MatrixProperties;
 import com.core.matrix.properties.TesteProperties;
 import com.core.matrix.properties.WbcProperties;
+import com.core.matrix.service.ContractMtxStatusService;
 import com.core.matrix.service.MeansurementPointStatusService;
 import com.core.matrix.utils.ThreadPoolDetail;
 import com.core.matrix.utils.ThreadPoolEmail;
@@ -41,6 +42,9 @@ public class MatrixApplication {
     @Autowired
     private MeansurementPointStatusService pointStatusService;
     
+    @Autowired
+    private ContractMtxStatusService contractMtxStatusService;
+    
     public static void main(String[] args) {
         SpringApplication.run(MatrixApplication.class, args);
     }
@@ -49,7 +53,8 @@ public class MatrixApplication {
     public void setTimeZone() {
         TimeZone.setDefault(TimeZone.getTimeZone("America/Cuiaba"));
         LocalDate now = LocalDate.now().minusMonths(1);
-        pointStatusService.createPointStatus((long)now.getMonthValue(), (long)now.getYear());
+        this.pointStatusService.createPointStatus((long)now.getMonthValue(), (long)now.getYear());
+        this.contractMtxStatusService.createContractStatus((long)now.getMonthValue(), (long)now.getYear());
     }
     
     @PreDestroy

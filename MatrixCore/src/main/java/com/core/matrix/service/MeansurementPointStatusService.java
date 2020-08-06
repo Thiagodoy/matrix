@@ -70,7 +70,7 @@ public class MeansurementPointStatusService implements Observer {
             });
         } else {
             if (this.mapPoint.isEmpty()) {
-                this.repository.findAll().forEach(point -> {
+                this.repository.findByMonthAndYear(month, year).forEach(point -> {
                     point.addObserver(this);
                     this.mapPoint.put(point.getPoint(), point);
                 });
@@ -113,19 +113,19 @@ public class MeansurementPointStatusService implements Observer {
     }
 
     @Transactional
-    public synchronized MeansurementPointStatus getPoint(String point) {
+    public synchronized Optional<MeansurementPointStatus> getPoint(String point) {
 
         if (this.mapPoint.containsKey(point)) {
-            return this.mapPoint.get(point);
+            return Optional.ofNullable(this.mapPoint.get(point));
         } else if (Optional.ofNullable(point).isPresent()) {
             MeansurementPointStatus status = this.mapPoint.values().stream().findFirst().get();
             MeansurementPointStatus statusNew = new MeansurementPointStatus(point, status.getMonth(), status.getYear());
             statusNew = this.repository.save(statusNew);
             statusNew.addObserver(this);
             this.mapPoint.put(point, statusNew);
-            return statusNew;
+             return Optional.ofNullable(statusNew);
         } else {
-            throw new RuntimeException("Not found point null for update!");
+            return Optional.empty();
         }
     }
 

@@ -39,22 +39,21 @@ public class ContractMtxService extends Service<ContractMtx, ContractMtxReposito
 
     @Autowired
     private MeansurementPointMtxService pointMtxService;
-    
+
     @Autowired
     private MeansurementFileService meansurementFileService;
-    
+
     @Autowired
     private MeansurementFileResultService fileResultService;
-    
+
     @Autowired
     private LogService logService;
-    
+
     @Autowired
     private TaskService taskService;
-    
+
     @Autowired
     private RuntimeService runtimeService;
-    
 
     public ContractMtxService(ContractMtxRepository repositoy) {
         super(repositoy);
@@ -70,7 +69,7 @@ public class ContractMtxService extends Service<ContractMtx, ContractMtxReposito
         pointMtxService.update(pointMtx);
 
     }
-    
+
     @Transactional
     public void unAssociateContractToPoint(Long contract, String point) throws Exception {
 
@@ -141,19 +140,18 @@ public class ContractMtxService extends Service<ContractMtx, ContractMtxReposito
 
     }
 
-    public boolean isConsumerUnit(Long contractId){        
-        
-        Optional<ContractMtx> opt =  this.repository.findByWbcContract(contractId);
-        
-        if(opt.isPresent()){
+    public boolean isConsumerUnit(Long contractId) {
+
+        Optional<ContractMtx> opt = this.repository.findByWbcContract(contractId);
+
+        if (opt.isPresent()) {
             return opt.get().isConsumerUnit();
-        }else{
+        } else {
             return false;
         }
     }
-    
-    
-     @Transactional(transactionManager = "matrixTransactionManager")
+
+    @Transactional(transactionManager = "matrixTransactionManager")
     public void reloadProcess(Long contractId) throws Exception {
 
         List<ContractMtx> list = this.findAll(contractId).getContracts();
@@ -161,9 +159,9 @@ public class ContractMtxService extends Service<ContractMtx, ContractMtxReposito
         if (list.isEmpty()) {
             throw new EntityNotFoundException("Contrato não cadastrado na base da [ Matrix ]");
         }
-        
-        if(list.size() == 1){
-            ContractMtx contractMtx = list.get(0);            
+
+        if (list.size() == 1) {
+            ContractMtx contractMtx = list.get(0);
             contractMtx.getPoint();
         }
 
@@ -178,10 +176,10 @@ public class ContractMtxService extends Service<ContractMtx, ContractMtxReposito
         if (!files.isEmpty()) {
 
             processInstanceID = files.stream().findFirst().get().getProcessInstanceId();
-            
+
             fileResultService.deleteByProcess(processInstanceID);
             meansurementFileService.deleteByProcessInstance(processInstanceID);
-            logService.deleteLogsByProcessInstance(processInstanceID);            
+            logService.deleteLogsByProcessInstance(processInstanceID);
 
             List<Attachment> attachments = taskService.getProcessInstanceAttachments(processInstanceID);
             List<Comment> comments = taskService.getProcessInstanceComments(processInstanceID);
@@ -193,20 +191,22 @@ public class ContractMtxService extends Service<ContractMtx, ContractMtxReposito
             comments.forEach(com -> {
                 taskService.deleteComment(com.getId());
             });
-            
+
             try {
                 runtimeService.deleteProcessInstance(processInstanceID, "Contract was updated!");
             } catch (Exception e) {
             }
-            
-        }        
-        
+
+        }
 
         Map<String, Object> variables = new HashMap<>();
         variables.put(PROCESS_CONTRACTS_RELOAD_BILLING, list);
         runtimeService.startProcessInstanceByMessage(PROCESS_BILLING_CONTRACT_MESSAGE_EVENT, variables);
 
     }
-    
+
+    public List<ContractMtx> findAll() {
+        return this.repository.findAll();
+    }
 
 }

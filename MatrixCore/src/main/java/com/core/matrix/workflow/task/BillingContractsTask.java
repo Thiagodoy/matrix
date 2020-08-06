@@ -15,6 +15,7 @@ import com.core.matrix.model.Log;
 import com.core.matrix.model.MeansurementFile;
 import com.core.matrix.model.Template;
 import com.core.matrix.service.ContractMtxService;
+import com.core.matrix.service.ContractMtxStatusService;
 import com.core.matrix.service.LogService;
 import com.core.matrix.service.MeansurementFileService;
 import com.core.matrix.service.MeansurementPointMtxService;
@@ -77,6 +78,7 @@ public class BillingContractsTask implements JavaDelegate {
     private Set<String> pointsAreNotAssociatedWithProInfa = new HashSet<>();
 
     private MeansurementPointStatusService pointStatusService;
+    private ContractMtxStatusService contractMtxStatusService;
 
     private static ApplicationContext context;
 
@@ -90,7 +92,7 @@ public class BillingContractsTask implements JavaDelegate {
             this.contractMtxService = context.getBean(ContractMtxService.class);
             this.meansurementPointMtxService = context.getBean(MeansurementPointMtxService.class);
             this.pointStatusService = context.getBean(MeansurementPointStatusService.class);
-
+            this.contractMtxStatusService = context.getBean(ContractMtxStatusService.class);
         }
     }
 
@@ -113,6 +115,7 @@ public class BillingContractsTask implements JavaDelegate {
                 contracts = Collections.synchronizedList(this.contractService.listForBilling(null));
             }
 
+            this.loadAllContracts();
             this.loadAllPoints();
 
             List<Log> logs = new ArrayList<>();
@@ -137,6 +140,11 @@ public class BillingContractsTask implements JavaDelegate {
     private void loadAllPoints() {
         LocalDate now = LocalDate.now().minusMonths(1);
         this.pointStatusService.createPointStatus((long) now.getMonthValue(), (long) now.getYear());
+    }
+    
+    private void loadAllContracts(){
+        LocalDate now = LocalDate.now().minusMonths(1);
+        this.contractMtxStatusService.createContractStatus((long) now.getMonthValue(), (long) now.getYear());
     }
 
     private void sendEmailWithErrors(DelegateExecution execution) {

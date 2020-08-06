@@ -25,14 +25,14 @@ public class PointStatusTest {
     @Test
     public void generateAllPoints() {
 
-        pointStatusService.createPointStatus(7L, 2020L);
-
-        MeansurementPointStatus status = pointStatusService.getPoint("ALFKFRENTR101");
-        status.setStatus(PointStatus.NO_READ);
-        status.forceUpdate();
-
-        
-        status = pointStatusService.getPoint("THIAGO");
+//        pointStatusService.createPointStatus(7L, 2020L);
+//
+//        MeansurementPointStatus status = pointStatusService.getPoint("ALFKFRENTR101");
+//        status.setStatus(PointStatus.NO_READ);
+//        status.forceUpdate();
+//
+//        
+//        status = pointStatusService.getPoint("THIAGO");
         
 
     }

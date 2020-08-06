@@ -5,10 +5,12 @@
  */
 package com.core.matrix.service;
 
-import com.core.matrix.dto.PointStatusSummaryDTO;
-import com.core.matrix.model.MeansurementPointStatus;
-import com.core.matrix.repository.MeansurementPointStatusRepository;
-import com.core.matrix.utils.PointStatus;
+import com.core.matrix.dto.ContractStatusSummaryDTO;
+import com.core.matrix.exceptions.EntityNotFoundException;
+import com.core.matrix.model.ContractMtx;
+import com.core.matrix.model.ContractMtxStatus;
+import com.core.matrix.repository.ContractMtxStatusRepository;
+import com.core.matrix.utils.ContractStatus;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -17,122 +19,128 @@ import java.util.Observer;
 import java.util.Optional;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ThreadPoolExecutor;
-import javax.transaction.Transactional;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Scope;
 import org.springframework.data.domain.Example;
-import org.springframework.data.domain.ExampleMatcher;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Component;
+import org.springframework.transaction.annotation.Transactional;
 
 /**
  *
  * @author thiag
  */
-//@Component
-//@Scope("singleton")
-public class ContractMtxStatusService {
-//
-////    @Autowired
-////    private ContractMtxService contractMtxService;
-////
-////    @Autowired
-////    private MeansurementPointStatusRepository repository;
-////
-////    private final ThreadPoolExecutor pool = (ThreadPoolExecutor) Executors.newFixedThreadPool(1);
-////
-////    private Map< String, MeansurementPointStatus> mapPoint = new HashMap<>();
-////
-////    public void createContractStatus(Long month, Long year) {
-////
-////        MeansurementPointStatus pointStatus = new MeansurementPointStatus();
-////        pointStatus.setYear(year);
-////        pointStatus.setMonth(month);
-////
-////        ExampleMatcher matcher = ExampleMatcher
-////                .matching()
-////                .withIgnoreCase("point", "company", "status", "mount", "hours");
-////
-////        Example<MeansurementPointStatus> example = Example.of(pointStatus, matcher);
-//
-////        boolean exists = this.repository.exists(example);
-////
-////        if (!exists) {
-////            this.mapPoint.clear();
-////
-////            this.pointMtxService.findAllPoints().forEach(point -> {
-////                MeansurementPointStatus status = new MeansurementPointStatus(point, month, year);
-////                status = repository.save(status);
-////                status.addObserver(this);
-////                this.mapPoint.put(point, status);
-////            });
-////        } else {
-////            if (this.mapPoint.isEmpty()) {
-////                this.repository.findAll().forEach(point -> {
-////                    point.addObserver(this);
-////                    this.mapPoint.put(point.getPoint(), point);
-////                });
-////            }
-////        }
-//
-//    }
-//
-////    @Override
-////    public void update(Observable o, Object arg) {
-////
-////        final MeansurementPointStatus meansurementPointStatus = (MeansurementPointStatus) o;
-////
-////        synchronized (pool) {
-////            pool.submit(() -> {
-////                this.updatePOint(meansurementPointStatus);
-////            });
-////        }
-//    }
+@Component
+@Scope("singleton")
+public class ContractMtxStatusService implements Observer {
 
-//    @Transactional
-//    private void updatePOint(MeansurementPointStatus status) {
-////        MeansurementPointStatus up = this.repository.save(status);
-////        up.addObserver(this);
-////        this.mapPoint.put(status.getPoint(), up);
-//    }
-//    public void resetPoint(String point) {
-//
-////        if (this.mapPoint.containsKey(point)) {
-////            MeansurementPointStatus pointStatus = this.mapPoint.get(point);
-////            pointStatus.setHours(0L);
-////            pointStatus.setStatus(PointStatus.NO_READ);
-////            pointStatus.setMountScde(0D);
-////            pointStatus.setCompany("");
-////            pointStatus.setAmountGross(0D);
-////            pointStatus.setAmountLiquid(0D);
-////            pointStatus.forceUpdate();
-////        }
-//    }
-//    @Transactional
-//    public synchronized MeansurementPointStatus getPoint(String point) {
-//
-////        if (this.mapPoint.containsKey(point)) {
-////            return this.mapPoint.get(point);
-////        } else if (Optional.ofNullable(point).isPresent()) {
-////            MeansurementPointStatus status = this.mapPoint.values().stream().findFirst().get();
-////            MeansurementPointStatus statusNew = new MeansurementPointStatus(point, status.getMonth(), status.getYear());
-////            statusNew = this.repository.save(statusNew);
-////            statusNew.addObserver(this);
-////            this.mapPoint.put(point, statusNew);
-////            return statusNew;
-////        } else {
-////            throw new RuntimeException("Not found point null for update!");
-////        }
-//    }
-//    @Transactional
-//    public Page<MeansurementPointStatus> find(Specification specification, Pageable page) {
-////        return this.repository.findAll(specification, page);
-//    }
-//
-//    @Transactional
-//    public List<PointStatusSummaryDTO> summary(Long month, Long year) {
-//        return this.repository.summary(month, year);
-//    }
+    @Autowired
+    private ContractMtxService contractMtxService;
+
+    @Autowired
+    private ContractMtxStatusRepository contractMtxStatusRepository;
+
+    private final ThreadPoolExecutor pool = (ThreadPoolExecutor) Executors.newFixedThreadPool(1);
+
+    private Map< Long, ContractMtxStatus> mapContracts = new HashMap<>();
+
+    public void createContractStatus(Long month, Long year) {
+
+        ContractMtxStatus contractMtxStatus = new ContractMtxStatus();
+        contractMtxStatus.setYear(year);
+        contractMtxStatus.setMonth(month);
+
+        Example<ContractMtxStatus> example = Example.of(contractMtxStatus);
+
+        boolean exists = this.contractMtxStatusRepository.exists(example);
+
+        if (!exists) {
+            this.mapContracts.clear();
+
+            this.contractMtxService.findAll()
+                    .stream()
+                    .filter(c -> !c.isFather())
+                    .forEach(contract -> {
+                        ContractMtxStatus status = new ContractMtxStatus(contract);
+                        status = contractMtxStatusRepository.save(status);
+                        status.addObserver(this);
+                        this.mapContracts.put(contract.getWbcContract(), status);
+                    });
+        } else {
+            if (this.mapContracts.isEmpty()) {
+                this.contractMtxStatusRepository.findByMonthAndYear(month, year).forEach(status -> {
+                    status.addObserver(this);
+                    this.mapContracts.put(status.getWbcContract(), status);
+                });
+            }
+        }
+
+    }
+
+    @Override
+    public void update(Observable o, Object arg) {
+
+        final ContractMtxStatus status = (ContractMtxStatus) o;
+
+        synchronized (pool) {
+            pool.submit(() -> {
+                this.updateContract(status);
+            });
+        }
+    }
+
+    @Transactional
+    private void updateContract(ContractMtxStatus status) {
+        status = this.contractMtxStatusRepository.save(status);
+        status.addObserver(this);
+        this.mapContracts.put(status.getWbcContract(), status);
+    }
+
+    public void resetPoint(Long contract) {
+
+        if (this.mapContracts.containsKey(contract)) {
+            ContractMtxStatus contractStatus = this.mapContracts.get(contract);
+            contractStatus.setAmountGross(0D);
+            contractStatus.setStatus(ContractStatus.NO_BILL);
+            contractStatus.setReasonStatus("");
+            contractStatus.setAmountGross(0D);
+            contractStatus.setAmountLiquid(0D);
+            contractStatus.forceUpdate();
+        }
+    }
+
+    @Transactional
+    public synchronized Optional<ContractMtxStatus> getContract(Long contract) {
+
+        if (this.mapContracts.containsKey(contract)) {
+            return Optional.ofNullable(this.mapContracts.get(contract));
+        } else if (Optional.ofNullable(contract).isPresent()) {
+            ContractMtx contractMtx;
+            try {
+                contractMtx = this.contractMtxService.findByWbcContract(contract);
+                ContractMtxStatus statusNew = new ContractMtxStatus(contractMtx);
+                statusNew = this.contractMtxStatusRepository.save(statusNew);
+                statusNew.addObserver(this);
+                this.mapContracts.put(statusNew.getWbcContract(), statusNew);
+                return Optional.ofNullable(statusNew);
+            } catch (EntityNotFoundException ex) {
+                return Optional.empty();
+            }
+
+        } else {
+            return Optional.empty();
+        }
+    }
+
+    @Transactional
+    public Page<ContractMtxStatus> find(Specification s, Pageable page) {
+      return this.contractMtxStatusRepository.findAll(s, page);
+    }
+
+    @Transactional
+    public List<ContractStatusSummaryDTO> summary(Long month, Long year) {
+        return this.contractMtxStatusRepository.summary(month, year);
+    }
 }

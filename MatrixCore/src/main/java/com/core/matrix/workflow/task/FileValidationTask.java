@@ -10,16 +10,19 @@ import static com.core.matrix.utils.Constants.*;
 import com.core.matrix.dto.FileDetailDTO;
 import com.core.matrix.dto.FileParsedDTO;
 import com.core.matrix.io.BeanIO;
+import com.core.matrix.model.ContractMtxStatus;
 import com.core.matrix.model.Log;
 import com.core.matrix.model.MeansurementFile;
 import com.core.matrix.model.MeansurementFileDetail;
 import com.core.matrix.model.MeansurementPointMtx;
 import com.core.matrix.model.MeansurementPointStatus;
+import com.core.matrix.service.ContractMtxStatusService;
 import com.core.matrix.service.LogService;
 import com.core.matrix.service.MeansurementFileDetailService;
 import com.core.matrix.service.MeansurementFileService;
 import com.core.matrix.service.MeansurementPointMtxService;
 import com.core.matrix.service.MeansurementPointStatusService;
+import com.core.matrix.utils.ContractStatus;
 import com.core.matrix.utils.MeansurementFileStatus;
 import com.core.matrix.utils.MeansurementFileType;
 import com.core.matrix.utils.PointStatus;
@@ -69,6 +72,7 @@ public class FileValidationTask extends Task {
     private MeansurementPointMtxService meansurementPointMtxService;
     private List<MeansurementFile> files;
     private MeansurementPointStatusService pointStatusService;
+    private ContractMtxStatusService contractMtxStatusService;
 
     private List<Log> logs;
 
@@ -81,7 +85,7 @@ public class FileValidationTask extends Task {
             this.logService = FileValidationTask.context.getBean(LogService.class);
             this.meansurementPointMtxService = FileValidationTask.context.getBean(MeansurementPointMtxService.class);
             this.pointStatusService = FileValidationTask.context.getBean(MeansurementPointStatusService.class);
-
+            this.contractMtxStatusService = FileValidationTask.context.getBean(ContractMtxStatusService.class);
         }
 
     }
@@ -196,17 +200,18 @@ public class FileValidationTask extends Task {
 
     private void alterStatusPoint() {
 
-        try {
-            this.getPointsRead().forEach(point -> {
-                MeansurementPointStatus pointStatus = this.pointStatusService.getPoint(point);
+        this.getPointsRead().forEach(point -> {
+            Optional<MeansurementPointStatus> opt = this.pointStatusService.getPoint(point);
+
+            if (opt.isPresent()) {
+                MeansurementPointStatus pointStatus = opt.get();
                 pointStatus.setStatus(PointStatus.PENDING);
                 MeansurementFile file = this.getFileByPoint(point);
                 pointStatus.setCompany(file.getNickname());
                 pointStatus.forceUpdate();
-            });
-        } catch (Exception e) {
-            Logger.getLogger(FileValidationTask.class.getName()).log(Level.SEVERE, "[alterStatusPoint]", e);
-        }
+            }
+
+        });
 
     }
 
@@ -488,8 +493,18 @@ public class FileValidationTask extends Task {
                         .filter(file -> point.equals(file.getMeansurementPoint())).findFirst();
 
                 if (opt.isPresent()) {
-
                     MeansurementFile file = opt.get();
+
+                    Optional<ContractMtxStatus>optContract = contractMtxStatusService.getContract(file.getWbcContract());
+                    
+                    if(optContract.isPresent()){
+                        ContractMtxStatus contractMtxStatus = optContract.get();
+                        contractMtxStatus.setStatus(ContractStatus.PENDING);
+                        contractMtxStatus.forceUpdate();
+                    }
+                    
+                    
+                    
                     file.setFile(attachmentId);
                     file.setUser(userId);
                     file.setType(type);

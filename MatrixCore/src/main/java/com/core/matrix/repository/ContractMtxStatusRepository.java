@@ -5,8 +5,8 @@
  */
 package com.core.matrix.repository;
 
-import com.core.matrix.dto.PointStatusSummaryDTO;
-import com.core.matrix.model.MeansurementPointStatus;
+import com.core.matrix.dto.ContractStatusSummaryDTO;
+import com.core.matrix.model.ContractMtxStatus;
 import java.util.List;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.JpaSpecificationExecutor;
@@ -19,13 +19,11 @@ import org.springframework.stereotype.Repository;
  * @author thiag
  */
 @Repository
-public interface MeansurementPointStatusRepository extends JpaRepository<MeansurementPointStatus, Long>, JpaSpecificationExecutor<MeansurementPointStatus> {
+public interface ContractMtxStatusRepository extends JpaRepository<ContractMtxStatus, Long>, JpaSpecificationExecutor<ContractMtxStatus> {
 
-    @Query(nativeQuery = true)
-    List<PointStatusSummaryDTO> summary(@Param("month") Long month, @Param("year") Long year);
-
-    List<MeansurementPointStatus> findByMonthAndYear(Long month, Long year);
-
-
+    List<ContractMtxStatus> findByMonthAndYear(Long month, Long year);
     
+    @Query(nativeQuery = true)
+    List<ContractStatusSummaryDTO>summary(@Param("month")Long month,@Param("year")Long year);
+
 }

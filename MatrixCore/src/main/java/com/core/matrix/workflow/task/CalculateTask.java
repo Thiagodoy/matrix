@@ -8,6 +8,7 @@ package com.core.matrix.workflow.task;
 import com.core.matrix.dto.ConsumptionResult;
 import com.core.matrix.exceptions.EntityNotFoundException;
 import com.core.matrix.model.ContractMtx;
+import com.core.matrix.model.ContractMtxStatus;
 import com.core.matrix.model.Log;
 import com.core.matrix.model.MeansurementFile;
 import com.core.matrix.model.MeansurementFileDetail;
@@ -15,6 +16,7 @@ import com.core.matrix.model.MeansurementFileResult;
 import com.core.matrix.model.MeansurementPointMtx;
 import com.core.matrix.model.MeansurementPointProInfa;
 import com.core.matrix.model.MeansurementPointStatus;
+import com.core.matrix.service.ContractMtxStatusService;
 import com.core.matrix.service.LogService;
 
 import com.core.matrix.service.MeansurementFileResultService;
@@ -23,6 +25,7 @@ import com.core.matrix.service.MeansurementPointProInfaService;
 import com.core.matrix.service.MeansurementPointStatusService;
 import com.core.matrix.utils.Constants;
 import static com.core.matrix.utils.Constants.VAR_FOLLOW_TO_RESULT;
+import com.core.matrix.utils.ContractStatus;
 import com.core.matrix.utils.PointStatus;
 import com.core.matrix.wbc.dto.ContractWbcInformationDTO;
 import com.core.matrix.wbc.dto.ContractDTO;
@@ -60,6 +63,7 @@ public class CalculateTask extends Task {
     private MeansurementPointMtxService meansurementPointMtxService;
     private MeansurementPointProInfaService meansurementPointProInfaService;
     private MeansurementPointStatusService pointStatusService;
+    private ContractMtxStatusService contractMtxStatusService;
 
     public CalculateTask() {
 
@@ -70,6 +74,7 @@ public class CalculateTask extends Task {
             this.meansurementPointMtxService = CalculateTask.context.getBean(MeansurementPointMtxService.class);
             this.meansurementPointProInfaService = CalculateTask.context.getBean(MeansurementPointProInfaService.class);
             this.pointStatusService = CalculateTask.context.getBean(MeansurementPointStatusService.class);
+            this.contractMtxStatusService = CalculateTask.context.getBean(ContractMtxStatusService.class);
         }
 
     }
@@ -171,17 +176,10 @@ public class CalculateTask extends Task {
                 fileResult.setWbcPerfilCCEE(consultaPerfilCCEE(contracts, Long.valueOf(contractWbcInformationDTO.getNrContract())));
 
                 resultService.save(fileResult);
+                this.updatePointStatus(fileResult, file.getMeansurementPoint());
+                this.updateContractStatus(fileResult, file.getWbcContract());
 
-                try {
-                    MeansurementPointStatus pointStatus = this.pointStatusService.getPoint(fileResult.getMeansurementPoint());
-                    pointStatus.setHours(0L);
-                    pointStatus.setStatus(PointStatus.SUCCESS);
-                    pointStatus.setAmountLiquid(fileResult.getAmountLiquido());
-                    pointStatus.setAmountGross(fileResult.getAmountBruto());
-                    pointStatus.forceUpdate();
-                } catch (Exception e) {
-                    Logger.getLogger(CalculateTask.class.getName()).log(Level.SEVERE, "[ Update point status ]", e);
-                }
+                
 
             }
 
@@ -197,6 +195,34 @@ public class CalculateTask extends Task {
 
     }
 
+    private synchronized void updatePointStatus(MeansurementFileResult result, String point){
+        Optional<MeansurementPointStatus> opt = this.pointStatusService.getPoint(point);
+                if (opt.isPresent()) {
+                    MeansurementPointStatus pointStatus = opt.get();
+                    pointStatus.setHours(0L);
+                    pointStatus.setStatus(PointStatus.SUCCESS);
+                    pointStatus.setAmountLiquid(result.getAmountLiquido());
+                    pointStatus.setAmountGross(result.getAmountBruto());
+                    pointStatus.forceUpdate();
+                }
+    }
+    
+    private synchronized void updateContractStatus(MeansurementFileResult result, Long contract){
+        
+        Optional<ContractMtxStatus> opt = this.contractMtxStatusService.getContract(contract);
+        if(opt.isPresent()){
+            ContractMtxStatus status = opt.get();
+            status.setReasonStatus("");
+            status.setStatus(ContractStatus.BILLED);
+            status.setAmountGross(result.getAmountBruto());            
+            Double value = Optional.ofNullable(result.getAmountLiquidoAdjusted()).isPresent() ? result.getAmountLiquidoAdjusted() : result.getAmountLiquido();            
+            status.setAmountLiquid(value);
+            status.forceUpdate();
+        }
+        
+        
+    }
+    
     private synchronized Double roundValue(Double value, int qtd) {
         Double result = new BigDecimal(value).setScale(qtd, RoundingMode.HALF_EVEN).doubleValue();
         return result.compareTo(0D) > 0 ? result : 0.0D;
@@ -211,7 +237,7 @@ public class CalculateTask extends Task {
 
                 try {
                     details.addAll(this.getDetails(file, de));
-                } catch (Exception e) {                  
+                } catch (Exception e) {
                     //TODO Remover o try catch e não lançar as exceções
                 }
 
@@ -330,17 +356,8 @@ public class CalculateTask extends Task {
                 resultService.saveAll(results);
 
                 results.forEach(res -> {
-                    try {
-                        MeansurementPointStatus pointStatus = this.pointStatusService.getPoint(res.getMeansurementPoint());
-                        pointStatus.setHours(0L);
-                        pointStatus.setAmountLiquid(res.getAmountLiquido());
-                        pointStatus.setAmountGross(res.getAmountBruto());
-                        pointStatus.setStatus(PointStatus.SUCCESS);
-                        pointStatus.forceUpdate();
-                    } catch (Exception e) {
-                        Logger.getLogger(CalculateTask.class.getName()).log(Level.SEVERE, "[ Update point status ]", e);
-                    }
-
+                    this.updatePointStatus(res, res.getMeansurementPoint());
+                    this.updateContractStatus(res, res.getWbcContract());
                 });
 
             }
@@ -415,15 +432,15 @@ public class CalculateTask extends Task {
     private void mountFakeResultToContractFlat(List<MeansurementFile> files, List<ContractMtx> contractsInformations, DelegateExecution de) {
         contractsInformations
                 .stream()
-                .filter(c -> c.isFlat())                                
+                .filter(c -> c.isFlat())
                 .forEach(c -> {
 
                     Long idFile = files.stream()
-                            .filter(f-> f.getWbcContract().equals(c.getWbcContract()))
+                            .filter(f -> f.getWbcContract().equals(c.getWbcContract()))
                             .map(MeansurementFile::getId)
                             .findFirst()
                             .orElse(null);
-                    
+
                     ContractWbcInformationDTO contractWbcInformation = contractWbcInformationDTOs
                             .stream()
                             .filter(cc -> cc.getNrContract().equals(String.valueOf(c.getWbcContract())))
@@ -459,6 +476,8 @@ public class CalculateTask extends Task {
 
                     fileResult.setQtdHiredMax(0D);
                     fileResult.setQtdHiredMin(0D);
+                    
+                    this.updateContractStatus(fileResult, fileResult.getWbcContract());
 
                     synchronized (this.resultService) {
                         resultService.save(fileResult);
@@ -471,7 +490,7 @@ public class CalculateTask extends Task {
 
         contractsInformations
                 .stream()
-                .filter(c -> c.isConsumerUnit() && c.getWbcContract().equals(file.getWbcContract()))                
+                .filter(c -> c.isConsumerUnit())
                 .forEach(c -> {
 
                     ContractWbcInformationDTO contractWbcInformation = contractWbcInformationDTOs
@@ -506,6 +525,8 @@ public class CalculateTask extends Task {
                     Long perfil = contractDTO.isPresent() ? contractDTO.get().getNCdPerfilCCEE() : 0;
                     fileResult.setWbcPerfilCCEE(perfil.intValue());
                     fileResult.setMeansurementFileId(file.getId());
+                    
+                    this.updateContractStatus(fileResult, fileResult.getWbcContract());
 
                     synchronized (this.resultService) {
                         if (!result.contains(fileResult)) {
