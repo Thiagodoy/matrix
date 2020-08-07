@@ -10,7 +10,6 @@ import static com.core.matrix.utils.Constants.*;
 import com.core.matrix.dto.FileParsedDTO;
 import com.core.matrix.io.BeanIO;
 import com.core.matrix.model.Log;
-import com.core.matrix.service.ContractCompInformationService;
 import com.core.matrix.service.LogService;
 import com.core.matrix.service.MeansurementFileDetailService;
 import com.core.matrix.service.MeansurementFileService;
@@ -47,8 +46,7 @@ public class ValidationFileLoteTask1 implements JavaDelegate {
     private MeansurementFileService service;
     private MeansurementFileDetailService detailService;
     private DelegateExecution delegateExecution;
-    private LogService logService;
-    private ContractCompInformationService contractInformationService;   
+    private LogService logService;    
 
     private List<Log> logs;
     private List<FileParsedDTO> files;
@@ -59,8 +57,7 @@ public class ValidationFileLoteTask1 implements JavaDelegate {
             this.taskService = ValidationFileLoteTask1.context.getBean(TaskService.class);
             this.service = ValidationFileLoteTask1.context.getBean(MeansurementFileService.class);
             this.detailService = ValidationFileLoteTask1.context.getBean(MeansurementFileDetailService.class);
-            this.logService = ValidationFileLoteTask1.context.getBean(LogService.class);
-            this.contractInformationService = ValidationFileLoteTask1.context.getBean(ContractCompInformationService.class);
+            this.logService = ValidationFileLoteTask1.context.getBean(LogService.class);            
         }
 
     }

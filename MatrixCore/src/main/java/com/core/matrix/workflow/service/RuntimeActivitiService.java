@@ -98,10 +98,9 @@ public class RuntimeActivitiService {
 
     @Autowired
     private CommentActivitiService commentActivitiService;
-    
+
     @Autowired
     private ManagementService managementService;
-    
 
     @Transactional
     public void startProcessByMessage(String message, Map<String, Object> variables) {
@@ -111,29 +110,54 @@ public class RuntimeActivitiService {
     @Transactional
     public String startProcessByMessage(String message) throws ProcessIsRunningException {
 
-        if (message.equals(PROCESS_BILLING_CONTRACT_MESSAGE_EVENT)) {
-            ProcessDefinition definition = this.repositoryService
-                    .createProcessDefinitionQuery()
-                    .latestVersion()
-                    .processDefinitionNameLike("AGENDAMENTO DE MEDIÇÃO")
-                    .active()
-                    .singleResult();
-            
-            
-           long count = managementService.createJobQuery().processDefinitionId(definition.getId()).executable().count();
-           
-           if(count > 0){
-               throw new ProcessIsRunningException();
-           }
-        }
-
+        this.hasInstanceRunning(message, null);
         return runtimeService.startProcessInstanceByMessage(message).getProcessInstanceId();
+
+    }
+
+    private void hasInstanceRunning(String message, String key) throws ProcessIsRunningException {
+
+        if (Optional.ofNullable(key).isPresent()) {
+
+            ProcessDefinition definition = this.repositoryService
+                        .createProcessDefinitionQuery()
+                        .latestVersion()
+                        .processDefinitionKey(key)
+                        .active()
+                        .singleResult();
+            
+             long count = managementService.createJobQuery().processDefinitionId(definition.getId()).executable().count();
+
+                if (count > 0) {
+                    throw new ProcessIsRunningException();
+                }
+            
+            
+        } else {
+            if (message.equals(PROCESS_BILLING_CONTRACT_MESSAGE_EVENT)) {
+                ProcessDefinition definition = this.repositoryService
+                        .createProcessDefinitionQuery()
+                        .latestVersion()
+                        .processDefinitionNameLike("AGENDAMENTO DE MEDIÇÃO")
+                        .active()
+                        .singleResult();
+
+                long count = managementService.createJobQuery().processDefinitionId(definition.getId()).executable().count();
+
+                if (count > 0) {
+                    throw new ProcessIsRunningException();
+                }
+            }
+        }
 
     }
 
     @Transactional
     public Optional<TaskResponse> startProcess(StartProcessRequest request, String userId) throws Exception {
 
+        
+        this.hasInstanceRunning(null, request.getKey());
+        
         if (!Optional.ofNullable(request.getVariables()).isPresent()) {
             request.setVariables(new HashMap<String, Object>());
         }

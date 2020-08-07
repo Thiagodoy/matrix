@@ -7,7 +7,6 @@ package com.core.matrix.service;
 
 import com.core.matrix.dto.ContractPointDTO;
 import com.core.matrix.exceptions.EntityNotFoundException;
-import com.core.matrix.model.ContractCompInformation;
 import com.core.matrix.model.ContractMtx;
 import com.core.matrix.model.MeansurementFile;
 import com.core.matrix.model.MeansurementPointMtx;

@@ -53,17 +53,4 @@ public class ContractResource {
             return ResponseEntity.status(HttpStatus.resolve(500)).body(e.getMessage());
         }
     }
-    
-    
-    @RequestMapping(value = "/reloadBilling", method = RequestMethod.POST)
-    public ResponseEntity reloadBilling(@RequestParam(name = "contractId")Long contractId) {
-        try {
-            service.reloadProcess(contractId);
-            return ResponseEntity.ok().build();
-        } catch (Exception e) {
-            Logger.getLogger(ContractResource.class.getName()).log(Level.SEVERE, "[get]", e);
-            return ResponseEntity.status(HttpStatus.resolve(500)).body(e.getMessage());
-        }
-    }
-
 }

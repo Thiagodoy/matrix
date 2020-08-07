@@ -138,5 +138,9 @@ public class MeansurementPointStatusService implements Observer {
     public List<PointStatusSummaryDTO> summary(Long month, Long year) {
         return this.repository.summary(month, year);
     }
+    
+     public void shutdown(){
+        pool.shutdown();
+    }
 
 }

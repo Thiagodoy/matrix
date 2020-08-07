@@ -143,4 +143,8 @@ public class ContractMtxStatusService implements Observer {
     public List<ContractStatusSummaryDTO> summary(Long month, Long year) {
         return this.contractMtxStatusRepository.summary(month, year);
     }
+    
+    public void shutdown(){
+        pool.shutdown();
+    }
 }

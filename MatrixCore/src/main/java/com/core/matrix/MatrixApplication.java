@@ -11,8 +11,6 @@ import com.core.matrix.utils.ThreadPoolDetail;
 import com.core.matrix.utils.ThreadPoolEmail;
 import java.time.LocalDate;
 import java.util.TimeZone;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 import javax.annotation.PostConstruct;
 import javax.annotation.PreDestroy;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -45,6 +43,9 @@ public class MatrixApplication {
     @Autowired
     private ContractMtxStatusService contractMtxStatusService;
     
+    @Autowired
+    private ThreadPoolEmail poolEmail;
+    
     public static void main(String[] args) {
         SpringApplication.run(MatrixApplication.class, args);
     }
@@ -58,10 +59,13 @@ public class MatrixApplication {
     }
     
     @PreDestroy
-    public void detroy(){       
-        Logger.getLogger(MatrixApplication.class.getName()).log(Level.INFO, "Call method destroy");
-        ThreadPoolEmail.deleteFiles();
+    public void detroy(){               
+        poolEmail.shutdown();
+        poolEmail.deleteFiles();
         ThreadPoolDetail.shutdown();
+        contractMtxStatusService.shutdown();
+        pointStatusService.shutdown();
+        
         
     }
 

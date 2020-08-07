@@ -77,7 +77,7 @@ public class ContractMtxResource extends Resource<ContractMtx, ContractMtxServic
             return ResponseEntity.status(HttpStatus.resolve(500)).body(e.getMessage());
         }
         catch (Exception e) {
-            Logger.getLogger(ContractCompInformationResource.class.getName()).log(Level.SEVERE, "[post]", e);
+            Logger.getLogger(this.getClass().getName()).log(Level.SEVERE, "[post]", e);
             return ResponseEntity.status(HttpStatus.resolve(500)).body(e.getMessage());
         }
     }
