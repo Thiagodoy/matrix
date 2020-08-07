@@ -112,6 +112,13 @@ public class MeansurementPointStatusService implements Observer {
         }
     }
 
+    
+    public void resetAll(){
+        this.mapPoint.keySet().forEach(point->{        
+            this.resetPoint(point);
+        });                
+    }
+    
     @Transactional
     public synchronized Optional<MeansurementPointStatus> getPoint(String point) {
 

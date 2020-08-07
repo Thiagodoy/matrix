@@ -61,4 +61,16 @@ public class MonitoringPointResource {
         }
     }
     
+    @RequestMapping(value = "/resetAllStatus", method = RequestMethod.POST)
+    public ResponseEntity resetAllStatus() {
+        try {
+
+            this.pointStatusService.resetAll();
+            return ResponseEntity.ok().build();
+        } catch (Exception e) {
+            Logger.getLogger(MonitoringPointResource.class.getName()).log(Level.SEVERE, "[resetAllStatus]", e);
+            return ResponseEntity.status(HttpStatus.resolve(500)).body(e.getMessage());
+        }
+    }
+    
 }
