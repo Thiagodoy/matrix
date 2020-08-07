@@ -5,6 +5,7 @@
  */
 package com.core.matrix.workflow.task;
 
+import com.core.matrix.service.ContractMtxStatusService;
 import com.core.matrix.service.LogService;
 import com.core.matrix.service.MeansurementFileDetailService;
 import com.core.matrix.service.MeansurementFileResultService;
@@ -34,6 +35,7 @@ public class CleanFiles implements JavaDelegate {
     private MeansurementFileResultService fileResultService;
     private LogService logService;
     private MeansurementPointStatusService pointStatusService;
+    private ContractMtxStatusService contractMtxStatusService;
 
     public CleanFiles(ApplicationContext context) {
         CleanFiles.context = context;
@@ -46,6 +48,7 @@ public class CleanFiles implements JavaDelegate {
             this.logService = CleanFiles.context.getBean(LogService.class);
             this.fileResultService = CleanFiles.context.getBean(MeansurementFileResultService.class);
             this.pointStatusService = CleanFiles.context.getBean(MeansurementPointStatusService.class);
+            this.contractMtxStatusService = CleanFiles.context.getBean(ContractMtxStatusService.class);
         }
     }
 
@@ -67,7 +70,8 @@ public class CleanFiles implements JavaDelegate {
             }
 
             this.fileService.findByProcessInstanceId(execution.getProcessInstanceId()).forEach(file -> {
-                pointStatusService.resetPoint(file.getMeansurementPoint());
+                this.pointStatusService.resetPoint(file.getMeansurementPoint());
+                this.contractMtxStatusService.resetContract(file.getWbcContract());
             });
 
             this.fileService.updateStatusByProcessInstanceId(MeansurementFileStatus.FILE_PENDING, execution.getProcessInstanceId());

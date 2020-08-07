@@ -98,7 +98,7 @@ public class ContractMtxStatusService implements Observer {
         this.mapContracts.put(status.getWbcContract(), status);
     }
 
-    public void resetPoint(Long contract) {
+    public void resetContract(Long contract) {
 
         if (this.mapContracts.containsKey(contract)) {
             ContractMtxStatus contractStatus = this.mapContracts.get(contract);
@@ -109,6 +109,10 @@ public class ContractMtxStatusService implements Observer {
             contractStatus.setAmountLiquid(0D);
             contractStatus.forceUpdate();
         }
+    }
+    
+    public void resetAll(){
+        this.mapContracts.keySet().forEach(contract-> this.resetContract(contract));
     }
 
     @Transactional

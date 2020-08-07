@@ -53,9 +53,9 @@ public class MonitoringContractResource {
     ) {
         try {
 
-            Specification spc = ContractMtxStatusSpecification.find(status, contract, month, year);            
+            Specification spc = ContractMtxStatusSpecification.find(status, contract, month, year);
             PageRequest pageRequest = PageRequest.of(page, size, Sort.by("wbcContract"));
-            
+
             Page pageResponse = this.contractMtxStatusService.find(spc, pageRequest);
 
             List<ContractStatusSummaryDTO> summary = this.contractMtxStatusService.summary(month, year);
@@ -64,6 +64,18 @@ public class MonitoringContractResource {
 
         } catch (Exception e) {
             Logger.getLogger(MonitoringPointResource.class.getName()).log(Level.SEVERE, "[status]", e);
+            return ResponseEntity.status(HttpStatus.resolve(500)).body(e.getMessage());
+        }
+    }
+
+    @RequestMapping(value = "/resetAllStatus", method = RequestMethod.POST)
+    public ResponseEntity resetAllStatus() {
+        try {
+
+            this.contractMtxStatusService.resetAll();
+            return ResponseEntity.ok().build();
+        } catch (Exception e) {
+            Logger.getLogger(MonitoringPointResource.class.getName()).log(Level.SEVERE, "[resetAllStatus]", e);
             return ResponseEntity.status(HttpStatus.resolve(500)).body(e.getMessage());
         }
     }
