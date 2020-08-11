@@ -180,6 +180,18 @@ public class RuntimeResource {
             return ResponseEntity.status(HttpStatus.resolve(500)).body(e.getMessage());
         }
     }
+    
+    @RequestMapping(value = "/getAllLabels", method = RequestMethod.GET)
+    public ResponseEntity getAllLabels(            
+            @RequestParam(name = "processInstanceId", required = false) String processInstanceId) {
+        try {
+            String response = this.service.getAllLabels(processInstanceId);
+            return ResponseEntity.ok(response);
+        } catch (Exception e) {
+            Logger.getLogger(RuntimeResource.class.getName()).log(Level.SEVERE, "[getMyTask]", e);
+            return ResponseEntity.status(HttpStatus.resolve(500)).body(e.getMessage());
+        }
+    }
 
     @Deprecated
     @RequestMapping(value = "/assigneeTask", method = RequestMethod.POST)

@@ -168,6 +168,10 @@ public abstract class Task implements JavaDelegate {
     public List<ContractMtx> getContractsMtx() {
         return (List<ContractMtx>) this.variables.get(PROCESS_INFORMATION_CONTRACTS_MATRIX);
     }
+    
+    public boolean hasVariable(String key){
+        return this.variables.containsKey(key);
+    }
 
     public List<String> getAllFilesUploaded() {
         return (List<String>) this.variables.get(LIST_ATTACHMENT_ID);

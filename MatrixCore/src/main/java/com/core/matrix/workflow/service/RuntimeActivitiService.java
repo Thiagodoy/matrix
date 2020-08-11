@@ -20,6 +20,10 @@ import com.core.matrix.response.ProcessInstanceStatusResponse;
 import com.core.matrix.response.TaskResponse;
 import com.core.matrix.utils.Constants;
 import static com.core.matrix.utils.Constants.PROCESS_BILLING_CONTRACT_MESSAGE_EVENT;
+import static com.core.matrix.utils.Constants.PROCESS_INFORMATION_CNPJ;
+import static com.core.matrix.utils.Constants.PROCESS_INFORMATION_CONTRACT_NUMBERS;
+import static com.core.matrix.utils.Constants.PROCESS_INFORMATION_MEANSUREMENT_POINT;
+import static com.core.matrix.utils.Constants.PROCESS_INFORMATION_NICKNAME;
 import static com.core.matrix.utils.Constants.PROCESS_INFORMATION_PROCESSO_ID;
 import static com.core.matrix.utils.Constants.TASK_DRAFT;
 import com.core.matrix.utils.Utils;
@@ -120,19 +124,18 @@ public class RuntimeActivitiService {
         if (Optional.ofNullable(key).isPresent()) {
 
             ProcessDefinition definition = this.repositoryService
-                        .createProcessDefinitionQuery()
-                        .latestVersion()
-                        .processDefinitionKey(key)
-                        .active()
-                        .singleResult();
-            
-             long count = managementService.createJobQuery().processDefinitionId(definition.getId()).executable().count();
+                    .createProcessDefinitionQuery()
+                    .latestVersion()
+                    .processDefinitionKey(key)
+                    .active()
+                    .singleResult();
 
-                if (count > 0) {
-                    throw new ProcessIsRunningException();
-                }
-            
-            
+            long count = managementService.createJobQuery().processDefinitionId(definition.getId()).executable().count();
+
+            if (count > 0) {
+                throw new ProcessIsRunningException();
+            }
+
         } else {
             if (message.equals(PROCESS_BILLING_CONTRACT_MESSAGE_EVENT)) {
                 ProcessDefinition definition = this.repositoryService
@@ -155,9 +158,8 @@ public class RuntimeActivitiService {
     @Transactional
     public Optional<TaskResponse> startProcess(StartProcessRequest request, String userId) throws Exception {
 
-        
         this.hasInstanceRunning(null, request.getKey());
-        
+
         if (!Optional.ofNullable(request.getVariables()).isPresent()) {
             request.setVariables(new HashMap<String, Object>());
         }
@@ -410,95 +412,88 @@ public class RuntimeActivitiService {
         return new PageResponse<ProcessInstanceStatusResponse>(Arrays.asList(status), (long) 1, (long) 1, (long) 0);
     }
 
-    public PageResponse<TaskResponse> getAssigneAndCandidateTask(UserActiviti user, String searchValue, int page, int size) {
+    public String getAllLabels(String processInstanceId) {
 
-        String groupFilter = user.getGroups()
-                .stream()
-                .map(g -> "'" + g.getGroupId() + "'")
-                .filter(Objects::nonNull)
-                .collect(Collectors.joining(","));
+        List<String> informations = new ArrayList<String>();
 
-        long start = System.currentTimeMillis();
-        long end;
+        informations.add(MessageFormat.format("[PROCESSO]\n#{0}", processInstanceId));
 
-        List<String> processInstances = this.listProcessInstances(groupFilter, user.getId(), searchValue, page, size);
-        end = System.currentTimeMillis();
-        Logger.getLogger(RuntimeActivitiService.class.getName()).log(Level.INFO, "[getAssigneAndCandidateTask] Seleciona processo tempo :" + (end - start) / 1000);
-
-        long total = Long.parseLong(processInstances.get(0));
-
-        processInstances = processInstances.subList(1, processInstances.size());
-
-        if (processInstances.isEmpty()) {
-            return new PageResponse<TaskResponse>(new ArrayList(), 1L, 1L, (long) page);
+        String points = this.runtimeService.getVariable(processInstanceId, PROCESS_INFORMATION_MEANSUREMENT_POINT, String.class);
+        if (Optional.ofNullable(points).isPresent()) {
+            String t = "[PONTOS]\n" + Arrays.asList(points.split(",")).stream().map(d -> "#" + d).collect(Collectors.joining("\n"));
+            informations.add(t);
         }
 
-        start = System.currentTimeMillis();
+        String names = this.runtimeService.getVariable(processInstanceId, PROCESS_INFORMATION_NICKNAME, String.class);
+        if (Optional.ofNullable(names).isPresent()) {
+            String t = "[EMPRESA]\n" + Arrays.asList(names.split(",")).stream().map(d -> "#" + d).collect(Collectors.joining("\n"));
+            informations.add(t);
+        }
 
-        List<TaskResponse> response = taskService
-                .createTaskQuery()
-                .includeProcessVariables()
-                .includeTaskLocalVariables()
-                .processInstanceIdIn(processInstances)
-                .orderByTaskCreateTime()
-                .desc()
-                .list()
-                .parallelStream()
-                .map(t -> {
-                    TaskResponse instance = new TaskResponse(t);
-                    instance.setProcessDefinitionName(this.getProcessDefinitionName(t.getProcessDefinitionId()));
-                    return instance;
-                })
-                .collect(Collectors.toList());
+        String cnpj = this.runtimeService.getVariable(processInstanceId, PROCESS_INFORMATION_CNPJ, String.class);
+        if (Optional.ofNullable(cnpj).isPresent()) {
+            String t = "[CNPJs]\n" + Arrays.asList(cnpj.split(",")).stream().map(d -> "#" + d).collect(Collectors.joining("\n"));
+            informations.add(t);
+        }
 
-        end = System.currentTimeMillis();
-        Logger.getLogger(RuntimeActivitiService.class.getName()).log(Level.INFO, "[getAssigneAndCandidateTask] Preparando response tarefas tempo :" + (end - start) / 1000);
+        String contracts = this.runtimeService.getVariable(processInstanceId, PROCESS_INFORMATION_CONTRACT_NUMBERS, String.class);
+        if (Optional.ofNullable(contracts).isPresent()) {
+            String t = "[CONTRATOS]\n" + Arrays.asList(contracts.split(";")).stream().map(d -> "#" + d).collect(Collectors.joining("\n"));
+            informations.add(t);
+        }
 
-        return new PageResponse<TaskResponse>(response, (long) total, (long) size, (long) page);
+        return informations.stream().collect(Collectors.joining("\n\n"));
+
     }
 
-    private List<String> listProcessInstances(String groupFilter, String user, String valueSearch, int page, int size) {
+    public PageResponse<TaskResponse> getAssigneAndCandidateTask(UserActiviti user, String searchValue, int page, int size) {       
 
         int min = page * size;
+        
+        if (Optional.ofNullable(searchValue).isPresent()) {            
 
-        String query = "SELECT DISTINCT\n"
-                + "    t.PROC_INST_ID_, t.ID_,t.CREATE_TIME_\n"
-                + "FROM\n"
-                + "    activiti.ACT_RU_TASK t\n"
-                + "        INNER JOIN\n"
-                + "    activiti.ACT_RU_VARIABLE v ON t.PROC_INST_ID_ = v.PROC_INST_ID_\n"
-                + "        INNER JOIN\n"
-                + "    activiti.ACT_RU_IDENTITYLINK k ON t.ID_ = k.TASK_ID_\n"
-                + "WHERE\n"
-                + "    (t.ASSIGNEE_ = '" + user + "'\n"
-                + "        OR k.GROUP_ID_ in (" + groupFilter + "))\n";
-
-        if (Optional.ofNullable(valueSearch).isPresent()) {
-            query += "  AND ((UPPER(v.TEXT_) LIKE '%" + valueSearch.toUpperCase() + "%'\n" + "   AND SUBSTRING(v.NAME_, 1, 1) = '#') OR t.NAME_ like '%" + valueSearch.toUpperCase() + "%')\n";
-        }
-
-        query += "  order by t.CREATE_TIME_ desc";
-
-        List<String> processInstances = taskService
-                .createNativeTaskQuery()
-                .sql(query)
-                .listPage(min, size)
+           List<TaskResponse> response = taskService.createTaskQuery()
+                    .processVariableValueLike(Constants.PROCESS_LABEL, "%"+searchValue.toUpperCase()+"%")
+                    .includeTaskLocalVariables()
+                    .orderByTaskCreateTime()
+                    .desc()
+                    .listPage(min, size)
+                    .parallelStream()
+                    .map(t -> {
+                        TaskResponse instance = new TaskResponse(t);
+                        instance.setProcessDefinitionName(this.getProcessDefinitionName(t.getProcessDefinitionId()));
+                        return instance;
+                    })
+                    .collect(Collectors.toList());
+           
+           return new PageResponse<TaskResponse>(response, (long) response.size(), (long) size, (long) page);
+        }else{
+            
+            List<String> groups = user.getGroups()
                 .stream()
-                .map(t -> t.getProcessInstanceId())
-                .distinct()
+                .map(g -> String.valueOf(g.getGroupId()) )                
                 .collect(Collectors.toList());
-
-        long total = taskService
-                .createNativeTaskQuery()
-                .sql(query)
-                .list()
-                .stream()
-                .count();
-
-        processInstances.add(0, String.valueOf(total));
-
-        return processInstances;
-    }
+            
+           long total = taskService.createTaskQuery()
+                    .taskCandidateGroupIn(groups).count();
+            
+           List<TaskResponse> response = taskService.createTaskQuery()
+                    .taskCandidateGroupIn(groups)
+                    .includeTaskLocalVariables()
+                    .orderByTaskCreateTime()
+                    .desc()
+                    .listPage(min, size)
+                    .parallelStream()
+                    .map(t -> {
+                        TaskResponse instance = new TaskResponse(t);
+                        instance.setProcessDefinitionName(this.getProcessDefinitionName(t.getProcessDefinitionId()));
+                        return instance;
+                    })
+                    .collect(Collectors.toList());
+           
+            return new PageResponse<TaskResponse>(response,  total, (long) size, (long) page);
+        }      
+    }    
 
     @Deprecated
     public PageResponse<TaskResponse> getCandidateTasks(UserActiviti user, String variableValue, String processInstance, int page, int size) {

@@ -51,6 +51,7 @@ import com.core.matrix.utils.Utils;
 import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
+import java.text.MessageFormat;
 import java.time.LocalDate;
 import java.util.Arrays;
 import java.util.HashSet;
@@ -393,7 +394,10 @@ public class BillingContractsTask implements JavaDelegate {
             variables.put(Constants.PROCESS_INFORMATION_CNPJ, cnpjsString);
             variables.put(PROCESS_INFORMATION_CONTRACT_NUMBERS, contractsNumber);
             variables.put(PROCESS_INFORMATION_PROCESSO_ID, processInstance.getProcessInstanceId());
+            variables.put(Constants.PROCESS_LABEL, MessageFormat.format("{0}{1}{2}", pointers,contracts,processInstance.getProcessInstanceId()));
 
+            
+            
             if (execution.hasVariable(PROCESS_CONTRACTS_RELOAD_BILLING)) {
                 execution.setVariable(PROCESS_NEW_INSTANCE_ID, processInstance.getProcessInstanceId());
             }

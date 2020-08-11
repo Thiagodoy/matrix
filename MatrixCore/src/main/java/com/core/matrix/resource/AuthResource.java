@@ -151,7 +151,7 @@ public class AuthResource {
                 throw new Exception();
             }
         } catch (Exception ex) {
-            Logger.getLogger(AuthResource.class.getName()).log(Level.SEVERE, "[ checkToken ]", ex);
+            //Logger.getLogger(AuthResource.class.getName()).log(Level.SEVERE, "[ checkToken ]", ex);
             return ResponseEntity.status(HttpStatus.resolve(500)).body("TOKEN_EXPIRED");
         }
 
