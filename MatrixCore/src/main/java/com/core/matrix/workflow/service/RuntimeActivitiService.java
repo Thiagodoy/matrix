@@ -6,6 +6,7 @@
 package com.core.matrix.workflow.service;
 
 import com.core.matrix.dto.CommentDTO;
+import com.core.matrix.dto.TaskFilterDTO;
 import com.core.matrix.exceptions.ProcessIsRunningException;
 import com.core.matrix.request.AddComment;
 import com.core.matrix.request.CompleteTaskRequest;
@@ -31,8 +32,14 @@ import com.core.matrix.workflow.model.GroupMemberActiviti;
 import com.core.matrix.workflow.model.UserActiviti;
 import java.io.IOException;
 import java.io.InputStream;
+import java.sql.Connection;
+import java.sql.ResultSet;
+import java.sql.SQLException;
+import java.sql.Statement;
 import java.text.MessageFormat;
+import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.time.LocalTime;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -46,6 +53,7 @@ import java.util.Optional;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import java.util.stream.Collectors;
+import javax.sql.DataSource;
 import org.activiti.engine.ActivitiTaskAlreadyClaimedException;
 import org.activiti.engine.delegate.Expression;
 import org.activiti.engine.HistoryService;
@@ -107,6 +115,9 @@ public class RuntimeActivitiService {
 
     @Autowired
     private ManagementService managementService;
+
+    @Autowired
+    private DataSource dataSource;
 
     @Transactional
     public void startProcessByMessage(String message, Map<String, Object> variables) {
@@ -392,6 +403,57 @@ public class RuntimeActivitiService {
 
     }
 
+    public Object getTaskFilter() {
+
+        Connection connection;
+        try {
+            connection = this.dataSource.getConnection();
+            Statement statement = connection.createStatement();
+            
+            LocalDateTime start = LocalDate.now().withDayOfMonth(1).atStartOfDay();
+            LocalDate temp = LocalDate.now().withDayOfMonth(LocalDate.now().lengthOfMonth());
+            LocalDateTime end = LocalDateTime.of(temp, LocalTime.MIDNIGHT);
+
+            String query = "SELECT DISTINCT\n"
+                    + "    'TASK_NAME' type, NAME_ value\n"
+                    + "FROM\n"
+                    + "    activiti.ACT_RU_TASK t\n"
+                    + "WHERE\n"
+                    + "    t.CREATE_TIME_ BETWEEN '{0}' AND '{1}' \n"
+                    + "UNION ALL SELECT DISTINCT\n"
+                    + "    'USER', t.ASSIGNEE_\n"
+                    + "FROM\n"
+                    + "    activiti.ACT_RU_TASK t\n"
+                    + "WHERE\n"
+                    + "    t.CREATE_TIME_ BETWEEN '{2}' AND '{3}'";
+
+            
+            String startString = Utils.localDateTimeToMsqlString(start);
+            String endString = Utils.localDateTimeToMsqlString(end);
+            
+            query = MessageFormat.format(query, start,end, start,end);
+            
+            
+            ResultSet resultSet =  statement.executeQuery(query);           
+            
+            
+            List<TaskFilterDTO> filters = new ArrayList<>();
+            
+            while(resultSet.next()){
+                
+                String type = resultSet.getString("type");
+                String value = resultSet.getString("value");                
+                filters.add(new TaskFilterDTO(type, value));
+            }
+            
+            
+            
+        } catch (SQLException ex) {
+            Logger.getLogger(RuntimeActivitiService.class.getName()).log(Level.SEVERE, null, ex);
+        }
+
+    }
+
     public PageResponse<TaskResponse> getAssigneAndCandidateTask(UserActiviti user, String searchValue, String taskName, String userAssigned, int page, int size) {
 
         int min = page * size;
@@ -470,7 +532,7 @@ public class RuntimeActivitiService {
 
         return new PageResponse<TaskResponse>(response, (long) sizeTotalElements, (long) size, (long) page);
 
-    }   
+    }
 
     @Transactional
     public Task getNextUserTaskByProcessInstanceId(String processInstanceId, String userId, boolean assigneToUser) throws Exception {
