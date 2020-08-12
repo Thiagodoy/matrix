@@ -75,6 +75,15 @@ public class RepositoryActivitiService {
 
     }
 
+    public synchronized String getProcessNameByProcessDefinitionId(String processDefinitionId) {
+        return this.listAll()
+                .stream()
+                .filter(p -> p.getId().equals(processDefinitionId))
+                .map(ProcessDefinitionResponse::getName)
+                .findFirst()
+                .orElse("");
+    }
+
     @Cacheable("processDefinition")
     public List<ProcessDefinitionResponse> listAllFromCache() {
         return this.repositoryService
@@ -94,13 +103,13 @@ public class RepositoryActivitiService {
                 .latestVersion()
                 .list()
                 .parallelStream()
-                .map(p -> "'"+ p.getId() + "'")
+                .map(p -> "'" + p.getId() + "'")
                 .collect(Collectors.joining(","));
 
         String groups = user
                 .getGroups()
                 .stream()
-                .map(p -> "'" +  p.getGroupId() + "'")
+                .map(p -> "'" + p.getGroupId() + "'")
                 .collect(Collectors.joining(","));
 
         return this.repositoryService.createNativeProcessDefinitionQuery().sql("SELECT \n"

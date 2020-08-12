@@ -36,7 +36,7 @@ public class ResourceAbstractTest {
     WebApplicationContext webApplicationContext;
 
     protected void setUp() {
-        mvc = MockMvcBuilders.webAppContextSetup(webApplicationContext).build();
+        mvc = MockMvcBuilders.webAppContextSetup(webApplicationContext).build();        
     }
 
     protected String mapToJson(Object obj) throws JsonProcessingException, com.fasterxml.jackson.core.JsonProcessingException {

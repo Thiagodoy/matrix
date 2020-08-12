@@ -36,6 +36,7 @@ import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.Comparator;
 import java.util.HashMap;
 import java.util.List;
@@ -70,6 +71,7 @@ import org.activiti.engine.task.Comment;
 import org.activiti.engine.task.DelegationState;
 import org.activiti.engine.task.Task;
 import org.activiti.engine.task.TaskInfo;
+import org.activiti.engine.task.TaskQuery;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -320,63 +322,6 @@ public class RuntimeActivitiService {
 
     }
 
-    public synchronized String getProcessDefinitionName(String processDefinitionId) {
-
-        return repositoryActivitiService
-                .listAll()
-                .stream()
-                .filter(p -> p.getId().equals(processDefinitionId))
-                .map(t -> t.getName())
-                .findFirst()
-                .orElse("");
-
-    }
-
-    public PageResponse<TaskResponse> findTask(String searchValue, int page, int size) {
-
-        int min = page * size;
-
-        LocalDateTime now = LocalDateTime.now();
-        int daysOfMonth = Utils.getDaysOfMonth(now.toLocalDate());
-
-        String start = LocalDateTime.of(now.getYear(), now.getMonth(), 1, 0, 1).format(DateTimeFormatter.ISO_LOCAL_DATE_TIME).replace("T", " ");
-        String end = LocalDateTime.of(now.getYear(), now.getMonth(), daysOfMonth, 23, 59).format(DateTimeFormatter.ISO_LOCAL_DATE_TIME).replace("T", " ");
-
-        String query = "SELECT DISTINCT\n"
-                + "    t.*\n"
-                + "FROM\n"
-                + "    activiti.ACT_RU_TASK t\n"
-                + "        INNER JOIN\n"
-                + "    activiti.ACT_RU_VARIABLE v ON t.PROC_INST_ID_ = v.PROC_INST_ID_\n"
-                + "        INNER JOIN\n"
-                + "    activiti.ACT_RU_IDENTITYLINK k ON t.ID_ = k.TASK_ID_\n"
-                + "WHERE\n"
-                + " ((UPPER(v.TEXT_) LIKE '%" + searchValue.toUpperCase() + "%'\n" + "   AND SUBSTRING(v.NAME_, 1, 1) = '#') OR t.NAME_ like '%" + searchValue.toUpperCase() + "%')\n"
-                + "AND t.CREATE_TIME_ between '" + start + "' and '" + end + "'";
-
-        query += "  order by t.CREATE_TIME_ desc";
-
-        List<TaskResponse> responses = taskService
-                .createNativeTaskQuery()
-                .sql(query)
-                .listPage(min, size)
-                .stream()
-                .map(t -> {
-                    TaskResponse response = new TaskResponse(t);
-                    response.setProcessDefinitionName(this.getProcessDefinitionName(t.getProcessDefinitionId()));
-                    return response;
-                })
-                .distinct()
-                .collect(Collectors.toList());
-
-        long total = taskService
-                .createNativeTaskQuery()
-                .sql(query).list().size();
-
-        return new PageResponse<TaskResponse>(responses, (long) total, (long) size, (long) page);
-
-    }
-
     public PageResponse<ProcessInstanceStatusResponse> findProcess(String searchValue) {
 
         LocalDateTime now = LocalDateTime.now();
@@ -407,9 +352,10 @@ public class RuntimeActivitiService {
         ProcessInstanceStatusResponse status = new ProcessInstanceStatusResponse();
 
         status.setId(process.getId());
-        status.setProcessName(this.getProcessDefinitionName(process.getProcessDefinitionId()));
+        String name = this.repositoryActivitiService.getProcessNameByProcessDefinitionId(process.getId());
+        status.setProcessName(name);
         status.setStatus(Optional.ofNullable(process.getEndTime()).isPresent() ? "Encerrado" : "Em aberto");
-        return new PageResponse<ProcessInstanceStatusResponse>(Arrays.asList(status), (long) 1, (long) 1, (long) 0);
+        return new PageResponse<>(Arrays.asList(status), (long) 1, (long) 1, (long) 0);
     }
 
     public String getAllLabels(String processInstanceId) {
@@ -442,190 +388,40 @@ public class RuntimeActivitiService {
             informations.add(t);
         }
 
-        return informations.stream().collect(Collectors.joining("\n\n"));
+        return informations.stream().collect(Collectors.joining("\n"));
 
     }
 
-    public PageResponse<TaskResponse> getAssigneAndCandidateTask(UserActiviti user, String searchValue, int page, int size) {       
+    public PageResponse<TaskResponse> getAssigneAndCandidateTask(UserActiviti user, String searchValue, String taskName, String userAssigned, int page, int size) {
 
         int min = page * size;
-        
-        if (Optional.ofNullable(searchValue).isPresent()) {            
 
-           List<TaskResponse> response = taskService.createTaskQuery()
-                    .processVariableValueLike(Constants.PROCESS_LABEL, "%"+searchValue.toUpperCase()+"%")
-                    .includeTaskLocalVariables()
-                    .orderByTaskCreateTime()
-                    .desc()
-                    .listPage(min, size)
-                    .parallelStream()
-                    .map(t -> {
-                        TaskResponse instance = new TaskResponse(t);
-                        instance.setProcessDefinitionName(this.getProcessDefinitionName(t.getProcessDefinitionId()));
-                        return instance;
-                    })
-                    .collect(Collectors.toList());
-           
-           return new PageResponse<TaskResponse>(response, (long) response.size(), (long) size, (long) page);
-        }else{
-            
-            List<String> groups = user.getGroups()
-                .stream()
-                .map(g -> String.valueOf(g.getGroupId()) )                
-                .collect(Collectors.toList());
-            
-           long total = taskService.createTaskQuery()
-                    .taskCandidateGroupIn(groups).count();
-            
-           List<TaskResponse> response = taskService.createTaskQuery()
-                    .taskCandidateGroupIn(groups)
-                    .includeTaskLocalVariables()
-                    .orderByTaskCreateTime()
-                    .desc()
-                    .listPage(min, size)
-                    .parallelStream()
-                    .map(t -> {
-                        TaskResponse instance = new TaskResponse(t);
-                        instance.setProcessDefinitionName(this.getProcessDefinitionName(t.getProcessDefinitionId()));
-                        return instance;
-                    })
-                    .collect(Collectors.toList());
-           
-            return new PageResponse<TaskResponse>(response,  total, (long) size, (long) page);
-        }      
-    }    
+        TaskQuery query = taskService.createTaskQuery();
 
-    @Deprecated
-    public PageResponse<TaskResponse> getCandidateTasks(UserActiviti user, String variableValue, String processInstance, int page, int size) {
-
-        // grou
-        int min = page * size;
-        //int max = min + size;
-
-        if (Optional.ofNullable(variableValue).isPresent()) {
-
-            String gro = user.getGroups().stream().map(g -> "'" + g.getGroupId() + "'").filter(Objects::nonNull).collect(Collectors.joining(","));
-
-            List<String> processInstances = taskService
-                    .createNativeTaskQuery().sql("SELECT \n"
-                            + " distinct   t.PROC_INST_ID_,\n"
-                            + "    t.ID_ \n"
-                            + "FROM\n"
-                            + "    activiti.ACT_RU_TASK t\n"
-                            + "        INNER JOIN\n"
-                            + "    activiti.ACT_RU_VARIABLE v ON t.PROC_INST_ID_ = v.PROC_INST_ID_\n"
-                            + "        INNER JOIN\n"
-                            + "    activiti.ACT_RU_IDENTITYLINK k ON t.ID_ = k.TASK_ID_\n"
-                            + "WHERE\n"
-                            + "    upper(v.TEXT_) LIKE '%" + variableValue.toUpperCase() + "%'\n"
-                            + "        AND k.GROUP_ID_ in(" + gro + ") ")
-                    .list()
-                    .stream()
-                    .map(t -> t.getProcessInstanceId())
-                    .distinct()
-                    .collect(Collectors.toList());
-
-            if (processInstances.isEmpty()) {
-                return new PageResponse<TaskResponse>(new ArrayList(), 1L, 1L, (long) page);
-            }
-
-            List<TaskResponse> response = taskService
-                    .createTaskQuery()
-                    .includeProcessVariables()
-                    .includeTaskLocalVariables()
-                    .processInstanceIdIn(processInstances)
-                    .orderByTaskCreateTime()
-                    .desc()
-                    .listPage(min, size)
-                    .parallelStream()
-                    .map(t -> {
-                        TaskResponse instance = new TaskResponse(t);
-                        Optional<ProcessDefinitionResponse> resp = repositoryActivitiService.listAll().stream().filter(p -> p.getId().equals(t.getProcessDefinitionId())).findFirst();
-                        String name = resp.isPresent() ? resp.get().getName() : "";
-                        instance.setProcessDefinitionName(name);
-                        return instance;
-                    })
-                    .collect(Collectors.toList());
-
-            return new PageResponse<TaskResponse>(response, (long) processInstances.size(), (long) size, (long) page);
-
-        } else if (Optional.ofNullable(processInstance).isPresent()) {
-
-            List<TaskResponse> response = taskService
-                    .createTaskQuery()
-                    //.taskCandidateGroupIn(groups)
-                    .processInstanceId(processInstance)
-                    .includeProcessVariables()
-                    .includeTaskLocalVariables()
-                    .orderByTaskCreateTime()
-                    .desc()
-                    .listPage(min, size)
-                    .parallelStream()
-                    .map(t -> {
-                        TaskResponse instance = new TaskResponse(t);
-                        Optional<ProcessDefinitionResponse> resp = repositoryActivitiService.listAll().stream().filter(p -> p.getId().equals(t.getProcessDefinitionId())).findFirst();
-                        String name = resp.isPresent() ? resp.get().getName() : "";
-                        instance.setProcessDefinitionName(name);
-                        return instance;
-                    })
-                    .collect(Collectors.toList());
-
-            response.stream().forEach(task -> {
-                //esta apresentando erro para listar.. não reconhece 
-//            List<String> gr = groupActivitiService.listByTask(task.getTaskId()).stream().map(g -> g.getName()).collect(Collectors.toList());
-//            task.setProfileCanditates(gr);
-            });
-
-            return new PageResponse<TaskResponse>(response, 1L, 1L, (long) page);
-
+        if (Optional.ofNullable(userAssigned).isPresent()) {
+            query = query.taskAssignee(userAssigned);
         } else {
 
-            List<String> groups = user.getGroups().stream().map(g -> g.getGroupId()).filter(Objects::nonNull).collect(Collectors.toList());
-            Long sizeTotalElements = taskService.createTaskQuery().taskCandidateGroupIn(groups).count();
-
-            List<TaskResponse> response = taskService
-                    .createTaskQuery()
-                    .taskCandidateGroupIn(groups)
-                    .includeProcessVariables()
-                    .includeTaskLocalVariables()
-                    .orderByTaskCreateTime()
-                    .desc()
-                    .listPage(min, size)
-                    .parallelStream()
-                    .map(t -> {
-                        TaskResponse instance = new TaskResponse(t);
-                        Optional<ProcessDefinitionResponse> resp = repositoryActivitiService.listAll().stream().filter(p -> p.getId().equals(t.getProcessDefinitionId())).findFirst();
-                        String name = resp.isPresent() ? resp.get().getName() : "";
-                        instance.setProcessDefinitionName(name);
-                        return instance;
-                    })
+            List<String> groups = user.getGroups()
+                    .stream()
+                    .map(g -> String.valueOf(g.getGroupId()))
                     .collect(Collectors.toList());
 
-            response.stream().forEach(task -> {
-                //esta apresentando erro para listar.. não reconhece 
-//            List<String> gr = groupActivitiService.listByTask(task.getTaskId()).stream().map(g -> g.getName()).collect(Collectors.toList());
-//            task.setProfileCanditates(gr);
-            });
-
-            return new PageResponse<TaskResponse>(response, sizeTotalElements, (long) size, (long) page);
+            query = query.taskCandidateOrAssigned(user.getEmail());
+            query = query.taskCandidateGroupIn(groups);
         }
 
-    }
+        if (Optional.ofNullable(taskName).isPresent()) {
+            query = query.taskName(taskName);
+        }
 
-    public PageResponse<TaskResponse> getCandidateTasks(UserActiviti user, int page, int size) {
+        if (Optional.ofNullable(searchValue).isPresent()) {
+            query = query.processVariableValueLike(Constants.PROCESS_LABEL, MessageFormat.format("%{0}%", searchValue.toUpperCase()));
+        }
 
-        List<String> groups = user.getGroups().stream().map(g -> g.getGroupId()).filter(Objects::nonNull).collect(Collectors.toList());
+        long total = query.count();
 
-        Long sizeTotalElements = taskService.createTaskQuery().taskCandidateGroupIn(groups).count();
-        // grou
-
-        int min = page * size;
-        //int max = min + size;
-
-        List<TaskResponse> response = taskService
-                .createTaskQuery()
-                .taskCandidateGroupIn(groups)
-                .includeProcessVariables()
+        List<TaskResponse> response = query
                 .includeTaskLocalVariables()
                 .orderByTaskCreateTime()
                 .desc()
@@ -633,179 +429,48 @@ public class RuntimeActivitiService {
                 .parallelStream()
                 .map(t -> {
                     TaskResponse instance = new TaskResponse(t);
-                    Optional<ProcessDefinitionResponse> resp = repositoryActivitiService.listAll().stream().filter(p -> p.getId().equals(t.getProcessDefinitionId())).findFirst();
-                    String name = resp.isPresent() ? resp.get().getName() : "";
+                    String name = this.repositoryActivitiService.getProcessNameByProcessDefinitionId(t.getProcessDefinitionId());
                     instance.setProcessDefinitionName(name);
                     return instance;
                 })
                 .collect(Collectors.toList());
 
-        response.stream().forEach(task -> {
-            //esta apresentando erro para listar.. não reconhece 
-//            List<String> gr = groupActivitiService.listByTask(task.getTaskId()).stream().map(g -> g.getName()).collect(Collectors.toList());
-//            task.setProfileCanditates(gr);
-        });
-
-        return new PageResponse<TaskResponse>(response, sizeTotalElements, (long) size, (long) page);
+        return new PageResponse<TaskResponse>(response, total, (long) size, (long) page);
 
     }
 
     @Transactional(readOnly = true)
-    public PageResponse<TaskResponse> getMyTasks(String user, String variableValue, String processInstance, int page, int size) {
+    public PageResponse<TaskResponse> getMyTask(String user, String searchValue, int page, int size) {
+
+        TaskQuery query = this.taskService.createTaskQuery();
+
+        query = query.taskAssignee(user);
+
+        if (Optional.ofNullable(searchValue).isPresent()) {
+            query = query.processVariableValueLike(Constants.PROCESS_LABEL, MessageFormat.format("%{0}%", searchValue.toUpperCase()));
+        }
 
         int min = page * size;
 
-        if (Optional.ofNullable(variableValue).isPresent()) {
-
-            List<String> processInstances = taskService
-                    .createNativeTaskQuery().sql("SELECT \n"
-                            + "    distinct t.PROC_INST_ID_,\n"
-                            + "    t.ID_ \n"
-                            + "FROM\n"
-                            + "    activiti.ACT_RU_TASK t\n"
-                            + "        INNER JOIN\n"
-                            + "    activiti.ACT_RU_VARIABLE v ON t.PROC_INST_ID_ = v.PROC_INST_ID_\n"
-                            + "        INNER JOIN\n"
-                            + "    activiti.ACT_RU_IDENTITYLINK k ON t.PROC_INST_ID_ = k.PROC_INST_ID_\n"
-                            + "WHERE\n"
-                            + "    upper(v.TEXT_) LIKE '%" + variableValue.toUpperCase() + "%'\n"
-                            + "        AND k.USER_ID_ = '" + user + "'; ").list()
-                    .stream()
-                    .map(t -> t.getProcessInstanceId())
-                    .distinct()
-                    .collect(Collectors.toList());
-
-            if (processInstances.isEmpty()) {
-                return new PageResponse<TaskResponse>(new ArrayList(), 1L, 1L, (long) page);
-            }
-
-            List<TaskResponse> response = taskService
-                    .createTaskQuery()
-                    .includeProcessVariables()
-                    .includeTaskLocalVariables()
-                    .processInstanceIdIn(processInstances)
-                    .orderByTaskCreateTime()
-                    .desc()
-                    .listPage(min, size)
-                    .parallelStream()
-                    .map(t -> {
-                        TaskResponse instance = new TaskResponse(t);
-                        Optional<ProcessDefinitionResponse> resp = repositoryActivitiService.listAll().stream().filter(p -> p.getId().equals(t.getProcessDefinitionId())).findFirst();
-                        String name = resp.isPresent() ? resp.get().getName() : "";
-                        instance.setProcessDefinitionName(name);
-                        return instance;
-                    })
-                    .collect(Collectors.toList());
-
-            return new PageResponse<TaskResponse>(response, (long) processInstances.size(), (long) size, (long) page);
-
-            // return new PageResponse<TaskResponse>(response, (long) response.size(), (long) processInstances.size(), (long) page);
-        } else if (Optional.ofNullable(processInstance).isPresent()) {
-
-            List<TaskResponse> response = taskService
-                    .createTaskQuery()
-                    .taskAssignee(user)
-                    .processInstanceId(processInstance)
-                    .includeProcessVariables()
-                    .includeTaskLocalVariables()
-                    .orderByTaskCreateTime()
-                    .desc()
-                    .listPage(min, size)
-                    .parallelStream()
-                    .map(t -> {
-                        TaskResponse instance = new TaskResponse(t);
-                        Optional<ProcessDefinitionResponse> resp = repositoryActivitiService.listAll().stream().filter(p -> p.getId().equals(t.getProcessDefinitionId())).findFirst();
-                        String name = resp.isPresent() ? resp.get().getName() : "";
-                        instance.setProcessDefinitionName(name);
-                        return instance;
-                    })
-                    .collect(Collectors.toList());
-
-            response.stream().forEach(task -> {
-                //esta apresentando erro para listar.. não reconhece 
-//            List<String> gr = groupActivitiService.listByTask(task.getTaskId()).stream().map(g -> g.getName()).collect(Collectors.toList());
-//            task.setProfileCanditates(gr);
-            });
-
-            return new PageResponse<TaskResponse>(response, 1L, 1L, (long) page);
-
-        } else {
-
-            Long sizeTotalElements = taskService.createTaskQuery().taskAssignee(user).count();
-
-            List<TaskResponse> response = taskService
-                    .createTaskQuery()
-                    .taskAssignee(user)
-                    .includeProcessVariables()
-                    .includeTaskLocalVariables()
-                    .orderByTaskCreateTime()
-                    .desc()
-                    .listPage(min, size)
-                    .parallelStream()
-                    .map(t -> {
-                        TaskResponse instance = new TaskResponse(t);
-                        Optional<ProcessDefinitionResponse> resp = repositoryActivitiService.listAll().stream().filter(p -> p.getId().equals(t.getProcessDefinitionId())).findFirst();
-                        String name = resp.isPresent() ? resp.get().getName() : "";
-                        instance.setProcessDefinitionName(name);
-                        return instance;
-                    })
-                    .collect(Collectors.toList());
-
-            response.stream().forEach(task -> {
-                //esta apresentando erro para listar.. não reconhece 
-//            List<String> gr = groupActivitiService.listByTask(task.getTaskId()).stream().map(g -> g.getName()).collect(Collectors.toList());
-//            task.setProfileCanditates(gr);
-            });
-
-            return new PageResponse<TaskResponse>(response, (long) sizeTotalElements, (long) size, (long) page);
-        }
-
-//        List<TaskResponse> response = taskService
-//                .createTaskQuery()
-//                .taskAssignee(user)
-//                .includeProcessVariables()
-//                .orderByTaskCreateTime()
-//                .desc()
-//                .listPage(min, size)
-//                .parallelStream()
-//                .map(t -> {
-//                    TaskResponse instance = new TaskResponse(t);
-//
-//                    Optional<ProcessDefinitionResponse> resp = repositoryActivitiService.listAll().stream().filter(p -> p.getKey().equals(instance.getKey())).findFirst();
-//                    String name = resp.isPresent() ? resp.get().getName() : "";
-//                    instance.setProcessDefinitionName(name);
-//                    return instance;
-//                })
-//                .collect(Collectors.toList());
-//
-//        return new PageResponse<TaskResponse>(response, (long) response.size(), sizeTotalElements, (long) page);
-    }
-
-    @Transactional(readOnly = true)
-    public PageResponse<TaskResponse> getInvolvedTasks(String user, int page, int size) {
-
-        Long sizeTotalElements = taskService.createTaskQuery().taskInvolvedUser(user).count();
-
-        List<TaskResponse> response = taskService
-                .createTaskQuery()
-                .taskInvolvedUser(user)
-                .includeProcessVariables()
+        List<TaskResponse> response = query
+                .includeTaskLocalVariables()
                 .orderByTaskCreateTime()
                 .desc()
-                .listPage(page, size)
+                .listPage(min, size)
                 .parallelStream()
                 .map(t -> {
                     TaskResponse instance = new TaskResponse(t);
-                    Optional<ProcessDefinitionResponse> resp = repositoryActivitiService.listAll().stream().filter(p -> p.getId().equals(t.getProcessDefinitionId())).findFirst();
-                    String name = resp.isPresent() ? resp.get().getName() : "";
+                    String name = repositoryActivitiService.getProcessNameByProcessDefinitionId(t.getProcessDefinitionId());
                     instance.setProcessDefinitionName(name);
                     return instance;
                 })
                 .collect(Collectors.toList());
 
+        long sizeTotalElements = query.count();
+
         return new PageResponse<TaskResponse>(response, (long) sizeTotalElements, (long) size, (long) page);
 
-    }
+    }   
 
     @Transactional
     public Task getNextUserTaskByProcessInstanceId(String processInstanceId, String userId, boolean assigneToUser) throws Exception {

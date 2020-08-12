@@ -26,6 +26,8 @@ public class Url {
     
     public static final String URL_API_MEANSUREMENT_POINT = "/api/meansurement/point";
     public static final String URL_API_CONTRACT = "/api/contract";
+    public static final String URL_API_RUNTIME = "/api/workflow/runtime";
+    
     
     
 }
