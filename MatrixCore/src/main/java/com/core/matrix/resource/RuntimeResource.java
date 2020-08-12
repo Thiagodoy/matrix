@@ -129,6 +129,19 @@ public class RuntimeResource {
             return ResponseEntity.status(HttpStatus.resolve(500)).body(e.getMessage());
         }
     }
+    
+    
+     @RequestMapping(value = "/getTaskFilters", method = RequestMethod.GET)
+    public ResponseEntity getTaskFilters() {
+        try {
+           List response =  this.service.getTaskFilter();
+            return ResponseEntity.ok(response);
+        } catch (Exception e) {
+            Logger.getLogger(RuntimeResource.class.getName()).log(Level.SEVERE, "[assigneeTask]", e);
+            return ResponseEntity.status(HttpStatus.resolve(500)).body(e.getMessage());
+        }
+
+    }
 
     @RequestMapping(value = "/getAssigneAndCandidateTask", method = RequestMethod.GET)
     public ResponseEntity getAssigneAndCandidateTask(

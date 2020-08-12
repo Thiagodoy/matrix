@@ -403,7 +403,7 @@ public class RuntimeActivitiService {
 
     }
 
-    public Object getTaskFilter() {
+    public List<TaskFilterDTO> getTaskFilter() {
 
         Connection connection = null;
          List<TaskFilterDTO> filters = new ArrayList<>();
