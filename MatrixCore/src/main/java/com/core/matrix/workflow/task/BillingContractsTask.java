@@ -394,7 +394,7 @@ public class BillingContractsTask implements JavaDelegate {
             variables.put(Constants.PROCESS_INFORMATION_CNPJ, cnpjsString);
             variables.put(PROCESS_INFORMATION_CONTRACT_NUMBERS, contractsNumber);
             variables.put(PROCESS_INFORMATION_PROCESSO_ID, processInstance.getProcessInstanceId());
-            variables.put(Constants.PROCESS_LABEL, MessageFormat.format("{0}{1}{2}", pointers,contractsNumber,processInstance.getProcessInstanceId()));
+            variables.put(Constants.PROCESS_LABEL, MessageFormat.format("{0}{1}{2}{3}", pointers,contractsNumber,processInstance.getProcessInstanceId(), nicknames));
 
             
             

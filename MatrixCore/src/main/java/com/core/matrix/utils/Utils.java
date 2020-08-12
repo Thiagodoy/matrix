@@ -332,7 +332,7 @@ public class Utils {
     
     
     public static String localDateTimeToMsqlString(LocalDateTime time ){
-        return time.format(dateTimeFormatter);
+        return "'" + time.format(dateTimeFormatter) + "'";
     }
     
 }

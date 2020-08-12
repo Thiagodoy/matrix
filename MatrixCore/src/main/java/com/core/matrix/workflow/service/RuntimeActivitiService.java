@@ -406,46 +406,54 @@ public class RuntimeActivitiService {
     public List<TaskFilterDTO> getTaskFilter() {
 
         Connection connection = null;
-         List<TaskFilterDTO> filters = new ArrayList<>();
+        List<TaskFilterDTO> filters = new ArrayList<>();
         try {
             connection = this.dataSource.getConnection();
             Statement statement = connection.createStatement();
 
             LocalDateTime start = LocalDate.now().withDayOfMonth(1).atStartOfDay();
             LocalDate temp = LocalDate.now().withDayOfMonth(LocalDate.now().lengthOfMonth());
-            LocalDateTime end = LocalDateTime.of(temp, LocalTime.MIDNIGHT);
+            LocalDateTime end = LocalDateTime.of(temp, LocalTime.MAX);
 
             String query = "SELECT DISTINCT\n"
-                    + "    'TASK_NAME' type, NAME_ value\n"
+                    + "     NAME_ as value\n"
                     + "FROM\n"
                     + "    activiti.ACT_RU_TASK t\n"
                     + "WHERE\n"
-                    + "    t.CREATE_TIME_ BETWEEN '{0}' AND '{1}' \n"
-                    + "UNION ALL SELECT DISTINCT\n"
-                    + "    'USER', t.ASSIGNEE_\n"
-                    + "FROM\n"
-                    + "    activiti.ACT_RU_TASK t\n"
-                    + "WHERE\n"
-                    + "    t.CREATE_TIME_ BETWEEN '{2}' AND '{3}'";
+                    + "    t.CREATE_TIME_ BETWEEN {0} AND {1} \n";
 
             String startString = Utils.localDateTimeToMsqlString(start);
             String endString = Utils.localDateTimeToMsqlString(end);
 
-            query = MessageFormat.format(query, startString, endString, startString, endString);
+            query = MessageFormat.format(query, startString, endString);
 
             ResultSet resultSet = statement.executeQuery(query);
 
-           
+            while (resultSet.next()) {
+                // String type = resultSet.getString("type");
+                String value = resultSet.getString("value");
+                filters.add(new TaskFilterDTO("TASK_NAME", value));
+            }
+
+            query = "SELECT DISTINCT\n"
+                    + "     ASSIGNEE_ as value\n"
+                    + "FROM\n"
+                    + "    activiti.ACT_RU_TASK t\n"
+                    + "WHERE\n"
+                    + "    t.CREATE_TIME_ BETWEEN {0} AND {1} \n";
+
+            query = MessageFormat.format(query, startString, endString);
+
+            resultSet = statement.executeQuery(query);
 
             while (resultSet.next()) {
-                String type = resultSet.getString("type");
                 String value = resultSet.getString("value");
-                filters.add(new TaskFilterDTO(type, value));
+                filters.add(new TaskFilterDTO("USER", value));
             }
 
         } catch (SQLException ex) {
             Logger.getLogger(RuntimeActivitiService.class.getName()).log(Level.SEVERE, null, ex);
-        }finally{
+        } finally {
             return filters;
         }
 
