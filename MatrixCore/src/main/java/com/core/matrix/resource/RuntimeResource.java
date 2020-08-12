@@ -320,4 +320,16 @@ public class RuntimeResource {
         }
     }
 
+    @RequestMapping(value = "/assigneeTask", method = RequestMethod.POST)
+    public ResponseEntity assigneeTask(@RequestParam(name = "taskId") String taskId, Principal principal) {
+        try {
+            this.service.assigneeTask(taskId, principal.getName());
+            return ResponseEntity.ok().build();
+        } catch (Exception e) {
+            Logger.getLogger(RuntimeResource.class.getName()).log(Level.SEVERE, "[assigneeTask]", e);
+            return ResponseEntity.status(HttpStatus.resolve(500)).body(e.getMessage());
+        }
+
+    }
+
 }

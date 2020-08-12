@@ -405,11 +405,12 @@ public class RuntimeActivitiService {
 
     public Object getTaskFilter() {
 
-        Connection connection;
+        Connection connection = null;
+         List<TaskFilterDTO> filters = new ArrayList<>();
         try {
             connection = this.dataSource.getConnection();
             Statement statement = connection.createStatement();
-            
+
             LocalDateTime start = LocalDate.now().withDayOfMonth(1).atStartOfDay();
             LocalDate temp = LocalDate.now().withDayOfMonth(LocalDate.now().lengthOfMonth());
             LocalDateTime end = LocalDateTime.of(temp, LocalTime.MIDNIGHT);
@@ -427,29 +428,25 @@ public class RuntimeActivitiService {
                     + "WHERE\n"
                     + "    t.CREATE_TIME_ BETWEEN '{2}' AND '{3}'";
 
-            
             String startString = Utils.localDateTimeToMsqlString(start);
             String endString = Utils.localDateTimeToMsqlString(end);
-            
-            query = MessageFormat.format(query, start,end, start,end);
-            
-            
-            ResultSet resultSet =  statement.executeQuery(query);           
-            
-            
-            List<TaskFilterDTO> filters = new ArrayList<>();
-            
-            while(resultSet.next()){
-                
+
+            query = MessageFormat.format(query, startString, endString, startString, endString);
+
+            ResultSet resultSet = statement.executeQuery(query);
+
+           
+
+            while (resultSet.next()) {
                 String type = resultSet.getString("type");
-                String value = resultSet.getString("value");                
+                String value = resultSet.getString("value");
                 filters.add(new TaskFilterDTO(type, value));
             }
-            
-            
-            
+
         } catch (SQLException ex) {
             Logger.getLogger(RuntimeActivitiService.class.getName()).log(Level.SEVERE, null, ex);
+        }finally{
+            return filters;
         }
 
     }
