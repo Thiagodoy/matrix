@@ -84,18 +84,7 @@ public class RepositoryActivitiService {
                 .orElse("");
     }
 
-    @Cacheable("processDefinition")
-    public List<ProcessDefinitionResponse> listAllFromCache() {
-        return this.repositoryService
-                .createProcessDefinitionQuery()
-                .latestVersion()
-                .list()
-                .parallelStream()
-                .map(p -> new ProcessDefinitionResponse(p))
-                .collect(Collectors.toList());
-
-    }
-
+    
     public List<ProcessDefinitionResponse> listCadidateProcessByUser(UserActiviti user) {
 
         String ids = this.repositoryService

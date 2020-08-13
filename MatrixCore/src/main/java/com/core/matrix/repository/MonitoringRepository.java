@@ -27,11 +27,7 @@ public interface MonitoringRepository extends JpaRepository<Monitoring, Double>,
     List<MonitoringStatusDTO> status(@Param("mes")Long mes,@Param("ano")Long ano);
     
     @Query(nativeQuery = true)
-    List<MonitoringFilterDTO>filters();
-    
-    
-    
-    
+    List<MonitoringFilterDTO>filters();     
     
     
 }

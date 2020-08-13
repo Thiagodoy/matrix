@@ -8,6 +8,8 @@ package com.core.matrix.configuration;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Configurable;
 import org.springframework.cache.CacheManager;
+import org.springframework.cache.concurrent.ConcurrentMapCacheManager;
+import org.springframework.context.annotation.Bean;
 import org.springframework.scheduling.annotation.Scheduled;
 
 /**
@@ -20,9 +22,16 @@ public class CacheManagerConfiguration {
     @Autowired
     private CacheManager cacheManager;
 
+    
+    @Bean
+    public CacheManager cacheManager() {
+        return new ConcurrentMapCacheManager();
+    }
+    
+    
     @Scheduled(fixedRate = 300000)
     public void clearCache() {
-        cacheManager.getCacheNames().forEach(ke -> {
+        cacheManager().getCacheNames().forEach(ke -> {
             cacheManager.getCache(ke).clear();
         });
     }

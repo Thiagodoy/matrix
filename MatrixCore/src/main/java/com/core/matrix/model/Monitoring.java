@@ -151,7 +151,7 @@ import lombok.Data;
         resultSetMapping = "statusMonitoringDTO")
 
 @Entity
-@Table(schema = "matrix", name = "mtx_monitoramento")
+@Table(schema = "matrix", name = "monitoramento_view_1")
 @Data
 @JsonIgnoreProperties(value = {"id"})
 public class Monitoring implements Serializable {
@@ -159,76 +159,76 @@ public class Monitoring implements Serializable {
     private static final long serialVersionUID = 359460498870162995L;
 
     @Id
-    @Column(name = "id_monitoramento")
+    @Column(name = "ID")
     public Long id;
 
-    @Column(name = "id_tarefa")
+    @Column(name = "ID_TASK")
     public String taskId;
 
-    @Column(name = "id_formulario")
+    @Column(name = "TEMPLATE")
     public String template;
 
-    @ReportColumn(name = "instancia_process0", position = 0, typeValue = String.class, typeReport = {"FULL"})
+    @ReportColumn(name = "INSTANCIA_DO_PROCESSO", position = 0, typeValue = String.class, typeReport = {"FULL"})
     @Column(name = "INSTANCIA_DO_PROCESSO")
     public String instanciaDoProcesso;
 
     @ReportColumn(name = "MES", position = 0, typeValue = String.class, typeReport = {"FULL"})
-    @Column(name = "mes")
+    @Column(name = "MES")
     public String mes;
 
     @ReportColumn(name = "ANO", position = 0, typeValue = String.class, typeReport = {"FULL"})
-    @Column(name = "ano")
+    @Column(name = "ANO")
     public String ano;
 
     @ReportColumn(name = "WBC_CONTRATO", position = 0, typeValue = String.class, typeReport = {"FULL"})
-    @Column(name = "wbc_contrato")
+    @Column(name = "WBC_CONTRATO")
     public String wbcContrato;
 
-    @Column(name = "wbc_contrato_referencia")
+    @Column(name = "WBC_CONTRATO_REFERENCIA")
     public String wbcContratoReferencia;
 
     @ReportColumn(name = "WBC_RATEIO", position = 0, typeValue = String.class, typeReport = {"FULL"})
-    @Column(name = "wbc_rateio")
+    @Column(name = "WBC_RATEIO")
     public String wbcRateio;
 
     @ReportColumn(name = "PONTO_DE_MEDICAO", position = 0, typeValue = String.class, typeReport = {"FULL"})
-    @Column(name = "wbc_ponto_medicao")
+    @Column(name = "PONTO_DE_MEDICAO")
     public String pontoDeMedicao;
 
     @ReportColumn(name = "MONTANTE_SCDE", position = 0, typeValue = String.class, typeReport = {"FULL"})
-    @Column(name = "montante_scde")
+    @Column(name = "MONTANTE_SCDE")
     public String montanteScde;
 
     @ReportColumn(name = "INSTANCIA_DO_PROCESSO", position = 0, typeValue = String.class, typeReport = {"FULL"})
-    @Column(name = "proinfa")
+    @Column(name = "PROINFA")
     public String proinfa;
 
     @ReportColumn(name = "PROINFA", position = 0, typeValue = String.class, typeReport = {"FULL"})
-    @Column(name = "fator_de_carga")
+    @Column(name = "FATOR_DE_CARGA")
     public String fatorDeCarga;
 
     @ReportColumn(name = "PERCENTUAL_DE_PERDA", position = 0, typeValue = String.class, typeReport = {"FULL"})
-    @Column(name = "percentual_de_perda")
+    @Column(name = "PERCENTUAL_DE_PERDA")
     public String percentualDeCarga;
 
     @ReportColumn(name = "SOLICITADO_BRUTO", position = 0, typeValue = String.class, typeReport = {"FULL"})
-    @Column(name = "solicitado_bruto")
+    @Column(name = "SOLICITADO_BRUTO")
     public String solicitadoBruto;
 
     @ReportColumn(name = "QUANTIDADE_CONTRATADA", position = 0, typeValue = String.class, typeReport = {"FULL"})
-    @Column(name = "quantidade_contratada")
+    @Column(name = "QAUNTIDADE_CONTRATADA")
     public String quantidadeContratada;
 
     @ReportColumn(name = "LIMITE_MIN", position = 0, typeValue = String.class, typeReport = {"FULL"})
-    @Column(name = "limite_min")
+    @Column(name = "LIMITE_MIN")
     public String limiteMin;
 
     @ReportColumn(name = "LIMITE_MAX", position = 0, typeValue = String.class, typeReport = {"FULL"})
-    @Column(name = "limite_max")
+    @Column(name = "LIMITE_MAX")
     public String limiteMax;
 
     @ReportColumn(name = "SOLICITADO_LIQUIDO", position = 0, typeValue = String.class, typeReport = {"FULL"})
-    @Column(name = "solicitado_liquido")
+    @Column(name = "SOLICITADO_LIQUIDO")
     public String solicitadoLiquido;
 
     @ReportColumn(name = "PRECO_CONTRATADO", position = 0, typeValue = String.class, typeReport = {"FULL"})
@@ -236,11 +236,11 @@ public class Monitoring implements Serializable {
     public String precoContratado;
 
     @ReportColumn(name = "NOTIONAL_CONTRATADO", position = 0, typeValue = String.class, typeReport = {"FULL"})
-    @Column(name = "notional_contratado")
+    @Column(name = "NOTIONAL_CONTRATADO")
     public String notionalContratado;
 
     @ReportColumn(name = "TAKE", position = 0, typeValue = String.class, typeReport = {"FULL"})
-    @Column(name = "take")
+    @Column(name = "TAKE")
     public String take;
 
     @ReportColumn(name = "VOLUME_RECOMPRA", position = 0, typeValue = String.class, typeReport = {"FULL"})
@@ -248,46 +248,46 @@ public class Monitoring implements Serializable {
     public String volumeRecompra;
 
     @ReportColumn(name = "PRECO_RECOMPRA", position = 0, typeValue = String.class, typeReport = {"FULL"})
-    @Column(name = "preco_recompra")
+    @Column(name = "PRECO_RECOMPRA")
     public String precoRecompra;
 
     @ReportColumn(name = "NOTIONAL_RECOMPRA", position = 0, typeValue = String.class, typeReport = {"FULL"})
-    @Column(name = "notional_recompra")
+    @Column(name = "NOTIONAL_RECOMPRA")
     public String notionalRecompra;
 
     @ReportColumn(name = "NOVO_FATURAMENTO", position = 0, typeValue = String.class, typeReport = {"FULL"})
-    @Column(name = "novo_faturamento")
+    @Column(name = "NOVO_FATURAMENTO")
     public String novoFaturamento;
 
     @ReportColumn(name = "NOVO_PRECO", position = 0, typeValue = String.class, typeReport = {"FULL"})
-    @Column(name = "novo_preco")
+    @Column(name = "NOVO_PRECO")
     public String novoPreco;
 
     @ReportColumn(name = "NOVO_NOTIONAL", position = 0, typeValue = String.class, typeReport = {"FULL"})
-    @Column(name = "novo_notional")
+    @Column(name = "NOVO_NOTIONAL")
     public String novoNotional;
 
     @ReportColumn(name = "EMPRESA", position = 0, typeValue = String.class, typeReport = {"FULL"})
-    @Column(name = "empresa")
+    @Column(name = "EMPRESA")
     public String empresa;
 
     @ReportColumn(name = "STATUS", position = 0, typeValue = String.class, typeReport = {"FULL"})
-    @Column(name = "status")
+    @Column(name = "STATUS")
     public String status;
 
     @ReportColumn(name = "ATIVIDADE_NO_MOMENTO", position = 0, typeValue = String.class, typeReport = {"FULL"})
-    @Column(name = "nome_tarefa")
+    @Column(name = "ATIVIDADE_NO_MOMENTO")
     public String atividadeNoMomento;
 
     @ReportColumn(name = "RESPONSAVEL", position = 0, typeValue = String.class, typeReport = {"FULL"})
-    @Column(name = "responsavel")
+    @Column(name = "RESPONSAVEL")
     public String responsavel;
 
     @ReportColumn(name = "VALOR_AJUSTADO", position = 0, typeValue = String.class, typeReport = {"FULL"})
-    @Column(name = "valor_ajustado")
+    @Column(name = "VALOR_AJUSTADO")
     public Double valorAjustado;
     
-    @Column(name = "valor_esperado_wbc")
+    @Transient
     public Double valorEsperadoWbc;
 
 }

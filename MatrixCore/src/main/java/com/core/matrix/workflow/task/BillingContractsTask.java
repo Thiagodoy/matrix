@@ -20,6 +20,7 @@ import com.core.matrix.service.LogService;
 import com.core.matrix.service.MeansurementFileService;
 import com.core.matrix.service.MeansurementPointMtxService;
 import com.core.matrix.service.MeansurementPointStatusService;
+
 import com.core.matrix.utils.Constants;
 import static com.core.matrix.utils.Constants.GROUP_MANAGER_PORTAL;
 import static com.core.matrix.utils.Constants.GROUP_SUPPORT_TI;
@@ -142,8 +143,8 @@ public class BillingContractsTask implements JavaDelegate {
         LocalDate now = LocalDate.now().minusMonths(1);
         this.pointStatusService.createPointStatus((long) now.getMonthValue(), (long) now.getYear());
     }
-    
-    private void loadAllContracts(){
+
+    private void loadAllContracts() {
         LocalDate now = LocalDate.now().minusMonths(1);
         this.contractMtxStatusService.createContractStatus((long) now.getMonthValue(), (long) now.getYear());
     }
@@ -394,10 +395,8 @@ public class BillingContractsTask implements JavaDelegate {
             variables.put(Constants.PROCESS_INFORMATION_CNPJ, cnpjsString);
             variables.put(PROCESS_INFORMATION_CONTRACT_NUMBERS, contractsNumber);
             variables.put(PROCESS_INFORMATION_PROCESSO_ID, processInstance.getProcessInstanceId());
-            variables.put(Constants.PROCESS_LABEL, MessageFormat.format("{0}{1}{2}{3}", pointers,contractsNumber,processInstance.getProcessInstanceId(), nicknames));
+            variables.put(Constants.PROCESS_LABEL, MessageFormat.format("{0}{1}{2}{3}", pointers, contractsNumber, processInstance.getProcessInstanceId(), nicknames));
 
-            
-            
             if (execution.hasVariable(PROCESS_CONTRACTS_RELOAD_BILLING)) {
                 execution.setVariable(PROCESS_NEW_INSTANCE_ID, processInstance.getProcessInstanceId());
             }

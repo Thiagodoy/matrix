@@ -10,7 +10,6 @@ import com.core.matrix.workflow.model.UserActiviti;
 import com.core.matrix.workflow.service.RepositoryActivitiService;
 
 import java.io.InputStream;
-import java.security.Principal;
 import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
