@@ -13,12 +13,12 @@ import com.core.matrix.model.Template;
 import com.core.matrix.service.NotificationService;
 import com.core.matrix.service.ParametersService;
 import com.core.matrix.utils.Constants;
+import static com.core.matrix.utils.Constants.PROCESS_ASSOCIATE_USER_AFTER_SALES;
 import com.core.matrix.utils.ThreadPoolEmail;
 import com.core.matrix.workflow.model.GroupActiviti;
 import com.core.matrix.workflow.model.UserActiviti;
 import com.core.matrix.workflow.service.GroupActivitiService;
 import com.core.matrix.workflow.service.RepositoryActivitiService;
-import com.core.matrix.workflow.service.UserActivitiService;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.HashSet;
@@ -31,6 +31,7 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 import java.util.stream.Collectors;
 import org.activiti.engine.IdentityService;
+import org.activiti.engine.RuntimeService;
 import org.activiti.engine.TaskService;
 import org.activiti.engine.delegate.event.ActivitiEvent;
 import org.activiti.engine.delegate.event.ActivitiEventListener;
@@ -43,23 +44,21 @@ import org.springframework.context.ApplicationContext;
  */
 public class RuntimeListener implements ActivitiEventListener {
 
-    private final UserActivitiService userActivitiService;
     private final ThreadPoolEmail threadPoolEmail;
-    private final IdentityService identityService;
+
     private final RepositoryActivitiService repositoryActivitiService;
     private final GroupActivitiService groupActivitiService;
     private final NotificationService notificationService;
     private final EmailFactory emailFactory;
     private final ParametersService parametersService;
     private TaskService taskService;
+    private RuntimeService runtimeService;
     private final static ThreadPoolExecutor pool = (ThreadPoolExecutor) Executors.newFixedThreadPool(1);
 
     public RuntimeListener(ApplicationContext context, IdentityService identityService) {
 
         synchronized (context) {
-            this.userActivitiService = context.getBean(UserActivitiService.class);
             this.threadPoolEmail = context.getBean(ThreadPoolEmail.class);
-            this.identityService = identityService;
             this.repositoryActivitiService = context.getBean(RepositoryActivitiService.class);
             this.groupActivitiService = context.getBean(GroupActivitiService.class);
             this.notificationService = context.getBean(NotificationService.class);
@@ -72,12 +71,17 @@ public class RuntimeListener implements ActivitiEventListener {
     @Override
     public void onEvent(ActivitiEvent event) {
 
-        this.taskService = event.getEngineServices().getTaskService();
+        if (!Optional.ofNullable(this.taskService).isPresent()) {
+            this.taskService = event.getEngineServices().getTaskService();
+            this.runtimeService = event.getEngineServices().getRuntimeService();
+        }
+
         Task task = null;
         switch (event.getType()) {
 
             case TASK_CREATED:
-                prepareEmails(event, Template.TemplateBusiness.GROUP_TASK_PENDING, Notification.NotificationType.GROUP_TASK_PENDING);
+                assineeTask(event);
+                prepareEmails(event, Template.TemplateBusiness.GROUP_TASK_PENDING, Notification.NotificationType.GROUP_TASK_PENDING);                
                 break;
 
             case TASK_COMPLETED:
@@ -117,7 +121,7 @@ public class RuntimeListener implements ActivitiEventListener {
             try {
                 final ActivitiEvent events = event;
 
-                Thread.sleep(5000);
+                Thread.sleep(1000);
 
                 Task task;
                 try {
@@ -140,9 +144,9 @@ public class RuntimeListener implements ActivitiEventListener {
                             usersEmails.addAll(this.groupActivitiService.getUsersByIdGroup(group));
                         });
 
-                        List<UserActiviti>users = usersEmails.stream().collect(Collectors.toList());
+                        List<UserActiviti> users = usersEmails.stream().collect(Collectors.toList());
                         List<Email> emails1 = this.prepareEmails(users, template, task);
-                        
+
                         List<Notification> notifications1 = this.prepareNotifications(users, task, notificationType);
                         this.send(emails1, notifications1);
                     }
@@ -150,6 +154,38 @@ public class RuntimeListener implements ActivitiEventListener {
             } catch (Exception e) {
                 Logger.getLogger(RuntimeListener.class.getName()).log(Level.SEVERE, "[Erro ao enviar o email]", e);
             }
+        });
+    }
+
+    private void assineeTask(ActivitiEvent e) {
+
+        pool.submit(() -> {
+
+            try {
+
+                final ActivitiEvent event = e;
+
+                Thread.sleep(1000);
+
+                Task task;
+                task = this.taskService.createTaskQuery()
+                        .processInstanceId(event.getProcessInstanceId())
+                        .includeProcessVariables()
+                        .singleResult();
+
+                if (Optional.ofNullable(task).isPresent()) {
+                    if (task.getProcessVariables().containsKey(PROCESS_ASSOCIATE_USER_AFTER_SALES)) {
+                        String userId = (String) task.getProcessVariables().get(PROCESS_ASSOCIATE_USER_AFTER_SALES);
+                        //event.getEngineServices().getTaskService().claim(task.getId(), userId);
+                        this.taskService.setAssignee(task.getId(), userId);
+                        this.runtimeService.removeVariable(task.getProcessInstanceId(), PROCESS_ASSOCIATE_USER_AFTER_SALES);
+                    }
+                }
+
+            } catch (Exception ex) {
+                Logger.getLogger(this.getClass().getName()).log(Level.SEVERE, "[assineeTask]", ex);
+            }
+
         });
     }
 

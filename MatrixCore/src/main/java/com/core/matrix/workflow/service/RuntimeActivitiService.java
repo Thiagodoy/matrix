@@ -450,6 +450,23 @@ public class RuntimeActivitiService {
                 String value = resultSet.getString("value");
                 filters.add(new TaskFilterDTO("USER", value));
             }
+            
+            
+             query = "SELECT DISTINCT\n"
+                    + "     PRIORITY_ as value\n"
+                    + "FROM\n"
+                    + "    activiti.ACT_RU_TASK t\n"
+                    + "WHERE\n"
+                    + "    t.CREATE_TIME_ BETWEEN {0} AND {1} \n";
+
+            query = MessageFormat.format(query, startString, endString);
+
+            resultSet = statement.executeQuery(query);
+
+            while (resultSet.next()) {
+                String value = resultSet.getString("value");
+                filters.add(new TaskFilterDTO("PRIORITY", value));
+            }
 
         } catch (SQLException ex) {
             Logger.getLogger(RuntimeActivitiService.class.getName()).log(Level.SEVERE, null, ex);
@@ -459,7 +476,7 @@ public class RuntimeActivitiService {
 
     }
 
-    public PageResponse<TaskResponse> getAssigneAndCandidateTask(UserActiviti user, String searchValue, String taskName, String userAssigned, int page, int size) {
+    public PageResponse<TaskResponse> getAssigneAndCandidateTask(UserActiviti user, String searchValue, String taskName, String userAssigned, Integer priority, int page, int size) {
 
         int min = page * size;
 
@@ -482,6 +499,11 @@ public class RuntimeActivitiService {
             query = query.taskName(taskName);
         }
 
+        if(Optional.ofNullable(priority).isPresent()){                       
+            query = query.taskPriority(priority);            
+        }
+        
+        
         if (Optional.ofNullable(searchValue).isPresent()) {
             query = query.processVariableValueLike(Constants.PROCESS_LABEL, MessageFormat.format("%{0}%", searchValue.toUpperCase()));
         }
@@ -507,7 +529,7 @@ public class RuntimeActivitiService {
     }
 
     @Transactional(readOnly = true)
-    public PageResponse<TaskResponse> getMyTask(String user, String searchValue, int page, int size) {
+    public PageResponse<TaskResponse> getMyTask(String user, String searchValue,Integer priority, int page, int size) {
 
         TaskQuery query = this.taskService.createTaskQuery();
 
@@ -515,6 +537,11 @@ public class RuntimeActivitiService {
 
         if (Optional.ofNullable(searchValue).isPresent()) {
             query = query.processVariableValueLike(Constants.PROCESS_LABEL, MessageFormat.format("%{0}%", searchValue.toUpperCase()));
+        }
+        
+        
+        if(Optional.ofNullable(priority).isPresent()){
+            query = query.taskPriority(priority);
         }
 
         int min = page * size;

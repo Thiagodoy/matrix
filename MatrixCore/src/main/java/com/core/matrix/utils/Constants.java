@@ -86,6 +86,7 @@ public class Constants {
 
     
     public static final String PROCESS_INFORMATION_CONTRACTS_MATRIX = "process_informarion_contract_matrix";
+    public static final String PROCESS_ASSOCIATE_USER_AFTER_SALES = "process_associate_user_after_sales";
     public static final String PROCESS_INFORMATION_MONITOR_CLIENT = "@Cliente";
     public static final String PROCESS_INFORMATION_CLIENT = "#Cliente";
     public static final String PROCESS_INFORMATION_MEANSUREMENT_POINT = "#Ponto";

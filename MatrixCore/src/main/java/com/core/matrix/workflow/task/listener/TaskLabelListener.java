@@ -7,10 +7,8 @@ package com.core.matrix.workflow.task.listener;
 
 import com.core.matrix.model.ContractMtx;
 import static com.core.matrix.utils.Constants.*;
-import com.core.matrix.workflow.task.Task;
 import java.util.List;
 import java.util.Optional;
-import org.activiti.engine.delegate.DelegateExecution;
 import org.activiti.engine.delegate.DelegateTask;
 import org.activiti.engine.delegate.TaskListener;
 
@@ -36,10 +34,19 @@ public class TaskLabelListener implements TaskListener {
                 Optional<ContractMtx> opt = contractsMtx.stream().filter(c -> c.isFather()).findFirst();
                 if (opt.isPresent()) {
                     ContractMtx contractMtx = opt.get();                    
-                    delegateTask.setVariableLocal(TASK_LABEL, contractMtx.getNameCompany());
+                    delegateTask.setVariableLocal(TASK_LABEL, contractMtx.getNickname());
                 }
             }
         }
+        
+        
+//        if(delegateTask.hasVariable(PROCESS_ASSOCIATE_USER_AFTER_SALES)){            
+//            String userId = delegateTask.getVariable(PROCESS_ASSOCIATE_USER_AFTER_SALES, String.class);            
+//            delegateTask.setAssignee(userId);
+//            delegateTask.setOwner(userId);
+//            delegateTask.removeVariable(PROCESS_ASSOCIATE_USER_AFTER_SALES);
+//            
+//        }
 
     }
 }

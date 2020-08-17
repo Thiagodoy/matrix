@@ -7,6 +7,7 @@ package com.core.matrix.service;
 
 import com.core.matrix.model.CompanyAfterSales;
 import com.core.matrix.repository.CompanyAfterSalesRepository;
+import java.util.List;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -33,6 +34,12 @@ public class CompanyAfterSalesService {
         id.setCompany(company);
         id.setUser(user);
         this.repository.deleteById(id);
+    }
+    
+    
+    @Transactional
+    public List<CompanyAfterSales> findByCodCompany(List<Long> codes){
+        return this.repository.findByCompanyIn(codes);
     }
     
     
