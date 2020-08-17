@@ -39,6 +39,7 @@ public class TaskResponse {
     private List<String> breadCrump;
     private List<String>profileCanditates;
     private String key;
+    private int priority;
 
     public TaskResponse(TaskInfo task) {
 
@@ -52,10 +53,7 @@ public class TaskResponse {
         this.globalVariables = task.getProcessVariables();
         this.localVariables = task.getTaskLocalVariables();
         this.key = task.getProcessDefinitionId().split(":")[0];
-        
-        
-        
-        
+        this.priority = task.getPriority();
         
         
         

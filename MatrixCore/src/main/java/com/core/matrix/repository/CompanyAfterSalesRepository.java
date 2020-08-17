@@ -6,6 +6,7 @@
 package com.core.matrix.repository;
 
 import com.core.matrix.model.CompanyAfterSales;
+import java.util.List;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 
@@ -15,5 +16,9 @@ import org.springframework.stereotype.Repository;
  */
 @Repository
 public interface CompanyAfterSalesRepository extends JpaRepository<CompanyAfterSales, CompanyAfterSales.IdClass>{
+    
+    
+    List<CompanyAfterSales> findByCompanyIn(List<Long> codes);
+    
     
 }

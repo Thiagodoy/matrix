@@ -87,10 +87,15 @@ public class MeansurementPointMtx implements Model<MeansurementPointMtx>, Serial
             throw new PointWithoutProinfaException();
         }
 
-        proinfas.parallelStream()
-                .filter(p -> p.getMonth().equals(month) && p.getYear().equals(year))
-                .findFirst()
-                .orElseThrow(() -> new PointWithoutProinfaException());
+        try {
+            proinfas
+                    .parallelStream()
+                    .filter(p -> p.getMonth().equals(month) && p.getYear().equals(year))
+                    .findFirst()
+                    .orElseThrow(PointWithoutProinfaException::new);
+        } catch (java.lang.NullPointerException e) {
+            throw new PointWithoutProinfaException();
+        }
 
     }
 

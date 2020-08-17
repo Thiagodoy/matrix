@@ -145,6 +145,7 @@ public class RuntimeResource {
 
     @RequestMapping(value = "/getAssigneAndCandidateTask", method = RequestMethod.GET)
     public ResponseEntity getAssigneAndCandidateTask(
+            @RequestParam(name = "priority", required = false) Integer priority,
             @RequestParam(name = "searchValue", required = false) String searchValue,
             @RequestParam(name = "taskName", required = false) String taskName,
             @RequestParam(name = "userAssigned", required = false) String userAssigned,
@@ -157,6 +158,7 @@ public class RuntimeResource {
                     searchValue,
                     taskName,
                     userAssigned,
+                    priority,
                     page,
                     size);
 
@@ -169,12 +171,13 @@ public class RuntimeResource {
 
     @RequestMapping(value = "/getMyTask", method = RequestMethod.GET)
     public ResponseEntity getMyTask(
+            @RequestParam(name = "priority", required = false) Integer priority,
             @RequestParam(name = "searchValue", required = false) String valueVariable,
             @RequestParam(name = "page", required = true, defaultValue = "0") int page,
             @RequestParam(name = "size", required = true, defaultValue = "10") int size,
             Principal principal) {
         try {
-            PageResponse<TaskResponse> response = this.service.getMyTask(principal.getName(), valueVariable, page, size);
+            PageResponse<TaskResponse> response = this.service.getMyTask(principal.getName(), valueVariable,priority, page, size);
             return ResponseEntity.ok(response);
         } catch (Exception e) {
             Logger.getLogger(RuntimeResource.class.getName()).log(Level.SEVERE, "[getMyTask]", e);

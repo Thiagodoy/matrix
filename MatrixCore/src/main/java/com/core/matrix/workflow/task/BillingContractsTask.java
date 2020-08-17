@@ -9,11 +9,13 @@ import com.core.matrix.exceptions.ContractNotAssociatedWithPointException;
 import com.core.matrix.exceptions.EntityNotFoundException;
 import com.core.matrix.exceptions.PointWithoutProinfaException;
 import com.core.matrix.factory.EmailFactory;
+import com.core.matrix.model.CompanyAfterSales;
 import com.core.matrix.model.ContractMtx;
 import com.core.matrix.model.Email;
 import com.core.matrix.model.Log;
 import com.core.matrix.model.MeansurementFile;
 import com.core.matrix.model.Template;
+import com.core.matrix.service.CompanyAfterSalesService;
 import com.core.matrix.service.ContractMtxService;
 import com.core.matrix.service.ContractMtxStatusService;
 import com.core.matrix.service.LogService;
@@ -24,6 +26,7 @@ import com.core.matrix.service.MeansurementPointStatusService;
 import com.core.matrix.utils.Constants;
 import static com.core.matrix.utils.Constants.GROUP_MANAGER_PORTAL;
 import static com.core.matrix.utils.Constants.GROUP_SUPPORT_TI;
+import static com.core.matrix.utils.Constants.PROCESS_ASSOCIATE_USER_AFTER_SALES;
 import static com.core.matrix.utils.Constants.PROCESS_CONTRACTS_RELOAD_BILLING;
 import static com.core.matrix.utils.Constants.PROCESS_INFORMATION_CLIENT;
 import static com.core.matrix.utils.Constants.PROCESS_INFORMATION_CONTRACTS_MATRIX;
@@ -58,6 +61,9 @@ import java.util.Arrays;
 import java.util.HashSet;
 import java.util.Objects;
 import java.util.Set;
+import org.activiti.engine.ActivitiTaskAlreadyClaimedException;
+import org.activiti.engine.RuntimeService;
+import org.activiti.engine.TaskService;
 import org.activiti.engine.runtime.ProcessInstance;
 import org.apache.commons.io.FileUtils;
 
@@ -81,6 +87,8 @@ public class BillingContractsTask implements JavaDelegate {
 
     private MeansurementPointStatusService pointStatusService;
     private ContractMtxStatusService contractMtxStatusService;
+    private CompanyAfterSalesService companyAfterSalesService;
+    private DelegateExecution delegateExecution;
 
     private static ApplicationContext context;
 
@@ -95,6 +103,7 @@ public class BillingContractsTask implements JavaDelegate {
             this.meansurementPointMtxService = context.getBean(MeansurementPointMtxService.class);
             this.pointStatusService = context.getBean(MeansurementPointStatusService.class);
             this.contractMtxStatusService = context.getBean(ContractMtxStatusService.class);
+            this.companyAfterSalesService = context.getBean(CompanyAfterSalesService.class);
         }
     }
 
@@ -105,14 +114,14 @@ public class BillingContractsTask implements JavaDelegate {
     @Override
     public void execute(DelegateExecution execution) throws Exception {
 
+        this.delegateExecution = execution;
+
         try {
             List<ContractDTO> contracts;
 
             if (execution.hasVariable(PROCESS_CONTRACTS_RELOAD_BILLING)) {
                 List<ContractMtx> cc = (List<ContractMtx>) execution.getVariable(PROCESS_CONTRACTS_RELOAD_BILLING, List.class);
-
                 contracts = Collections.synchronizedList(this.contractService.listForBilling(cc));
-
             } else {
                 contracts = Collections.synchronizedList(this.contractService.listForBilling(null));
             }
@@ -355,7 +364,7 @@ public class BillingContractsTask implements JavaDelegate {
         return this.createAProcessForBilling(execution, Arrays.asList(contract), variables);
     }
 
-    @javax.transaction.Transactional
+    //@javax.transaction.Transactional
     private synchronized ProcessInstance createAProcessForBilling(DelegateExecution execution, List<ContractDTO> contracts, Map<String, Object> variables) {
 
         variables.put(Constants.LIST_CONTRACTS_FOR_BILLING, contracts);
@@ -396,7 +405,13 @@ public class BillingContractsTask implements JavaDelegate {
             variables.put(PROCESS_INFORMATION_CONTRACT_NUMBERS, contractsNumber);
             variables.put(PROCESS_INFORMATION_PROCESSO_ID, processInstance.getProcessInstanceId());
             variables.put(Constants.PROCESS_LABEL, MessageFormat.format("{0}{1}{2}{3}", pointers, contractsNumber, processInstance.getProcessInstanceId(), nicknames));
+            
 
+            Optional<CompanyAfterSales> optUser = this.hasAssigneeTask(contracts);
+
+            if (optUser.isPresent()) {
+                variables.put(PROCESS_ASSOCIATE_USER_AFTER_SALES, optUser.get().getUser());
+            }
             if (execution.hasVariable(PROCESS_CONTRACTS_RELOAD_BILLING)) {
                 execution.setVariable(PROCESS_NEW_INSTANCE_ID, processInstance.getProcessInstanceId());
             }
@@ -411,6 +426,23 @@ public class BillingContractsTask implements JavaDelegate {
         }
 
         return processInstance;
+    }
+
+    private Optional<CompanyAfterSales> hasAssigneeTask(List<ContractDTO> contracts) {
+
+        List<Long> codes = contracts
+                .stream()
+                .mapToLong(ContractDTO::getNCdEmpresaContratante)
+                .boxed()
+                .collect(Collectors.toList());
+
+        if (!codes.isEmpty()) {
+            return this.companyAfterSalesService.findByCodCompany(codes).stream().findFirst();
+
+        } else {
+            return Optional.empty();
+        }
+
     }
 
     private void sendEmailError(DelegateExecution execution, String contract) {
