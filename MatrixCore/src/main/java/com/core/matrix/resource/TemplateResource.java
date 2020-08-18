@@ -36,23 +36,4 @@ public class TemplateResource extends Resource<Template, TemplateService> {
     public TemplateResource(TemplateService service) {
         super(service);
     }
-
-    @Autowired
-    private TemplateRepository templateRepository;
-
-    @ApiResponses(value = {
-            @ApiResponse(code = 200, message = "Retorna um template de acordo com o id"),
-            @ApiResponse(code = 404, message = "Nao ha um template com id informado")
-    })
-    @GetMapping(produces = "application/json", consumes = "application/json")
-    public ResponseEntity get(@RequestParam long id) {
-
-        Optional<Template> template = templateRepository.findById(id);
-
-        if (template.isPresent()) {
-            return ok(template);
-        } else {
-            return notFound().build();
-        }
-    }
 }
