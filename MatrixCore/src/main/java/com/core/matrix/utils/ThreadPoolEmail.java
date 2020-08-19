@@ -93,7 +93,6 @@ public class ThreadPoolEmail {
         }
 
         email.setStatus(Email.EmailStatus.QUEUE);
-
         Map<String, File> attachments = email.getAttachment();
 
         if (!this.map.containsKey(email.generateKey())) {
@@ -122,6 +121,7 @@ public class ThreadPoolEmail {
             Map<String, String> parameters = Utils.toMap(email.getData());
 
             Template template = this.templateService.find(email.getTemplate());
+
             String content = template.getTemplate();
 
             helper.setSubject(template.getSubject());
@@ -129,9 +129,16 @@ public class ThreadPoolEmail {
 
             if (parameters != null && parameters.size() > 0) {
                 for (String key : parameters.keySet()) {
-                    content = content.replace(key, parameters.get(key));
+                    if (email.getContent() == null) {
+                        content = content.replace(key, parameters.get(key));
+                    } else {
+                        content = email.getContent();
+                    }
                     if (key.equals(":email")) {
                         helper.setTo(parameters.get(key).split(";"));
+                    }
+                    if (key.equals(":subject")) {
+                        helper.setSubject(parameters.get(key));
                     }
                 }
             }
@@ -244,8 +251,8 @@ public class ThreadPoolEmail {
             }
         });
     }
-    
-    public void shutdown(){
+
+    public void shutdown() {
         pool.shutdown();
     }
 }
