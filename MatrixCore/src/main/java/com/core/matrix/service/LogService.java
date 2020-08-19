@@ -28,7 +28,7 @@ public class LogService extends com.core.matrix.service.Service<Log, LogReposito
     
     @Transactional(readOnly = true)
     public Page<Log>listByProcessInstance(String id, Pageable page){
-        return this.repository.findByProcessInstanceId(id);
+        return this.repository.findByProcessInstanceId(id, page);
     }
    
     
