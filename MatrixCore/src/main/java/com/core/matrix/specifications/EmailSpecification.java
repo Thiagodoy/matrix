@@ -37,11 +37,8 @@ public class EmailSpecification {
         
         if (Optional.ofNullable(status).isPresent()) {
             predicatives.add((root, criteriaQuery, criteriaBuilder) -> criteriaBuilder.equal(root.get(Email_.status), status));
-        }
-        
-        if (Optional.ofNullable(status).isPresent()) {
-            predicatives.add((root, criteriaQuery, criteriaBuilder) -> criteriaBuilder.equal(root.get(Email_.status), status));
-        }
+        }        
+      
 
         Specification<Email> spc = predicatives.stream().reduce((a, b) -> a.and(b)).orElse(null);
 

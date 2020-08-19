@@ -11,6 +11,9 @@ import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Sort;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -31,9 +34,11 @@ public class LogResource {
     private LogService service;
 
     @RequestMapping(method = RequestMethod.GET)
-    public ResponseEntity getErrors(@RequestParam("processInstanceId") String processInstance) {
+    public ResponseEntity getErrors(@RequestParam("processInstanceId") String processInstance,
+            @RequestParam(name = "page", required = false, defaultValue = "0") int page,
+            @RequestParam(name = "size", required = false, defaultValue = "30") int size) {
         try {
-            List<Log>response = this.service.listByProcessInstance(processInstance);
+            Page<Log>response = this.service.listByProcessInstance(processInstance, PageRequest.of(page, size, Sort.by("id").ascending()));
             return ResponseEntity.ok(response);
         } catch (Exception e) {
             Logger.getLogger(LogResource.class.getName()).log(Level.SEVERE, "[getErrors]", e);

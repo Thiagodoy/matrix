@@ -57,6 +57,7 @@ public class RuntimeResource {
     @RequestMapping(value = "/startProcess", method = RequestMethod.POST)
     public ResponseEntity startProcess(@RequestBody StartProcessRequest request, Principal principal) {
         try {
+
             Optional<TaskResponse> response = this.service.startProcess(request, principal.getName());
             return ResponseEntity.ok(response);
         } catch (Exception e) {
@@ -129,12 +130,11 @@ public class RuntimeResource {
             return ResponseEntity.status(HttpStatus.resolve(500)).body(e.getMessage());
         }
     }
-    
-    
-     @RequestMapping(value = "/getTaskFilters", method = RequestMethod.GET)
+
+    @RequestMapping(value = "/getTaskFilters", method = RequestMethod.GET)
     public ResponseEntity getTaskFilters() {
         try {
-           List response =  this.service.getTaskFilter();
+            List response = this.service.getTaskFilter();
             return ResponseEntity.ok(response);
         } catch (Exception e) {
             Logger.getLogger(RuntimeResource.class.getName()).log(Level.SEVERE, "[assigneeTask]", e);
@@ -177,7 +177,7 @@ public class RuntimeResource {
             @RequestParam(name = "size", required = true, defaultValue = "10") int size,
             Principal principal) {
         try {
-            PageResponse<TaskResponse> response = this.service.getMyTask(principal.getName(), valueVariable,priority, page, size);
+            PageResponse<TaskResponse> response = this.service.getMyTask(principal.getName(), valueVariable, priority, page, size);
             return ResponseEntity.ok(response);
         } catch (Exception e) {
             Logger.getLogger(RuntimeResource.class.getName()).log(Level.SEVERE, "[getMyTask]", e);

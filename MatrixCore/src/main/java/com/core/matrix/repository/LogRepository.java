@@ -7,6 +7,7 @@ package com.core.matrix.repository;
 
 import com.core.matrix.model.Log;
 import java.util.List;
+import org.springframework.data.domain.Page;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.JpaSpecificationExecutor;
 import org.springframework.data.jpa.repository.Modifying;
@@ -31,5 +32,5 @@ public interface LogRepository extends JpaRepository<Log, Long>, JpaSpecificatio
     long deleteByprocessInstanceId(String id);
     
     
-    List<Log> findByProcessInstanceId(String process);
+    Page<Log> findByProcessInstanceId(String process);
 }
