@@ -21,32 +21,22 @@ public class TaskLabelListener implements TaskListener {
     @Override
     public void notify(DelegateTask delegateTask) {
 
-        
-
         if (delegateTask.hasVariable(PROCESS_INFORMATION_CONTRACTS_MATRIX)) {
 
             List<ContractMtx> contractsMtx = delegateTask.getVariable(PROCESS_INFORMATION_CONTRACTS_MATRIX, List.class);
 
             if (contractsMtx.size() == 1) {
-                ContractMtx contractMtx = contractsMtx.get(0);                
+                ContractMtx contractMtx = contractsMtx.get(0);
                 delegateTask.setVariableLocal(TASK_LABEL, contractMtx.getNickname());
+                delegateTask.setVariableLocal(TASK_LABEL_CONTRACT, contractMtx.getWbcContract());
             } else {
                 Optional<ContractMtx> opt = contractsMtx.stream().filter(c -> c.isFather()).findFirst();
                 if (opt.isPresent()) {
-                    ContractMtx contractMtx = opt.get();                    
+                    ContractMtx contractMtx = opt.get();
                     delegateTask.setVariableLocal(TASK_LABEL, contractMtx.getNickname());
+                    delegateTask.setVariableLocal(TASK_LABEL_CONTRACT, contractMtx.getWbcContract());
                 }
             }
         }
-        
-        
-//        if(delegateTask.hasVariable(PROCESS_ASSOCIATE_USER_AFTER_SALES)){            
-//            String userId = delegateTask.getVariable(PROCESS_ASSOCIATE_USER_AFTER_SALES, String.class);            
-//            delegateTask.setAssignee(userId);
-//            delegateTask.setOwner(userId);
-//            delegateTask.removeVariable(PROCESS_ASSOCIATE_USER_AFTER_SALES);
-//            
-//        }
-
     }
 }
