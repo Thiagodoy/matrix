@@ -21,7 +21,7 @@ import org.springframework.web.bind.annotation.RestController;
 @RequestMapping(value = "/asset")
 public class AssetResource {
 
-    private String version = "v4.0.11";
+    private String version = "v4.0.13";
 
     @Autowired
     private CacheManager cacheManager;

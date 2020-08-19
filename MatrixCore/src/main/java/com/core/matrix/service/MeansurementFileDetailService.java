@@ -58,17 +58,7 @@ public class MeansurementFileDetailService {
     @Autowired
     private TableSequenceService sequenceService;
 
-    private static File directory;
-
     private static Connection connection;
-
-    static {
-        directory = new File(Constants.DIR_FILE_NO_PESIST);
-
-        if (!directory.isDirectory()) {
-            directory.mkdir();
-        }
-    }
 
     @Transactional
     public void save(MeansurementFileDetail detail) {
@@ -164,26 +154,7 @@ public class MeansurementFileDetailService {
             return this.connection;
         }
 
-    }
-
-    private void writeFile(String query, String processInstance, String error, int count) {
-
-        String data = new SimpleDateFormat("dd-mm-yyyy").format(new Date());
-
-        try {
-
-            File file = new File(this.directory, MessageFormat.format("detail-p{0}-{1}-{2}.sql", processInstance, data, count));
-            FileWriter writer = new FileWriter(file);
-
-            writer.write(error + "\n\n\n" + query);
-            writer.flush();
-            writer.close();
-
-        } catch (Exception e) {
-            Logger.getLogger(MeansurementFileDetailService.class.getName()).log(Level.SEVERE, "[writeFile]", e);
-        }
-
-    }
+    }   
 
     @Transactional
     public void fixFile(List<DataValidationResultDTO> requests) throws Exception {

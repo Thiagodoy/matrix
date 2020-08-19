@@ -7,9 +7,13 @@ package com.core.matrix.service;
 
 import com.core.matrix.dto.MeansurementFileResultStatusDTO;
 import com.core.matrix.model.MeansurementFileResult;
+import com.core.matrix.model.Monitoring;
 import com.core.matrix.repository.MeansurementFileResultRepository;
+import com.core.matrix.wbc.service.ContractService;
 import java.util.Comparator;
 import java.util.List;
+import java.util.Objects;
+import java.util.Optional;
 import java.util.stream.Collectors;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -25,11 +29,14 @@ public class MeansurementFileResultService {
     @Autowired
     private MeansurementFileResultRepository repository;
 
+    @Autowired
+    private ContractService contractService;
+
     @Transactional
     public void save(MeansurementFileResult result) {
         this.repository.save(result);
     }
-    
+
     @Transactional
     public void saveAll(List<MeansurementFileResult> result) {
         this.repository.saveAll(result);
@@ -63,10 +70,28 @@ public class MeansurementFileResultService {
 
     @Transactional(readOnly = true)
     public List<MeansurementFileResultStatusDTO> getStatusBilling(Long year, Long month) {
-        return this.repository.getStatusBilling(year, month)
+
+        List<MeansurementFileResultStatusDTO> results = this.repository.getStatusBilling(year, month)
                 .stream()
                 .sorted(Comparator.comparing(MeansurementFileResultStatusDTO::getId))
                 .collect(Collectors.toList());
+        
+         List<Long> contracts = results
+                    .stream()
+                    .map(MeansurementFileResultStatusDTO::getWbcContract)
+                    .filter(Objects::nonNull)
+                    .mapToLong(Long::valueOf)
+                    .boxed()
+                    .collect(Collectors.toList());
+         
+         contractService.getInformation(year, month, contracts).stream().forEach(i -> {
+            Optional<MeansurementFileResultStatusDTO> opt = results.stream().filter(cc -> cc.getWbcContract().equals(Long.valueOf(i.getNrContract()))).findFirst();
+            if (opt.isPresent()) {
+                opt.get().setBillingWbc(i.getQtdBillingWbc());
+            }
+        });         
+        
+        return results;
     }
 
     @Transactional(readOnly = true)

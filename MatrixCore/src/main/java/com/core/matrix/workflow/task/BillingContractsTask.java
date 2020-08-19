@@ -61,9 +61,6 @@ import java.util.Arrays;
 import java.util.HashSet;
 import java.util.Objects;
 import java.util.Set;
-import org.activiti.engine.ActivitiTaskAlreadyClaimedException;
-import org.activiti.engine.RuntimeService;
-import org.activiti.engine.TaskService;
 import org.activiti.engine.runtime.ProcessInstance;
 import org.apache.commons.io.FileUtils;
 

@@ -48,8 +48,8 @@ public class EmailServiceConfiguration {
 
     @Bean
     @Scope("singleton")
-    public ThreadPoolEmail threadPoolEmail (EmailService emailService, LogService logService, TemplateService templateService) {
-        return new ThreadPoolEmail(emailService, logService, getJavaMailSender(),templateService);
+    public ThreadPoolEmail threadPoolEmail(EmailService emailService, LogService logService, TemplateService templateService) {
+        return new ThreadPoolEmail(emailService, logService, getJavaMailSender(), templateService);
 
     }
 

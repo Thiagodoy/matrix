@@ -261,6 +261,7 @@ public class FileValidationTask extends Task {
 
         Map<String, Long> checkDuplicity = detail
                 .parallelStream()
+                .filter(mpd -> !mpd.getMeansurementPoint().contains("(B)"))
                 .collect(Collectors.groupingBy(FileDetailDTO::generateKey, Collectors.counting()));
 
         List<String> errors = Collections.synchronizedList(new ArrayList<String>());
@@ -393,7 +394,7 @@ public class FileValidationTask extends Task {
                 .forEach(f -> {
 
                     List<FileDetailDTO> r = detail
-                            .parallelStream()
+                            .parallelStream()                            
                             .filter(d -> d.getMeansurementPoint().replaceAll("\\((L|B)\\)", "").trim().equals(f.getMeansurementPoint()))
                             .collect(Collectors.toList());
 
