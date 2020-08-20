@@ -157,6 +157,7 @@ public class Constants {
     public static final String DIR_FILE_NO_PESIST = "details-no-writed";
     
     public static final String TASK_LABEL = "task-label";
+    public static final String TASK_LABEL_CONTRACT = "task-label-contract";
     public static final String PROCESS_LABEL = "process-label";
     
     

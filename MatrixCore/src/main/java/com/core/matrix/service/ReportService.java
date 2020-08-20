@@ -62,7 +62,7 @@ public class ReportService {
         final ReportConstants.ReportType type = request.getType();
         List<MeansurementFileResultStatusDTO> report = results
                 .stream()
-                .filter(t -> request.getIds().stream().anyMatch(tt -> tt.equals(t.getId())))
+                .filter(t -> request.getIds().stream().anyMatch(tt -> String.valueOf(tt).equals(t.processInstanceId)))
                 .collect(Collectors.toList());
 
         List<Long> contractsId = report.stream()
@@ -95,11 +95,10 @@ public class ReportService {
         out.close();
         this.wb.dispose();
 
-        report.stream()
-                .forEach(r -> {
-                    fileResultService.updateToExported(r.getId());
-                });
-
+        
+        report.stream().map(MeansurementFileResultStatusDTO::getProcessInstanceId).distinct().forEach((processInstanceId->{        
+            fileResultService.updateToExportedByProcessInstance(processInstanceId);        
+        }));
     }
 
     public <T> void export(HttpServletResponse response, List<T> data, ReportConstants.ReportType type) throws IOException {

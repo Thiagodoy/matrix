@@ -33,67 +33,95 @@ import lombok.NoArgsConstructor;
         classes = @ConstructorResult(
                 targetClass = MeansurementFileResultStatusDTO.class,
                 columns = {
-                    @ColumnResult(name = "id_arquivo_de_medicao", type = Long.class)
+                    @ColumnResult(name = "act_id_process", type = String.class)
                     ,
-                    @ColumnResult(name = "ano", type = Long.class)
+                    @ColumnResult(name = "year", type = Long.class)
                     ,
-                    @ColumnResult(name = "mes", type = Long.class)
+                    @ColumnResult(name = "month", type = Long.class)
                     ,
                     @ColumnResult(name = "wbc_contrato", type = Long.class)
                     ,
+                    @ColumnResult(name = "apelido", type = String.class)
+                    ,
+                    @ColumnResult(name = "montante", type = Double.class)
+                    ,
                     @ColumnResult(name = "wbc_ponto_de_medicao", type = String.class)
-                    ,
-                    @ColumnResult(name = "montante_liquido", type = Double.class)
-                    ,
-                    @ColumnResult(name = "status", type = String.class)
-                    ,
-                    @ColumnResult(name = "data_criacao", type = Date.class)
-                    ,
-                    @ColumnResult(name = "exportado", type = Boolean.class)
-                    ,
-                    @ColumnResult(name = "nome_empresa", type = String.class)
-                    ,
-                    @ColumnResult(name = "responsavel", type = String.class)
                     ,
                     @ColumnResult(name = "rateio", type = String.class)
                     ,
-                    @ColumnResult(name = "act_id_processo", type = String.class)
+                    @ColumnResult(name = "status", type = String.class)
+                    ,
+                    @ColumnResult(name = "responsavel", type = String.class)
+                    ,
+                    @ColumnResult(name = "exportado", type = Boolean.class)
+                    ,
+                    @ColumnResult(name = "checkbox", type = String.class)                   
+                    
                 }))
 
 @NamedNativeQuery(name = "MeansurementFileResult.getStatusBilling",
-        query = "SELECT distinct \n"
-        + "    a.id_arquivo_de_medicao,\n"
-        + "    a.act_id_processo,\n"
-        + "    a.ano,\n"
-        + "    a.mes,\n"
-        + "    case b.contrato_pai when 1 then c.wbc_contrato else a.wbc_contrato end as wbc_contrato,\n"
-        + "    a.wbc_ponto_de_medicao,\n"
-        + " case b.justificativa when 'APROVADO' then b.montante_liquido_ajustado else b.montante_liquido end as montante_liquido,\n"
-        + "    'APROVADO' as status,\n"
-        + "    a.data_criacao,\n"
-        + "    b.exportado,\n"
-        + "    b.nome_empresa,\n"
-        + "    CONCAT(u.FIRST_ ,' ', u.LAST_) as responsavel,\n"
-        + "   (CASE WHEN c.wbc_rateio = 1 THEN 'SIM'\n"
-        + "            ELSE 'NÃO'\n"
-        + "    END) as rateio\n"
-        + " FROM\n"
-        + "  mtx_arquivo_de_medicao a\n"
-        + "                INNER JOIN\n"
-        + "            mtx_arquivo_de_medicao_resultado b ON a.id_arquivo_de_medicao = b.id_arquivo_de_medicao\n"
-        + "                LEFT JOIN\n"
-        + "            mtx_contrato c ON  b.wbc_contrato = c.wbc_codigo_contrato or b.wbc_contrato = c.wbc_contrato\n"
-        + "            LEFT JOIN \n"
-        + "			activiti.act_hi_varinst v ON v.PROC_INST_ID_ = a.act_id_processo  \n"
-        + "        INNER JOIN\n"
-        + "			activiti.act_id_user u ON u.ID_ = v.TEXT_ and v.NAME_ = 'created_by'"
-        + "\n"
+        query = "SELECT \n"
+        + "    x.act_id_process,\n"
+        + "    x.year,\n"
+        + "    x.month,\n"
+        + "    x.wbc_contrato,\n"
+        + "    x.apelido,\n"
+        + "    x.montante,\n"
+        + "    x.wbc_ponto_de_medicao,\n"
+        + "    (CASE\n"
+        + "        WHEN x.rateio > 0 THEN 'SIM'\n"
+        + "        ELSE 'NÃO'\n"
+        + "    END) AS rateio,\n"
+        + "    x.status,\n"
+        + "    x.responsavel,\n"
+        + "    x.exportado,\n"
+        + "    IF((x.rateio = 0 AND x.contrato_pai = '00')\n"
+        + "            OR (x.rateio > 0 AND x.contrato_pai = '01'),\n"
+        + "        'true',\n"
+        + "        'false') AS checkbox\n"
+        + "FROM\n"
+        + "    (SELECT 		\n"
+        + "        a.apelido,\n"
+        + "            a.nome_empresa,\n"
+        + "            a.wbc_contrato,\n"
+        + "            MONTH(r.data_criacao) AS month,\n"
+        + "            YEAR(r.data_criacao) AS year,\n"
+        + "            (CASE\n"
+        + "                WHEN r.montante_liquido_ajustado IS NOT NULL THEN r.montante_liquido_ajustado\n"
+        + "                ELSE r.montante_liquido\n"
+        + "            END) AS montante,\n"
+        + "            (CASE\n"
+        + "                WHEN r.contrato_pai = '01' THEN a.wbc_codigo_contrato\n"
+        + "                WHEN a.wbc_codigo_contrato_rateio IS NULL THEN 0\n"
+        + "                ELSE a.wbc_codigo_contrato_rateio\n"
+        + "            END) AS rateio,\n"
+        + "            a.flat,\n"
+        + "            a.unidade_consumidora,\n"
+        + "            c.wbc_ponto_de_medicao,\n"
+        + "            IF(id_aquivo_de_medicao_resultado, 'APROVADO', 'PENDENTE') AS status,\n"
+        + "            r.exportado,\n"
+        + "            r.act_id_process,\n"
+        + "            IFNULL(r.contrato_pai, '00') AS contrato_pai,\n"
+        + "            CONCAT(u.FIRST_, ' ', u.LAST_) AS responsavel\n"
+        + "    FROM\n"
+        + "        mtx_contrato a\n"
+        + "    LEFT JOIN mtx_ponto_contrato b ON a.id_contrato = b.id_contrato\n"
+        + "    LEFT JOIN mtx_ponto_de_medicao c ON b.id_ponto_de_medicao = c.id_ponto_de_medicao\n"
+        + "    LEFT JOIN mtx_arquivo_de_medicao_resultado r ON a.wbc_contrato = r.wbc_contrato\n"
+        + "    LEFT JOIN activiti.act_hi_varinst v ON v.PROC_INST_ID_ = r.act_id_process\n"
+        + "    INNER JOIN activiti.act_id_user u ON u.ID_ = v.TEXT_\n"
+        + "        AND v.NAME_ = 'created_by'\n"
+        + "    WHERE\n"
+        + "        r.data_criacao BETWEEN :start AND :end\n"
+        + "            AND NOT EXISTS( SELECT \n"
+        + "                1\n"
+        + "            FROM\n"
+        + "                mtx_aqruivo_de_medicao_recompra rr\n"
+        + "            WHERE\n"
+        + "                rr.act_id_processo = r.act_id_process)) AS x\n"
         + "WHERE\n"
-        + "    a.status IN ('APPROVED')\n"
-        + "        AND b.act_id_process not in (select distinct mr.act_id_processo from mtx_aqruivo_de_medicao_recompra mr) \n"
-        + "        AND a.ano = :year\n"
-        + "        AND a.mes = :month\n"
-        + "    order by a.data_criacao",
+        + "    x.status = 'APROVADO'\n"
+        + "ORDER BY x.rateio , x.contrato_pai DESC",
         resultSetMapping = "statusBillingDTO")
 
 @Entity
@@ -179,7 +207,7 @@ public class MeansurementFileResult {
 
     @Column(name = "exportado")
     private boolean isExported;
-    
+
     @Column(name = "data_criacao")
     private LocalDateTime createdAt;
 
@@ -195,13 +223,11 @@ public class MeansurementFileResult {
 
     }
 
-    
     @PrePersist
-    public void generateDate(){
+    public void generateDate() {
         this.createdAt = LocalDateTime.now();
     }
-    
-    
+
     public void update(MeansurementFileResult result) {
 
         if (Optional.fromNullable(result.getAmountLiquidoAdjusted()).isPresent() && !result.getAmountLiquidoAdjusted().equals(this.amountLiquidoAdjusted)) {

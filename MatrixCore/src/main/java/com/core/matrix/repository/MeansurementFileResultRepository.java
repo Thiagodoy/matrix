@@ -7,6 +7,7 @@ package com.core.matrix.repository;
 
 import com.core.matrix.dto.MeansurementFileResultStatusDTO;
 import com.core.matrix.model.MeansurementFileResult;
+import java.time.LocalDateTime;
 import java.util.List;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Modifying;
@@ -27,11 +28,15 @@ public interface MeansurementFileResultRepository extends JpaRepository<Meansure
     void deleteByIdProcess(String id);
     
     @Query(nativeQuery = true)
-    List<MeansurementFileResultStatusDTO> getStatusBilling(@Param("year")Long year, @Param("month")Long month);
+    List<MeansurementFileResultStatusDTO> getStatusBilling(@Param("start")LocalDateTime start, @Param("end")LocalDateTime end);
     
     @Modifying
     @Query(value = "update MeansurementFileResult s set s.isExported = true where s.meansurementFileId = :id ")    
     void updateToExported(@Param("id")Long id);
+    
+    @Modifying
+    @Query(value = "update MeansurementFileResult s set s.isExported = true where s.idProcess = :id ")    
+    void updateToExportedByProcessInstance(@Param("id")String id);
     
     
     
