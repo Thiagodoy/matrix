@@ -7,9 +7,11 @@ package com.core.matrix.service;
 
 import com.core.matrix.dto.MeansurementFileResultStatusDTO;
 import com.core.matrix.model.MeansurementFileResult;
-import com.core.matrix.model.Monitoring;
 import com.core.matrix.repository.MeansurementFileResultRepository;
 import com.core.matrix.wbc.service.ContractService;
+import java.time.LocalDate;
+import java.time.LocalDateTime;
+import java.time.Month;
 import java.util.Comparator;
 import java.util.List;
 import java.util.Objects;
@@ -70,10 +72,16 @@ public class MeansurementFileResultService {
 
     @Transactional(readOnly = true)
     public List<MeansurementFileResultStatusDTO> getStatusBilling(Long year, Long month) {
+        
+        
+        LocalDate monthBilling = LocalDate.of(year.intValue(), month.intValue(), 1);
+        
+        LocalDateTime start = monthBilling.atStartOfDay();
+        LocalDateTime end = LocalDateTime.of(year.intValue(), month.intValue(), monthBilling.getMonth().maxLength(), 23, 59);
+        
 
-        List<MeansurementFileResultStatusDTO> results = this.repository.getStatusBilling(year, month)
-                .stream()
-                .sorted(Comparator.comparing(MeansurementFileResultStatusDTO::getId))
+        List<MeansurementFileResultStatusDTO> results = this.repository.getStatusBilling(start, end)
+                .stream()                
                 .collect(Collectors.toList());
         
          List<Long> contracts = results
@@ -102,6 +110,11 @@ public class MeansurementFileResultService {
     @Transactional(transactionManager = "matrixTransactionManager")
     public void updateToExported(Long id) {
         this.repository.updateToExported(id);
+    }
+    
+    @Transactional(transactionManager = "matrixTransactionManager")
+    public void updateToExportedByProcessInstance(String id) {
+        this.repository.updateToExportedByProcessInstance(id);
     }
 
     public List<MeansurementFileResult> findByIdProcess(String id) {

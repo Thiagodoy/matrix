@@ -66,7 +66,7 @@ public class MeansurementFileResultResource {
             return ResponseEntity.ok(response);
 
         } catch (Exception e) {
-            Logger.getLogger(MeansurementFileResultResource.class.getName()).log(Level.SEVERE, "[getStatusBilling]", e.getMessage());
+            Logger.getLogger(MeansurementFileResultResource.class.getName()).log(Level.SEVERE, "[getStatusBilling]", e);
             return ResponseEntity.status(HttpStatus.resolve(500)).body(e.getMessage());
         }
     }
