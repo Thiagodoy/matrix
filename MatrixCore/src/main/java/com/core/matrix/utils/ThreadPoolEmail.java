@@ -140,6 +140,9 @@ public class ThreadPoolEmail {
                     if (key.equals(":subject")) {
                         helper.setSubject(parameters.get(key));
                     }
+                    if (key.equals(":copy")){
+                        helper.addCc(parameters.get(key));
+                    }
                 }
             }
 
