@@ -76,6 +76,12 @@ public class Template implements Model<Template> {
     @Column(name = "parametros")
     protected String attachments;
 
+    @Column(name = "texto_base")
+    protected String standardText;
+
+    @Column(name = "texto_base_rodape")
+    protected String standardFooterText;
+
     @PrePersist
     public void generatedDate() {
         this.createdAt = LocalDateTime.now();

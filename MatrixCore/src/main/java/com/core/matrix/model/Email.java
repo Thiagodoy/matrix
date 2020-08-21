@@ -68,6 +68,9 @@ public class Email implements Model<Email> {
 
     @Column(name = "data_criacao")
     protected LocalDateTime createdAt;
+    
+    @Column(name = "conteudo")
+    protected String content;
 
     @Transient
     protected Map<String, String> mapData;
