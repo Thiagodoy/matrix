@@ -366,6 +366,7 @@ public class BillingContractsTask implements JavaDelegate {
     private synchronized ProcessInstance createAProcessForBilling(DelegateExecution execution, List<ContractDTO> contracts, Map<String, Object> variables) {
 
         variables.put(Constants.LIST_CONTRACTS_FOR_BILLING, contracts);
+        variables.put(PROCESS_GLOBAL_PRIORITY, this.getPriority(contracts));
 
         List<String> meansurementPoint = new ArrayList();
         List<String> nicknames = new ArrayList();
@@ -397,8 +398,6 @@ public class BillingContractsTask implements JavaDelegate {
         ProcessInstance processInstance = execution.getEngineServices().getRuntimeService().startProcessInstanceByMessage(Constants.PROCESS_MEANSUREMENT_FILE_MESSAGE_EVENT, variables);
 
         if (Optional.ofNullable(processInstance).isPresent()) {
-            
-            variables.put(PROCESS_GLOBAL_PRIORITY, this.getPriority(contracts));
             variables.put(PROCESS_INFORMATION_MEANSUREMENT_POINT, pointers);
             variables.put(PROCESS_INFORMATION_NICKNAME, nickname);
             variables.put(Constants.PROCESS_INFORMATION_CNPJ, cnpjsString);

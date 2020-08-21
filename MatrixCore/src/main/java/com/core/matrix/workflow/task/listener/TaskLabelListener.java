@@ -28,7 +28,7 @@ public class TaskLabelListener implements TaskListener {
             if (contractsMtx.size() == 1) {
                 ContractMtx contractMtx = contractsMtx.get(0);
                 delegateTask.setVariableLocal(TASK_LABEL, contractMtx.getNickname());
-                delegateTask.setVariableLocal(TASK_LABEL_CONTRACT, contractMtx.getWbcContract());
+                delegateTask.setVariableLocal(TASK_LABEL_CONTRACT, contractMtx.getWbcContract());                 
             } else {
                 Optional<ContractMtx> opt = contractsMtx.stream().filter(c -> c.isFather()).findFirst();
                 if (opt.isPresent()) {
@@ -36,6 +36,7 @@ public class TaskLabelListener implements TaskListener {
                     delegateTask.setVariableLocal(TASK_LABEL, contractMtx.getNickname());
                     delegateTask.setVariableLocal(TASK_LABEL_CONTRACT, contractMtx.getWbcContract());
                 }
+              
             }
         }
         
