@@ -31,7 +31,6 @@ public class ContractDTO implements Serializable{
     private String sNrContrato;
 
     private String sNmContrato;
-
     
     @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss", shape = JsonFormat.Shape.STRING)
     private LocalDateTime tDdInicio;
@@ -86,6 +85,8 @@ public class ContractDTO implements Serializable{
     private Long nCdPerfilCCEE;
     
     private String sNrCnpj;
+    
+    private String condicaoPgto;
 
     public ContractDTO(
             Long nCdContrato,
@@ -116,6 +117,7 @@ public class ContractDTO implements Serializable{
             Long nCdSiglaCCEEContratante,
             Long nCdPerfilCCEE,
             String sNrCnpj
+            
     ) {
 
         this.nCdContrato = nCdContrato;
@@ -146,6 +148,7 @@ public class ContractDTO implements Serializable{
         this.nCdSiglaCCEEContratante = nCdSiglaCCEEContratante;
         this.nCdPerfilCCEE = nCdPerfilCCEE;
         this.sNrCnpj = sNrCnpj;
+        this.condicaoPgto = "";
     }
 
     public ContractDTO(
@@ -167,7 +170,7 @@ public class ContractDTO implements Serializable{
             Long nCdContratoRateioControlador,
             Long nCdSiglaCCEEContratante,
             Long nCdPerfilCCEE,
-            String sNrCnpj
+            String sNrCnpj            
     ) {
 
         this.nCdContrato = nCdContrato;
@@ -189,6 +192,7 @@ public class ContractDTO implements Serializable{
         this.nCdSiglaCCEEContratante = nCdSiglaCCEEContratante;
         this.nCdPerfilCCEE = nCdPerfilCCEE;  
         this.sNrCnpj = sNrCnpj;
+        
     }
 
     public ContractDTO(

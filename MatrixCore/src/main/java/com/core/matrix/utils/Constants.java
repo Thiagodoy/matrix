@@ -94,6 +94,7 @@ public class Constants {
     public static final String PROCESS_INFORMATION_CNPJ = "#Cnpj";
     public static final String PROCESS_INFORMATION_PROCESSO_ID = "#Processo";
     public static final String PROCESS_INFORMATION_CONTRACT_NUMBERS = "#Contracts";
+    public static final String PROCESS_GLOBAL_PRIORITY = "global-priority";
     
     
     public static final String RESPONSE_LIST_PROCESS_ANALIZED = "list_process_analized";

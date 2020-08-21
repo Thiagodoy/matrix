@@ -38,5 +38,13 @@ public class TaskLabelListener implements TaskListener {
                 }
             }
         }
+        
+        if(delegateTask.hasVariable(PROCESS_GLOBAL_PRIORITY)){
+            Long priority = delegateTask.getVariable(PROCESS_GLOBAL_PRIORITY, Long.class);
+            delegateTask.setPriority(priority.intValue());
+        }else{
+            delegateTask.setPriority(4);
+        }
+        
     }
 }

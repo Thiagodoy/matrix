@@ -5,7 +5,6 @@
  */
 package com.core.matrix.wbc.service;
 
-
 import com.core.matrix.model.ContractMtx;
 
 import com.core.matrix.service.LogService;
@@ -14,10 +13,15 @@ import com.core.matrix.service.MeansurementFileService;
 import com.core.matrix.wbc.dto.ContractDTO;
 import com.core.matrix.wbc.dto.ContractWbcInformationDTO;
 import com.core.matrix.wbc.repository.ContractRepository;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
+import java.util.logging.Level;
+import java.util.logging.Logger;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 import org.activiti.engine.RuntimeService;
 import org.activiti.engine.TaskService;
@@ -39,8 +43,6 @@ public class ContractService {
 
     @Autowired
     private LogService logService;
-
-    
 
     @Autowired
     private MeansurementFileService meansurementFileService;
@@ -75,17 +77,15 @@ public class ContractService {
     public Optional<ContractWbcInformationDTO> getInformation(Long year, Long month, Long contract) {
         return this.repository.getInformation(year, month, Arrays.asList(contract)).stream().findFirst();
     }
-    
+
     @Transactional(readOnly = true)
-    public List<ContractWbcInformationDTO> getInformation(Long year, Long month, List<Long> contract) {        
-        if(contract.isEmpty()){
+    public List<ContractWbcInformationDTO> getInformation(Long year, Long month, List<Long> contract) {
+        if (contract.isEmpty()) {
             return Collections.EMPTY_LIST;
-        }else{
-           return this.repository.getInformation(year, month, contract);     
+        } else {
+            return this.repository.getInformation(year, month, contract);
         }
     }
-    
-    
 
     @Transactional(readOnly = true)
     public List<ContractDTO> listForBilling(List<ContractMtx> filter) {
@@ -104,5 +104,35 @@ public class ContractService {
         return contracts;
     }
 
-   
+    @Transactional(readOnly = true)
+    public Long getDayPgto(Long contract, Long month, Long year) {
+
+        try {
+            Optional<String> opt = this.repository.getPgto(contract, month, year);
+
+            if (opt.isPresent()) {
+                String value = opt.get();
+
+                Pattern p = Pattern.compile("\\d+");
+                Matcher m = p.matcher(value);
+                
+                List<String> numbers = new ArrayList<String>();
+                
+                while (m.find()) {
+                    numbers.add(m.group());
+                }
+                
+                return Long.parseLong(numbers.get(0));
+
+            } else {
+                return 0L;
+            }
+
+        } catch (Exception e) {
+            Logger.getLogger(this.getClass().getName()).log(Level.SEVERE, "[getDayPgto]", e);
+            return 0L;
+        }
+
+    }
+
 }

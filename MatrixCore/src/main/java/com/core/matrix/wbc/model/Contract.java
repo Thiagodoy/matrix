@@ -63,6 +63,8 @@ import lombok.Data;
                         @ColumnResult(name = "nCdPerfilCCEE", type = Long.class)
                     ,
                         @ColumnResult(name = "sNrCnpj", type = String.class)
+                    
+                        
                 }))
 
 @SqlResultSetMapping(name = "contractDTO",
@@ -501,6 +503,8 @@ import lombok.Data;
         + "       AND ( Getdate() > Dateadd(month, 1, CT.[tddinicio]) \n"
         + "             AND Getdate() < Dateadd(month, 1, CT.[tddtermino]) ) \n"
         + "ORDER  BY EPCE.[snmempresa] ", name = "Contract.listForBilling", resultSetMapping = "contractForBillinDTO")
+
+
 
 @Entity
 @Table(name = "CE_CONTRATO")

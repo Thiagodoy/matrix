@@ -74,7 +74,7 @@ public class MeansurementFileResultService {
     public List<MeansurementFileResultStatusDTO> getStatusBilling(Long year, Long month) {
         
         
-        LocalDate monthBilling = LocalDate.of(year.intValue(), month.intValue(), 1);
+        LocalDate monthBilling = LocalDate.of(year.intValue(), month.intValue(), 1).plusMonths(1);
         
         LocalDateTime start = monthBilling.atStartOfDay();
         LocalDateTime end = LocalDateTime.of(year.intValue(), month.intValue(), monthBilling.getMonth().maxLength(), 23, 59);

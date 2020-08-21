@@ -28,6 +28,7 @@ import static com.core.matrix.utils.Constants.GROUP_MANAGER_PORTAL;
 import static com.core.matrix.utils.Constants.GROUP_SUPPORT_TI;
 import static com.core.matrix.utils.Constants.PROCESS_ASSOCIATE_USER_AFTER_SALES;
 import static com.core.matrix.utils.Constants.PROCESS_CONTRACTS_RELOAD_BILLING;
+import static com.core.matrix.utils.Constants.PROCESS_GLOBAL_PRIORITY;
 import static com.core.matrix.utils.Constants.PROCESS_INFORMATION_CLIENT;
 import static com.core.matrix.utils.Constants.PROCESS_INFORMATION_CONTRACTS_MATRIX;
 import static com.core.matrix.utils.Constants.PROCESS_INFORMATION_CONTRACT_NUMBERS;
@@ -396,13 +397,14 @@ public class BillingContractsTask implements JavaDelegate {
         ProcessInstance processInstance = execution.getEngineServices().getRuntimeService().startProcessInstanceByMessage(Constants.PROCESS_MEANSUREMENT_FILE_MESSAGE_EVENT, variables);
 
         if (Optional.ofNullable(processInstance).isPresent()) {
+            
+            variables.put(PROCESS_GLOBAL_PRIORITY, this.getPriority(contracts));
             variables.put(PROCESS_INFORMATION_MEANSUREMENT_POINT, pointers);
             variables.put(PROCESS_INFORMATION_NICKNAME, nickname);
             variables.put(Constants.PROCESS_INFORMATION_CNPJ, cnpjsString);
             variables.put(PROCESS_INFORMATION_CONTRACT_NUMBERS, contractsNumber);
             variables.put(PROCESS_INFORMATION_PROCESSO_ID, processInstance.getProcessInstanceId());
             variables.put(Constants.PROCESS_LABEL, MessageFormat.format("{0}{1}{2}{3}", pointers, contractsNumber, processInstance.getProcessInstanceId(), nicknames));
-            
 
             Optional<CompanyAfterSales> optUser = this.hasAssigneeTask(contracts);
 
@@ -423,6 +425,27 @@ public class BillingContractsTask implements JavaDelegate {
         }
 
         return processInstance;
+    }
+
+    private Long getPriority(List<ContractDTO> contracts) {
+
+        ContractDTO contractDTO = contracts.get(0);
+
+        LocalDate now = LocalDate.now().minusMonths(1);
+
+        Long day = this.contractService.getDayPgto(Long.parseLong(contractDTO.getSNrContrato()), (long) now.getMonth().getValue(), (long) now.getYear());
+
+        switch (day.intValue()) {
+            case 6:
+                return 1L;
+            case 7:
+                return 2L;
+            case 8:
+                return 3L;
+            default:
+                return 4L;
+        }
+
     }
 
     private Optional<CompanyAfterSales> hasAssigneeTask(List<ContractDTO> contracts) {

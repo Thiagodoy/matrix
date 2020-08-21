@@ -491,7 +491,7 @@ public class RuntimeActivitiService {
                     .map(g -> String.valueOf(g.getGroupId()))
                     .collect(Collectors.toList());
 
-            query = query.taskCandidateOrAssigned(user.getEmail());
+           // query = query.taskCandidateOrAssigned(user.getEmail());
             query = query.taskCandidateGroupIn(groups);
         }
 

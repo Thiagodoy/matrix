@@ -244,8 +244,8 @@ public class ThreadPoolEmail {
             }
         });
     }
-    
-    public void shutdown(){
+
+    public void shutdown() {
         pool.shutdown();
     }
 }
