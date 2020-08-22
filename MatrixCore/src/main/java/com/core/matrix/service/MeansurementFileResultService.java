@@ -11,7 +11,6 @@ import com.core.matrix.repository.MeansurementFileResultRepository;
 import com.core.matrix.wbc.service.ContractService;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
-import java.time.Month;
 import java.util.Comparator;
 import java.util.List;
 import java.util.Objects;
@@ -77,7 +76,7 @@ public class MeansurementFileResultService {
         LocalDate monthBilling = LocalDate.of(year.intValue(), month.intValue(), 1).plusMonths(1);
         
         LocalDateTime start = monthBilling.atStartOfDay();
-        LocalDateTime end = LocalDateTime.of(year.intValue(), month.intValue(), monthBilling.getMonth().maxLength(), 23, 59);
+        LocalDateTime end = LocalDateTime.of(monthBilling.getYear(),monthBilling.getMonthValue(), monthBilling.getMonth().maxLength(), 23, 59);
         
 
         List<MeansurementFileResultStatusDTO> results = this.repository.getStatusBilling(start, end)
