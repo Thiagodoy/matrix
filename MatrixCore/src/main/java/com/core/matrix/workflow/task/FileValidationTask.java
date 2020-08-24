@@ -191,7 +191,7 @@ public class FileValidationTask extends Task {
 
         } catch (Exception e) {
             this.setVariable(CONTROLE, RESPONSE_LAYOUT_INVALID);
-            this.generateLog(de, e, "Erro ao processar o arquivo");
+            Logger.getLogger(this.getClass().getName()).log(Level.SEVERE, "Erro ao finalizar o processo", e);
         } finally {
             this.writeVariables(delegateExecution);
         }
@@ -201,14 +201,20 @@ public class FileValidationTask extends Task {
     private void alterStatusPoint() {
 
         this.getPointsRead().forEach(point -> {
-            Optional<MeansurementPointStatus> opt = this.pointStatusService.getPoint(point);
 
-            if (opt.isPresent()) {
-                MeansurementPointStatus pointStatus = opt.get();
-                pointStatus.setStatus(PointStatus.PENDING);
-                MeansurementFile file = this.getFileByPoint(point);
-                pointStatus.setCompany(file.getNickname());
-                pointStatus.forceUpdate();
+            try {
+                Optional<MeansurementPointStatus> opt = this.pointStatusService.getPoint(point);
+
+                if (opt.isPresent()) {
+                    MeansurementPointStatus pointStatus = opt.get();
+                    pointStatus.setStatus(PointStatus.PENDING);
+                    MeansurementFile file = this.getFileByPoint(point);
+                    pointStatus.setCompany(file.getNickname());
+                    pointStatus.forceUpdate();
+                }
+
+            } catch (Exception e) {
+                Logger.getLogger(this.getClass().getName()).log(Level.SEVERE, "Não foi possivel atualizar o ponto -> " + point, e);
             }
 
         });
@@ -394,7 +400,7 @@ public class FileValidationTask extends Task {
                 .forEach(f -> {
 
                     List<FileDetailDTO> r = detail
-                            .parallelStream()                            
+                            .parallelStream()
                             .filter(d -> d.getMeansurementPoint().replaceAll("\\((L|B)\\)", "").trim().equals(f.getMeansurementPoint()))
                             .collect(Collectors.toList());
 
@@ -496,16 +502,14 @@ public class FileValidationTask extends Task {
                 if (opt.isPresent()) {
                     MeansurementFile file = opt.get();
 
-                    Optional<ContractMtxStatus>optContract = contractMtxStatusService.getContract(file.getWbcContract());
-                    
-                    if(optContract.isPresent()){
+                    Optional<ContractMtxStatus> optContract = contractMtxStatusService.getContract(file.getWbcContract());
+
+                    if (optContract.isPresent()) {
                         ContractMtxStatus contractMtxStatus = optContract.get();
                         contractMtxStatus.setStatus(ContractStatus.PENDING);
                         contractMtxStatus.forceUpdate();
                     }
-                    
-                    
-                    
+
                     file.setFile(attachmentId);
                     file.setUser(userId);
                     file.setType(type);

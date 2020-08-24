@@ -112,13 +112,12 @@ public class MeansurementPointStatusService implements Observer {
         }
     }
 
-    
-    public void resetAll(){
-        this.mapPoint.keySet().forEach(point->{        
+    public void resetAll() {
+        this.mapPoint.keySet().forEach(point -> {
             this.resetPoint(point);
-        });                
+        });
     }
-    
+
     @Transactional
     public synchronized Optional<MeansurementPointStatus> getPoint(String point) {
 
@@ -130,7 +129,7 @@ public class MeansurementPointStatusService implements Observer {
             statusNew = this.repository.save(statusNew);
             statusNew.addObserver(this);
             this.mapPoint.put(point, statusNew);
-             return Optional.ofNullable(statusNew);
+            return Optional.ofNullable(statusNew);
         } else {
             return Optional.empty();
         }
@@ -145,8 +144,8 @@ public class MeansurementPointStatusService implements Observer {
     public List<PointStatusSummaryDTO> summary(Long month, Long year) {
         return this.repository.summary(month, year);
     }
-    
-     public void shutdown(){
+
+    public void shutdown() {
         pool.shutdown();
     }
 
