@@ -282,6 +282,13 @@ public class BillingContractsTask implements JavaDelegate {
                         }
                     });
 
+                    //Remove contracts are not in database Matrix
+                    contractsSon = contractsSon.stream()
+                            .filter(c -> !contractsNotRegistered
+                            .stream()
+                            .anyMatch(cc -> cc.getSNrContrato().equals(c.getSNrContrato())))
+                            .collect(Collectors.toList());
+
                     //Get Contract parent
                     Optional<ContractDTO> opt = contracts
                             .parallelStream()
