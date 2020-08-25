@@ -26,14 +26,12 @@ public class CompanyAfterSales implements  Serializable{
     private static final long serialVersionUID = 9345709234532L;
     
     @Id
-    @Column(name = "wbc_empresa")
+    @Column(name = "wbc_empresa", unique = true)
     private Long company;
     
     @Id
     @Column(name = "act_usuario")
-    private String user; 
-    
-    
+    private String user;    
     
     
     @Data
