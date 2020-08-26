@@ -23,6 +23,7 @@ import org.activiti.engine.repository.ProcessDefinition;
 import org.activiti.image.ProcessDiagramGenerator;
 import org.activiti.image.impl.DefaultProcessDiagramGenerator;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Service;
 
@@ -46,6 +47,7 @@ public class RepositoryActivitiService {
         return this.repositoryService.createDeploymentQuery().deploymentId(deploymentId).singleResult();
     }
 
+    @CacheEvict(allEntries = true,value = "processDefinition")    
     public void upload(String fileName, InputStream content) throws IOException {
         this.repositoryService.createDeployment().addInputStream(fileName, content).name(fileName).deploy();
         content.close();
