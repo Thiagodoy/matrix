@@ -9,7 +9,6 @@ package com.core.matrix.configuration;
  *
  * @author thiag
  */
-
 import com.core.matrix.filter.WebSocketCorsFilter;
 import com.core.matrix.filter.JwtRequestFilter;
 import com.core.matrix.service.AuthService;
@@ -47,16 +46,13 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
 
     @Autowired
     private JwtRequestFilter jwtRequestFilter;
-    
+
     @Autowired
     private WebSocketCorsFilter corsFilter;
 
     @Autowired
     public void configureGlobal(AuthenticationManagerBuilder auth) throws Exception {
-    // configure AuthenticationManager so that it knows from where to load
-    // user for matching credentials
-    // Use BCryptPasswordEncoder
-    auth.userDetailsService(userDetailsService).passwordEncoder(passwordEncoder());
+        auth.userDetailsService(userDetailsService).passwordEncoder(passwordEncoder());
     }
 
     @Bean
@@ -77,8 +73,8 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
                 .csrf()
                 .disable()
                 .authorizeRequests()
-                .antMatchers("/api/auth","/api/auth/forgotPassword","/websocket/**","/api/workflow/repository/diagram","/asset/**", "/swagger**","/webjars/**", "/swagger-resources/**","/swagger-ui.html**","/v2/api-docs","/csrf", "/")
-                .permitAll()                                            
+                .antMatchers("/api/auth", "/api/auth/forgotPassword", "/websocket/**", "/api/workflow/repository/diagram", "/asset/**", "/swagger**", "/webjars/**", "/swagger-resources/**", "/swagger-ui.html**", "/v2/api-docs", "/csrf", "/")
+                .permitAll()
                 .antMatchers(HttpMethod.OPTIONS, "/**")
                 .permitAll()
                 .anyRequest()
@@ -91,20 +87,20 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
                 .sessionCreationPolicy(SessionCreationPolicy.STATELESS).and()
                 .cors().configurationSource(corsConfigurationSource());
 
-        httpSecurity               
-                .addFilterBefore(corsFilter,ChannelProcessingFilter.class)
+        httpSecurity
+                .addFilterBefore(corsFilter, ChannelProcessingFilter.class)
                 .addFilterBefore(jwtRequestFilter, UsernamePasswordAuthenticationFilter.class);
     }
-    
+
     @Bean
     public CorsConfigurationSource corsConfigurationSource() {
         CorsConfiguration configuration = new CorsConfiguration();
         configuration.setAllowedOrigins(Arrays.asList("*"));
         configuration.setAllowedHeaders(Arrays.asList("*"));
-        configuration.setAllowedMethods(Arrays.asList("DELETE","GET","POST","PUT","OPTIONS","TRACE","PATCH","HEAD"));
+        configuration.setAllowedMethods(Arrays.asList("DELETE", "GET", "POST", "PUT", "OPTIONS", "TRACE", "PATCH", "HEAD"));
         UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
         source.registerCorsConfiguration("/**", configuration);
-        
+
         return source;
-   }
+    }
 }
