@@ -28,7 +28,7 @@ public class TaskLabelListener implements TaskListener {
             if (contractsMtx.size() == 1) {
                 ContractMtx contractMtx = contractsMtx.get(0);
                 delegateTask.setVariableLocal(TASK_LABEL, contractMtx.getNickname());
-                delegateTask.setVariableLocal(TASK_LABEL_CONTRACT, contractMtx.getWbcContract());                 
+                delegateTask.setVariableLocal(TASK_LABEL_CONTRACT, contractMtx.getWbcContract());
             } else {
                 Optional<ContractMtx> opt = contractsMtx.stream().filter(c -> c.isFather()).findFirst();
                 if (opt.isPresent()) {
@@ -36,16 +36,21 @@ public class TaskLabelListener implements TaskListener {
                     delegateTask.setVariableLocal(TASK_LABEL, contractMtx.getNickname());
                     delegateTask.setVariableLocal(TASK_LABEL_CONTRACT, contractMtx.getWbcContract());
                 }
-              
+
             }
         }
-        
-        if(delegateTask.hasVariable(PROCESS_GLOBAL_PRIORITY)){
+
+        if (delegateTask.hasVariable(PROCESS_GLOBAL_PRIORITY)) {
             Long priority = delegateTask.getVariable(PROCESS_GLOBAL_PRIORITY, Long.class);
             delegateTask.setPriority(priority.intValue());
-        }else{
+        } else {
             delegateTask.setPriority(4);
         }
-        
+
+        if (delegateTask.hasVariable(PROCESS_ASSOCIATE_USER_AFTER_SALES) && delegateTask.getName().equals("PENDENTE DE UPLOAD")) {
+            String user = delegateTask.getVariable(PROCESS_ASSOCIATE_USER_AFTER_SALES, String.class);
+            delegateTask.setAssignee(user);
+        }
+
     }
 }

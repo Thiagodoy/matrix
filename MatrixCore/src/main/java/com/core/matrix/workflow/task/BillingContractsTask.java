@@ -108,8 +108,8 @@ public class BillingContractsTask implements JavaDelegate {
     public BillingContractsTask(ApplicationContext context) {
         BillingContractsTask.context = context;
     }
-    
-    public static void setContext(ApplicationContext context){
+
+    public static void setContext(ApplicationContext context) {
         BillingContractsTask.context = context;
     }
 
@@ -405,6 +405,10 @@ public class BillingContractsTask implements JavaDelegate {
                 .collect(Collectors.joining(","));
 
         String contractsNumber = contracts.stream().map(c -> c.getSNrContrato()).collect(Collectors.joining(";"));
+        Optional<CompanyAfterSales> optUser = this.hasAssigneerTask(contracts);
+        if (optUser.isPresent()) {
+            variables.put(PROCESS_ASSOCIATE_USER_AFTER_SALES, optUser.get().getUser());
+        }
 
         ProcessInstance processInstance = execution.getEngineServices().getRuntimeService().startProcessInstanceByMessage(Constants.PROCESS_MEANSUREMENT_FILE_MESSAGE_EVENT, variables);
 
@@ -416,11 +420,6 @@ public class BillingContractsTask implements JavaDelegate {
             variables.put(PROCESS_INFORMATION_PROCESSO_ID, processInstance.getProcessInstanceId());
             variables.put(Constants.PROCESS_LABEL, MessageFormat.format("{0}{1}{2}{3}", pointers, contractsNumber, processInstance.getProcessInstanceId(), nicknames));
 
-            Optional<CompanyAfterSales> optUser = this.hasAssigneeTask(contracts);
-
-            if (optUser.isPresent()) {
-                variables.put(PROCESS_ASSOCIATE_USER_AFTER_SALES, optUser.get().getUser());
-            }
             if (execution.hasVariable(PROCESS_CONTRACTS_RELOAD_BILLING)) {
                 execution.setVariable(PROCESS_NEW_INSTANCE_ID, processInstance.getProcessInstanceId());
             }
@@ -458,7 +457,7 @@ public class BillingContractsTask implements JavaDelegate {
 
     }
 
-    private Optional<CompanyAfterSales> hasAssigneeTask(List<ContractDTO> contracts) {
+    private Optional<CompanyAfterSales> hasAssigneerTask(List<ContractDTO> contracts) {
 
         List<Long> codes = contracts
                 .stream()

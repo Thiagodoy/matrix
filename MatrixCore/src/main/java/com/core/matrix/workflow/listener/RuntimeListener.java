@@ -80,7 +80,7 @@ public class RuntimeListener implements ActivitiEventListener {
         switch (event.getType()) {
 
             case TASK_CREATED:
-                assineeTask(event);
+                //assineeTask(event);
                 prepareEmails(event, Template.TemplateBusiness.GROUP_TASK_PENDING, Notification.NotificationType.GROUP_TASK_PENDING);                
                 break;
 
