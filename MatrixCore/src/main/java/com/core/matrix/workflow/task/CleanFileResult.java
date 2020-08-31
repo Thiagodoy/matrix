@@ -37,6 +37,10 @@ public class CleanFileResult extends Task {
     public CleanFileResult(ApplicationContext context) {
         CleanFileResult.context = context;
     }
+    
+    public static void setContext(ApplicationContext context){
+        CleanFileResult.context = context;
+    }
 
     public CleanFileResult() {
         synchronized (CleanFileResult.context) {

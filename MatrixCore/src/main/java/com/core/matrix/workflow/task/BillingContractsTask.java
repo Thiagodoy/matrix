@@ -108,6 +108,10 @@ public class BillingContractsTask implements JavaDelegate {
     public BillingContractsTask(ApplicationContext context) {
         BillingContractsTask.context = context;
     }
+    
+    public static void setContext(ApplicationContext context){
+        BillingContractsTask.context = context;
+    }
 
     @Override
     public void execute(DelegateExecution execution) throws Exception {

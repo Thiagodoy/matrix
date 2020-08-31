@@ -93,6 +93,10 @@ public class FileValidationTask extends Task {
     public FileValidationTask(ApplicationContext context) {
         FileValidationTask.context = context;
     }
+    
+    public static void setContext(ApplicationContext context){
+        FileValidationTask.context = context;
+    }
 
     @Override
     public void execute(DelegateExecution de) throws Exception {

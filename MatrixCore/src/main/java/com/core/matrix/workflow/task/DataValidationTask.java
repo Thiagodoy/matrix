@@ -66,6 +66,10 @@ public class DataValidationTask extends Task {
     public DataValidationTask(ApplicationContext context) {
         DataValidationTask.context = context;
     }
+    
+    public static void setContext(ApplicationContext context){
+        DataValidationTask.context = context;
+    }
 
     @Override
     public void execute(DelegateExecution de) throws Exception {

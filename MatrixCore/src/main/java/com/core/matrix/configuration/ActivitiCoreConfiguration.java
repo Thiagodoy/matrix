@@ -28,6 +28,7 @@ import com.zaxxer.hikari.HikariDataSource;
 import java.util.HashMap;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import javax.annotation.PostConstruct;
 import javax.sql.DataSource;
 import org.activiti.engine.HistoryService;
 import org.activiti.engine.IdentityService;
@@ -70,6 +71,9 @@ public class ActivitiCoreConfiguration implements EnvironmentAware {
     @Autowired
     private MatrixProperties matrixProperties;
 
+    @Autowired
+    private ApplicationContext context;
+
     private Environment environment;
 
     @org.springframework.beans.factory.annotation.Value("${spring.profiles.active}")
@@ -80,7 +84,6 @@ public class ActivitiCoreConfiguration implements EnvironmentAware {
         this.environment = e;
     }
 
-    
     @Bean
     public LocalContainerEntityManagerFactoryBean entityManagerFactory() {
         LocalContainerEntityManagerFactoryBean em
@@ -104,10 +107,8 @@ public class ActivitiCoreConfiguration implements EnvironmentAware {
         return em;
     }
 
-    
     @Bean
     public DataSource dataSource() {
-        
 
         DataSource dataSource;
 
@@ -124,9 +125,8 @@ public class ActivitiCoreConfiguration implements EnvironmentAware {
         hikariConfig.setPassword(activitiProperties.getDatasource().getSqlserver().getDataSourcePassword());
         hikariConfig.setMaxLifetime(activitiProperties.getDatasource().getMaxLifetime());
         hikariConfig.setPoolName("ActivitiPool");
-        
-        //hikariConfig.setConnectionTestQuery(activitiProperties.getDatasource().getSqlserver().getConnectionTestQuery());
 
+        //hikariConfig.setConnectionTestQuery(activitiProperties.getDatasource().getSqlserver().getConnectionTestQuery());
         dataSource = new HikariDataSource(hikariConfig);
 
         Logger.getLogger(ActivitiCoreConfiguration.class.getName()).log(Level.INFO, "Profile -> " + activeProfile);
@@ -134,7 +134,6 @@ public class ActivitiCoreConfiguration implements EnvironmentAware {
         return dataSource;
     }
 
-    
     @Bean
     public PlatformTransactionManager transactionManager() {
 
@@ -161,10 +160,9 @@ public class ActivitiCoreConfiguration implements EnvironmentAware {
                 .setJobExecutorActivate(true);
 
         ProcessEngine processEngine = s.buildProcessEngine();
-        
-        
+
         JobExecutor jobExecutor = processEngine.getProcessEngineConfiguration().getJobExecutor();
-        jobExecutor.setLockTimeInMillis(15*60000);        
+        jobExecutor.setLockTimeInMillis(15 * 60000);
 
         return processEngine;
 
@@ -200,84 +198,24 @@ public class ActivitiCoreConfiguration implements EnvironmentAware {
         return this.processEngine().getHistoryService();
     }
 
-    @Bean
-    public FileValidationTask fileValidationTask(ApplicationContext context) {
-        return new FileValidationTask(context);
-    }
-
-    @Bean
-    public DataValidationTask dataValidationTask(ApplicationContext context) {
-        return new DataValidationTask(context);
-    }
-
-    @Bean
-    public CalculateTask calculateTask(ApplicationContext context) {
-        return new CalculateTask(context);
-    }
-
-    @Bean
-    public CleanFiles cleanFiles(ApplicationContext context) {
-        return new CleanFiles(context);
-    }
-
-    @Bean
-    public BillingContractsTask billingContractsTask(ApplicationContext context) {
-        return new BillingContractsTask(context);
-    }
-
-    @Bean
-    public DeleteProcessInstanceTask deleteProcessInstanceTask(ApplicationContext context) {
-        return new DeleteProcessInstanceTask(context);
-    }
-
-    @Bean
-    public ChangeStatusFileTask changeStatusFileTask(ApplicationContext context) {
-        return new ChangeStatusFileTask(context);
-    }
-
-    @Bean
-    public CheckStatusFileResultTask checkStatusFileResultTask(ApplicationContext context) {
-        return new CheckStatusFileResultTask(context);
-    }
-
-    @Bean
-    public CleanFileResult cleanFileResult(ApplicationContext context) {
-        return new CleanFileResult(context);
-    }
-
-    @Bean
-    public CheckLevelOfApproval checkLevelOfApproval(ApplicationContext context) {
-        return new CheckLevelOfApproval(context);
-    }
-
-    @Bean
-    public CheckTake checkTake(ApplicationContext context) {
-        return new CheckTake(context);
-    }
-
-    @Bean
-    public ProcessFilesInLoteTask processFilesInLoteTask(ApplicationContext context) {
-        return new ProcessFilesInLoteTask(context, matrixProperties.getThreadPoolSize());
-    }
-
-    @Bean
-    public ValidationFileLoteTask validationFileLoteTask(ApplicationContext context) {
-        return new ValidationFileLoteTask(context);
-    }
-
-    @Bean
-    public ResultFileLoteListener resultFileLoteListener(ApplicationContext context) {
-        return new ResultFileLoteListener(context);
-    }
-    
-    @Bean
-    public ResetResultTask resetResultTask(ApplicationContext context){
-        return new ResetResultTask(context);
-    }
-    
-    @Bean
-    public PersistInformationTask persistInformationTask(ApplicationContext context){
-        return new PersistInformationTask(context);
+    @PostConstruct
+    private void configureContext() {
+        FileValidationTask.setContext(context);
+        DataValidationTask.setContext(context);
+        CalculateTask.setContext(context);
+        CleanFiles.setContext(context);
+        BillingContractsTask.setContext(context);
+        DeleteProcessInstanceTask.setContext(context);
+        ChangeStatusFileTask.setContext(context);
+        CheckStatusFileResultTask.setContext(context);
+        CleanFileResult.setContext(context);
+        CheckLevelOfApproval.setContext(context);
+        CheckTake.setContext(context);
+        ProcessFilesInLoteTask.setContext(context);
+        ValidationFileLoteTask.setContext(context);
+        ResultFileLoteListener.setContext(context);
+        ResetResultTask.setContext(context);
+        PersistInformationTask.setContext(context);
     }
 
 }

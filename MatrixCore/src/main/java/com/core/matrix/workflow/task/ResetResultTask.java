@@ -7,6 +7,7 @@ package com.core.matrix.workflow.task;
 
 import com.core.matrix.service.MeansurementFileAuthorityService;
 import com.core.matrix.service.MeansurementFileResultService;
+import com.core.matrix.workflow.task.listener.ResultFileLoteListener;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import org.activiti.engine.delegate.DelegateExecution;
@@ -24,6 +25,10 @@ public class ResetResultTask implements JavaDelegate {
     private MeansurementFileResultService meansurementFileResultService;
 
     public ResetResultTask(ApplicationContext context) {
+        ResetResultTask.context = context;
+    }
+    
+    public static void setContext(ApplicationContext context) {
         ResetResultTask.context = context;
     }
 

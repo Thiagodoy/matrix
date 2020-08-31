@@ -42,6 +42,10 @@ public class CheckLevelOfApproval implements JavaDelegate {
     public CheckLevelOfApproval(ApplicationContext context) {
         CheckLevelOfApproval.context = context;
     }
+    
+    public static void setContext(ApplicationContext context){
+        CheckLevelOfApproval.context = context;
+    }
 
     public CheckLevelOfApproval() {
         synchronized (CheckLevelOfApproval.context) {

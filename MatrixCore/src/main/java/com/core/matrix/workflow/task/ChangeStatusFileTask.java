@@ -29,6 +29,10 @@ public class ChangeStatusFileTask implements JavaDelegate {
     public ChangeStatusFileTask(ApplicationContext context) {
         ChangeStatusFileTask.context = context;
     }
+    
+    public static void setContext(ApplicationContext context){
+        ChangeStatusFileTask.context = context;
+    }
 
     public ChangeStatusFileTask() {
         synchronized (ChangeStatusFileTask.context) {
