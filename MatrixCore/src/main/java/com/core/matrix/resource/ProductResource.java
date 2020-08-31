@@ -5,9 +5,11 @@
  */
 package com.core.matrix.resource;
 
+import com.core.matrix.dto.SubMarketDTO;
 import com.core.matrix.model.Product;
 import com.core.matrix.service.ProductService;
 import static com.core.matrix.utils.Url.URL_API_PRODUCT;
+import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import org.springframework.data.domain.Page;
@@ -42,6 +44,17 @@ public class ProductResource extends Resource<Product, ProductService> {
             @RequestParam(name = "size", required = false, defaultValue = "10") int size) {
         try {
             Page response = this.getService().find(subMarket, wbcCodigoPerfilCCEE, wbcPerfilCCEE, subMarketDescription, PageRequest.of(page, size, Sort.by("wbcPerfilCCEE")));
+            return ResponseEntity.ok(response);
+        } catch (Exception e) {
+            Logger.getLogger(ProductResource.class.getName()).log(Level.SEVERE, "[get]", e);
+            return ResponseEntity.status(HttpStatus.resolve(500)).body(e.getMessage());
+        }
+    }
+    
+    @RequestMapping(value = "/allSubMarkets", method = RequestMethod.GET)
+    public ResponseEntity getAllSubMarkets(){
+        try {
+            List<SubMarketDTO> response = this.getService().getAllSubMarkets();
             return ResponseEntity.ok(response);
         } catch (Exception e) {
             Logger.getLogger(ProductResource.class.getName()).log(Level.SEVERE, "[get]", e);

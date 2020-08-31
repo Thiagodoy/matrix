@@ -36,6 +36,10 @@ public class CheckTake implements JavaDelegate {
     public CheckTake(ApplicationContext context) {
         CheckTake.context = context;
     }
+    
+    public static void setContext(ApplicationContext context){
+        CheckTake.context = context;
+    }
 
     public CheckTake() {
         synchronized (CheckTake.context) {

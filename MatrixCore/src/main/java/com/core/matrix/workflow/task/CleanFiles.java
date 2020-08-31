@@ -51,6 +51,10 @@ public class CleanFiles implements JavaDelegate {
             this.contractMtxStatusService = CleanFiles.context.getBean(ContractMtxStatusService.class);
         }
     }
+    
+    public static void setContext(ApplicationContext context){
+        CleanFiles.context = context;
+    }
 
     @Override
     public void execute(DelegateExecution execution) throws Exception {

@@ -67,6 +67,10 @@ public class ValidationFileLoteTask implements JavaDelegate {
     public ValidationFileLoteTask(ApplicationContext context) {
         ValidationFileLoteTask.context = context;
     }
+    
+    public static void setContext(ApplicationContext context) {
+        ValidationFileLoteTask.context = context;
+    }
 
     @Override
     public void execute(DelegateExecution de) throws Exception {

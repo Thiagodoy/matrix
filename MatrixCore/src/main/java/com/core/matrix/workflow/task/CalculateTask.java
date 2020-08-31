@@ -83,6 +83,10 @@ public class CalculateTask extends Task {
         CalculateTask.context = context;
     }
 
+    public static void setContext(ApplicationContext context){
+        CalculateTask.context = context;
+    }
+    
     @Override
     public void execute(DelegateExecution de) {
 

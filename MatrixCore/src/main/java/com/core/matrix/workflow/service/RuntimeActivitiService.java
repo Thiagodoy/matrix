@@ -43,12 +43,10 @@ import java.time.LocalTime;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Collections;
 import java.util.Comparator;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.Objects;
 import java.util.Optional;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -450,9 +448,8 @@ public class RuntimeActivitiService {
                 String value = resultSet.getString("value");
                 filters.add(new TaskFilterDTO("USER", value));
             }
-            
-            
-             query = "SELECT DISTINCT\n"
+
+            query = "SELECT DISTINCT\n"
                     + "     PRIORITY_ as value\n"
                     + "FROM\n"
                     + "    activiti.ACT_RU_TASK t\n"
@@ -482,6 +479,36 @@ public class RuntimeActivitiService {
 
         TaskQuery query = taskService.createTaskQuery();
 
+        boolean hasSearchParam = Optional.ofNullable(searchValue).isPresent();
+        boolean hasTaskNameParam = Optional.ofNullable(taskName).isPresent();
+        boolean hasUserAssignedParam = Optional.ofNullable(userAssigned).isPresent();
+
+        if (hasSearchParam || hasTaskNameParam || hasUserAssignedParam) {
+
+            if (Optional.ofNullable(taskName).isPresent()) {
+                query = query.taskName(taskName);
+            }
+
+        } else {
+            List<String> groups = user.getGroups()
+                    .stream()
+                    .map(g -> String.valueOf(g.getGroupId()))
+                    .collect(Collectors.toList());
+
+            query = query.taskCandidateGroupIn(groups);
+
+        }
+        
+        
+        if (Optional.ofNullable(priority).isPresent()) {
+            query = query.taskPriority(priority);
+        }
+        
+        
+        
+        
+        
+        
         if (Optional.ofNullable(userAssigned).isPresent()) {
             query = query.taskAssignee(userAssigned);
         } else {
@@ -492,21 +519,20 @@ public class RuntimeActivitiService {
                     .collect(Collectors.toList());
 
             //query = query.taskCandidateOrAssigned(userAssigned);
-            if(!Optional.ofNullable(searchValue).isPresent()){
+            if (!Optional.ofNullable(searchValue).isPresent()) {
                 query = query.taskCandidateGroupIn(groups);
             }
-            
+
         }
 
         if (Optional.ofNullable(taskName).isPresent()) {
             query = query.taskName(taskName);
         }
 
-        if(Optional.ofNullable(priority).isPresent()){                       
-            query = query.taskPriority(priority);            
+        if (Optional.ofNullable(priority).isPresent()) {
+            query = query.taskPriority(priority);
         }
-        
-        
+
         if (Optional.ofNullable(searchValue).isPresent()) {
             query = query.processVariableValueLike(Constants.PROCESS_LABEL, MessageFormat.format("%{0}%", searchValue.toUpperCase()));
         }
@@ -532,7 +558,7 @@ public class RuntimeActivitiService {
     }
 
     @Transactional(readOnly = true)
-    public PageResponse<TaskResponse> getMyTask(String user, String searchValue,Integer priority, int page, int size) {
+    public PageResponse<TaskResponse> getMyTask(String user, String searchValue, Integer priority, int page, int size) {
 
         TaskQuery query = this.taskService.createTaskQuery();
 
@@ -541,9 +567,8 @@ public class RuntimeActivitiService {
         if (Optional.ofNullable(searchValue).isPresent()) {
             query = query.processVariableValueLike(Constants.PROCESS_LABEL, MessageFormat.format("%{0}%", searchValue.toUpperCase()));
         }
-        
-        
-        if(Optional.ofNullable(priority).isPresent()){
+
+        if (Optional.ofNullable(priority).isPresent()) {
             query = query.taskPriority(priority);
         }
 

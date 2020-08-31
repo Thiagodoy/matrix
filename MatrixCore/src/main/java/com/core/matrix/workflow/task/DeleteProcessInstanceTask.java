@@ -77,6 +77,10 @@ public class DeleteProcessInstanceTask implements JavaDelegate {
     public DeleteProcessInstanceTask(ApplicationContext context) {
         DeleteProcessInstanceTask.context = context;
     }
+    
+    public static void setContext(ApplicationContext context){
+        DeleteProcessInstanceTask.context = context;
+    }
 
     @Override
     public void execute(DelegateExecution execution) throws Exception {

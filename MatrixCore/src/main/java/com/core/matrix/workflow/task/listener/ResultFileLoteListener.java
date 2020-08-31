@@ -13,6 +13,7 @@ import com.core.matrix.service.NotificationService;
 import static com.core.matrix.utils.Constants.*;
 import com.core.matrix.utils.ThreadPoolEmail;
 import com.core.matrix.workflow.service.RepositoryActivitiService;
+import com.core.matrix.workflow.task.ValidationFileLoteTask;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import org.activiti.engine.delegate.DelegateTask;
@@ -32,6 +33,10 @@ public class ResultFileLoteListener implements TaskListener {
     private static ApplicationContext context;
 
     public ResultFileLoteListener(ApplicationContext context) {
+        ResultFileLoteListener.context = context;
+    }
+    
+    public static void setContext(ApplicationContext context) {
         ResultFileLoteListener.context = context;
     }
 

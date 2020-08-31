@@ -30,6 +30,10 @@ public class CheckStatusFileResultTask implements JavaDelegate {
     public CheckStatusFileResultTask(ApplicationContext context) {
         CheckStatusFileResultTask.context = context;
     }
+    
+    public static void setContext(ApplicationContext context){
+        CheckStatusFileResultTask.context = context;
+    }
 
     public CheckStatusFileResultTask() {
         synchronized (CheckStatusFileResultTask.context) {

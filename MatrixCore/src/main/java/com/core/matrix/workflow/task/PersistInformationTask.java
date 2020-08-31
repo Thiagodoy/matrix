@@ -34,6 +34,10 @@ public class PersistInformationTask extends Task implements ExecutionListener {
     public PersistInformationTask(ApplicationContext context) {
         PersistInformationTask.context = context;
     }
+    
+    public static void setContext(ApplicationContext context) {
+        PersistInformationTask.context = context;
+    }
 
     public PersistInformationTask() {
         synchronized (PersistInformationTask.context) {

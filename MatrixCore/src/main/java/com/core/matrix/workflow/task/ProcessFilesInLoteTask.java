@@ -72,6 +72,10 @@ public class ProcessFilesInLoteTask implements JavaDelegate, Observer {
 
     }
 
+    public static void setContext(ApplicationContext context) {
+        ProcessFilesInLoteTask.context = context;
+    }
+     
     public ProcessFilesInLoteTask(ApplicationContext context, Long threadPoolSize) {
         this.context = context;
     }
