@@ -298,7 +298,7 @@ public class CalculateTask extends Task {
                                  */
                                 final MeansurementPointProInfa pointProInfa = this.meansurementPointProInfaService.getCurrentProInfa(file.getMeansurementPoint());
 
-                                boolean isConsumerUnit = contractMtx.isConsumerUnit();
+                                boolean isConsumerUnit = contractMtx.getIsConsumerUnit();
 
                                 final Double factorAtt = contractMtx.getFactorAttendanceCharge();
                                 final double percentLoss = contractMtx.getPercentOfLoss() / 100;
@@ -396,7 +396,7 @@ public class CalculateTask extends Task {
         /**
          * Set result to zero when the contract is consumer unit
          */
-        boolean isConsumerUnit = contractInformationParent.isConsumerUnit();
+        boolean isConsumerUnit = contractInformationParent.getIsConsumerUnit();
 
         Double sum = isConsumerUnit ? 0D : results.stream().mapToDouble(MeansurementFileResult::getAmountBruto).reduce(0d, Double::sum);
         Double sumScde = isConsumerUnit ? 0D : results.stream().mapToDouble(MeansurementFileResult::getAmountScde).reduce(0d, Double::sum);
@@ -436,7 +436,7 @@ public class CalculateTask extends Task {
     private void mountFakeResultToContractFlat(List<MeansurementFile> files, List<ContractMtx> contractsInformations, DelegateExecution de) {
         contractsInformations
                 .stream()
-                .filter(c -> c.isFlat())
+                .filter(c -> c.getIsFlat())
                 .forEach(c -> {
 
                     Long idFile = files.stream()
@@ -494,7 +494,7 @@ public class CalculateTask extends Task {
 
         contractsInformations
                 .stream()
-                .filter(c -> c.isConsumerUnit())
+                .filter(c -> c.getIsConsumerUnit())
                 .forEach(c -> {
 
                     ContractWbcInformationDTO contractWbcInformation = contractWbcInformationDTOs

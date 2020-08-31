@@ -9,6 +9,8 @@ import com.core.matrix.dto.ContractPointDTO;
 import com.core.matrix.exceptions.ContractNotAssociatedWithPointException;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
+import com.fasterxml.jackson.databind.deser.std.NumberDeserializers;
 import java.io.Serializable;
 import java.time.LocalDateTime;
 import java.util.Optional;
@@ -67,9 +69,9 @@ public class ContractMtx implements Model<ContractMtx>, Serializable {
 
     @Column(name = "wbc_codigo_contrato")
     protected Long codeWbcContract;
-
+    
     @Column(name = "wbc_rateio")
-    protected boolean isApportionment;
+    protected Boolean isApportionment;
 
     @Column(name = "wbc_codigo_contrato_rateio")
     protected Long codeContractApportionment;
@@ -92,10 +94,10 @@ public class ContractMtx implements Model<ContractMtx>, Serializable {
     protected LocalDateTime lastUpdate;
 
     @Column(name = "unidade_consumidora")
-    protected boolean isConsumerUnit;
+    protected Boolean isConsumerUnit;
 
     @Column(name = "flat")
-    protected boolean isFlat;
+    protected Boolean isFlat;
 
     @Column(name = "nome_empresa")
     protected String nameCompany;

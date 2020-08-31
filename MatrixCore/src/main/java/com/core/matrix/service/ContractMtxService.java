@@ -101,9 +101,9 @@ public class ContractMtxService extends Service<ContractMtx, ContractMtxReposito
         ContractMtx contractMtx = this.findByWbcContract(contract);
         final List<ContractMtx> contracts = new ArrayList<>();
 
-        if (!contractMtx.isApportionment()) {
+        if (!contractMtx.getIsApportionment()) {
             contracts.add(contractMtx);
-        } else if (contractMtx.isApportionment()) {
+        } else if (contractMtx.getIsApportionment()) {
 
             Optional<Long> isSon = Optional.ofNullable(contractMtx.getCodeContractApportionment());
 
@@ -144,7 +144,7 @@ public class ContractMtxService extends Service<ContractMtx, ContractMtxReposito
         Optional<ContractMtx> opt = this.repository.findByWbcContract(contractId);
 
         if (opt.isPresent()) {
-            return opt.get().isConsumerUnit();
+            return opt.get().getIsConsumerUnit();
         } else {
             return false;
         }

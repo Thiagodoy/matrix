@@ -181,20 +181,20 @@ public abstract class Task implements JavaDelegate {
 
         List<ContractMtx> contractMtxs = this.getContractsMtx();
 
-        boolean allFlat = contractMtxs.stream().allMatch(ContractMtx::isFlat);
-        boolean allUnitConsumer = contractMtxs.stream().allMatch(ContractMtx::isConsumerUnit);
+        boolean allFlat = contractMtxs.stream().allMatch(ContractMtx::getIsFlat);
+        boolean allUnitConsumer = contractMtxs.stream().allMatch(ContractMtx::getIsConsumerUnit);
         boolean noFile = this.getAllFilesUploaded().isEmpty();
         return ((allFlat || allUnitConsumer) && noFile);
     }
 
     public boolean isFlat(Long contract) {
         List<ContractMtx> contractMtxs = this.getContractsMtx();
-        return contractMtxs.stream().filter(c -> c.getWbcContract().equals(contract)).allMatch(ContractMtx::isFlat);
+        return contractMtxs.stream().filter(c -> c.getWbcContract().equals(contract)).allMatch(ContractMtx::getIsFlat);
     }
 
     public boolean isUnitConsumer(Long contract) {
         List<ContractMtx> contractMtxs = this.getContractsMtx();
-        return contractMtxs.stream().filter(c -> c.getWbcContract().equals(contract)).allMatch(ContractMtx::isConsumerUnit);
+        return contractMtxs.stream().filter(c -> c.getWbcContract().equals(contract)).allMatch(ContractMtx::getIsConsumerUnit);
     }
 
     public MeansurementFile getFileByPoint(String point) {

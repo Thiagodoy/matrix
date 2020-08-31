@@ -190,8 +190,8 @@ public class ProcessFilesInLoteTask implements JavaDelegate, Observer {
 
                 List<String> points = contractMtxs
                         .stream()
-                        .filter(c -> !c.isFlat())
-                        .filter(c -> !c.isConsumerUnit())
+                        .filter(c -> !c.getIsFlat())
+                        .filter(c -> !c.getIsConsumerUnit())
                         .filter(c -> !c.isFather())
                         .map(ContractMtx::getPointAssociated).collect(Collectors.toList());
 
@@ -200,12 +200,12 @@ public class ProcessFilesInLoteTask implements JavaDelegate, Observer {
                 boolean unitConsumer = contractMtxs
                         .stream()
                         .filter(c -> !c.isFather())                                               
-                        .map(ContractMtx::isConsumerUnit).reduce(Boolean.TRUE, Boolean::logicalAnd);
+                        .map(ContractMtx::getIsConsumerUnit).reduce(Boolean.TRUE, Boolean::logicalAnd);
                 
                 boolean flat = contractMtxs
                         .stream()
                         .filter(c -> !c.isFather())                        
-                        .map(ContractMtx::isFlat).reduce(Boolean.TRUE, Boolean::logicalAnd);
+                        .map(ContractMtx::getIsFlat).reduce(Boolean.TRUE, Boolean::logicalAnd);
 
                 boolean isOnlyUnitConsumerOrFlat = Boolean.logicalOr(flat, unitConsumer);
                 

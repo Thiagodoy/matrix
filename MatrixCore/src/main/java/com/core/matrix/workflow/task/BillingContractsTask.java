@@ -271,7 +271,7 @@ public class BillingContractsTask implements JavaDelegate {
                             point = contractMtx.getPoint();
                             contract.setMeansurementPoint(point);
 
-                            if ((!contractMtx.isFlat() || !contractMtx.isConsumerUnit()) && Optional.ofNullable(point).isPresent()) {
+                            if ((!contractMtx.getIsFlat() || !contractMtx.getIsConsumerUnit()) && Optional.ofNullable(point).isPresent()) {
                                 this.meansurementPointMtxService
                                         .getByPoint(point)
                                         .checkProInfa();
@@ -344,7 +344,7 @@ public class BillingContractsTask implements JavaDelegate {
                         point = contractMtx.getPoint();
                         contract.setMeansurementPoint(point);
 
-                        if ((!contractMtx.isFlat() || !contractMtx.isConsumerUnit()) && Optional.ofNullable(point).isPresent()) {
+                        if ((!contractMtx.getIsFlat() || !contractMtx.getIsConsumerUnit()) && Optional.ofNullable(point).isPresent()) {
                             this.meansurementPointMtxService
                                     .getByPoint(point)
                                     .checkProInfa();
@@ -543,7 +543,7 @@ public class BillingContractsTask implements JavaDelegate {
         Long month = Integer.valueOf(monthBilling.getMonth().getValue()).longValue();
         Long year = Integer.valueOf(monthBilling.getYear()).longValue();
 
-        boolean isFlatOrUnit = Boolean.logicalOr(contract.isFlat(), contract.isConsumerUnit());
+        boolean isFlatOrUnit = Boolean.logicalOr(contract.getIsFlat(), contract.getIsConsumerUnit());
 
         if (isFlatOrUnit || !Optional.ofNullable(point).isPresent()) {
             return this.meansurementFileService.exists(contract.getWbcContract(), month, year);

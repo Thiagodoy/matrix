@@ -86,9 +86,9 @@ public class ContractMtxStatus extends Observable {
     public ContractMtxStatus(ContractMtx contractMtx) {
         this.wbcContract = contractMtx.getWbcContract();
         this.nickname = contractMtx.getNickname();
-        this.isFlat = contractMtx.isFlat();
-        this.isApportionment = contractMtx.isApportionment();
-        this.isUnitConsumer = contractMtx.isConsumerUnit();
+        this.isFlat = contractMtx.getIsFlat();
+        this.isApportionment = contractMtx.getIsApportionment();
+        this.isUnitConsumer = contractMtx.getIsConsumerUnit();
         this.status = ContractStatus.NO_BILL;        
         this.month = (long) LocalDate.now().minusMonths(1).getMonthValue();
         this.year = (long) LocalDate.now().getYear();
