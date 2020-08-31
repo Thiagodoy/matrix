@@ -485,9 +485,17 @@ public class RuntimeActivitiService {
 
         if (hasSearchParam || hasTaskNameParam || hasUserAssignedParam) {
 
-            if (Optional.ofNullable(taskName).isPresent()) {
+            if (hasTaskNameParam) {
                 query = query.taskName(taskName);
             }
+
+            if (hasSearchParam) {
+                query = query.processVariableValueLike(Constants.PROCESS_LABEL, MessageFormat.format("%{0}%", searchValue.toUpperCase()));
+            }
+            
+            if (hasUserAssignedParam) {
+                query = query.taskAssignee(userAssigned);
+            } 
 
         } else {
             List<String> groups = user.getGroups()
@@ -498,44 +506,10 @@ public class RuntimeActivitiService {
             query = query.taskCandidateGroupIn(groups);
 
         }
-        
-        
-        if (Optional.ofNullable(priority).isPresent()) {
-            query = query.taskPriority(priority);
-        }
-        
-        
-        
-        
-        
-        
-        if (Optional.ofNullable(userAssigned).isPresent()) {
-            query = query.taskAssignee(userAssigned);
-        } else {
-
-            List<String> groups = user.getGroups()
-                    .stream()
-                    .map(g -> String.valueOf(g.getGroupId()))
-                    .collect(Collectors.toList());
-
-            //query = query.taskCandidateOrAssigned(userAssigned);
-            if (!Optional.ofNullable(searchValue).isPresent()) {
-                query = query.taskCandidateGroupIn(groups);
-            }
-
-        }
-
-        if (Optional.ofNullable(taskName).isPresent()) {
-            query = query.taskName(taskName);
-        }
 
         if (Optional.ofNullable(priority).isPresent()) {
             query = query.taskPriority(priority);
-        }
-
-        if (Optional.ofNullable(searchValue).isPresent()) {
-            query = query.processVariableValueLike(Constants.PROCESS_LABEL, MessageFormat.format("%{0}%", searchValue.toUpperCase()));
-        }
+        }       
 
         long total = query.count();
 
