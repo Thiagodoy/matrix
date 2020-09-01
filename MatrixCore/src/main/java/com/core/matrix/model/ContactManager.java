@@ -32,9 +32,7 @@ public class ContactManager {
     @Column(name = "id_contato_gestor")
     private Long id;
 
-    
-    
-    @Column(name = "id_gestor",nullable = false,updatable = false)
+    @Column(name = "id_gestor", nullable = false, updatable = false)
     private Long manager;
 
     @Column(name = "nome")
@@ -62,9 +60,7 @@ public class ContactManager {
     @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss", shape = JsonFormat.Shape.STRING)
     @Column(name = "data_ultima_alteracao")
     private LocalDateTime lastUpdate;
-    
-    
-    
+
     public ContactManager(ContactManagerRequest request) {
 
         this.email = request.getEmail();
@@ -72,12 +68,10 @@ public class ContactManager {
         this.telephone1 = request.getTelephone1();
         this.telephone2 = request.getTelephone2();
         this.telephone3 = request.getTelephone3();
-        this.typeContact = request.getTypeContact();  
+        this.typeContact = request.getTypeContact();
         this.manager = request.getManager();
-        
-    }
 
-   
+    }
 
     public ContactManager() {
 
@@ -86,7 +80,7 @@ public class ContactManager {
     @PrePersist
     public void generateDateCreated() {
         this.createdAt = LocalDateTime.now();
-        
+
     }
 
     @PreUpdate

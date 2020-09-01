@@ -65,8 +65,6 @@ public class MatrixApplication {
         ThreadPoolDetail.shutdown();
         contractMtxStatusService.shutdown();
         pointStatusService.shutdown();
-        
-        
     }
 
 }

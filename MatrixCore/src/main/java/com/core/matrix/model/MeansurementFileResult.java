@@ -84,7 +84,7 @@ import lombok.NoArgsConstructor;
         + "        a.apelido,\n"
         + "            a.nome_empresa,\n"
         + "            a.wbc_contrato,\n"
-        + "            MONTH(r.data_criacao) AS month,\n"
+        + "            (MONTH(r.data_criacao) - 1) AS month,\n"
         + "            YEAR(r.data_criacao) AS year,\n"
         + "            (CASE\n"
         + "                WHEN r.montante_liquido_ajustado IS NOT NULL THEN r.montante_liquido_ajustado\n"

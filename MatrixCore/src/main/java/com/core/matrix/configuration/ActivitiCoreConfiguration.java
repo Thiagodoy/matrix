@@ -6,7 +6,6 @@
 package com.core.matrix.configuration;
 
 import com.core.matrix.properties.ActivitiProperties;
-import com.core.matrix.properties.MatrixProperties;
 import com.core.matrix.workflow.task.BillingContractsTask;
 import com.core.matrix.workflow.task.CalculateTask;
 import com.core.matrix.workflow.task.ChangeStatusFileTask;
@@ -66,10 +65,7 @@ import org.springframework.transaction.PlatformTransactionManager;
 public class ActivitiCoreConfiguration implements EnvironmentAware {
 
     @Autowired
-    private ActivitiProperties activitiProperties;
-
-    @Autowired
-    private MatrixProperties matrixProperties;
+    private ActivitiProperties activitiProperties;    
 
     @Autowired
     private ApplicationContext context;

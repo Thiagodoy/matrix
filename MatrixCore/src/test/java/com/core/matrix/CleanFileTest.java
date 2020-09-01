@@ -20,7 +20,7 @@ class CleanFileTest {
     @Test
     void contextLoads() throws Exception {
         
-        
+        String f = "$2a$10$S8ReIKY9N1YlLBKMJhXrN.wOHkyN6ewMcvkjGnzal1DWy2r4IW1mW";
          //Get task
      
         //Task task = taskService.createTaskQuery().taskId("187518").singleResult();

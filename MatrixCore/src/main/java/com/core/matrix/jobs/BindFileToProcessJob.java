@@ -80,6 +80,7 @@ public class BindFileToProcessJob implements Runnable {
                 FileUtils.forceDelete(file);
             }
         } catch (Exception e) {
+            Logger.getLogger(BindFileToProcessJob.class.getName()).log(Level.SEVERE, "Erro ao remover o arquivo", e);
         }
     }
 

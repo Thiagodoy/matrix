@@ -11,9 +11,6 @@ import com.core.matrix.service.MeansurementFileDetailService;
 import com.core.matrix.utils.Constants;
 import com.core.matrix.utils.ThreadPoolDetail;
 import com.core.matrix.utils.ThreadPoolEmail;
-import com.core.matrix.utils.Utils;
-import java.io.File;
-import java.io.FileWriter;
 import java.text.MessageFormat;
 import java.util.List;
 import java.util.Optional;
@@ -60,7 +57,7 @@ public class PersistDetailsJob implements Runnable {
         try {
 
             long start = System.currentTimeMillis();
-            detailService.saveAllBatch(details,processInstanceId);
+            detailService.saveAllBatch(details, processInstanceId);
             Logger.getLogger(this.getClass().getName()).log(Level.INFO, MessageFormat.format("[Salvando registros] -> tempo : {0} min", (System.currentTimeMillis() - start) / 60000D));
 
             Optional opt = Optional.ofNullable(this.runtimeService.createProcessInstanceQuery().processDefinitionId(processInstanceId).singleResult());
@@ -71,20 +68,11 @@ public class PersistDetailsJob implements Runnable {
             }
 
         } catch (Exception e) {
-            this.writeFile();
-            
             Logger.getLogger(PersistDetailsJob.class.getName()).log(Level.SEVERE, "Não foi possivel salvar os dados no banco de dados processInstanceId -> " + processInstanceId, e);
-            
-            // TODO Enviar email avisando 
         } finally {
             ThreadPoolDetail.finalize(processInstanceId);
         }
 
     }
 
-    
-    private void writeFile(){
-        
-    }
-    
 }
