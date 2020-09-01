@@ -502,8 +502,14 @@ public class RuntimeActivitiService {
                     .stream()
                     .map(g -> String.valueOf(g.getGroupId()))
                     .collect(Collectors.toList());
+            
+            boolean isAdm = groups.stream().anyMatch((profile)-> profile.equalsIgnoreCase("profile-administrador"));
 
-            query = query.taskCandidateGroupIn(groups);
+            if(!isAdm){
+                query = query.taskCandidateGroupIn(groups);
+            }
+            
+            
 
         }
 

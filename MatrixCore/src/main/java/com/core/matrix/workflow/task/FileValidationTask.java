@@ -93,8 +93,8 @@ public class FileValidationTask extends Task {
     public FileValidationTask(ApplicationContext context) {
         FileValidationTask.context = context;
     }
-    
-    public static void setContext(ApplicationContext context){
+
+    public static void setContext(ApplicationContext context) {
         FileValidationTask.context = context;
     }
 
@@ -204,24 +204,28 @@ public class FileValidationTask extends Task {
 
     private void alterStatusPoint() {
 
-        this.getPointsRead().forEach(point -> {
+        try {
+            this.getPointsRead().forEach(point -> {
 
-            try {
-                Optional<MeansurementPointStatus> opt = this.pointStatusService.getPoint(point);
+                try {
+                    Optional<MeansurementPointStatus> opt = this.pointStatusService.getPoint(point);
 
-                if (opt.isPresent()) {
-                    MeansurementPointStatus pointStatus = opt.get();
-                    pointStatus.setStatus(PointStatus.PENDING);
-                    MeansurementFile file = this.getFileByPoint(point);
-                    pointStatus.setCompany(file.getNickname());
-                    pointStatus.forceUpdate();
+                    if (opt.isPresent()) {
+                        MeansurementPointStatus pointStatus = opt.get();
+                        pointStatus.setStatus(PointStatus.PENDING);
+                        MeansurementFile file = this.getFileByPoint(point);
+                        pointStatus.setCompany(file.getNickname());
+                        pointStatus.forceUpdate();
+                    }
+
+                } catch (Exception e) {
+                    Logger.getLogger(this.getClass().getName()).log(Level.SEVERE, "Não foi possivel atualizar o ponto -> " + point, e);
                 }
 
-            } catch (Exception e) {
-                Logger.getLogger(this.getClass().getName()).log(Level.SEVERE, "Não foi possivel atualizar o ponto -> " + point, e);
-            }
-
-        });
+            });
+        } catch (Exception e) {
+            Logger.getLogger(this.getClass().getName()).log(Level.SEVERE, "Não foi possivel alterar status dos pontos referente ao processo -> " + delegateExecution.getProcessInstanceId() , e);
+        }
 
     }
 
