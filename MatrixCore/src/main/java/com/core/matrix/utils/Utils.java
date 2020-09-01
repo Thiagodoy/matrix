@@ -117,7 +117,7 @@ public class Utils {
         entitiesHtml.put("ç", "&#231;");
         entitiesHtml.put("Ç", "&#199;");
 
-        dateTimeFormatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
+        dateTimeFormatter = DateTimeFormatter.ofPattern("yyyy-MM-dd hh:mm:ss");
         formmatDate = new SimpleDateFormat("yyyy-MM-dd hh:mm:ss");
 
     }
@@ -332,7 +332,7 @@ public class Utils {
     
     
     public static String localDateTimeToMsqlString(LocalDateTime time ){
-        return "'" + time.format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss")) + "'";
+        return "'" + time.format(dateTimeFormatter) + "'";
     }
     
 }
