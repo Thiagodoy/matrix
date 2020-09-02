@@ -26,9 +26,11 @@ import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 import javax.sql.DataSource;
 
 import org.activiti.engine.RuntimeService;
@@ -94,6 +96,24 @@ public class MeansurementFileDetailService {
     public List<MeansurementFileDetail> getDetails(Long id) {
         return this.repository.findByIdMeansurementFile(id);
     }
+    
+    
+    public void hasDetailsToDelete(Long id) throws SQLException{
+        Long count = this.repository.count(id);
+        
+        Logger.getLogger(this.getClass().getName()).log(Level.INFO, "hasDetailsToDelete");
+        if(count.compareTo(0L) > 0){
+            Logger.getLogger(this.getClass().getName()).log(Level.INFO, "Deletando detalhes do arquivo " + id + " qtd: " + count);
+            
+            Connection connection = getConnection();            
+            Statement createStatement = connection.createStatement();            
+            createStatement.execute("delete from mtx_arquivo_de_medicao_detalhe where id_arquivo_de_medicao = " + id);
+            connection.commit();         
+            
+        }
+    }
+    
+    
 
     public void saveAllBatch(List<MeansurementFileDetail> detail, String process) {
 
@@ -101,8 +121,14 @@ public class MeansurementFileDetailService {
 
             int limit = 3000;
 
-            long init = sequenceService.getValue("mtx_arquivo_de_medicao_detalhe", detail.size());
-
+            long init = sequenceService.getValue("mtx_arquivo_de_medicao_detalhe", detail.size());           
+            
+            Optional<MeansurementFileDetail>opt = detail.stream().findFirst();
+            
+            if(opt.isPresent()){
+                this.hasDetailsToDelete(opt.get().getIdMeansurementFile());
+            }
+            
             for (int i = 0; i < detail.size(); i++) {
                 detail.get(i).setId(init++);
             }

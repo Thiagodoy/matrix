@@ -18,7 +18,6 @@ import com.core.matrix.model.MeansurementPointMtx;
 import com.core.matrix.model.MeansurementPointStatus;
 import com.core.matrix.service.ContractMtxStatusService;
 import com.core.matrix.service.LogService;
-import com.core.matrix.service.MeansurementFileDetailService;
 import com.core.matrix.service.MeansurementFileService;
 import com.core.matrix.service.MeansurementPointMtxService;
 import com.core.matrix.service.MeansurementPointStatusService;
@@ -65,8 +64,7 @@ public class FileValidationTask extends Task {
     private static ApplicationContext context;
 
     private TaskService taskService;
-    private MeansurementFileService service;
-    private MeansurementFileDetailService detailService;
+    private MeansurementFileService service;    
     private DelegateExecution delegateExecution;
     private LogService logService;
     private MeansurementPointMtxService meansurementPointMtxService;
@@ -80,8 +78,7 @@ public class FileValidationTask extends Task {
 
         synchronized (FileValidationTask.context) {
             this.taskService = FileValidationTask.context.getBean(TaskService.class);
-            this.service = FileValidationTask.context.getBean(MeansurementFileService.class);
-            this.detailService = FileValidationTask.context.getBean(MeansurementFileDetailService.class);
+            this.service = FileValidationTask.context.getBean(MeansurementFileService.class);            
             this.logService = FileValidationTask.context.getBean(LogService.class);
             this.meansurementPointMtxService = FileValidationTask.context.getBean(MeansurementPointMtxService.class);
             this.pointStatusService = FileValidationTask.context.getBean(MeansurementPointStatusService.class);

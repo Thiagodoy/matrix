@@ -10,6 +10,8 @@ import com.core.matrix.utils.MeansurementFileDetailStatus;
 import java.util.List;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Modifying;
+import org.springframework.data.jpa.repository.Query;
+import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
 /**
@@ -28,6 +30,9 @@ public interface MeansurementFileDetailRepository extends JpaRepository<Meansure
     
     @Modifying
     void deleteByIdMeansurementFileIn(List<Long> ids);
+    
+    @Query(nativeQuery = true, value = "select count(1) from mtx_arquivo_de_medicao_detalhe where id_arquivo_de_medicao = :id ")
+    Long count(@Param("id")Long id);
     
     
     
