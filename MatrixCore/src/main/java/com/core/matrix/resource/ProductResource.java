@@ -57,7 +57,7 @@ public class ProductResource extends Resource<Product, ProductService> {
             List<SubMarketDTO> response = this.getService().getAllSubMarkets();
             return ResponseEntity.ok(response);
         } catch (Exception e) {
-            Logger.getLogger(ProductResource.class.getName()).log(Level.SEVERE, "[get]", e);
+            Logger.getLogger(ProductResource.class.getName()).log(Level.SEVERE, "[getAllSubMarkets]", e);
             return ResponseEntity.status(HttpStatus.resolve(500)).body(e.getMessage());
         }
     }

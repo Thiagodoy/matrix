@@ -108,5 +108,7 @@ public class MeansurementPointMtx implements Model<MeansurementPointMtx>, Serial
     public void generateDate() {
         this.createAt = LocalDateTime.now();
     }
+    
+    
 
 }

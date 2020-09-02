@@ -10,7 +10,6 @@ import com.core.matrix.service.CompanyAfterSalesService;
 import java.text.MessageFormat;
 import java.util.Arrays;
 import java.util.List;
-import org.hibernate.exception.ConstraintViolationException;
 import org.jboss.logging.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;

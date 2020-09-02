@@ -194,6 +194,8 @@ public class ActivitiCoreConfiguration implements EnvironmentAware {
         return this.processEngine().getHistoryService();
     }
 
+    
+    
     @PostConstruct
     private void configureContext() {
         FileValidationTask.setContext(context);

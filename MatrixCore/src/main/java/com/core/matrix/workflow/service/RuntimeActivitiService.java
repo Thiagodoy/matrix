@@ -20,6 +20,7 @@ import com.core.matrix.response.ProcessDetailResponse;
 import com.core.matrix.response.ProcessInstanceStatusResponse;
 import com.core.matrix.response.TaskResponse;
 import com.core.matrix.utils.Constants;
+import static com.core.matrix.utils.Constants.PROCESS_ASSOCIATE_USER_AFTER_SALES;
 import static com.core.matrix.utils.Constants.PROCESS_BILLING_CONTRACT_MESSAGE_EVENT;
 import static com.core.matrix.utils.Constants.PROCESS_INFORMATION_CNPJ;
 import static com.core.matrix.utils.Constants.PROCESS_INFORMATION_CONTRACT_NUMBERS;
@@ -294,6 +295,13 @@ public class RuntimeActivitiService {
             userId = null;
         }
 
+        
+        Task task = taskService.createTaskQuery().includeProcessVariables().taskId(taskId).singleResult();
+        
+        if(Optional.ofNullable(task).isPresent() && task.getProcessVariables().containsKey(PROCESS_ASSOCIATE_USER_AFTER_SALES)){
+            taskService.setVariable(taskId, PROCESS_ASSOCIATE_USER_AFTER_SALES, userId);
+        }
+        
         try {
             taskService.claim(taskId, userId);
         } catch (ActivitiTaskAlreadyClaimedException e) {
