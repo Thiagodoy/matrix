@@ -8,12 +8,14 @@ package com.core.matrix.validator;
 import com.core.matrix.dto.FileDetailDTO;
 import com.core.matrix.utils.MeansurementFileType;
 import java.text.MessageFormat;
+import java.time.YearMonth;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import lombok.Data;
+import org.joda.time.LocalDate;
 
 /**
  *
@@ -141,8 +143,7 @@ public class Validator {
         }
     }
     
-    public synchronized static boolean validateContentIfContains(List<FileDetailDTO>details){       
-        
+    public synchronized static boolean hasL(List<FileDetailDTO>details){       
          return details.stream().anyMatch(d-> d.getMeansurementPoint().contains("(L)"));    
     }
 
