@@ -71,7 +71,7 @@ public class ProcessFilesInLoteStatusDTO extends Observable implements Serializa
         this.clearChanged();
     }
 
-    public void pointChecked(List<InformationDTO> informations, HeaderDTO header, String type) {
+    public void check(List<InformationDTO> informations, HeaderDTO header, String type) {
 
         if (this.isFinished) {
             return;

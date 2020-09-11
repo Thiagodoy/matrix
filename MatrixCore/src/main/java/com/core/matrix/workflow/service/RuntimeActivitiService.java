@@ -525,6 +525,8 @@ public class RuntimeActivitiService {
             query = query.taskPriority(priority);
         }       
 
+        
+                
         long total = query.count();
 
         List<TaskResponse> response = query

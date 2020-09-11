@@ -86,6 +86,7 @@ public class DeleteProcessInstanceTask implements JavaDelegate {
     public void execute(DelegateExecution execution) throws Exception {
 
         final String processInstanceId = execution.getVariable(PROCESS_INSTANCE_ID, String.class);
+        this.contractId = null;
 
         try {
 
@@ -174,11 +175,8 @@ public class DeleteProcessInstanceTask implements JavaDelegate {
 
     }
 
-    private void setContract(List<ContractDTO> contractDTOs) {
-
-        if (!Optional.ofNullable(this.contractId).isPresent()) {
-            contractId = Long.valueOf(contractDTOs.stream().findFirst().get().getSNrContrato());
-        }
+    private void setContract(List<ContractDTO> contractDTOs) {        
+            contractId = Long.valueOf(contractDTOs.stream().findFirst().get().getSNrContrato());        
     }
 
 }

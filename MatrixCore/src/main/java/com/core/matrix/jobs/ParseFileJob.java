@@ -91,8 +91,8 @@ public class ParseFileJob implements Runnable {
                             .collect(Collectors.toSet());
 
                     lote.setPointsChecked(points);
-
-                    lote.pointChecked(informations, header, type);
+                    
+                    lote.check(informations, header, type);
 
                 });
 
